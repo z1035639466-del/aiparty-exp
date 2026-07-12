@@ -290,6 +290,17 @@ def read_usage_rows(path: Path = USAGE_PATH) -> list[dict[str, str]]:
         return list(csv.DictReader(handle))
 
 
+def successful_job_filenames(rows: Iterable[dict[str, str]]) -> set[str]:
+    """Return logical job names for successful attempts, including successful retries."""
+    successful: set[str] = set()
+    for row in rows:
+        if row.get("status") != "success":
+            continue
+        name = row.get("filename", "")
+        successful.add(re.sub(r"_r\d+(?=\.json$)", "", name))
+    return successful
+
+
 def summarize_usage(rows: Iterable[dict[str, str]]) -> UsageSummary:
     materialized = list(rows)
     prompt = sum(int(row.get("prompt_token") or 0) for row in materialized)
@@ -307,6 +318,12 @@ def classify_check_line(line: str) -> str:
     if "v18" in line or re.search(r"(?:dsT?_[A-D]_v18|ds_B_div_)", line):
         return "v18"
     return "other"
+
+
+def check_subprocess_environment(base: dict[str, str] | None = None) -> dict[str, str]:
+    environment = dict(os.environ if base is None else base)
+    environment["PYTHONIOENCODING"] = "utf-8"
+    return environment
 
 
 def validate_ds_files(paths: Iterable[Path]) -> bool:
@@ -333,6 +350,7 @@ def run_full_check(root: Path) -> int:
         text=True,
         encoding="utf-8",
         errors="replace",
+        env=check_subprocess_environment(),
         check=False,
     )
     groups = {"history_v11": [], "v18": [], "other": []}
@@ -418,7 +436,10 @@ def main(argv: list[str] | None = None) -> int:
     completed: list[Path] = []
     failures = 0
     try:
-        jobs = select_jobs(args.thinking)
+        completed_names = successful_job_filenames(existing_rows)
+        jobs = [job for job in select_jobs(args.thinking) if job.filename not in completed_names]
+        if completed_names:
+            print(f"恢复执行：跳过 {len(completed_names)} 个已成功文件。")
         for index, job in enumerate(jobs, start=1):
             print(f"[{index:02d}/{len(jobs):02d}] {job.filename}", flush=True)
             try:

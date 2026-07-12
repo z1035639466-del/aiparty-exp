@@ -1,5 +1,6 @@
 import csv
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -34,6 +35,13 @@ class PlanningTests(unittest.TestCase):
         self.assertEqual(8, len(run_ds.select_jobs("on")))
         self.assertTrue(all(job.thinking for job in run_ds.select_jobs("on")))
         self.assertEqual(36, len(run_ds.select_jobs("both")))
+
+    def test_successful_retry_maps_to_its_logical_filename_for_resume(self):
+        rows = [
+            {"filename": "dsT_A_v18_01_r1.json", "status": "success"},
+            {"filename": "ds_B_div_01.json", "status": "failed"},
+        ]
+        self.assertEqual({"dsT_A_v18_01.json"}, run_ds.successful_job_filenames(rows))
 
     def test_budget_gate_rejects_a_full_call_before_sending(self):
         with self.assertRaises(run_ds.BudgetExceeded):
@@ -136,6 +144,11 @@ class RequestAndRetryTests(unittest.TestCase):
 
 
 class ReportingTests(unittest.TestCase):
+    def test_check_subprocess_environment_forces_utf8_output(self):
+        environment = run_ds.check_subprocess_environment({"EXISTING": "value"})
+        self.assertEqual("value", environment["EXISTING"])
+        self.assertEqual("utf-8", environment["PYTHONIOENCODING"])
+
     def test_classify_check_line_separates_history_and_v18(self):
         self.assertEqual("history_v11", run_ds.classify_check_line("挂 fable_A_v11_01.json: bad"))
         self.assertEqual("v18", run_ds.classify_check_line("挂 haiku_D_v18_02.json: bad"))
