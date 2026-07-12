@@ -1,0 +1,16 @@
+{
+  "fable_A_v11_01.json": "历史产物：v1.1 输出，不计入当前冻结矩阵",
+  "fable_B_v11_01.json": "历史产物：v1.1 输出，不计入当前冻结矩阵",
+  "fable_C_v11_01.json": "历史产物：v1.1 输出，不计入当前冻结矩阵",
+  "haiku_D_v18_02.json": "失败原件：保留为重试证据，采用 haiku_D_v18_02_r1.json",
+  "ds_B_v18_02.json": "失败原件：无效 JSON，采用 ds_B_v18_02_r1.json",
+  "ds_B_div_01.json": "失败原件：无效 JSON，采用 ds_B_div_01_r1.json",
+  "ds_B_div_04.json": "失败原件：无效 JSON，采用 ds_B_div_04_r1.json",
+  "ds_B_div_12.json": "失败原件：无效 JSON，采用 ds_B_div_12_r1.json",
+  "ds_B_div_15.json": "失败原件：无效 JSON，采用 ds_B_div_15_r2.json",
+  "ds_B_div_15_r1.json": "失败重试原件：无效 JSON，采用 ds_B_div_15_r2.json",
+  "ds_B_div_16.json": "失败原件：无效 JSON，采用 ds_B_div_16_r2.json",
+  "ds_B_div_16_r1.json": "失败重试原件：无效 JSON，采用 ds_B_div_16_r2.json",
+  "ds_B_div_17.json": "失败原件：无效 JSON，采用 ds_B_div_17_r1.json",
+  "ds_B_div_18.json": "失败原件：无效 JSON，采用 ds_B_div_18_r1.json"
+}

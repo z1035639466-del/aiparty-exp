@@ -10,6 +10,7 @@ from typing import Any, Iterable
 ROOT = Path(__file__).resolve().parent
 OUTPUTS_DIR = ROOT / "outputs"
 WHITELIST_PATH = ROOT / "whitelist.json"
+EXCLUSIONS_PATH = ROOT / "check_exclusions.json"
 REQUIRED_FIELDS = (
     "game_title",
     "players",
@@ -28,6 +29,18 @@ def load_whitelist() -> dict[str, set[str]]:
     with WHITELIST_PATH.open("r", encoding="utf-8") as file:
         data = json.load(file)
     return {key: set(data[key]) for key in ("props", "mechanics", "visibility")}
+
+
+def load_exclusions(path: Path = EXCLUSIONS_PATH) -> dict[str, str]:
+    """读取冻结评测集排除清单；键为文件名，值为保留原因。"""
+    with path.open("r", encoding="utf-8") as file:
+        data = json.load(file)
+    if not isinstance(data, dict) or not all(
+        isinstance(name, str) and isinstance(reason, str) and reason.strip()
+        for name, reason in data.items()
+    ):
+        raise TypeError("排除清单必须是 {文件名: 非空原因} 对象")
+    return data
 
 
 def is_nonempty(value: Any) -> bool:
@@ -124,18 +137,25 @@ def check_file(path: Path, whitelist: dict[str, set[str]]) -> list[str]:
 def main() -> int:
     try:
         whitelist = load_whitelist()
+        exclusions = load_exclusions()
     except (OSError, KeyError, TypeError, json.JSONDecodeError) as error:
-        print(f"挂 whitelist.json: 无法读取白名单: {error}")
+        print(f"挂检查配置: 无法读取白名单或排除清单: {error}")
         return 1
 
-    files = sorted(OUTPUTS_DIR.glob("*.json")) if OUTPUTS_DIR.is_dir() else []
+    all_files = sorted(OUTPUTS_DIR.glob("*.json")) if OUTPUTS_DIR.is_dir() else []
+    files = [path for path in all_files if path.name not in exclusions]
+    for path in all_files:
+        if path.name in exclusions:
+            print(f"略 {path.name}: {exclusions[path.name]}")
+    failed = False
     for path in files:
         errors = check_file(path, whitelist)
         if errors:
+            failed = True
             print(f"挂 {path.name}: {'；'.join(errors)}")
         else:
             print(f"过 {path.name}: 检查通过")
-    return 1 if any(check_file(path, whitelist) for path in files) else 0
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":
