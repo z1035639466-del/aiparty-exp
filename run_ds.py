@@ -19,7 +19,7 @@ from typing import Any, Callable, Iterable
 
 ROOT = Path(__file__).resolve().parent
 OUTPUTS_DIR = ROOT / "outputs"
-SYSTEM_PATH = ROOT / "DM-skill-开局生成-v1.8.md"
+SYSTEM_PATH = ROOT / "DM-skill-开局生成-v2.0.md"
 INPUTS_DIR = ROOT / "inputs"
 USAGE_PATH = ROOT / "usage_log.csv"
 
@@ -96,12 +96,9 @@ def build_jobs() -> list[Job]:
     jobs: list[Job] = []
     for name in "ABCD":
         for sequence in range(1, 3):
-            jobs.append(Job(name, f"ds_{name}_v18_{sequence:02d}.json", False, ""))
-    for name in "ABCD":
-        for sequence in range(1, 3):
-            jobs.append(Job(name, f"dsT_{name}_v18_{sequence:02d}.json", True, "high"))
+            jobs.append(Job(name, f"dsT_{name}_v20_{sequence:02d}.json", True, "high"))
     for sequence in range(1, 21):
-        jobs.append(Job("B", f"ds_B_div_{sequence:02d}.json", False, ""))
+        jobs.append(Job("B", f"ds_B_div_v20_{sequence:02d}.json", False, ""))
     return jobs
 
 
@@ -315,8 +312,8 @@ def summarize_usage(rows: Iterable[dict[str, str]]) -> UsageSummary:
 def classify_check_line(line: str) -> str:
     if re.search(r"fable_[ABCD]_v11_01\.json", line):
         return "history_v11"
-    if "v18" in line or re.search(r"(?:dsT?_[A-D]_v18|ds_B_div_)", line):
-        return "v18"
+    if "v20" in line:
+        return "v20"
     return "other"
 
 
@@ -355,13 +352,13 @@ def run_full_check(root: Path) -> int:
         env=check_subprocess_environment(),
         check=False,
     )
-    groups = {"history_v11": [], "v18": [], "other": []}
+    groups = {"history_v11": [], "v20": [], "other": []}
     for line in result.stdout.splitlines():
         groups[classify_check_line(line)].append(line)
     print("\n=== v11 历史产物（不计入矩阵） ===")
     print("\n".join(groups["history_v11"]) or "无")
-    print("\n=== v18 矩阵及本次 DS 产物 ===")
-    print("\n".join(groups["v18"]) or "无")
+    print("\n=== v2.0 验证批及本次 DS 产物 ===")
+    print("\n".join(groups["v20"]) or "无")
     print("\n=== 其他版本 ===")
     print("\n".join(groups["other"]) or "无")
     if result.stderr:
@@ -383,9 +380,8 @@ def estimate_batches(
 def print_estimate(root: Path, max_tokens: int, budget: float, thinking_mode: str = "both") -> float:
     total, estimates = estimate_batches(root, max_tokens, thinking_mode)
     batches = [
-        ("ds_off 矩阵批", [item for item in estimates if item[0].filename.startswith("ds_") and "_div_" not in item[0].filename]),
-        ("ds_on 思考矩阵批", [item for item in estimates if item[0].filename.startswith("dsT_")]),
-        ("B 多样性批", [item for item in estimates if "_div_" in item[0].filename]),
+        ("dsT v2.0 思考主批", [item for item in estimates if item[0].filename.startswith("dsT_")]),
+        ("B v2.0 非思考多样性批", [item for item in estimates if "_div_" in item[0].filename]),
     ]
     print(f"模型: {MODEL}  max_tokens: {max_tokens}  硬顶: ${budget:.2f}")
     for label, items in batches:

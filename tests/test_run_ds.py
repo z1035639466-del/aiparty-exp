@@ -9,19 +9,16 @@ import run_ds
 
 
 class PlanningTests(unittest.TestCase):
-    def test_build_jobs_has_all_three_batches_and_exact_settings(self):
+    def test_build_jobs_has_frozen_v20_thinking_and_diversity_batches(self):
         jobs = run_ds.build_jobs()
-        self.assertEqual(36, len(jobs))
-        self.assertEqual("ds_A_v18_01.json", jobs[0].filename)
-        self.assertEqual("ds_D_v18_02.json", jobs[7].filename)
-        self.assertFalse(any(job.thinking for job in jobs[:8]))
-        self.assertEqual("dsT_A_v18_01.json", jobs[8].filename)
-        self.assertEqual("dsT_D_v18_02.json", jobs[15].filename)
-        self.assertTrue(all(job.thinking for job in jobs[8:16]))
-        self.assertTrue(all(job.reasoning_effort == "high" for job in jobs[8:16]))
-        self.assertEqual("ds_B_div_01.json", jobs[16].filename)
-        self.assertEqual("ds_B_div_20.json", jobs[-1].filename)
-        self.assertFalse(any(job.thinking for job in jobs[16:]))
+        self.assertEqual(28, len(jobs))
+        self.assertEqual("dsT_A_v20_01.json", jobs[0].filename)
+        self.assertEqual("dsT_D_v20_02.json", jobs[7].filename)
+        self.assertTrue(all(job.thinking for job in jobs[:8]))
+        self.assertTrue(all(job.reasoning_effort == "high" for job in jobs[:8]))
+        self.assertEqual("ds_B_div_v20_01.json", jobs[8].filename)
+        self.assertEqual("ds_B_div_v20_20.json", jobs[-1].filename)
+        self.assertFalse(any(job.thinking for job in jobs[8:]))
 
     def test_estimate_uses_utf8_upper_bound_and_full_maximum_output(self):
         estimate = run_ds.estimate_call_cost("中a", max_tokens=10)
@@ -30,18 +27,18 @@ class PlanningTests(unittest.TestCase):
         self.assertAlmostEqual(expected, estimate)
 
     def test_thinking_cli_filters_batches_but_diversity_remains_off(self):
-        self.assertEqual(28, len(run_ds.select_jobs("off")))
+        self.assertEqual(20, len(run_ds.select_jobs("off")))
         self.assertFalse(any(job.thinking for job in run_ds.select_jobs("off")))
         self.assertEqual(8, len(run_ds.select_jobs("on")))
         self.assertTrue(all(job.thinking for job in run_ds.select_jobs("on")))
-        self.assertEqual(36, len(run_ds.select_jobs("both")))
+        self.assertEqual(28, len(run_ds.select_jobs("both")))
 
     def test_successful_retry_maps_to_its_logical_filename_for_resume(self):
         rows = [
-            {"filename": "dsT_A_v18_01_r1.json", "status": "success"},
-            {"filename": "ds_B_div_01.json", "status": "failed"},
+            {"filename": "dsT_A_v20_01_r1.json", "status": "success"},
+            {"filename": "ds_B_div_v20_01.json", "status": "failed"},
         ]
-        self.assertEqual({"dsT_A_v18_01.json"}, run_ds.successful_job_filenames(rows))
+        self.assertEqual({"dsT_A_v20_01.json"}, run_ds.successful_job_filenames(rows))
 
     def test_budget_gate_rejects_a_full_call_before_sending(self):
         with self.assertRaises(run_ds.BudgetExceeded):
@@ -54,8 +51,9 @@ class RequestAndRetryTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         (self.root / "outputs").mkdir()
         (self.root / "inputs").mkdir()
-        (self.root / "DM-skill-开局生成-v1.8.md").write_text("SYSTEM", encoding="utf-8")
+        (self.root / "DM-skill-开局生成-v2.0.md").write_text("SYSTEM", encoding="utf-8")
         (self.root / "inputs" / "input_A.json").write_text('{"input":"A"}', encoding="utf-8")
+        (self.root / "inputs" / "input_B.json").write_text('{"input":"B"}', encoding="utf-8")
 
     def tearDown(self):
         self.temp.cleanup()
@@ -95,7 +93,7 @@ class RequestAndRetryTests(unittest.TestCase):
             payloads.append(payload)
             return next(replies)
 
-        job = run_ds.Job("A", "ds_A_v18_01.json", False, "")
+        job = run_ds.Job("B", "ds_B_div_v20_01.json", False, "")
         result = run_ds.run_job(
             job,
             root=self.root,
@@ -105,8 +103,8 @@ class RequestAndRetryTests(unittest.TestCase):
             budget=5.0,
             spent=0.0,
         )
-        self.assertEqual("ds_A_v18_01_r1.json", result.output_path.name)
-        self.assertEqual("not json", (self.root / "outputs" / "ds_A_v18_01.json").read_text(encoding="utf-8"))
+        self.assertEqual("ds_B_div_v20_01_r1.json", result.output_path.name)
+        self.assertEqual("not json", (self.root / "outputs" / "ds_B_div_v20_01.json").read_text(encoding="utf-8"))
         self.assertEqual({"ok": True}, json.loads(result.output_path.read_text(encoding="utf-8")))
         self.assertEqual(2, len(payloads))
 
@@ -125,7 +123,7 @@ class RequestAndRetryTests(unittest.TestCase):
         def transport(_key, _payload):
             return self.response("bad")
 
-        job = run_ds.Job("A", "ds_A_v18_01.json", False, "")
+        job = run_ds.Job("A", "dsT_A_v20_01.json", True, "high")
         with self.assertRaises(run_ds.JobFailed):
             run_ds.run_job(
                 job,
@@ -138,7 +136,7 @@ class RequestAndRetryTests(unittest.TestCase):
             )
         names = sorted(path.name for path in (self.root / "outputs").glob("*.json"))
         self.assertEqual(
-            ["ds_A_v18_01.json", "ds_A_v18_01_r1.json", "ds_A_v18_01_r2.json", "ds_A_v18_01_r3.json"],
+            ["dsT_A_v20_01.json", "dsT_A_v20_01_r1.json", "dsT_A_v20_01_r2.json", "dsT_A_v20_01_r3.json"],
             names,
         )
 
@@ -149,9 +147,9 @@ class ReportingTests(unittest.TestCase):
         self.assertEqual("value", environment["EXISTING"])
         self.assertEqual("utf-8", environment["PYTHONIOENCODING"])
 
-    def test_classify_check_line_separates_history_and_v18(self):
+    def test_classify_check_line_separates_history_and_v20(self):
         self.assertEqual("history_v11", run_ds.classify_check_line("挂 fable_A_v11_01.json: bad"))
-        self.assertEqual("v18", run_ds.classify_check_line("挂 haiku_D_v18_02.json: bad"))
+        self.assertEqual("v20", run_ds.classify_check_line("挂 haiku_D_v20_02.json: bad"))
         self.assertEqual("other", run_ds.classify_check_line("过 fable_A_v16_01.json: 检查通过"))
 
     def test_usage_summary_totals_tokens_cost_and_average_latency(self):
