@@ -36,8 +36,8 @@
         "raising": true,
         "raise_cap": 15,
         "on_cap": "force_challenge",
-        "on_liar": { "scoring_ref": ["开盅判输", "开盅判赢"] },
-        "on_false_accuse": { "scoring_ref": ["开盅判输", "开盅判赢"] }
+        "on_liar": { "scoring_ref": ["开盅判输"] },
+        "on_false_accuse": { "scoring_ref": ["开盅判输"] }
       }
     },
     {
@@ -50,7 +50,7 @@
         "question": "有人喊出上限'15 个 6'：全场自动开盅摊牌，点数 6 的骰子合计是否达到 15 个？",
         "expr": "count(全场开盅骰子, 点数==6) >= 15",
         "on": {
-          "过": { "scoring_ref": ["开盅判赢", "开盅判输"] },
+          "过": { "scoring_ref": ["开盅判输"] },
           "不过": { "scoring_ref": ["开盅判输"] }
         }
       }
@@ -58,12 +58,12 @@
     {
       "flavor_name": "票房分账",
       "mechanic": "加减分",
-      "plain_rule": "每次开盅结算：判输的每人 -1 分，判赢的每人 +1 分。普通'炸场'是叫价者与质疑者一对一结算；'爆音保险丝'的自动摊牌按喊顶者对全场其余人结算。",
+      "plain_rule": "每次开盅结算：判输的每人 -1 分。普通'炸场'是叫价者与质疑者一对一结算；'爆音保险丝'的自动摊牌按喊顶者对全场其余人结算。",
       "visibility": "全场公开",
       "params": {
         "who": "loser",
         "delta": "-1",
-        "scoring_ref": ["开盅判输", "开盅判赢"]
+        "scoring_ref": ["开盅判输"]
       }
     },
     {
@@ -114,7 +114,6 @@
   ],
   "settlement": {
     "scoring": [
-      { "event": "开盅判赢", "who": "该次开盅结算中判赢的每人", "effect": "+1" },
       { "event": "开盅判输", "who": "该次开盅结算中判输的每人", "effect": "-1" },
       { "event": "假唱处刑", "who": "该次开盅判输者", "effect": "惩罚(中)" },
       { "event": "猜中主唱", "who": "终场一指猜中主唱者（每人）", "effect": "+2" },
