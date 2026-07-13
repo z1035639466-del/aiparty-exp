@@ -1,0 +1,66 @@
+```json
+{
+  "game_title": "对齐颗粒度 · 瓜田攻防战",
+  "subtitle": "为公司团建包间定制 · 5人快节奏",
+  "premise": "每人一张秘密任务卡，完成自己的瓜/梗任务赚分。全场随时有人刷短视频挑战搞事。谁先攒够3分谁赢——但小心，你的任务可能被别人的任务打断。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "每人一张秘密任务卡，任务类型：①用黑话套别人话('对齐你的颗粒度') ②完成短视频挑战动作 ③编一个瓜让别人信 ④拉人做健身动作" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "用于判定任务是否成功：提交后同时揭晓，满足条件即判定成功" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每人每回合限时90秒执行任务" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "实时显示每人得分，先到3分触发终局" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 每人领一张密语卡(秘密任务)，沙漏开始倒计时",
+    "回合制: 90秒内，当前回合玩家尝试完成自己的秘密任务。任务类型分四类，由密语卡指定",
+    "任务执行中: 其他玩家可在任意时刻(不打断当前回合)使用自己的密语卡内容——但每张密语卡整局限用一次",
+    "任务判定: 当前回合玩家完成任务后，全场匿名投票确认是否有效。判定结果立即加减分",
+    "重复至有人得3分 → 终局结算"
+  ],
+  "rules": [
+    { "flavor_name": "闭环汇报", "mechanic": "同时提交", "plain_rule": "回合结束时，全场用匿名投票器提交'该玩家任务是否成功'。选项只有'成功'和'不成功'。所有人提交后一起揭晓，多数决。", "visibility": "自己看",
+      "params": { "prompt": "当前玩家任务是否成功？", "input_kind": "options", "options": ["成功", "不成功"], "timeout_s": 15, "reveal": "simultaneous", "scoring_ref": ["任务成功", "任务失败"] } },
+    { "flavor_name": "颗粒度对齐", "mechanic": "判定", "plain_rule": "当有人用黑话任务(如'对齐颗粒度'、'拉通闭环')去套别人话时，由系统按规则判定是否成功：只要被套话的人回应了任何话(包括'不懂')，就算成功。", "visibility": "全场公开",
+      "params": { "source": "expr", "question": "被套话者是否开口回应？", "expr": "被套话者发言 != ''", "on": { "过": { "scoring_ref": "黑话成功" }, "不过": { "scoring_ref": "黑话失败" } } } },
+    { "flavor_name": "抖音十秒", "mechanic": "惩罚(轻)", "plain_rule": "短视频挑战任务失败的玩家，当场做一个随机短视频动作(如'比个心'、'假装滑倒')，由全场评判是否够'火'。不够火的话再来一次。", "visibility": "全场公开",
+      "params": { "who": "actor", "pool": "$gen.penalty_内容池", "scoring_ref": "挑战失败" } },
+    { "flavor_name": "瓜田雷达", "mechanic": "加减分", "plain_rule": "如果有人成功编了一个假瓜(八卦)让至少一个人信了，编瓜者立即得1分。", "visibility": "全场公开",
+      "params": { "who": "actor", "delta": "+1", "scoring_ref": "假瓜成功" } },
+    { "flavor_name": "铁馆拉练", "mechanic": "转移", "plain_rule": "Tony的健身任务：拉一个人一起做3个深蹲。如果被拉的人做了，Tony得1分，被拉的人扣1分。如果被拉的人拒绝，Tony扣1分，被拉的人得1分。", "visibility": "全场公开",
+      "params": { "what": "score", "from": "actor", "to": "chosen", "scoring_ref": ["健身成功", "健身拒绝"] } },
+    { "flavor_name": "i人e人对决", "mechanic": "声明质疑", "plain_rule": "任何人可以当众声称某人'你这是i人行为'或'e人行为'。被声称的人可以反驳('我不是')，反驳即触发全场投票：多数支持声称者则被贴标签者扣1分，否则声称者扣1分。整局限用3次。", "visibility": "全场公开",
+      "params": { "claim_prompt": "声称某人属于某种人格标签", "challengers": "others", "challenge_window_s": 30, "verify_source": "judge", "verify_reveals": "prop_state", "on_liar": { "scoring_ref": "标签错误" }, "on_false_accuse": { "scoring_ref": "标签正确" } } },
+    { "flavor_name": "90秒闭环", "mechanic": "限时", "plain_rule": "每人每回合只有90秒执行自己的任务。沙漏流完必须停止动作、进入投票判定。", "visibility": "全场公开",
+      "params": { "seconds": 90, "visible_countdown": true, "on_timeout": { "effect": "scoring", "scoring_ref": "超时未完成" } } },
+    { "flavor_name": "全员对齐", "mechanic": "回合推进", "plain_rule": "按座位顺时针轮流当回合主角。一轮五人全部过完才进下一轮。", "visibility": "全场公开",
+      "params": { "order": "round_robin" } }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "任务成功", "who": "actor", "effect": "+1" },
+      { "event": "任务失败", "who": "actor", "effect": "-1" },
+      { "event": "黑话成功", "who": "actor", "effect": "+1" },
+      { "event": "黑话失败", "who": "actor", "effect": "-1" },
+      { "event": "挑战失败", "who": "actor", "effect": "-1" },
+      { "event": "假瓜成功", "who": "actor", "effect": "+1" },
+      { "event": "健身成功", "who": "actor", "effect": "+1" },
+      { "event": "健身拒绝", "who": "actor", "effect": "-1" },
+      { "event": "标签正确", "who": "actor", "effect": "+1" },
+      { "event": "标签错误", "who": "actor", "effect": "-1" },
+      { "event": "超时未完成", "who": "actor", "effect": "-1" }
+    ],
+    "win": "第一个积分达到3分的玩家获胜",
+    "tiebreak": "系统随机裁决（风味名：老板拍板）"
+  },
+  "reveal_text": "会议纪要写着'对齐颗粒度'，但今晚的颗粒度是：谁的瓜最野、谁的梗最冷、谁的深蹲最标准。散场时老周还在问：'这个闭环……算拉通了吗？'",
+  "reveal_signature": "融合自 阿凯 的「MBTI」× 琳琳 的「短视频挑战」× 老周 的「开会黑话」× 小雨 的「爱吃瓜」× Tony 的「健身狂魔」",
+  "flavor_glossary": [
+    { "term": "对齐颗粒度", "means": "职场黑话，意思是让信息/目标在细节层面保持一致。这里借指用黑话套路别人的任务。" },
+    { "term": "闭环", "means": "职场黑话，指一件事从开始到完成有完整流程。这里借指回合结束。" },
+    { "term": "i人/e人", "means": "MBTI人格分类，i=内向，e=外向。这里用作互相贴标签的游戏机制。" },
+    { "term": "瓜", "means": "网络用语，指八卦、爆料。这里指编造有趣的假新闻." }
+  ],
+  "safety_note": "黄暴档20/100(低): 无任何性化、暴力、真人诽谤内容。惩罚只到随机短视频动作(比心/假装滑倒)，无羞辱性内容。所有指向个人的标签/瓜都可以用'跳过'拒绝，代价仅为不得分。职场语境已避开点名贴身指令，全部为公开任务+匿名投票。"
+}
+```
