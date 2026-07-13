@@ -1,7 +1,9 @@
-# fable_A_v18_r1 → fable_A_v20_m1 迁移逐键审核清单（AI 试译稿 · 待人工审）
+# fable_A_v18_r1 → fable_A_v20_m1 迁移逐键审核清单（AI 试译草稿 · 待人工审）
 
-> 状态：**迁移流程第 2 步（人工逐键审）待办**。试译稿 `outputs/fable_A_v20_m1.json` 已过 check.py v2.0 硬闸；
-> 裁判 v0.3 闸与登册（inputs/README）待人工审 + 裁判后进行。原件 `outputs/fable_A_v18_r1.json` 原地留档未动。
+> 状态：**迁移流程第 2 步（人工逐键审）待办**。试译草稿件 `outputs/fable_A_v20_m1.draft.json`（`.draft`＝未定稿）。
+> 本轮按迁移单只产**草稿 + 迁移对照表**交人工逐键审：**不定稿、不跑闸（check.py v2.0）、不送裁判（v0.3）**。
+> 定稿名 `fable_A_v20_m1.json` 按 §3 须留待人工审 + check.py v2.0 + 裁判 v0.3 双闸通过后方可启用（本轮不占用该名）。
+> 原件 `outputs/fable_A_v18_r1.json` 原地留档未动。
 > 来源行 = 原件 `fable_A_v18_r1.json` 的行号。**散文一字不动**已由 diff 保证：本次只新增 `props_required`、
 > 每条 rule 的 `params`、顶层 `settlement` 三处，其余字节级原样。
 
@@ -93,10 +95,12 @@
 | `win` | 记分板总分最高者夺冠 | **21** | "终局: 记分板总分最高者夺冠"（原句截取，一字不动） | ☐ |
 | `tiebreak` | 任何投票、比分、指认出现平局或并列，默认由系统随机裁决（风味名'命运一掷'），本局全程适用此约定 | **21**（风味注 76） | 原句截取，一字不动 | ☐ |
 
-## 9. check.py v2.0 实测件头（预期软闸，供裁判 v0.3 读取）
+## 9. check.py v2.0 预期件头（结构照 MECHANIC_SPEC 手核推定 · 本轮遵「不跑闸」未实跑，供人工审与裁判 v0.3 参考）
 
-- 硬闸：**过**（0 error）。
-- 软闸 5 条，均有解释、非失真：
+- 硬闸：预期**过**（0 error）——每条 params 已逐键对照 check.py 的 `MECHANIC_SPEC`
+  手核（allowed/required/enum/fixed 键、scoring_ref 落点、惩罚档位一致性、win 有源、prop_ref 落库）；
+  本轮按迁移单「不跑闸」未实跑 check.py，最终硬闸判定留待人工审后与裁判 v0.3 同步进行。
+- 预期软闸 5 条，均有解释、非失真：
   - `prose_param_mismatch:rules[1].challenge_window_s=10` —— 10 秒驮在行 17/51，跨条参数（见 §1）。
   - `dead_prop:身份牌 / 匿名投票器 / 沙漏 / 记分板 / 公共看板` —— 这五件的行为是道具内置操作或流程/结算侧
     （终局翻牌、同揭、倒计时皮、计分展示），13 机制 params 无对应引用槽；唯一有判源槽位的引用是
