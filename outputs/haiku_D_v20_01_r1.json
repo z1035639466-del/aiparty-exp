@@ -1,0 +1,148 @@
+{
+  "game_title": "秘密信使",
+  "subtitle": "阿哲家的纸条游戏 · 4人",
+  "premise": "每人一个秘密，逐轮传递变歪，最后一起猜原文。考验默契、记忆与传达。",
+  "players": ["阿哲", "毛毛", "西西", "老练"],
+  "props_dealt": [
+    {
+      "prop": "密语卡",
+      "to": "全体",
+      "visibility": "自己看",
+      "note": "初始秘密。每人一张，只有自己看得到。"
+    },
+    {
+      "prop": "沙漏",
+      "to": "公共区",
+      "visibility": "全场公开",
+      "note": "每轮传递限时。"
+    },
+    {
+      "prop": "匿名投票器",
+      "to": "全体",
+      "visibility": "自己看",
+      "note": "最后一轮同时提交猜测。"
+    },
+    {
+      "prop": "记分板",
+      "to": "公共区",
+      "visibility": "全场公开",
+      "note": "记录每人猜对几个秘密。"
+    }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局：每人拿一张密语卡(秘密)，只有自己看得到",
+    "第1-3轮传递：从左边邻座接收秘密，用一句话或手势告诉右边邻座",
+    "每轮投票前计时30秒，时间到进入下一轮",
+    "第3轮后：每人记住听到的最后一个版本",
+    "最后一轮：所有人同时提交'第一轮听到的原始是什么'",
+    "结算：逐个揭晓，猜对加分"
+  ],
+  "rules": [
+    {
+      "flavor_name": "秘密传递",
+      "mechanic": "传递链",
+      "plain_rule": "每轮从左邻座接收一个秘密，用一句话或一个手势传给右邻座。系统记录每个版本。",
+      "visibility": "自己看",
+      "params": {
+        "content_from": "密语卡",
+        "order": "seat",
+        "each_sees": "prev_only",
+        "replay": "first_vs_last"
+      }
+    },
+    {
+      "flavor_name": "传话时限",
+      "mechanic": "限时",
+      "plain_rule": "每轮传递只有30秒，时间到立即换人。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 30,
+        "visible_countdown": true,
+        "on_timeout": {
+          "effect": "goto",
+          "goto": "下一轮传递"
+        }
+      }
+    },
+    {
+      "flavor_name": "手势暗号",
+      "mechanic": "受限沟通",
+      "plain_rule": "传递时只能用一个手势或一句简短的话(不超过5个字)。完整复述违反精神。",
+      "visibility": "全场公开",
+      "params": {
+        "channel": "one_word",
+        "enforce": "channel_only"
+      }
+    },
+    {
+      "flavor_name": "最后猜测",
+      "mechanic": "同时提交",
+      "plain_rule": "第3轮后，每人同时提交：'第1轮最初的秘密是什么'？不允许边听边改。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "第1轮的原始秘密是什么？",
+        "input_kind": "free_text",
+        "timeout_s": 20,
+        "reveal": "simultaneous",
+        "scoring_ref": ["猜对秘密", "猜错秘密"]
+      }
+    },
+    {
+      "flavor_name": "核对真相",
+      "mechanic": "判定",
+      "plain_rule": "系统逐个对比提交和原始秘密。完全一致或意思相同算猜对；有歪曲或遗漏算猜错。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "ai",
+        "question": "提交内容是否准确对应原始秘密？",
+        "ai_overridable": true,
+        "on": {
+          "过": {
+            "scoring_ref": ["猜对秘密"]
+          },
+          "不过": {
+            "scoring_ref": ["猜错秘密"]
+          }
+        }
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      {
+        "event": "猜对秘密",
+        "who": "actor",
+        "effect": "+1"
+      },
+      {
+        "event": "猜错秘密",
+        "who": "actor",
+        "effect": "0"
+      }
+    ],
+    "win": "终局时总分最高者胜",
+    "tiebreak": "系统随机裁决(风味名: 命运一掷)"
+  },
+  "reveal_text": "传到最后，秘密已经面目全非。但那一刻，大家一起笑出来的，不是传错了什么，而是'原来你听到的是这个'。",
+  "reveal_signature": "融合自 老练 的「传纸条」 × 阿哲 的「手势暗号」 × 西西 的「眼神默契」 × 毛毛 的「烧脑解谜」",
+  "flavor_glossary": [
+    {
+      "term": "手势暗号",
+      "means": "阿哲宿舍的私密通信方式，这里成为传递秘密的唯一渠道。"
+    },
+    {
+      "term": "传纸条",
+      "means": "老练高中的绝技——这次的'纸条'是一个口头秘密，考验的是记忆与表达。"
+    },
+    {
+      "term": "眼神默契",
+      "means": "西西和毛毛的默契，投射到全场——你能听懂别人歪掉的表达吗？"
+    },
+    {
+      "term": "烧脑解谜",
+      "means": "毛毛爱玩的密室逻辑，这里变成'从碎片还原全貌'的终局谜题。"
+    }
+  ],
+  "safety_note": "黄暴档 15/100(极低): 无惩罚、无点名、无身体接触。纯脑力默契游戏，完全友好。"
+}
