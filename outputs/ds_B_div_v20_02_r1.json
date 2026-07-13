@@ -1,0 +1,145 @@
+```json
+{
+  "game_title": "对齐颗粒度 · 八卦挑战赛",
+  "subtitle": "公司团建包间特供 · 5人速局",
+  "premise": "每人一张秘密身份牌，是「i人」或「e人」。通过限时挑战、匿名投票和八卦猜人来赚分和惩罚。最后总分最高者胜，但身份猜错会扣大分！",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "自己看", "note": "每人一张，写有「i人」或「e人」。只有自己知道。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "用于猜人、挑战投票等匿名环节。" },
+    { "prop": "盲盒", "to": "公共区", "visibility": "全场公开", "note": "内含5个后果球，用于挑战失败时随机触发。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "限时挑战用。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 每人发身份牌，宣布规则和背景：'今天对齐颗粒度，顺便吃瓜健身'",
+    "每轮: 随机抽一人发起挑战(来自挑战池)，限时完成 → 判定通过/失败 → 结算分数和惩罚",
+    "每两轮插入一次'八卦竞猜'：匿名投票猜一个人的真实身份(从已公开行为推断)",
+    "终局: 结算总分，公布所有人身份，验证猜对/错，补扣/加分",
+    "平局: 系统随机裁决(风味名：命运哑铃)"
+  ],
+  "rules": [
+    {
+      "flavor_name": "闭环挑战",
+      "mechanic": "判定",
+      "plain_rule": "从挑战池抽一个任务(如'30秒内做5个俯卧撑'或'用三个词描述一个同事')，你必须在沙漏漏完前完成，然后全场投票判定你算不算完成。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "expr",
+        "expr": "全场投票通过数 >= 3",
+        "on": {
+          "过": { "scoring_ref": "挑战成功" },
+          "不过": { "scoring_ref": "挑战失败" }
+        }
+      }
+    },
+    {
+      "flavor_name": "颗粒度对齐",
+      "mechanic": "加减分",
+      "plain_rule": "挑战成功者加2分，失败者扣1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "+2",
+        "scoring_ref": "挑战成功"
+      }
+    },
+    {
+      "flavor_name": "闭环失败",
+      "mechanic": "加减分",
+      "plain_rule": "挑战失败时，挑战者扣1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "-1",
+        "scoring_ref": "挑战失败"
+      }
+    },
+    {
+      "flavor_name": "盲盒惩罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "挑战失败后，你还要从盲盒里抽一个后果，比如'学一个同事的口头禅'或'全场敬酒一杯(可用茶替代)'。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "挑战失败"
+      }
+    },
+    {
+      "flavor_name": "八卦竞猜",
+      "mechanic": "同时提交",
+      "plain_rule": "每两轮，所有人用投票器匿名猜一个活着的玩家的真实身份(i人/e人)，限时30秒。猜对加1分，猜错不扣分。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "你认为谁是i人？(选择一位玩家)",
+        "input_kind": "options",
+        "options": ["$派生:alive_players"],
+        "timeout_s": 30,
+        "reveal": "simultaneous",
+        "scoring_ref": ["猜对身份", "猜错身份"]
+      }
+    },
+    {
+      "flavor_name": "吃瓜加码",
+      "mechanic": "限时",
+      "plain_rule": "八卦竞猜阶段只有30秒提交，超时视为放弃、不扣分。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 30,
+        "visible_countdown": true,
+        "on_timeout": {
+          "effect": "scoring",
+          "scoring_ref": "放弃提交"
+        }
+      }
+    },
+    {
+      "flavor_name": "身份大揭秘",
+      "mechanic": "声明质疑",
+      "plain_rule": "终局时所有人同时公开身份牌，然后系统计算每个玩家猜对/猜错的总分。",
+      "visibility": "全场公开",
+      "params": {
+        "claim_prompt": "所有人亮出你的身份牌！",
+        "challengers": "others",
+        "challenge_window_s": 0,
+        "verify_source": "prop_reveal:身份牌",
+        "verify_reveals": "prop_state",
+        "on_liar": { "scoring_ref": "猜对身份" },
+        "on_false_accuse": { "scoring_ref": "猜错身份" }
+      }
+    },
+    {
+      "flavor_name": "终局核算",
+      "mechanic": "加减分",
+      "plain_rule": "猜对一个活人的真实身份，加1分；猜错不扣分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "+1",
+        "scoring_ref": "猜对身份"
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "挑战成功", "who": "actor", "effect": "+2" },
+      { "event": "挑战失败", "who": "actor", "effect": "-1" },
+      { "event": "猜对身份", "who": "actor", "effect": "+1" },
+      { "event": "猜错身份", "who": "actor", "effect": "0" },
+      { "event": "放弃提交", "who": "actor", "effect": "0" }
+    ],
+    "win": "终局时总分最高者胜",
+    "tiebreak": "系统随机裁决(风味名：命运哑铃)"
+  },
+  "reveal_text": "对齐了半天，原来i人里藏着最八卦的瓜王，e人里混进了健身狂魔——这闭环总算没白闭。",
+  "reveal_signature": "融合自 阿凯 的「MBTI」 × 琳琳 的「短视频挑战」 × 老周 的「开会黑话」 × 小雨 的「八卦」 × Tony 的「健身」",
+  "flavor_glossary": [
+    { "term": "对齐", "means": "开会黑话：统一认识、拉齐信息。这里指挑战规则。" },
+    { "term": "颗粒度", "means": "开会黑话：细节的精细程度。这里指挑战的难度尺度。" },
+    { "term": "闭环", "means": "开会黑话：从开始到结束形成完整流程。这里指完成一个挑战。" },
+    { "term": "i人/e人", "means": "MBTI人格分类，i人偏内向、e人偏外向。这里是本局身份标签。" }
+  ],
+  "safety_note": "黄暴档20/100(低): 惩罚为'学口头禅'或'敬茶替代'，无身体接触、无羞辱、无饮酒强制；未点名任何真人、无版权引用。所有挑战自带'跳过/换一个'选项。"
+}
+```
