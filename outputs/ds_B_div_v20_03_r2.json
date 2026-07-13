@@ -1,0 +1,110 @@
+```json
+{
+  "game_title": "颗粒度对齐 · 闭眼局",
+  "subtitle": "公司团建包间 · 5人速配",
+  "premise": "每人收到一张密语卡，写着一个「开会黑话」和一个「MBTI标签」。你需要用一句话把这两个词同时「对齐」进一条八卦里，其他人闭眼投票猜你的MBTI——猜对加分，猜错扣分，最会「编闭环」的人赢。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "每人一张，正面写一个开会黑话词（如：对齐、颗粒度、闭环、赋能、抓手），背面写一个MBTI字母对（如：E/I, S/N, T/F, J/P）。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "每轮投票用：选你猜的ta是i还是e（只有两个选项）。亮票自动公开。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每人发言限时30秒。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每轮猜对/猜错得分。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 每人发一张密语卡（黑话+MBTI字母），各自记住，不公开",
+    "每轮: 抽一人当「发言人」→ 看沙漏30秒 → 用一句话把黑话和MBTI编进一条八卦里（可编可真实，但必须包含两个词）",
+    "发言人讲完后，其他人闭眼在匿名投票器上押他/她是i还是e（对应卡上的字母）",
+    "亮票 → 猜对的+1分，猜错的-1分 → 发言人若被多数猜对则额外+1分，被多数猜错则-1分",
+    "换下一人当发言人，直到每人发言过一轮（共5轮）",
+    "终局: 总分最高者胜"
+  ],
+  "rules": [
+    {
+      "flavor_name": "对齐闭环",
+      "mechanic": "同时提交",
+      "plain_rule": "发言人讲完八卦后，除发言人外的所有人同时用手机或纸片匿名提交你猜他/她是i还是e（二选一）。所有人提交后一起亮票。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "猜此人是 i 还是 e？",
+        "input_kind": "options",
+        "options": ["i", "e"],
+        "timeout_s": 15,
+        "reveal": "simultaneous",
+        "scoring_ref": ["猜对+1", "猜错-1"]
+      }
+    },
+    {
+      "flavor_name": "颗粒度限时",
+      "mechanic": "限时",
+      "plain_rule": "每人当发言人时只有30秒，时间一到必须闭嘴进入投票环节。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 30,
+        "visible_countdown": true,
+        "on_timeout": { "effect": "goto", "goto": "匿名投票" }
+      }
+    },
+    {
+      "flavor_name": "抓手加分",
+      "mechanic": "加减分",
+      "plain_rule": "发言人被多数人猜对（猜对人数≥猜错人数），发言人额外+1分；被多数猜错则-1分。猜对者每人+1分，猜错者每人-1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "+1",
+        "scoring_ref": "猜对+1"
+      }
+    },
+    {
+      "flavor_name": "闭环扣分",
+      "mechanic": "加减分",
+      "plain_rule": "猜错的人每人减1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "all_except_actor",
+        "delta": "-1",
+        "scoring_ref": "猜错-1"
+      }
+    },
+    {
+      "flavor_name": "密语保密",
+      "mechanic": "揭示",
+      "plain_rule": "每轮投票亮票后，发言人的密语卡（黑话+MBTI字母）向全场公开一次，验证大家的猜测。",
+      "visibility": "自己看",
+      "params": {
+        "reveal_of": "prop:密语卡",
+        "to": "all",
+        "once": false
+      }
+    },
+    {
+      "flavor_name": "八卦接力",
+      "mechanic": "回合推进",
+      "plain_rule": "按座位顺序轮换当发言人，每人一回合，共5回合。",
+      "visibility": "全场公开",
+      "params": { "order": "round_robin" }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "猜对+1", "who": "猜对的玩家", "effect": "+1" },
+      { "event": "猜错-1", "who": "猜错的玩家", "effect": "-1" },
+      { "event": "发言人被多数猜对", "who": "发言人", "effect": "+1" },
+      { "event": "发言人被多数猜错", "who": "发言人", "effect": "-1" }
+    ],
+    "win": "5轮结束后，总分最高者获胜",
+    "tiebreak": "系统随机裁决（风味名：抓阄闭环）"
+  },
+  "reveal_text": "对齐了一晚上颗粒度，最后发现——谁才是那个最会编闭环的八卦之王？",
+  "reveal_signature": "融合自 阿凯 的「MBTI」× 琳琳 的「短视频挑战」× 老周 的「开会黑话」× 小雨 的「爱吃瓜」× Tony 的「健身狂魔」",
+  "flavor_glossary": [
+    { "term": "对齐", "means": "开会黑话，意思是对接/同步信息，这里借指编八卦时要把两个词串起来。" },
+    { "term": "颗粒度", "means": "开会黑话，指细节的精细程度，这里借指八卦要编得具体。" },
+    { "term": "闭环", "means": "开会黑话，指事情完整收尾，这里借指把黑话和MBTI成功串成一个完整句子。" },
+    { "term": "抓手", "means": "开会黑话，指切入点/着力点，这里借指发言人找到编八卦的角度。" },
+    { "term": "i人/e人", "means": "MBTI中的内倾/外倾，这里作为每轮猜测的核心。" }
+  ],
+  "safety_note": "黄暴档20/100：极低；全员使用开会黑话和MBTI标签，无任何性化、羞辱或指向个人的攻击性内容；每轮发言全凭自愿编八卦，无需自曝隐私；拒绝权：若不想当发言人可跳过一轮（不扣分但也不得分）。"
+}
+```
