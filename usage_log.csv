@@ -101,3 +101,42 @@ ds_B_div_v20_19_r2.json,deepseek-v4-flash,false,,8581,1984,0,23.187265,0.0017568
 ds_B_div_v20_20_r2.json,deepseek-v4-flash,false,,8581,2061,0,24.024466,0.001778420,invalid_json: Expecting value: line 1 column 1 (char 0)
 ds_B_div_v20_19_r3.json,deepseek-v4-flash,false,,8581,1546,0,19.877232,0.001634220,invalid_json: Expecting value: line 1 column 1 (char 0)
 ds_B_div_v20_20_r3.json,deepseek-v4-flash,false,,8581,1752,0,21.277627,0.001691900,success
+dsT_D_v20_01_r1.json,deepseek-v4-flash,true,high,8934,2672,988,31.396323,0.001998920,success
+dsT_B_v20_01_r1.json,deepseek-v4-flash,true,high,8642,3023,1160,34.915903,0.002056320,success
+dsT_A_v20_01_r1.json,deepseek-v4-flash,true,high,8599,6494,5150,77.934080,0.003022180,success
+dsT_D_v20_02_r1.json,deepseek-v4-flash,true,high,8760,6294,5458,79.956172,0.002988720,success
+dsT_A_v20_02_r2.json,deepseek-v4-flash,true,high,8555,7005,5480,87.682611,0.003159100,success
+dsT_B_v20_02_r1.json,deepseek-v4-flash,true,high,8640,2851,1553,34.362289,0.002007880,success
+ds_B_div_v20_01_r3.json,deepseek-v4-flash,false,,8628,1655,0,17.174567,0.001671320,invalid_json: Expecting value: line 1 column 1 (char 0)
+dsT_C_v20_02_r2.json,deepseek-v4-flash,true,high,8613,2493,521,30.043190,0.001903860,success
+ds_B_div_v20_02_r1.json,deepseek-v4-flash,false,,8676,1834,0,16.915251,0.001728160,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_01_r4.json,deepseek-v4-flash,false,,8628,1888,0,20.349276,0.001736560,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_03_r1.json,deepseek-v4-flash,false,,8635,2081,0,21.101725,0.001791580,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_02_r2.json,deepseek-v4-flash,false,,8628,1897,0,18.929249,0.001739080,invalid_json: Expecting value: line 1 column 1 (char 0)
+dsT_C_v20_01_r1.json,deepseek-v4-flash,true,high,8645,5372,3929,61.342794,0.002714460,success
+ds_B_div_v20_04_r1.json,deepseek-v4-flash,false,,8628,1900,0,19.253858,0.001739920,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_03_r2.json,deepseek-v4-flash,false,,8628,1656,0,17.045444,0.001671600,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_05_r4.json,deepseek-v4-flash,false,,8628,1227,0,13.618645,0.001551480,success
+ds_B_div_v20_06_r2.json,deepseek-v4-flash,false,,8628,1505,0,17.304281,0.001629320,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_07_r1.json,deepseek-v4-flash,false,,8682,1817,0,19.427313,0.001724240,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_09_r3.json,deepseek-v4-flash,false,,8628,1525,0,17.986606,0.001634920,success
+ds_B_div_v20_04_r2.json,deepseek-v4-flash,false,,8628,2433,0,25.554979,0.001889160,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_06_r3.json,deepseek-v4-flash,false,,8628,1686,0,18.327115,0.001680000,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_07_r2.json,deepseek-v4-flash,false,,8628,1489,0,16.924226,0.001624840,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_09_r4.json,deepseek-v4-flash,false,,8629,1969,0,20.761934,0.001759380,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_10_r1.json,deepseek-v4-flash,false,,8631,2308,0,21.502318,0.001854580,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_11_r4.json,deepseek-v4-flash,false,,8628,1772,0,19.566823,0.001704080,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_10_r2.json,deepseek-v4-flash,false,,8628,1272,0,13.338949,0.001564080,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_16_r3.json,deepseek-v4-flash,false,,8628,1527,0,16.428293,0.001635480,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_13_r4.json,deepseek-v4-flash,false,,8628,2337,0,23.358434,0.001862280,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_11_r5.json,deepseek-v4-flash,false,,8628,1957,0,18.275384,0.001755880,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_16_r4.json,deepseek-v4-flash,false,,8628,1468,0,15.316857,0.001618960,success
+ds_B_div_v20_13_r5.json,deepseek-v4-flash,false,,8628,1676,0,18.310929,0.001677200,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_17_r4.json,deepseek-v4-flash,false,,8628,1984,0,21.644566,0.001763440,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_18_r2.json,deepseek-v4-flash,false,,8628,1840,0,19.044327,0.001723120,success
+ds_B_div_v20_19_r4.json,deepseek-v4-flash,false,,8628,1471,0,16.603063,0.001619800,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_17_r5.json,deepseek-v4-flash,false,,8628,1692,0,18.729923,0.001681680,success
+ds_B_div_v20_18_r3.json,deepseek-v4-flash,false,,8674,1870,0,18.297604,0.001737960,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_20_r4.json,deepseek-v4-flash,false,,8628,2339,0,25.044660,0.001862840,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_19_r5.json,deepseek-v4-flash,false,,8628,1744,0,18.311825,0.001696240,invalid_json: Expecting value: line 1 column 1 (char 0)
+ds_B_div_v20_20_r5.json,deepseek-v4-flash,false,,8628,2420,0,22.022302,0.001885520,invalid_json: Expecting value: line 1 column 1 (char 0)
