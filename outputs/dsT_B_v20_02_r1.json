@@ -1,0 +1,95 @@
+{
+  "game_title": "对齐颗粒度 · 快闪挑战",
+  "subtitle": "公司团建包间现制 · 5人速局",
+  "premise": "每轮一个短视频挑战+黑话雷区，匿名投票判定谁过关、谁踩雷。快节奏、低压力、高笑声。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "每轮挑战后匿名投票判定是否过关；亮票时自动转公开。" },
+    { "prop": "公共看板", "to": "公共区", "visibility": "全场公开", "note": "显示当前挑战题目、回合数。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "实时显示个人分数。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮挑战限时60秒。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局：公布MBTI虚拟标签（E/I型）作为分队暗示，但不影响机制。",
+    "每轮：公共看板显示一个挑战（短视频/黑话/健身等）→ 60秒准备 → 每人通过匿名投票器提交判断（过/不过）→ 同时揭晓 → 判定结果 -> 加减分。",
+    "第3轮插入一次‘吃瓜盲盒’：命运转盘随机指定一人接受八卦任务。",
+    "5轮后终局，总分最高者获胜。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "转场倒计时",
+      "mechanic": "限时",
+      "plain_rule": "每轮挑战准备时间60秒，沙漏走完必须提交判定。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 60,
+        "visible_countdown": true,
+        "on_timeout": { "effect": "goto", "goto": "匿名投票" }
+      }
+    },
+    {
+      "flavor_name": "一起扛还是单飞",
+      "mechanic": "同时提交",
+      "plain_rule": "所有人都要悄悄按‘完成’或‘未完成’，然后一起亮出结果。",
+      "visibility": "全场公开",
+      "params": {
+        "prompt": "你觉得自己的挑战完成了吗？",
+        "input_kind": "options",
+        "options": ["完成", "未完成"],
+        "timeout_s": 60,
+        "reveal": "simultaneous",
+        "scoring_ref": ["全员过关奖", "个人失败罚"]
+      }
+    },
+    {
+      "flavor_name": "颗粒度对齐判定",
+      "mechanic": "判定",
+      "plain_rule": "系统统计大家提交的‘完成’票数：若过半数则判定全员过关，否则个人失败者受惩罚。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "本轮挑战全员是否通过？",
+        "verdict_options": ["过", "不过"],
+        "on": {
+          "过": { "scoring_ref": ["全员过关奖"] },
+          "不过": { "scoring_ref": ["个人失败罚"] }
+        }
+      }
+    },
+    {
+      "flavor_name": "吃瓜转盘",
+      "mechanic": "命运转盘",
+      "plain_rule": "第3轮时，用命运转盘从在场所有人里抽一个，被抽到的人必须讲一个自己最近吃的瓜（八卦），不能编。",
+      "visibility": "全场公开",
+      "params": {}
+    },
+    {
+      "flavor_name": "健身清账",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "判定不过关的人，需要做5个深蹲或10秒平板支撑（自己选），然后加回1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "loser",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "个人失败罚"
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "全员过关奖", "who": "全员", "effect": "+2" },
+      { "event": "个人失败罚", "who": "提交未完成者", "effect": "-1" }
+    ],
+    "win": "5轮后总分最高者胜（并列则追加一轮金球挑战）。",
+    "tiebreak": "系统随机裁决（风味名：投屏抽签）"
+  },
+  "reveal_text": "对齐了颗粒度，闭环了这轮团建。原来i人e人都是假的，能一起扛分钟的就是好伙伴。",
+  "reveal_signature": "融合自 阿凯 「MBTI」× 琳琳 「短视频挑战」× 老周 「开会黑话」× 小雨 「爱吃瓜」× Tony 「健身」",
+  "flavor_glossary": [
+    { "term": "对齐颗粒度", "means": "开会黑话，让信息一致、步调统一。" },
+    { "term": "闭环", "means": "完成一个流程，让事情完结。" },
+    { "term": "i人 e人", "means": "MBTI内向/外向性格标签。" }
+  ],
+  "safety_note": "黄暴档20/100（低）：无性、无羞辱；惩罚为深蹲/平板支撑，可跳过换其他轻运动（如原地踏步）；八卦任务允许替换成“分享一个最近开心的事”。未出现真人真名或版权梗。"
+}
