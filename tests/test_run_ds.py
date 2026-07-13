@@ -2,8 +2,10 @@ import csv
 import json
 import os
 import tempfile
+import threading
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import run_ds
 
@@ -139,6 +141,112 @@ class RequestAndRetryTests(unittest.TestCase):
             ["dsT_A_v20_01.json", "dsT_A_v20_01_r1.json", "dsT_A_v20_01_r2.json", "dsT_A_v20_01_r3.json"],
             names,
         )
+
+
+class FeedbackRetryTests(RequestAndRetryTests):
+    def feedback_job(self, **changes):
+        values = {
+            "group": "main_structure",
+            "input_name": "A",
+            "source": "dsT_A_v20_01.json",
+            "start_retry": 1,
+            "max_new_attempts": 1,
+            "feedback_kind": "check",
+            "feedback": "rules[1] bad",
+            "model": "dsT",
+        }
+        values.update(changes)
+        return run_ds.FeedbackJob(**values)
+
+    def test_feedback_prompt_has_original_input_and_exactly_one_feedback_block(self):
+        seen = []
+
+        def transport(_key, payload):
+            seen.append(payload)
+            return self.response('{"ok": true}')
+
+        controller = run_ds.BudgetController(0.0, 5.0)
+        with mock.patch("run_ds.check_errors", return_value=[]):
+            result = run_ds.run_feedback_job(
+                self.feedback_job(), root=self.root, keys=["secret"], transport=transport,
+                max_tokens=100, budget_controller=controller,
+            )
+        self.assertTrue(result.success)
+        messages = seen[0]["messages"]
+        self.assertEqual("SYSTEM", messages[0]["content"])
+        self.assertTrue(messages[1]["content"].startswith('{"input":"A"}'))
+        self.assertEqual(1, messages[1]["content"].count("【check.py 报错原文】"))
+        self.assertEqual(1, messages[1]["content"].count("rules[1] bad"))
+
+    def test_retry_name_strips_existing_suffix_instead_of_double_r(self):
+        path = run_ds.feedback_attempt_path(self.root / "outputs", "dsT_A_v20_01_r1.json", 2)
+        self.assertEqual("dsT_A_v20_01_r2.json", path.name)
+
+    def test_occupied_explicit_suffix_makes_zero_calls(self):
+        occupied = self.root / "outputs" / "dsT_A_v20_01_r1.json"
+        occupied.write_text("KEEP", encoding="utf-8")
+        calls = []
+        controller = run_ds.BudgetController(0.0, 5.0)
+        result = run_ds.run_feedback_job(
+            self.feedback_job(), root=self.root, keys=["secret"],
+            transport=lambda *_: calls.append(1), max_tokens=100, budget_controller=controller,
+        )
+        self.assertFalse(result.success)
+        self.assertEqual([], calls)
+        self.assertEqual("KEEP", occupied.read_text(encoding="utf-8"))
+        self.assertFalse((self.root / "usage_log.csv").exists())
+
+    def test_b_second_attempt_uses_new_check_errors_and_never_creates_r3(self):
+        payloads = []
+
+        def transport(_key, payload):
+            payloads.append(payload)
+            return self.response('{"ok": true}')
+
+        job = self.feedback_job(
+            group="b_structure", source="ds_B_div_v20_02.json", model="ds_B_div",
+            input_name="B", max_new_attempts=5,
+        )
+        controller = run_ds.BudgetController(0.0, 5.0)
+        with mock.patch("run_ds.check_errors", side_effect=[["new r1 error"], []]):
+            result = run_ds.run_feedback_job(
+                job, root=self.root, keys=["secret"], transport=transport,
+                max_tokens=100, budget_controller=controller,
+            )
+        self.assertTrue(result.success)
+        self.assertEqual(2, len(payloads))
+        self.assertNotIn("new r1 error", payloads[0]["messages"][1]["content"])
+        self.assertIn("new r1 error", payloads[1]["messages"][1]["content"])
+        self.assertTrue((self.root / "outputs" / "ds_B_div_v20_02_r2.json").exists())
+        self.assertFalse((self.root / "outputs" / "ds_B_div_v20_02_r3.json").exists())
+
+    def test_manifest_selects_only_api_and_caps_attempts(self):
+        manifest = self.root / "manifest.json"
+        manifest.write_text(json.dumps({"jobs": [
+            {"group": "b_structure", "channel": "api", "model": "ds_B_div", "input_name": "B",
+             "source": "ds_B_div_v20_01.json", "start_retry": 1, "max_new_attempts": 9,
+             "feedback_kind": "check", "feedback": "bad"},
+            {"group": "main_structure", "channel": "web", "model": "haiku", "input_name": "A",
+             "source": "haiku_A.json", "start_retry": 1, "max_new_attempts": 1,
+             "feedback_kind": "check", "feedback": "bad"},
+        ]}), encoding="utf-8")
+        jobs = run_ds.load_feedback_jobs(manifest)
+        self.assertEqual(1, len(jobs))
+        self.assertEqual(2, jobs[0].max_new_attempts)
+
+    def test_concurrent_usage_append_writes_one_header(self):
+        path = self.root / "usage_log.csv"
+        base = {field: "x" for field in run_ds.USAGE_FIELDS}
+        threads = [threading.Thread(target=run_ds.append_usage, args=(path, {**base, "filename": str(i)}))
+                   for i in range(20)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        lines = path.read_text(encoding="utf-8").splitlines()
+        self.assertEqual(1, sum(line.startswith("filename,model,") for line in lines))
+        with path.open(encoding="utf-8", newline="") as handle:
+            self.assertEqual(20, len(list(csv.DictReader(handle))))
 
 
 class ReportingTests(unittest.TestCase):

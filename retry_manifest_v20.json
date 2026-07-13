@@ -1,0 +1,472 @@
+{
+  "version": "v2.0-retry-batch-2026-07-14",
+  "policy": {
+    "logical_attempts": "start at 1 for this batch",
+    "physical_suffix": "start_retry is next unused suffix; never overwrite",
+    "b_max_new_attempts": 2
+  },
+  "jobs": [
+    {
+      "group": "main_verdict",
+      "channel": "web",
+      "model": "sonnet",
+      "input_name": "A",
+      "source": "sonnet_A_v20_02.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "verdict",
+      "review_items": [
+        5,
+        7
+      ],
+      "feedback": "VERDICT: 破 | 死规则:0 坍缩:0 真空:0 伪猜:0 占优:1 终局:过 结算:破 落点:过 膨胀:原7条→有效5 融合:过 小局身份:不适用 shape:其他\n5. 占优与身份自利：破。「越吵越大声」允许复述人加到第 3 级后按自己看见的卡面如实声明；只要照卡执行并说真话，就不会触发 bust，却可拿「顶格摊牌成功」+3，严格优于提前喊停 +1，形成无风险自利路径，且每人都能复制。\n7. 结算语义对账：破。「越吵越大声」散文说夸张度与“筹码跟涨”、喊停“保住目前攒的筹码”，但账本只有不分等级的「喊停保底入账」+1 与顶格 +3，未定义二级喊停或已攒筹码如何折算；若多人同为最高等级，终局单选“谁最高”也没有说明哪些答案算猜中。win 因人人可无风险顶格而常态全同分，不能靠正常机制稳定区分胜负，只能频繁落到随机兜底。"
+    },
+    {
+      "group": "main_verdict",
+      "channel": "web",
+      "model": "sonnet",
+      "input_name": "B",
+      "source": "sonnet_B_v20_02.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "verdict",
+      "review_items": [
+        3,
+        7,
+        8
+      ],
+      "feedback": "VERDICT: 破 | 死规则:0 坍缩:0 真空:1 伪猜:0 占优:0 终局:过 结算:破 落点:破 膨胀:原7条→有效5 融合:过 小局身份:不适用 shape:其他\n3. 信息真空 / 死机制：破。「全组吃瓜接力」只把首尾句念出“对比走样”，没有任何判定、分数、任务后果或后续结算引用，是完整的装饰性死机制。\n7. 结算语义对账：破。「黑话潜伏行动」翻开密语卡只能证明玩家抽到了哪两个词，不能证明这些词此前是否真的说过，故「黑话说谎/冤枉黑话」没有可由账本事实支持的判定；人格“真实答案”也没有在投票前提交或冻结，挑战人可在揭票后自行认领答案。软闸的 rules[2].timeout_s=20 与 rules[6].challenge_window_s=30 虽可视为散文漏写而非数字冲突，但进一步说明两个判定窗口只存在参数侧。\n8. 原语落点：破。系统没有口头整晚逐词记录，`prop_reveal:密语卡` 不能核验某词是否已经说过；人格盲测也没有挑战人预先锁定答案的 ask/state 输入，却要求系统给“猜中”计分，均为系统盲区。"
+    },
+    {
+      "group": "main_verdict",
+      "channel": "web",
+      "model": "sonnet",
+      "input_name": "C",
+      "source": "sonnet_C_v20_01.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "verdict",
+      "review_items": [
+        3,
+        7,
+        8
+      ],
+      "feedback": "VERDICT: 破 | 死规则:0 坍缩:0 真空:1 伪猜:0 占优:0 终局:过 结算:破 落点:破 膨胀:原9条→有效6 融合:过 小局身份:不适用 shape:其他\n3. 信息真空 / 死机制：破。「烤肠传声筒」明确只对比首尾、“全场公认笑点，不计分”，其产出不进入任何任务成败或结算，是装饰性死机制。\n7. 结算语义对账：破。「全员盖章」一条单选提交同时询问“老猫哪个版本/谁先怂”，却没有规定每人提交一个跨案组合还是任选一案，也未定义“当庭最终认定结果”如何从前面的可信度投票生成；「十年加注」散文说喊停保住已得、爆雷，但账本未说明爆雷是否清空未入账分。flow 又称老猫供词由 AI 语义仲裁、可一键推翻，rule 却称全场判断，裁决主体冲突。\n8. 原语落点：破。引擎没有 AI 语义仲裁原语；若改用全场 ask 共识虽可执行，却与 flow 指定的先 AI 仲裁再推翻不是同一流程。终局跨两桩悬案的答案空间和正确答案状态也未落成可评分输入。"
+    },
+    {
+      "group": "main_verdict",
+      "channel": "web",
+      "model": "sonnet",
+      "input_name": "D",
+      "source": "sonnet_D_v20_02.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "verdict",
+      "review_items": [
+        2
+      ],
+      "feedback": "VERDICT: 破 | 死规则:0 坍缩:1 真空:0 伪猜:0 占优:0 终局:过 结算:过 落点:过 膨胀:原7条→有效5 融合:疑 小局身份:不适用 shape:其他\n2. 信息坍缩：破。「眼神默契核对」让全部四人同时提交后统一亮出，而链头本来就看过原始暗号，必能提交原句；它的答案一公开，随后才进行的「当众认领」与抓包已无悬念，其他人可直接用链头答案判断链尾是否走样。"
+    },
+    {
+      "group": "main_verdict",
+      "channel": "web",
+      "model": "haiku",
+      "input_name": "B",
+      "source": "haiku_B_v20_02.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "verdict",
+      "review_items": [
+        8
+      ],
+      "feedback": "VERDICT: 破 | 死规则:0 坍缩:0 真空:0 伪猜:0 占优:0 终局:过 结算:过 落点:破 膨胀:原3条→有效1 融合:疑 小局身份:不适用 shape:其他\n8. 原语落点：“黑话陷阱”没有让表演者用 ask 指定正确选项，系统无法知道动态选项中哪个是标准答案；“八卦真假判”的点头/摇头也没有 ask 输入，却要求系统判对并 state 加分。另有表演 30 秒只靠沙漏而无结构化 timer，属于现实物品触发系统结算的盲区，落点破。"
+    },
+    {
+      "group": "main_verdict",
+      "channel": "web",
+      "model": "haiku",
+      "input_name": "C",
+      "source": "haiku_C_v20_02.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "verdict",
+      "review_items": [
+        4,
+        7
+      ],
+      "feedback": "VERDICT: 破 | 死规则:0 坍缩:0 真空:0 伪猜:1 占优:0 终局:过 结算:破 落点:过 膨胀:原2条→有效1 融合:疑 小局身份:不适用 shape:其他\n4. 伪猜测：“群众判定”表面问故事是否真实，实际 plain_rule 直接以多数票本身决定讲述者 +2/-1，没有独立真相验证；赌注自指投票结果，伪猜 1，判破。\n7. 结算语义对账：plain_rule 只证明“被多数认可/不认可”，却把反对票 ledger 命名为“讲述不诚实”，并把最高票分解释成“最诚实”；多数意见不能语义上证明真假，散文、账本与 win 的“诚实”含义不一致，结算破。timeout_s=10 软警告仅为散文未复述时限，不改变此结论。"
+    },
+    {
+      "group": "main_verdict",
+      "channel": "api",
+      "model": "dsT",
+      "input_name": "D",
+      "source": "dsT_D_v20_01.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "verdict",
+      "review_items": [
+        1,
+        3,
+        7,
+        8
+      ],
+      "feedback": "VERDICT: 破 | 死规则:1 坍缩:0 真空:1 伪猜:0 占优:0 终局:过 结算:破 落点:破 膨胀:原2条→有效2 融合:过 小局身份:不适用 shape:其他\n1. 触发可达性：“心思碰撞”固定 3 次，“纸条漂流”固定 1 次；公共看板、匿名投票器和记分板虽被 check.py 标 dead_prop，但在 flow/rule/settlement 中有明确用途。沙漏的 note 明说系统限时已固定，仅作视觉节拍且无规则引用，确认为死道具，死规则 1。\n3. 信息真空 / 死机制：“纸条漂流”整段只供笑评，明确不记分，也不影响默契挑战或胜负，是装饰性死机制，真空 1，判破。\n7. 结算语义对账：“默契成功”与 +1 ledger、最高个人总分一致；但“纸条漂流”的 plain_rule 要玩家逐人写句子，params.content_from 却指定 `$gen:一句暗号相关短句`，散文与参数对内容来源相互矛盾，结算语义破。timeout_s=20 软警告也显示散文未说明该限制。\n8. 原语落点：开局每人贡献两个暗号写入公共看板没有对应 ask 输入；纸条漂流同样没有玩家文本提交字段，反而声明由生成器供稿，却要求系统私密传递和首尾回放，系统拿不到规则要求的人类输入，落点破。"
+    },
+    {
+      "group": "main_verdict",
+      "channel": "api",
+      "model": "dsT",
+      "input_name": "D",
+      "source": "dsT_D_v20_02.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "verdict",
+      "review_items": [
+        7
+      ],
+      "feedback": "VERDICT: 破 | 死规则:0 坍缩:0 真空:0 伪猜:0 占优:0 终局:过 结算:破 落点:过 膨胀:原3条→有效2 融合:疑 小局身份:不适用 shape:其他\n7. 结算语义对账：plain_rule 说“相同则该队 +1”，但两个 scoring 行使用完全相同的 event“队伍默契得分”，分别把 +1 固定给两支队；该通用事件一触发就会同时给双方加分，无法表达“哪队匹配哪队得分”，散文→账本不一致。且队内可预约用“一/二/三”一字直接报码，两队正常理性玩法都会每轮得分，win 的队伍分数无法区分胜负，结算破。"
+    },
+    {
+      "group": "main_structure",
+      "channel": "web",
+      "model": "sonnet",
+      "input_name": "B",
+      "source": "sonnet_B_v20_01.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "check",
+      "feedback": "rules[5].params.on.不过 的 scoring_ref 缺失或为空"
+    },
+    {
+      "group": "main_structure",
+      "channel": "web",
+      "model": "sonnet",
+      "input_name": "C",
+      "source": "sonnet_C_v20_02.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "check",
+      "feedback": "rules[3].params.verify_reveals 缺失（声明质疑 必填键）"
+    },
+    {
+      "group": "main_structure",
+      "channel": "web",
+      "model": "sonnet",
+      "input_name": "D",
+      "source": "sonnet_D_v20_01.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "check",
+      "feedback": "rules[3].params.on.过 缺失（需 on.过）\nrules[3].params.on.不过 缺失（需 on.不过）"
+    },
+    {
+      "group": "main_structure",
+      "channel": "web",
+      "model": "haiku",
+      "input_name": "A",
+      "source": "haiku_A_v20_01.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "check",
+      "feedback": "rules[1].params.on_timeout.scoring_ref 缺失（effect=scoring 时必填）"
+    },
+    {
+      "group": "main_structure",
+      "channel": "web",
+      "model": "haiku",
+      "input_name": "A",
+      "source": "haiku_A_v20_02.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "check",
+      "feedback": "rules[1] 惩罚档位不一致：scoring_ref 'solo成功' 的 effect '+1' ≠ 机制档位 惩罚(中)"
+    },
+    {
+      "group": "main_structure",
+      "channel": "web",
+      "model": "haiku",
+      "input_name": "B",
+      "source": "haiku_B_v20_01.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "check",
+      "feedback": "rules[3].params.delta 形态非法 '+$派生:投票总分'（须为 +N|-N）\nsettlement.win 引用分数/名次，但 scoring 无 ±N 数值增减来源（C3；惩罚(档) 不计作来源）"
+    },
+    {
+      "group": "main_structure",
+      "channel": "web",
+      "model": "haiku",
+      "input_name": "C",
+      "source": "haiku_C_v20_01.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "check",
+      "feedback": "rules[3].params.verify_reveals 缺失（声明质疑 必填键）\nrules[5].params.on.过 缺失（需 on.过）\nrules[5].params.on.不过 缺失（需 on.不过）\nrules[7] 惩罚档位不一致：scoring_ref '主动跳过' 的 effect '-1' ≠ 机制档位 惩罚(轻)"
+    },
+    {
+      "group": "main_structure",
+      "channel": "web",
+      "model": "haiku",
+      "input_name": "D",
+      "source": "haiku_D_v20_01.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "check",
+      "feedback": "rules[3].params.scoring_ref 缺失或为空（同时提交 必填顶层 scoring_ref）\nrules[4].params.on.过 缺失（需 on.过）\nrules[4].params.on.不过 缺失（需 on.不过）"
+    },
+    {
+      "group": "main_structure",
+      "channel": "web",
+      "model": "haiku",
+      "input_name": "D",
+      "source": "haiku_D_v20_02.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "check",
+      "feedback": "rules[1].params.scoring_ref 缺失或为空（同时提交 必填顶层 scoring_ref）\nrules[2].params.on.过 缺失（需 on.过）\nrules[2].params.on.不过 缺失（需 on.不过）"
+    },
+    {
+      "group": "main_structure",
+      "channel": "api",
+      "model": "dsT",
+      "input_name": "A",
+      "source": "dsT_A_v20_01.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "check",
+      "feedback": "rules[4].params.question 缺失（判定 必填键）\nrules[4].params.on.不过 的 scoring_ref 缺失或为空\nrules[3] 惩罚档位不一致：scoring_ref '惩罚执行' 的 effect '0' ≠ 机制档位 惩罚(中)"
+    },
+    {
+      "group": "main_structure",
+      "channel": "api",
+      "model": "dsT",
+      "input_name": "A",
+      "source": "dsT_A_v20_02.json",
+      "start_retry": 2,
+      "max_new_attempts": 1,
+      "feedback_kind": "check",
+      "feedback": "JSON 不可解析: Expecting ',' delimiter: line 17 column 16 (char 770)"
+    },
+    {
+      "group": "main_structure",
+      "channel": "api",
+      "model": "dsT",
+      "input_name": "B",
+      "source": "dsT_B_v20_01.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "check",
+      "feedback": "rules[2].params.on.不过 的 scoring_ref 缺失或为空\nrules[6].params.on_named 的 scoring_ref 缺失或为空"
+    },
+    {
+      "group": "main_structure",
+      "channel": "api",
+      "model": "dsT",
+      "input_name": "B",
+      "source": "dsT_B_v20_02.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "check",
+      "feedback": "rules[3].params.on.过 缺失（需 on.过）\nrules[3].params.on.不过 缺失（需 on.不过）"
+    },
+    {
+      "group": "main_structure",
+      "channel": "api",
+      "model": "dsT",
+      "input_name": "C",
+      "source": "dsT_C_v20_01.json",
+      "start_retry": 1,
+      "max_new_attempts": 1,
+      "feedback_kind": "check",
+      "feedback": "rules[1].params.timeout_s 缺失（同时提交 必填键）\nrules[1].params.scoring_ref 缺失或为空（同时提交 必填顶层 scoring_ref）\nrules[3].params.question 缺失（判定 必填键）"
+    },
+    {
+      "group": "main_structure",
+      "channel": "api",
+      "model": "dsT",
+      "input_name": "C",
+      "source": "dsT_C_v20_02.json",
+      "start_retry": 2,
+      "max_new_attempts": 1,
+      "feedback_kind": "check",
+      "feedback": "JSON 不可解析: Unterminated string starting at: line 2 column 17 (char 18)"
+    },
+    {
+      "group": "b_structure",
+      "channel": "api",
+      "model": "ds_B_div",
+      "input_name": "B",
+      "source": "ds_B_div_v20_01.json",
+      "start_retry": 3,
+      "max_new_attempts": 2,
+      "feedback_kind": "check",
+      "feedback": "JSON 不可解析: Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "group": "b_structure",
+      "channel": "api",
+      "model": "ds_B_div",
+      "input_name": "B",
+      "source": "ds_B_div_v20_02.json",
+      "start_retry": 1,
+      "max_new_attempts": 2,
+      "feedback_kind": "check",
+      "feedback": "rules[2].params.expr 缺失（source=expr 时必填）\nrules[3].params.delta 形态非法 '+2或+1或-1'（须为 +N|-N）\nrules[5].params.on_timeout.scoring_ref 缺失（effect=scoring 时必填）"
+    },
+    {
+      "group": "b_structure",
+      "channel": "api",
+      "model": "ds_B_div",
+      "input_name": "B",
+      "source": "ds_B_div_v20_03.json",
+      "start_retry": 1,
+      "max_new_attempts": 2,
+      "feedback_kind": "check",
+      "feedback": "rules[2].params.delta 形态非法 '+1 / -1 / -1'（须为 +N|-N）"
+    },
+    {
+      "group": "b_structure",
+      "channel": "api",
+      "model": "ds_B_div",
+      "input_name": "B",
+      "source": "ds_B_div_v20_04.json",
+      "start_retry": 1,
+      "max_new_attempts": 2,
+      "feedback_kind": "check",
+      "feedback": "rules[2].params.verify_reveals 缺失（声明质疑 必填键）"
+    },
+    {
+      "group": "b_structure",
+      "channel": "api",
+      "model": "ds_B_div",
+      "input_name": "B",
+      "source": "ds_B_div_v20_05.json",
+      "start_retry": 4,
+      "max_new_attempts": 2,
+      "feedback_kind": "check",
+      "feedback": "JSON 不可解析: Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "group": "b_structure",
+      "channel": "api",
+      "model": "ds_B_div",
+      "input_name": "B",
+      "source": "ds_B_div_v20_06.json",
+      "start_retry": 2,
+      "max_new_attempts": 2,
+      "feedback_kind": "check",
+      "feedback": "JSON 不可解析: Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "group": "b_structure",
+      "channel": "api",
+      "model": "ds_B_div",
+      "input_name": "B",
+      "source": "ds_B_div_v20_07.json",
+      "start_retry": 1,
+      "max_new_attempts": 2,
+      "feedback_kind": "check",
+      "feedback": "rules[4].mechanic 不在机制白名单: '盲盒'\nrules[5].params.delta 形态非法 '+2/-1/-3'（须为 +N|-N）\nrules[3] 惩罚档位不一致：scoring_ref '炸弹爆炸' 的 effect '-3' ≠ 机制档位 惩罚(轻)"
+    },
+    {
+      "group": "b_structure",
+      "channel": "api",
+      "model": "ds_B_div",
+      "input_name": "B",
+      "source": "ds_B_div_v20_09.json",
+      "start_retry": 3,
+      "max_new_attempts": 2,
+      "feedback_kind": "check",
+      "feedback": "JSON 不可解析: Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "group": "b_structure",
+      "channel": "api",
+      "model": "ds_B_div",
+      "input_name": "B",
+      "source": "ds_B_div_v20_10.json",
+      "start_retry": 1,
+      "max_new_attempts": 2,
+      "feedback_kind": "check",
+      "feedback": "scoring_ref 无对账目标: '扣分惩罚' 不在 settlement.scoring[].event"
+    },
+    {
+      "group": "b_structure",
+      "channel": "api",
+      "model": "ds_B_div",
+      "input_name": "B",
+      "source": "ds_B_div_v20_11.json",
+      "start_retry": 4,
+      "max_new_attempts": 2,
+      "feedback_kind": "check",
+      "feedback": "JSON 不可解析: Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "group": "b_structure",
+      "channel": "api",
+      "model": "ds_B_div",
+      "input_name": "B",
+      "source": "ds_B_div_v20_13.json",
+      "start_retry": 4,
+      "max_new_attempts": 2,
+      "feedback_kind": "check",
+      "feedback": "JSON 不可解析: Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "group": "b_structure",
+      "channel": "api",
+      "model": "ds_B_div",
+      "input_name": "B",
+      "source": "ds_B_div_v20_16.json",
+      "start_retry": 3,
+      "max_new_attempts": 2,
+      "feedback_kind": "check",
+      "feedback": "JSON 不可解析: Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "group": "b_structure",
+      "channel": "api",
+      "model": "ds_B_div",
+      "input_name": "B",
+      "source": "ds_B_div_v20_17.json",
+      "start_retry": 4,
+      "max_new_attempts": 2,
+      "feedback_kind": "check",
+      "feedback": "JSON 不可解析: Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "group": "b_structure",
+      "channel": "api",
+      "model": "ds_B_div",
+      "input_name": "B",
+      "source": "ds_B_div_v20_18.json",
+      "start_retry": 2,
+      "max_new_attempts": 2,
+      "feedback_kind": "check",
+      "feedback": "JSON 不可解析: Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "group": "b_structure",
+      "channel": "api",
+      "model": "ds_B_div",
+      "input_name": "B",
+      "source": "ds_B_div_v20_19.json",
+      "start_retry": 4,
+      "max_new_attempts": 2,
+      "feedback_kind": "check",
+      "feedback": "JSON 不可解析: Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "group": "b_structure",
+      "channel": "api",
+      "model": "ds_B_div",
+      "input_name": "B",
+      "source": "ds_B_div_v20_20.json",
+      "start_retry": 4,
+      "max_new_attempts": 2,
+      "feedback_kind": "check",
+      "feedback": "JSON 不可解析: Expecting value: line 1 column 1 (char 0)"
+    }
+  ]
+}

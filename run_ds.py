@@ -9,9 +9,11 @@ import os
 import re
 import subprocess
 import sys
+import threading
 import time
 import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Iterable
@@ -64,6 +66,29 @@ class JobResult:
 
 
 @dataclass(frozen=True)
+class FeedbackJob:
+    group: str
+    input_name: str
+    source: str
+    start_retry: int
+    max_new_attempts: int
+    feedback_kind: str
+    feedback: str
+    model: str
+
+    @property
+    def thinking(self) -> bool:
+        return self.model == "dsT"
+
+
+@dataclass(frozen=True)
+class FeedbackResult:
+    paths: tuple[Path, ...]
+    spent: float
+    success: bool
+
+
+@dataclass(frozen=True)
 class UsageSummary:
     prompt_tokens: int
     completion_tokens: int
@@ -90,6 +115,34 @@ class TransportFailure(RuntimeError):
     def __init__(self, message: str, raw_body: str = ""):
         super().__init__(message)
         self.raw_body = raw_body or message
+
+
+class BudgetController:
+    """Reserve worst-case call costs so parallel calls cannot cross the hard cap."""
+
+    def __init__(self, spent: float, budget: float):
+        self.spent = spent
+        self.budget = budget
+        self.reserved = 0.0
+        self._lock = threading.Lock()
+
+    def reserve(self, ceiling: float) -> None:
+        with self._lock:
+            require_call_budget(self.spent + self.reserved, ceiling, self.budget)
+            self.reserved += ceiling
+
+    def settle(self, ceiling: float, actual: float) -> float:
+        with self._lock:
+            self.reserved -= ceiling
+            self.spent += actual
+            return self.spent
+
+    def release(self, ceiling: float) -> None:
+        with self._lock:
+            self.reserved -= ceiling
+
+
+_USAGE_LOCK = threading.Lock()
 
 
 def build_jobs() -> list[Job]:
@@ -198,12 +251,179 @@ def extract_content(response: dict[str, Any]) -> str:
 
 
 def append_usage(path: Path, row: dict[str, Any]) -> None:
-    exists = path.exists() and path.stat().st_size > 0
-    with path.open("a", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=USAGE_FIELDS)
-        if not exists:
-            writer.writeheader()
-        writer.writerow(row)
+    with _USAGE_LOCK:
+        exists = path.exists() and path.stat().st_size > 0
+        with path.open("a", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=USAGE_FIELDS)
+            if not exists:
+                writer.writeheader()
+            writer.writerow(row)
+
+
+def load_feedback_jobs(path: Path) -> list[FeedbackJob]:
+    data = json.loads(path.read_text(encoding="utf-8-sig"))
+    jobs: list[FeedbackJob] = []
+    for item in data.get("jobs", []):
+        if item.get("channel") != "api":
+            continue
+        maximum = int(item["max_new_attempts"])
+        if item["group"] == "b_structure":
+            maximum = min(maximum, 2)
+        else:
+            maximum = min(maximum, 1)
+        jobs.append(
+            FeedbackJob(
+                group=str(item["group"]),
+                input_name=str(item["input_name"]),
+                source=str(item["source"]),
+                start_retry=int(item["start_retry"]),
+                max_new_attempts=maximum,
+                feedback_kind=str(item["feedback_kind"]),
+                feedback=str(item["feedback"]),
+                model=str(item["model"]),
+            )
+        )
+    return jobs
+
+
+def feedback_attempt_path(outputs_dir: Path, source: str, retry: int) -> Path:
+    base = Path(source)
+    stem = re.sub(r"_r\d+$", "", base.stem)
+    return outputs_dir / f"{stem}_r{retry}{base.suffix}"
+
+
+def make_feedback_user_text(original_input: str, feedback_kind: str, feedback: str) -> str:
+    if feedback_kind == "verdict":
+        label = "上版判词摘录（VERDICT 行+点名判项原文）"
+    elif feedback_kind == "check":
+        label = "check.py 报错原文"
+    else:
+        raise ValueError(f"未知 feedback_kind: {feedback_kind}")
+    return (
+        f"{original_input}\n\n【{label}】\n{feedback}\n"
+        "请据此重做，只交 JSON，不自检或解释。\n【反馈块结束】"
+    )
+
+
+def check_errors(path: Path, root: Path) -> list[str]:
+    import check
+
+    whitelist = check.load_whitelist()
+    return check.check_file(path, whitelist).errors
+
+
+def run_feedback_job(
+    job: FeedbackJob,
+    *,
+    root: Path,
+    keys: list[str],
+    transport: Callable[[str, dict[str, Any]], dict[str, Any]],
+    max_tokens: int,
+    budget_controller: BudgetController,
+) -> FeedbackResult:
+    system_text = (root / SYSTEM_PATH.name).read_text(encoding="utf-8")
+    original_input = (root / "inputs" / f"input_{job.input_name}.json").read_text(encoding="utf-8")
+    outputs_dir = root / "outputs"
+    outputs_dir.mkdir(exist_ok=True)
+    feedback = job.feedback
+    paths: list[Path] = []
+
+    allowed_attempts = min(job.max_new_attempts, 2 if job.group == "b_structure" else 1)
+    for logical_attempt in range(allowed_attempts):
+        retry = job.start_retry + logical_attempt
+        path = feedback_attempt_path(outputs_dir, job.source, retry)
+        user_text = make_feedback_user_text(original_input, job.feedback_kind, feedback)
+        payload = make_payload(system_text, user_text, thinking=job.thinking, max_tokens=max_tokens)
+        ceiling = estimate_call_cost(system_text + user_text, max_tokens)
+        budget_controller.reserve(ceiling)
+        try:
+            # Claim the exact manifest suffix before making a paid call.
+            handle = path.open("x", encoding="utf-8")
+        except FileExistsError:
+            budget_controller.release(ceiling)
+            return FeedbackResult(tuple(paths), budget_controller.spent, False)
+
+        started = time.perf_counter()
+        prompt_tokens = completion_tokens = reasoning_tokens = 0
+        status = "failed"
+        raw_to_save = ""
+        try:
+            response = transport(keys[logical_attempt % len(keys)], payload)
+            prompt_tokens, completion_tokens, reasoning_tokens = extract_usage(response)
+            raw_to_save = extract_content(response)
+            json.loads(raw_to_save)
+            status = "success"
+        except TransportFailure as error:
+            raw_to_save = error.raw_body
+            status = f"transport_error: {error}"
+        except (ValueError, json.JSONDecodeError) as error:
+            if not raw_to_save:
+                raw_to_save = json.dumps({"error": str(error)}, ensure_ascii=False, indent=2)
+            status = f"invalid_json: {error}"
+        finally:
+            handle.write(raw_to_save)
+            handle.close()
+
+        latency = time.perf_counter() - started
+        cost = actual_cost(prompt_tokens, completion_tokens)
+        spent = budget_controller.settle(ceiling, cost)
+        paths.append(path)
+        append_usage(
+            root / "usage_log.csv",
+            {
+                "filename": path.name,
+                "model": MODEL,
+                "thinking": str(job.thinking).lower(),
+                "reasoning_effort": "high" if job.thinking else "",
+                "prompt_token": prompt_tokens,
+                "completion_token": completion_tokens,
+                "reasoning_token": reasoning_tokens,
+                "latency_seconds": f"{latency:.6f}",
+                "cost_usd": f"{cost:.9f}",
+                "status": status,
+            },
+        )
+
+        # Use check.py's own text for the next feedback, including JSON parse failures.
+        errors = check_errors(path, root)
+        if status == "success" and not errors:
+            return FeedbackResult(tuple(paths), spent, True)
+        if job.group != "b_structure":
+            return FeedbackResult(tuple(paths), spent, False)
+        feedback = "\n".join(errors)
+
+    return FeedbackResult(tuple(paths), budget_controller.spent, False)
+
+
+def run_feedback_batch(
+    jobs: list[FeedbackJob],
+    *,
+    root: Path,
+    keys: list[str],
+    transport: Callable[[str, dict[str, Any]], dict[str, Any]],
+    max_tokens: int,
+    budget: float,
+    spent: float,
+    concurrency: int,
+) -> list[FeedbackResult]:
+    controller = BudgetController(spent, budget)
+    results: list[FeedbackResult] = []
+    with ThreadPoolExecutor(max_workers=concurrency) as executor:
+        futures = [
+            executor.submit(
+                run_feedback_job,
+                job,
+                root=root,
+                keys=keys,
+                transport=transport,
+                max_tokens=max_tokens,
+                budget_controller=controller,
+            )
+            for job in jobs
+        ]
+        for future in as_completed(futures):
+            results.append(future.result())
+    return results
 
 
 def run_job(
@@ -401,6 +621,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--key-file", type=Path, help="从本地文本提取 API key；文件不会被修改")
     parser.add_argument("--max-tokens", type=int, default=DEFAULT_MAX_TOKENS)
     parser.add_argument("--budget", type=float, default=DEFAULT_BUDGET)
+    parser.add_argument("--feedback-manifest", type=Path, help="按 manifest 执行 API 反馈重试")
+    parser.add_argument("--concurrency", type=int, default=1, help="反馈重试并发数")
     parser.add_argument(
         "--thinking",
         choices=("off", "on", "both"),
@@ -412,7 +634,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    if args.max_tokens <= 0 or args.budget <= 0:
+    if args.max_tokens <= 0 or args.budget <= 0 or args.concurrency <= 0:
         print("max_tokens 和 budget 必须大于 0", file=sys.stderr)
         return 2
     print_estimate(ROOT, args.max_tokens, args.budget, args.thinking)
@@ -431,6 +653,28 @@ def main(argv: list[str] | None = None) -> int:
 
     existing_rows = read_usage_rows()
     spent = sum(float(row.get("cost_usd") or 0) for row in existing_rows)
+    if args.feedback_manifest:
+        try:
+            jobs = load_feedback_jobs(args.feedback_manifest)
+            results = run_feedback_batch(
+                jobs,
+                root=ROOT,
+                keys=keys,
+                transport=api_transport,
+                max_tokens=args.max_tokens,
+                budget=args.budget,
+                spent=spent,
+                concurrency=args.concurrency,
+            )
+        except (OSError, ValueError, KeyError, json.JSONDecodeError) as error:
+            print(f"反馈 manifest 执行失败: {error}", file=sys.stderr)
+            return 2
+        except BudgetExceeded as error:
+            print(f"预算闸门停机: {error}", file=sys.stderr)
+            return 3
+        completed = [path for result in results for path in result.paths]
+        validate_ds_files(completed)
+        return 0 if all(result.success for result in results) else 1
     completed: list[Path] = []
     failures = 0
     try:
