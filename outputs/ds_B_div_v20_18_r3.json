@@ -1,0 +1,62 @@
+```json
+{
+  "game_title": "对齐颗粒度 · 八卦挑战夜",
+  "subtitle": "团建包间特供 · 5人速局",
+  "premise": "每人一张神秘身份牌，但只有你自己知道。用短视频挑战和开会黑话来隐藏或揭露身份，同时用你的八卦雷达吃瓜得分。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "自己看", "note": "5张身份牌：2张「i人」、2张「e人」、1张「瓜王」。瓜王获胜条件不同。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "用于吃瓜投票和最终身份指认。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮挑战限时。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录挑战得分和吃瓜得分。" },
+    { "prop": "骰盅", "to": "公共区", "visibility": "自己看", "note": "用于挑战失败时的惩罚摇奖。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 发身份牌，每人自己看。宣布本局规则。",
+    "每轮: 主持人(轮换)抛出一个命题 → 每人用短视频挑战或开会黑话回应 → 限时30秒 → 匿名投票选最佳/最差 → 揭晓得分",
+    "吃瓜环节: 每两轮结束后，有一次吃瓜投票，猜测某人的身份。",
+    "终局: 三轮挑战后 → 最终身份指认投票 → 揭晓身份 → 结算"
+  ],
+  "rules": [
+    { "flavor_name": "对齐一下", "mechanic": "同时提交", "plain_rule": "每人同时提交一个词或短句（黑话/挑战名），回应主持人命题。", "visibility": "自己看",
+      "params": { "prompt": "主持人命题（如：用一句黑话形容今天的团建）", "input_kind": "free_text", "timeout_s": 30, "reveal": "simultaneous", "scoring_ref": ["挑战最佳", "挑战最差"] } },
+    { "flavor_name": "颗粒度", "mechanic": "判定", "plain_rule": "所有提交同时揭晓后，系统随机判定一个‘最佳’和一个‘最差’（符合主题且最搞笑/最离谱）。", "visibility": "全场公开",
+      "params": { "source": "ai", "question": "哪个提交最符合主题且最搞笑？哪个最离谱？", "ai_overridable": true, "on": { "过": { "scoring_ref": "挑战最佳" }, "不过": { "scoring_ref": "挑战最差" } } } },
+    { "flavor_name": "闭环", "mechanic": "加减分", "plain_rule": "被判定为‘最佳’的人加1分，‘最差’的人减1分。", "visibility": "全场公开",
+      "params": { "who": "winner", "delta": "+1", "scoring_ref": "挑战最佳" } },
+    { "flavor_name": "吃瓜雷达", "mechanic": "同时提交", "plain_rule": "每两轮结束后，每人匿名猜测场上某人的真实身份（i人/e人/瓜王），只有一次吃瓜机会。", "visibility": "自己看",
+      "params": { "prompt": "你怀疑谁是瓜王？请选一个人。", "input_kind": "options", "options": ["阿凯", "琳琳", "老周", "小雨", "Tony"], "timeout_s": 20, "reveal": "simultaneous", "scoring_ref": ["吃瓜正确", "吃瓜错误"] } },
+    { "flavor_name": "爆瓜", "mechanic": "判定", "plain_rule": "吃瓜投票揭晓后，系统判定谁猜对了（选中的正是瓜王本人）。", "visibility": "全场公开",
+      "params": { "source": "expr", "question": "吃瓜投票中选瓜王的人猜对了吗？", "expr": "guess == actual_identity('瓜王')", "on": { "过": { "scoring_ref": "吃瓜正确" }, "不过": { "scoring_ref": "吃瓜错误" } } } },
+    { "flavor_name": "闭环加分", "mechanic": "加减分", "plain_rule": "吃瓜猜对的人加1分，猜错的人减1分。", "visibility": "全场公开",
+      "params": { "who": "winner", "delta": "+1", "scoring_ref": "吃瓜正确" } },
+    { "flavor_name": "吃瓜翻车", "mechanic": "加减分", "plain_rule": "吃瓜猜错的人减1分。", "visibility": "全场公开",
+      "params": { "who": "loser", "delta": "-1", "scoring_ref": "吃瓜错误" } },
+    { "flavor_name": "健身打卡", "mechanic": "惩罚(轻)", "plain_rule": "挑战最差的人，做一个10秒深蹲或俯卧撑（自选），做完即可。", "visibility": "全场公开",
+      "params": { "who": "loser", "pool": "$gen.penalty_内容池", "scoring_ref": "挑战最差" } },
+    { "flavor_name": "30秒倒计时", "mechanic": "限时", "plain_rule": "每轮挑战提交限时30秒，沙漏漏完必须停手。", "visibility": "全场公开",
+      "params": { "seconds": 30, "visible_countdown": true, "on_timeout": { "effect": "goto", "goto": "判定" } } }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "挑战最佳", "who": "最佳者", "effect": "+1" },
+      { "event": "挑战最差", "who": "最差者", "effect": "-1" },
+      { "event": "吃瓜正确", "who": "猜对者", "effect": "+1" },
+      { "event": "吃瓜错误", "who": "猜错者", "effect": "-1" }
+    ],
+    "win": "三轮后总分最高者胜。若瓜王存活至终局且被至少一人猜中，瓜王额外+2分。",
+    "tiebreak": "系统随机裁决（风味名：命运对齐）"
+  },
+  "reveal_text": "今晚的颗粒度对得整整齐齐，闭环也完美收束。瓜王被揪出，i人e人各自归位——健身打卡没白练，八卦雷达没白长。",
+  "reveal_signature": "融合自 阿凯 的「MBTI」× 琳琳 的「短视频挑战」× 老周 的「开会黑话」× 小雨 的「吃瓜」× Tony 的「健身」",
+  "flavor_guidance": [
+    { "term": "对齐", "means": "开会黑话，指统一目标或标准。这里指每人提交回应。" },
+    { "term": "颗粒度", "means": "指细节的精细程度。这里指系统判定提交质量。" },
+    { "term": "闭环", "means": "指流程完整结束。这里指加减分动作。" },
+    { "term": "瓜王", "means": "指掌握最多八卦的人，游戏中的特殊身份。" },
+    { "term": "健身打卡", "means": "Tony的日常习惯，借用作惩罚形式。" }
+  ],
+  "safety_note": "黄暴档20/100(低): 惩罚仅限轻度肢体动作（深蹲/俯卧撑），可自选替代；不涉及真人人身攻击、性化或版权内容；MVTI仅作为标签梗引用，无真实人格判定。"
+}
+```
