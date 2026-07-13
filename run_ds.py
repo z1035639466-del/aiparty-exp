@@ -557,7 +557,7 @@ def validate_ds_files(paths: Iterable[Path]) -> bool:
         else:
             print(f"过 {path.name}: 检查通过")
         if result.warnings:
-            print(f"  ⚠ 软闸(件头) {path.name}: {'；'.join(result.warnings)}")
+            print(f"  [WARNING] 软闸(件头) {path.name}: {'；'.join(result.warnings)}")
     return passed
 
 
