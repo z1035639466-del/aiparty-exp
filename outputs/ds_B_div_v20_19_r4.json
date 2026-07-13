@@ -1,0 +1,52 @@
+```json
+{
+  "game_title": "颗粒度对齐大会 · 健身瓜报",
+  "subtitle": "5人团建速局 · 黑话与挑战",
+  "premise": "每人随机获得一个MBTI标签（E或I），但不知道自己的。通过完成短视频挑战、对齐黑话、传递八卦，偷偷猜出自己标签。猜对赢，猜错接受非饮酒惩罚。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "额头", "note": "每人额头一张MBTI标签牌，只有别人看得见：3张「E人」、2张「I人」。" },
+    { "prop": "密语卡", "to": "小雨", "visibility": "自己看", "note": "开局私发一张八卦密语卡：一段虚构但合理的团内八卦（如‘有人偷偷用公司打印机打印健身食谱’），小雨需在传递链中把它传出去。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "终局猜自己标签时使用，提交后同时揭晓。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮限时用。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 每人额头贴MBTI标签（E/I），小雨收到密语卡。",
+    "三轮流程: 每轮60秒完成一个‘对齐’或‘挑战’行动，然后按座位顺序传递一句话。",
+    "三轮结束后: 所有人匿名提交‘我是E人还是I人’的猜测，同时揭晓。",
+    "猜对者得分，猜错者接受非饮酒惩罚（如深蹲5个或模仿一段黑话）。"
+  ],
+  "rules": [
+    { "flavor_name": "对齐颗粒度", "mechanic": "受限沟通", "plain_rule": "每轮60秒内，你只能对别人说一个词，用来暗示或误导你的MBTI标签。别人也只能用一个词回应你。", "visibility": "全场公开",
+      "params": { "channel": "one_word", "enforce": "channel_only" } },
+    { "flavor_name": "闭环挑战", "mechanic": "限时", "plain_rule": "每轮只有60秒时间进行‘对齐’交流，沙漏流完必须进入下一环节。", "visibility": "全场公开",
+      "params": { "seconds": 60, "visible_countdown": true, "on_timeout": { "effect": "goto", "goto": "传递链" } } },
+    { "flavor_name": "瓜传瓜", "mechanic": "传递链", "plain_rule": "按座位顺序（阿凯→琳琳→老周→小雨→Tony→阿凯），每人把自己听到的话悄悄传给下一个人，每人只看上一棒的内容。三轮结束，对比首尾。", "visibility": "全场公开",
+      "params": { "content_from": "prop:密语卡", "order": "seat", "each_sees": "prev_only", "replay": "first_vs_last" } },
+    { "flavor_name": "终局自曝", "mechanic": "同时提交", "plain_rule": "三轮结束后，所有人同时提交‘我额头上的标签是E人还是I人’的猜测，系统同时揭晓，猜对者加分。", "visibility": "自己看",
+      "params": { "prompt": "猜猜你额头上的标签：E人还是I人？", "input_kind": "options", "options": ["E人", "I人"], "timeout_s": 30, "reveal": "simultaneous", "scoring_ref": ["猜对标签", "猜错标签"] } },
+    { "flavor_name": "大冤种深蹲", "mechanic": "惩罚(轻)", "plain_rule": "猜错自己标签的人，需要做5个深蹲（由Tony喊节奏），或者选择模仿一句你们组常见的开会黑话（比如‘这个闭环我们对齐一下’）当作替代。", "visibility": "全场公开",
+      "params": { "who": "loser", "pool": "$gen.penalty_内容池", "scoring_ref": "猜错标签" } },
+    { "flavor_name": "健身教练喊停", "mechanic": "点名目标", "plain_rule": "每轮结束时，Tony可以点名一个人，让他额外做一个俯卧撑（可选，跳过则无事发生）。", "visibility": "全场公开",
+      "params": { "selector": "actor", "target_pool": "all", "on_named": { "scoring_ref": null, "eliminate": false } } }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "猜对标签", "who": "猜对者", "effect": "+2" },
+      { "event": "猜错标签", "who": "猜错者", "effect": "惩罚(轻)" }
+    ],
+    "win": "终局时得分最高者胜",
+    "tiebreak": "系统随机裁决（风味名: 团建转盘）"
+  },
+  "reveal_text": "对齐了一晚上颗粒度，最后发现——最I的人天天在群里发健身自拍，最E的人默默吃了全程的瓜。闭环了。",
+  "reveal_signature": "融合自 阿凯的MBTI × 琳琳的短视频挑战 × 老周的开会黑话 × 小雨的八卦 × Tony的健身",
+  "flavor_glossary": [
+    { "term": "对齐颗粒度", "means": "开会黑话，指把各方信息拉平、统一标准，这里指只能用一个词交流。" },
+    { "term": "闭环", "means": "黑话，指一件事有始有终完成，这里指完成一轮挑战。" },
+    { "term": "瓜传瓜", "means": "八卦传递，像传话游戏一样。" },
+    { "term": "E人/I人", "means": "MBTI人格分类，E=外向，I=内向。" }
+  ],
+  "safety_note": "黄暴档20/100（极低）：无性化、无饮酒、无羞辱；惩罚（轻）仅限深蹲或模仿黑话，且跳过权始终保留；不涉及任何真实个人隐私或职场敏感内容。"
+}
+```
