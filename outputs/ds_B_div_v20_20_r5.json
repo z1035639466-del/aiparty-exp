@@ -1,0 +1,190 @@
+```json
+{
+  "game_title": "对齐颗粒度 · 闭环挑战",
+  "subtitle": "公司团建速局 · 5人",
+  "premise": "每人额头贴着你的MBTI类型——别人看得见，你自己看不见。轮流发起一个短视频挑战或健身动作，其他人要做『闭环』判定。全程用黑话沟通，谁先暴露真实性格谁扣分。吃瓜群众兼当裁判。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "额头", "note": "每人一张MBTI类型牌(E/I/S/N/T/F/J/P的组合，由系统随机生成，不是玩家真实类型)" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "每轮『闭环判定』用，亮票自动公开" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮挑战限时30秒" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每人分数" },
+    { "prop": "密语卡", "to": "每人每轮一次", "visibility": "自己看", "note": "用于发起挑战时指定『对齐方式』(可跳过/换一个)" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 发额头MBTI牌，每人不知自己类型。宣布本局黑话规则(见下方)。",
+    "每轮: 轮到的玩家当『发起人』→ 抽一张密语卡(指定挑战类型，跳过/换一个可选) → 发起一个短视频挑战/健身动作(30秒限时) → 其他人做『闭环判定』(匿名投票: 这个挑战『有颗粒度』还是『没对齐』) → 揭晓投票，判定结果影响分数",
+    "全程: 聊天必须『对齐』黑话(说一句正常话扣1分，全场可一键举报触发判定)",
+    "终局: 分数最高者胜"
+  ],
+  "rules": [
+    {
+      "flavor_name": "闭环判定",
+      "mechanic": "判定",
+      "plain_rule": "发起人做完挑战后，其他人匿名投票判定这个挑战『有颗粒度』(通过)还是『没对齐』(不通过)。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "这个挑战有颗粒度吗？",
+        "verdict_options": ["有颗粒度(通过)", "没对齐(不通过)"],
+        "on": {
+          "通过": { "scoring_ref": ["挑战通过加分"] },
+          "不通过": { "scoring_ref": ["挑战不通过扣分"] }
+        }
+      }
+    },
+    {
+      "flavor_name": "对齐黑话",
+      "mechanic": "判定",
+      "plain_rule": "全程只说『对齐』『颗粒度』『闭环』『拉通』『抓手』『落地』这些词，说一句正常话(如『给我水』)会被举报。举报后大家投票判定是否违规。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "这句算违规(不是黑话)吗？",
+        "verdict_options": ["是，违规了", "不算，可以接受"],
+        "on": {
+          "是，违规了": { "scoring_ref": ["违规扣分"] },
+          "不算，可以接受": { "scoring_ref": ["举报者扣分"] }
+        }
+      }
+    },
+    {
+      "flavor_name": "挑战计时",
+      "mechanic": "限时",
+      "plain_rule": "发起人必须在30秒内完成挑战，沙漏流完没做完算挑战失败。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 30,
+        "visible_countdown": true,
+        "on_timeout": { "effect": "scoring", "scoring_ref": "超时扣分" }
+      }
+    },
+    {
+      "flavor_name": "吃瓜举报",
+      "mechanic": "声明质疑",
+      "plain_rule": "任何时刻，你可以质疑某人『暴露真实性格了』(比如他的行为不符合他额头的MBTI)。被质疑的人必须揭示他额头的牌来验证。验证后，如果质疑正确，被质疑者扣分；质疑错误，质疑者扣分。",
+      "visibility": "全场公开",
+      "params": {
+        "claim_prompt": "我觉得[玩家名]的行为不符合他额头的MBTI，他暴露了！",
+        "challengers": "others",
+        "challenge_window_s": 10,
+        "verify_source": "prop_reveal:身份牌",
+        "verify_reveals": "identity",
+        "identity_resolution": "terminal",
+        "on_liar": { "scoring_ref": ["质疑正确(对方扣分)"] },
+        "on_false_accuse": { "scoring_ref": ["质疑错误(质疑者扣分)"] }
+      }
+    },
+    {
+      "flavor_name": "发起人点名",
+      "mechanic": "点名目标",
+      "plain_rule": "每轮由系统按座位顺序指定一个发起人，发起人必须做一次挑战(可跳过/换一个)。",
+      "visibility": "全场公开",
+      "params": {
+        "selector": "actor",
+        "target_pool": "round_robin",
+        "on_named": { "scoring_ref": [], "eliminate": false }
+      }
+    },
+    {
+      "flavor_name": "颗粒度加分",
+      "mechanic": "加减分",
+      "plain_rule": "挑战被判定『有颗粒度』(通过)时，发起人加1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "+1",
+        "scoring_ref": "挑战通过加分"
+      }
+    },
+    {
+      "flavor_name": "没对齐扣分",
+      "mechanic": "加减分",
+      "plain_rule": "挑战被判定『没对齐』(不通过)时，发起人扣1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "-1",
+        "scoring_ref": "挑战不通过扣分"
+      }
+    },
+    {
+      "flavor_name": "违规扣分",
+      "mechanic": "加减分",
+      "plain_rule": "说话违规被判定成立，违规者扣1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "-1",
+        "scoring_ref": "违规扣分"
+      }
+    },
+    {
+      "flavor_name": "举报者扣分",
+      "mechanic": "加减分",
+      "plain_rule": "举报他人说话违规但判定不成立，举报者扣1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "-1",
+        "scoring_ref": "举报者扣分"
+      }
+    },
+    {
+      "flavor_name": "超时扣分",
+      "mechanic": "加减分",
+      "plain_rule": "挑战超时没做完，发起人扣1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "-1",
+        "scoring_ref": "超时扣分"
+      }
+    },
+    {
+      "flavor_name": "质疑正确(对方扣分)",
+      "mechanic": "加减分",
+      "plain_rule": "质疑别人暴露性格成功，被质疑者扣1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "target",
+        "delta": "-1",
+        "scoring_ref": "质疑正确(对方扣分)"
+      }
+    },
+    {
+      "flavor_name": "质疑错误(质疑者扣分)",
+      "mechanic": "加减分",
+      "plain_rule": "质疑别人暴露性格但错了，质疑者扣1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "-1",
+        "scoring_ref": "质疑错误(质疑者扣分)"
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "挑战通过加分", "who": "发起人", "effect": "+1" },
+      { "event": "挑战不通过扣分", "who": "发起人", "effect": "-1" },
+      { "event": "违规扣分", "who": "违规者", "effect": "-1" },
+      { "event": "举报者扣分", "who": "举报者", "effect": "-1" },
+      { "event": "超时扣分", "who": "发起人", "effect": "-1" },
+      { "event": "质疑正确(对方扣分)", "who": "被质疑者", "effect": "-1" },
+      { "event": "质疑错误(质疑者扣分)", "who": "质疑者", "effect": "-1" }
+    ],
+    "win": "终局时分数最高者获胜",
+    "tiebreak": "系统随机裁决(风味名: 抓阄闭环)"
+  },
+  "reveal_text": "今晚的对齐颗粒度挑战圆满闭环！阿凯的E人面具被老周一招质疑撕破，琳琳的健身挑战让全场『拉通』了体能，小雨的吃瓜雷达精准命中了Tony的I人本质。闭环！",
+  "reveal_signature": "融合自 阿凯的MBTI × 琳琳的短视频挑战 × 老周的开会黑话 × 小雨的吃瓜 × Tony的健身",
+  "flavor_glossary": [
+    { "term": "对齐/颗粒度/闭环", "means": "公司开会常用黑话，这里指『这个挑战好不好』『有没有违规』的判定标准" },
+    { "term": "E人/I人", "means": "MBTI中的外向/内向人格维度，这里指贴额头上的类型" },
+    { "term": "吃瓜", "means": "小雨的特质——爱围观八卦，这里指她负责举报和质疑" }
+  ],
+  "safety_note": "黄暴档20/100(低): 无黄暴内容，全是办公室梗和健身/短视频挑战，惩罚只到扣分不涉及羞辱或身体接触。跳过/换一个选项已嵌入密语卡机制。"
+}
+```
