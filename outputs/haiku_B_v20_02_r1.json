@@ -1,0 +1,163 @@
+{
+  "game_title": "职场人设局·八卦速推",
+  "subtitle": "为阿凯们5人团建现制·快速轮转版",
+  "premise": "每轮看一个\"职场关键词\"，所有人同时判断：这个词最可能出自谁之口？是八卦精、黑话王、还是健身狂？判对加分，判错可以申辞——全场投票决定你的命运。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {
+      "prop": "身份牌",
+      "to": "全体",
+      "visibility": "自己看",
+      "note": "开局发5张职场人设卡(分别暗示：MBTI爱好者、短视频达人、黑话通、八卦精、健身狂)，只有本人看得到自己的牌。"
+    },
+    {
+      "prop": "匿名投票器",
+      "to": "全体",
+      "visibility": "自己看",
+      "note": "每轮同时提交判断，本人选项;亮票时自动转全场公开。"
+    },
+    {
+      "prop": "沙漏",
+      "to": "公共区",
+      "visibility": "全场公开",
+      "note": "每轮答题限时(作节拍器)；不单独触发结算。"
+    },
+    {
+      "prop": "记分板",
+      "to": "公共区",
+      "visibility": "全场公开",
+      "note": "记每轮得分与累计排名。"
+    }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局：发底牌身份卡(每人一张，暗示职场特征)，宣读规则",
+    "第1-4轮循环：① 公屏出\"职场关键词\"(如'对齐、颗粒度、闭环') → ② 所有人30秒内通过投票器同时提交\"这个词最可能出自谁\" → ③ 沙漏到点后亮票 → ④ 系统按多数票判定\"标准答案\" → ⑤ 判对加分；判错进入申辞环节 → ⑥ 申辞失败者表演罚 → ⑦ 全场一键确认表演完成后进入下一轮",
+    "终局：4轮结束后总分最高者胜；平局系统随机裁决"
+  ],
+  "rules": [
+    {
+      "flavor_name": "人设速判",
+      "mechanic": "同时提交",
+      "plain_rule": "看到关键词后30秒内，每人私密选择'这个词最可能出自5人中的谁'。时间一到同时亮票，不准看别人的选择再改。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "这句话/关键词最可能出自谁之口？\n\"{关键词}\"\n\n选择：",
+        "input_kind": "options",
+        "options": ["$派生:除本人外的4人名单"],
+        "timeout_s": 30,
+        "reveal": "simultaneous",
+        "scoring_ref": ["判对", "判错"]
+      }
+    },
+    {
+      "flavor_name": "标准答案系统判",
+      "mechanic": "判定",
+      "plain_rule": "亮票后，系统以多数票为\"标准答案\"自动判定：你的选择与多数票一致则判对，否则判错。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "expr",
+        "question": "提交的人物选择是否与多数票一致？",
+        "expr": "actor_choice == plurality_choice",
+        "on": {
+          "过": { "scoring_ref": "判对" },
+          "不过": { "scoring_ref": "判错" }
+        }
+      }
+    },
+    {
+      "flavor_name": "判对得分",
+      "mechanic": "加减分",
+      "plain_rule": "判对 → +1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "+1",
+        "scoring_ref": "判对"
+      }
+    },
+    {
+      "flavor_name": "冤枉申辞",
+      "mechanic": "声明质疑",
+      "plain_rule": "判错了？你可以当场申辞：'我其实是说这个词的人，不是那个人'。系统私密提示你申辞的具体内容(学一句黑话、或解释为什么这词可能出自你)。你有20秒完成快速表演或口头申辞。全场一键表决'相信不相信你的申辞'。",
+      "visibility": "全场公开",
+      "params": {
+        "claim_prompt": "我其实就是说'{关键词}'这词的人",
+        "challengers": "others",
+        "challenge_window_s": 20,
+        "verify_source": "judge",
+        "verify_reveals": "prop_state",
+        "identity_resolution": "terminal",
+        "on_liar": { "scoring_ref": "申辞失败" },
+        "on_false_accuse": { "scoring_ref": "冤枉他" }
+      }
+    },
+    {
+      "flavor_name": "申辞失败·快速表演罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "申辞没被全场相信 → 做20秒快速表演(学一句职场黑话的怪腔、或用3个动作演绎这个词的含义、或学这个被指控的人的代表动作)。表演完成后全场一键tap'完成'，系统记录罚分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "申辞失败"
+      }
+    },
+    {
+      "flavor_name": "表演完成确认",
+      "mechanic": "判定",
+      "plain_rule": "表演罚结束后，全场一键表决'这个表演算完成吗'。共识通过则本轮结束；未通过则该玩家继续表演直到通过。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "这个表演是否完成？",
+        "verdict_options": ["完成", "继续表演"],
+        "on": {
+          "过": { "scoring_ref": "表演确认通过" },
+          "不过": { "scoring_ref": "表演需继续" }
+        }
+      }
+    },
+    {
+      "flavor_name": "轮次推进",
+      "mechanic": "回合推进",
+      "plain_rule": "本轮申辞与罚分结束后，自动进入下一轮，公屏出下一个关键词。",
+      "visibility": "全场公开",
+      "params": {
+        "order": "round_robin"
+      }
+    },
+    {
+      "flavor_name": "闷麦计时",
+      "mechanic": "限时",
+      "plain_rule": "每轮答题30秒，沙漏倒计时对所有人可见。30秒一到，投票器自动锁定，无法再改选择。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 30,
+        "visible_countdown": true,
+        "on_timeout": { "effect": "goto", "goto": "亮票判定" }
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "判对", "who": "actor", "effect": "+1" },
+      { "event": "判错", "who": "actor", "effect": "+0" },
+      { "event": "申辞失败", "who": "actor", "effect": "惩罚(轻)" },
+      { "event": "冤枉他", "who": "actor", "effect": "+0" },
+      { "event": "表演确认通过", "who": "actor", "effect": "+0" },
+      { "event": "表演需继续", "who": "actor", "effect": "+0" }
+    ],
+    "win": "4轮结束后总分最高者胜",
+    "tiebreak": "系统随机裁决(风味名：八卦命运轮)"
+  },
+  "reveal_text": "四个关键词转下来，谁是黑话连篇的怪杰、谁是一本正经拆台的八卦精、谁的健身碎碎念最容易被模仿——职场众生相一局定音。平时看似正经的那位，全是'对齐'和'颗粒度'；最爱健身的哥们儿，一嘴都是组里的秘密。",
+  "reveal_signature": "融合自 阿凯 的「MBTI贴标签」× 琳琳 的「短视频挑战」× 老周 的「开会黑话」× 小雨 的「八卦雷达」× Tony 的「健身狂魔」",
+  "flavor_glossary": [
+    { "term": "人设卡", "means": "每位玩家开局获得的秘密底牌，暗示自己在这局里的\"说话特征\"(MBTI爱好者/八卦精/黑话王等)。" },
+    { "term": "对齐、颗粒度、闭环", "means": "职场开会常见的黑话，用来判断谁最爱说这些词。" },
+    { "term": "冤枉申辞", "means": "判错后可以当场申辞'我才是说这词的人'，全场投票决定是否原谅。" },
+    { "term": "表演罚", "means": "申辞失败后需要20秒内做快速表演(学黑话腔、演绎词义、模仿被指控的人)来完成罚分。" }
+  ],
+  "safety_note": "黄暴档 20/100(极低)：无贴身指令、无性化内容、无真人诽谤；惩罚仅限'快速表演'(学腔调/动作)，不涉身体接触或羞耻；八卦内容限公司开会话题与素材给出范围，无个人隐私扒皮。"
+}
