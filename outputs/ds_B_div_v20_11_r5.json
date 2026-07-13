@@ -1,0 +1,152 @@
+```json
+{
+  "game_title": "对齐颗粒度的瓜",
+  "subtitle": "5人速局 · 公司团建版",
+  "premise": "每人脑门贴一张MBTI标签，别人看得到，自己看不到。轮流用黑话提问，猜自己的标签。猜对加分，猜错触发一个短视频挑战。全场吃瓜模式开启。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "额头", "note": "每人一张MBTI标签（I/E, N/S, F/T, P/J 各一维组合，共4张不同标签，剩1张随机重复）" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮限时30秒" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录猜对次数和挑战完成数" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "用于吃瓜投票" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 每人额头贴一张MBTI标签，自己看不到，别人全看到",
+    "每轮: 当前玩家选一个人，用一句黑话问一个关于自己标签的问题，对方只能回答是/否/无关。问完30秒内猜自己的标签，猜对+1分。",
+    "猜错: 当前玩家从盲盒抽一个短视频挑战，当场完成。完成+1分，拒绝/失败-1分。",
+    "每3轮: 触发一次吃瓜环节，匿名投票选一个'全场最佳黑话'，得票最高者+1分。",
+    "5轮后或有人达到6分 → 终局揭晓"
+  ],
+  "rules": [
+    {
+      "flavor_name": "黑话对焦",
+      "mechanic": "判定",
+      "plain_rule": "当前玩家说一句黑话提问，对方只能回答一字：是、否、或无关。问题必须包含一个黑话词。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "当前玩家的黑话提问是否含有黑话词且对方回答合规？",
+        "verdict_options": ["合规","不合规"],
+        "on": {
+          "过": { "scoring_ref": [] },
+          "不过": { "scoring_ref": ["黑话犯规"] }
+        }
+      }
+    },
+    {
+      "flavor_name": "猜标签",
+      "mechanic": "判定",
+      "plain_rule": "当前玩家在30秒内猜自己额头上的MBTI标签，猜对得分，猜错触发挑战。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "当前玩家猜的标签和他额头上的标签一致吗？",
+        "verdict_options": ["猜对了","猜错了"],
+        "on": {
+          "过": { "scoring_ref": ["猜对标签"] },
+          "不过": { "scoring_ref": ["猜错标签"] }
+        }
+      }
+    },
+    {
+      "flavor_name": "短视频挑战盲盒",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "猜错标签的人从盲盒里抽一个短视频挑战任务，当场完成（例如：学一个抖音舞、念一段绕口令、做10个深蹲）。完成即可，拒绝或失败则扣分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "挑战完成"
+      }
+    },
+    {
+      "flavor_name": "闷杯",
+      "mechanic": "限时",
+      "plain_rule": "每轮提问和猜标签一共限时30秒，沙漏漏完必须出结果。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 30,
+        "visible_countdown": true,
+        "on_timeout": {
+          "effect": "scoring",
+          "scoring_ref": ["超时扣分"]
+        }
+      }
+    },
+    {
+      "flavor_name": "吃瓜大会",
+      "mechanic": "同时提交",
+      "plain_rule": "每3轮结束后，所有人匿名投票选出本局'最佳黑话'——谁说的黑话最搞笑/最经典。得票最高者加分。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "选出本局最佳黑话创造者",
+        "input_kind": "options",
+        "options": ["$派生:在场玩家"],
+        "timeout_s": 20,
+        "reveal": "simultaneous",
+        "scoring_ref": ["吃瓜冠军"]
+      }
+    },
+    {
+      "flavor_name": "闭环加分",
+      "mechanic": "加减分",
+      "plain_rule": "猜对标签、完成挑战、赢得吃瓜投票都加1分。超时或犯规扣1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "+1",
+        "scoring_ref": ["猜对标签","挑战完成","吃瓜冠军"]
+      }
+    },
+    {
+      "flavor_name": "颗粒度扣分",
+      "mechanic": "加减分",
+      "plain_rule": "超时或黑话提问不合规时，扣1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "-1",
+        "scoring_ref": ["超时扣分","黑话犯规"]
+      }
+    },
+    {
+      "flavor_name": "拒绝权声明",
+      "mechanic": "声明质疑",
+      "plain_rule": "任何人被要求做挑战时，可以说'跳过'，代价是扣1分（不羞辱）。不允许连续跳两次。",
+      "visibility": "全场公开",
+      "params": {
+        "claim_prompt": "你是否跳过当前挑战？",
+        "challengers": "others",
+        "challenge_window_s": 5,
+        "verify_source": "judge",
+        "verify_reveals": "prop_state",
+        "identity_resolution": "terminal",
+        "on_liar": { "scoring_ref": [] },
+        "on_false_accuse": { "scoring_ref": [] }
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "猜对标签", "who": "当前玩家", "effect": "+1" },
+      { "event": "猜错标签", "who": "当前玩家", "effect": "惩罚(轻)" },
+      { "event": "挑战完成", "who": "当前玩家", "effect": "+1" },
+      { "event": "超时扣分", "who": "当前玩家", "effect": "-1" },
+      { "event": "黑话犯规", "who": "当前玩家", "effect": "-1" },
+      { "event": "吃瓜冠军", "who": "得票最高者", "effect": "+1" }
+    ],
+    "win": "5轮结束后总分最高者胜；若有人提前达到6分则立即获胜",
+    "tiebreak": "系统随机裁决（风味名：掷骰吃瓜）"
+  },
+  "reveal_text": "今晚对齐了五个人格颗粒度，闭环了所有黑话，吃到了最甜的瓜——原来i人也能在团建里狂欢。",
+  "reveal_signature": "融合自 阿凯 的「MBTI」× 琳琳 的「短视频挑战」× 老周 的「开会黑话」× 小雨 的「吃瓜」× Tony 的「健身」",
+  "flavor_glossary": [
+    { "term": "对齐颗粒度", "means": "公司黑话，指让各方信息一致；这里指猜标签" },
+    { "term": "闭环", "means": "黑话，指事情有始有终；这里指完成挑战" },
+    { "term": "MBTI", "means": "人格类型测试，分I/E等维度" },
+    { "term": "吃瓜", "means": "看热闹/八卦" }
+  ],
+  "safety_note": "黄暴档20/100(低): 惩罚限于短视频挑战类（跳舞/深蹲/绕口令），含跳过权；禁止性化、羞辱、饮酒；未使用真人台词或版权素材"
+}
+```
