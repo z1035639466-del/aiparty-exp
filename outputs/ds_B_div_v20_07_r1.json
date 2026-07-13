@@ -1,0 +1,125 @@
+```json
+{
+  "game_title": "对齐风暴 · MBTI 团建版",
+  "subtitle": "5人速通 · 开会？不，开战",
+  "premise": "每个人开局拿到一个隐藏的MBTI标签（I人/E人/未知），通过表演、甩锅、吃瓜来拉拢或陷害他人。回合限时快节奏，目标是成为全场唯一『颗粒度对齐』的人——或者让所有人一起闭环。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "自己看", "note": "每人的MBTI标签：2个E人、2个I人、1个『混沌人』（无标签，可自由声称）。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "用来吃瓜投票、拉踩、举报。亮票自动转全场公开。" },
+    { "prop": "骰子", "to": "公共区", "visibility": "全场公开", "note": "每轮由『对齐人』掷骰决定本轮吃瓜主题。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮限时60秒。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录『对齐分』和『吃瓜分』。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局：发身份牌（每人自己看），宣布混沌人机制。宣读背景：『今天必须对齐颗粒度，闭环所有黑话。』",
+    "每轮：①掷骰确定吃瓜主题（黑话/健身/八卦/短视频），②限时60秒轮流『抛梗』（表演/自曝/甩锅），③匿名投票『谁最该闭环』，④亮票，得票最高者触发惩罚或转分。",
+    "终局：三轮后，得分最高者胜。平局随机裁决（风味名：『老板一锤』）。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "颗粒度对齐",
+      "mechanic": "点名目标",
+      "plain_rule": "每轮匿名投票结束后，得票最高的人被『点名』，必须执行当轮惩罚或转分。",
+      "visibility": "全场公开",
+      "params": {
+        "selector": "vote",
+        "target_pool": "all",
+        "on_named": {
+          "scoring_ref": ["闭环一击", "吃瓜成功"],
+          "eliminate": false
+        }
+      }
+    },
+    {
+      "flavor_name": "闭环一击",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "被点名的人做一个15秒的即兴表演（模仿领导开会、健身动作、或翻拍短视频梗），然后本轮结束。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "target",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "闭环一击"
+      }
+    },
+    {
+      "flavor_name": "吃瓜成功",
+      "mechanic": "加减分",
+      "plain_rule": "成功投票给最终被点名的人，你加1分；投错了不加分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "all_except_actor",
+        "delta": "+1",
+        "scoring_ref": "吃瓜成功"
+      }
+    },
+    {
+      "flavor_name": "限时对齐",
+      "mechanic": "限时",
+      "plain_rule": "每轮抛梗和讨论只有60秒，沙漏走完必须立刻开始投票。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 60,
+        "visible_countdown": true,
+        "on_timeout": {
+          "effect": "goto",
+          "goto": "匿名投票"
+        }
+      }
+    },
+    {
+      "flavor_name": "黑话甩锅",
+      "mechanic": "声明质疑",
+      "plain_rule": "每人每局限一次，可以公开声称『我是E人』或『我是I人』。任何人可以质疑你；质疑后系统揭示你的身份牌，说谎者扣2分，冤枉者扣1分。",
+      "visibility": "自己看",
+      "params": {
+        "claim_prompt": "声称你的MBTI阵营（E/I），可以说谎。",
+        "challengers": "others",
+        "challenge_window_s": 15,
+        "verify_source": "prop_reveal:身份牌",
+        "verify_reveals": "identity",
+        "identity_resolution": "reshuffle",
+        "on_liar": { "scoring_ref": "黑话穿帮" },
+        "on_false_accuse": { "scoring_ref": "冤枉好人" }
+      }
+    },
+    {
+      "flavor_name": "健身打卡",
+      "mechanic": "续押喊停",
+      "plain_rule": "每轮『被点名的人』可以选择：做1个俯卧撑（或同等级健身动作）换1分，然后选择『继续』（再做1个再得1分）或『收手』。连续做时一旦中途放弃，失去本轮所有累计分。上限5个。",
+      "visibility": "全场公开",
+      "params": {
+        "draw_from": "$gen.事件池",
+        "continue_prompt": "再做1个换+1分？还是就此收手保住已有分？",
+        "bust_when": "放弃或做不到",
+        "cap": 5,
+        "on_cap": "force_settle",
+        "bank_on_stop": true,
+        "scoring_ref": ["健身打卡得分", "健身打卡爆掉"]
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "闭环一击", "who": "被点名者", "effect": "惩罚(轻)" },
+      { "event": "吃瓜成功", "who": "投票正确的玩家", "effect": "+1" },
+      { "event": "黑话穿帮", "who": "说谎者", "effect": "-2" },
+      { "event": "冤枉好人", "who": "质疑者", "effect": "-1" },
+      { "event": "健身打卡得分", "who": "成功续押者", "effect": "+N" },
+      { "event": "健身打卡爆掉", "who": "爆掉者", "effect": "惩罚(轻)" }
+    ],
+    "win": "三轮后总分最高者胜",
+    "tiebreak": "系统随机裁决（风味名：老板一锤）"
+  },
+  "reveal_text": "今天终于对齐了颗粒度——但不是KPI，是你们的MBTI、黑话、和健身flag。闭环，收工！",
+  "reveal_signature": "融合自 阿凯的MBTI × 老周的开会黑话 × Tony的健身狂魔 × 琳琳的短视频 × 小雨的吃瓜雷达",
+  "flavor_glossary": [
+    { "term": "对齐颗粒度", "means": "开会黑话，指统一目标/细节；这里指投票/惩罚机制。" },
+    { "term": "闭环", "means": "黑话，指完成一个流程；这里指被点名的人完成惩罚。" },
+    { "term": "吃瓜", "means": "小雨的八卦属性，这里指投票环节。" },
+    { "term": "混沌人", "means": "一个没有固定MBTI标签的角色，可以自由声称自己是E或I，增加欺骗空间。" }
+  ],
+  "safety_note": "黄暴档20/100（极低）：惩罚只有即兴表演或健身动作，不涉身体接触/露骨内容；所有指向个人的任务都附带『跳过/换一个』的拒绝权（由全场共识确认替代）；未引用任何真人/IP/版权内容。"
+}
+```
