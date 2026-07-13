@@ -1,0 +1,70 @@
+```json
+{
+  "game_title": "对齐颗粒度 · 团建瓜局",
+  "subtitle": "5人·短视频挑战版",
+  "premise": "每人一张秘密身份牌，牌上写着你的MBTI人格标签。但你的任务是——通过完成各种短视频挑战和开会黑话任务，来猜出别人的标签，同时藏好自己的。每轮挑战后匿名投票，票数最高的人被要求公开身份。猜对加分，猜错受罚。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "自己看", "note": "每张牌写一个MBTI类型（如ENFP、ISTJ等），外加一条该类型专属的'开会黑话'暗号。共5张，每人一张，互不相同。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "每轮投票用，亮票自动全场公开。" },
+    { "prop": "盲盒", "to": "公共区", "visibility": "自己看", "note": "内装5张挑战签：模仿一个同事的经典动作 / 用'闭环'造句卖安利 / 原地高抬腿30秒 / 爆一个关于自己的瓜 / 用三个词描述你左边的人。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "挑战限时用。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录猜对/猜错分数。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 每人发一张MBTI身份牌（自己看），暗号记心里。",
+    "每轮: ① 公共盲盒抽一张挑战签 → ② 被挑战者完成挑战（沙漏限时60秒）→ ③ 所有人匿名投票猜被挑战者的MBTI → ④ 亮票，猜对的人+1分，猜错的人-1分",
+    "挑战完成后，被挑战者有权用一句黑话暗号声明自己的类型（可以撒谎）。",
+    "每两轮后多一轮自由八卦时间（3分钟），可随意提问或爆料，但每人只能问一个问题。",
+    "5轮后或有人公开认输 → 终局揭晓所有身份。"
+  ],
+  "rules": [
+    { "flavor_name": "闭环挑战", "mechanic": "判定", "plain_rule": "抽到挑战签的人必须在60秒内完成挑战内容。完成度由全场投票决定：过半数认为完成即算通过，否则算失败。", "visibility": "全场公开",
+      "params": { "source": "consensus", "question": "挑战是否完成？", "verdict_options": ["完成", "没完成"], "on": { "过": { "scoring_ref": "挑战完成" }, "不过": { "scoring_ref": "挑战失败" } } } },
+    { "flavor_name": "颗粒度对齐", "mechanic": "声明质疑", "plain_rule": "挑战结束后，被挑战者可以公开声称自己的MBTI类型（可以说真话，也可以说谎）。任何其他人可以质疑他的声明。质疑时，被质疑者必须亮出自己的身份牌验证。说谎或冤枉，都要受罚。", "visibility": "全场公开",
+      "params": { "claim_prompt": "声称自己的MBTI类型", "challengers": "others", "challenge_window_s": 30, "verify_source": "prop_reveal:身份牌", "verify_reveals": "prop_state", "on_liar": { "scoring_ref": "说谎受罚" }, "on_false_accuse": { "scoring_ref": "冤枉受罚" } } },
+    { "flavor_name": "八卦雷达", "mechanic": "同时提交", "plain_rule": "自由八卦时间结束后，每人私密提交一个猜测：你认为某人的MBTI是什么。所有人同时揭晓。猜对+1分，猜错不扣分。", "visibility": "自己看",
+      "params": { "prompt": "猜一个人的MBTI（格式：人名+类型）", "input_kind": "free_text", "timeout_s": 120, "reveal": "simultaneous", "scoring_ref": ["八卦猜中", "八卦猜错"] } },
+    { "flavor_name": "续杯喊停", "mechanic": "续押喊停", "plain_rule": "每轮挑战前，每人可以选择是否额外押注1分赌自己猜对。如果猜对，押注翻倍赚回2分；如果猜错，押注的1分被没收。你可以选择'不押'保住现有分数。", "visibility": "全场公开",
+      "params": { "draw_from": "$gen.事件池", "continue_prompt": "是否押注？押1分赌自己这轮猜对", "bust_when": "猜错", "cap": 5, "on_cap": "force_settle", "bank_on_stop": "不押", "scoring_ref": ["押注赢", "押注输"] } },
+    { "flavor_name": "对齐周期", "mechanic": "回合推进", "plain_rule": "按座位顺序轮流当被挑战者。一圈转完再转下一圈，直到游戏结束。", "visibility": "全场公开",
+      "params": { "order": "round_robin" } },
+    { "flavor_name": "颗粒度限时", "mechanic": "限时", "plain_rule": "挑战限时60秒，沙漏一漏完就必须停下来接受投票判定。", "visibility": "全场公开",
+      "params": { "seconds": 60, "visible_countdown": true, "on_timeout": { "effect": "goto", "goto": "判定投票" } } },
+    { "flavor_name": "闭环扣分", "mechanic": "惩罚(轻)", "plain_rule": "挑战失败的人，必须做10个深蹲作为小惩罚。如果你不想做，可以用一次'跳过'机会免罚（每人整局只有一次跳过机会）。", "visibility": "全场公开",
+      "params": { "who": "actor", "pool": "$gen.penalty_内容池", "scoring_ref": "挑战失败" } },
+    { "flavor_name": "i人e人猜猜猜", "mechanic": "加减分", "plain_rule": "每轮猜对别人MBTI的人加1分，猜错的人减1分。", "visibility": "全场公开",
+      "params": { "who": "actor", "delta": "+1", "scoring_ref": "八卦猜中" } },
+    { "flavor_name": "e人误判", "mechanic": "加减分", "plain_rule": "猜错别人MBTI的人减1分。", "visibility": "全场公开",
+      "params": { "who": "actor", "delta": "-1", "scoring_ref": "八卦猜错" } },
+    { "flavor_name": "谎话闭环", "mechanic": "惩罚(中)", "plain_rule": "声明质疑中被证实说谎的人，扣2分，并当场模仿一个在场同事的招牌动作（由全场指定）。", "visibility": "全场公开",
+      "params": { "who": "actor", "pool": "$gen.penalty_内容池", "scoring_ref": "说谎受罚" } },
+    { "flavor_name": "误伤闭环", "mechanic": "惩罚(轻)", "plain_rule": "声明质疑中冤枉了别人的人，扣1分，并接受一次'真心话'惩罚（必须回答全场一个问题）。", "visibility": "全场公开",
+      "params": { "who": "actor", "pool": "$gen.penalty_内容池", "scoring_ref": "冤枉受罚" } }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "挑战完成", "who": "被挑战者", "effect": "+1" },
+      { "event": "挑战失败", "who": "被挑战者", "effect": "惩罚(轻)" },
+      { "event": "八卦猜中", "who": "猜对者", "effect": "+1" },
+      { "event": "八卦猜错", "who": "猜错者", "effect": "-1" },
+      { "event": "押注赢", "who": "押注者", "effect": "+2" },
+      { "event": "押注输", "who": "押注者", "effect": "-1" },
+      { "event": "说谎受罚", "who": "说谎者", "effect": "惩罚(中)" },
+      { "event": "冤枉受罚", "who": "冤枉者", "effect": "惩罚(轻)" }
+    ],
+    "win": "终局时总分最高者胜。若分数相同，则连续猜对次数最多者胜。",
+    "tiebreak": "系统随机裁决（风味名：命运对齐）"
+  },
+  "reveal_text": "五张MBTI牌翻开的瞬间，会议室里响起一阵爆笑——原来那个天天喊'颗粒度对齐'的老周，是个最随性的ENFP。而全组最i的小雨，牌上赫然写着ENTJ。实习生Tony默默收起了他的哑铃，嘀咕了一句：'这闭环，我闭环了。'",
+  "reveal_signature": "融合自 阿凯 的「MBTI」 × 琳琳 的「短视频挑战」 × 老周 的「开会黑话」 × 小雨 的「吃瓜」 × Tony 的「健身」",
+  "flavor_glossary": [
+    { "term": "对齐颗粒度", "means": "互联网黑话，意思是统一标准、拉齐信息，这里借指猜别人身份的过程。" },
+    { "term": "闭环", "means": "黑话，指一件事从开始到结束形成完整流程，这里指挑战从开始到判定完成。" },
+    { "term": "i人/e人", "means": "MBTI中内向/外向的基本维度，这里泛指所有MBTI类型。" },
+    { "term": "续杯", "means": "押注机制的风味叫法，指继续加码赌自己猜对。" }
+  ],
+  "safety_note": "黄暴档20/100(极低)：惩罚仅限深蹲/模仿动作/真心话，无身体接触或羞辱内容。所有指向个人的任务自带'跳过'豁免权（每人整局一次）。未点名任何真人、无版权引用。职场语境下已避开高羞耻惩罚与点名贴身指令。"
+}
+```
