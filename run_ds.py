@@ -333,12 +333,14 @@ def validate_ds_files(paths: Iterable[Path]) -> bool:
     passed = True
     print("\n=== 本次 DS 输出单独校验 ===")
     for path in paths:
-        errors = check.check_file(path, whitelist)
-        if errors:
+        result = check.check_file(path, whitelist)
+        if result.errors:
             passed = False
-            print(f"挂 {path.name}: {'；'.join(errors)}")
+            print(f"挂 {path.name}: {'；'.join(result.errors)}")
         else:
             print(f"过 {path.name}: 检查通过")
+        if result.warnings:
+            print(f"  ⚠ 软闸(件头) {path.name}: {'；'.join(result.warnings)}")
     return passed
 
 
