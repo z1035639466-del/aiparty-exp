@@ -1,0 +1,129 @@
+{
+  "game_title": "对齐颗粒度的闭闭环 · 团建专场",
+  "subtitle": "5 人速局 · 职场黑话 + MBTI 八卦派对",
+  "premise": "每人额头一张身份牌——别人看得见，你自己看不见。牌上写着你的 MBTI 类型+一个黑话标签。轮流执行短视频挑战，同时用黑话诱导别人说出自己的标签。猜中自己标签的人得分，猜错触发迷你惩罚。节奏快、笑点密。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "额头", "note": "牌面写 MBTI 四字母+一个职场黑话标签（如 ENFP·闭环）。别人看到，你本人看不到。" },
+    { "prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "每轮每人私发一张挑战任务（短视频风格：15秒表演/模仿/即兴台词）" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮挑战限时 15 秒" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "用于猜测他人额头标签的投票，以及八卦瓜主票选" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每人得分" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 每人额头贴身份牌，发第一轮密语卡，沙漏开始",
+    "主循环: 轮流出战者 → 抽密语卡并执行15秒挑战 → 挑战后其他玩家用黑话提问诱导 → 出战者猜自己额头标签 → 猜对得分，猜错触发小惩罚",
+    "支线: 每3轮插入一次『八卦瓜主票选』——匿名投票选出一个「本周瓜主」，瓜主必须爆一个自己本周的真八卦/趣事，并接受全场判定(共识)是否够瓜",
+    "终局: 5轮主循环后，得分最高者胜"
+  ],
+  "rules": [
+    {
+      "flavor_name": "15秒挑战赛",
+      "mechanic": "限时",
+      "plain_rule": "轮到你的回合，执行密语卡上的任务，必须在15秒内完成。超时视为挑战失败。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 15,
+        "visible_countdown": true,
+        "on_timeout": {
+          "effect": "scoring",
+          "scoring_ref": "挑战失败"
+        }
+      }
+    },
+    {
+      "flavor_name": "黑话诱导局",
+      "mechanic": "声明质疑",
+      "plain_rule": "挑战结束后，其他玩家轮流说一句开会黑话来诱导你。你可以选择『我猜到了』并说出你额头的标签，也可以等下一轮。猜对得分，猜错触发惩罚。",
+      "visibility": "全场公开",
+      "params": {
+        "claim_prompt": "猜你额头上的 MBTI+黑话标签是什么？",
+        "challengers": "others",
+        "challenge_window_s": 30,
+        "verify_source": "prop_reveal:身份牌",
+        "verify_reveals": "prop_state",
+        "on_liar": { "scoring_ref": "猜错标签" },
+        "on_false_accuse": { "scoring_ref": "诬告者惩罚" }
+      }
+    },
+    {
+      "flavor_name": "对齐颗粒度之惩",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "猜错自己标签的人，必须即兴喊出一句『对齐颗粒度』+一个健身动作（深蹲/抬手）。拒绝者由全场共识判定是否换一个。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "猜错标签"
+      }
+    },
+    {
+      "flavor_name": "八卦瓜主票选",
+      "mechanic": "同时提交",
+      "plain_rule": "每3轮结束后，全员匿名投票选出一个『本周瓜主』。得票最多的人必须爆一个自己本周的真八卦/趣事，然后全场用共识按钮判定『够不够瓜』。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "你心中的本周瓜主是谁？",
+        "input_kind": "options",
+        "options": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+        "timeout_s": 15,
+        "reveal": "simultaneous",
+        "scoring_ref": ["瓜主当选"]
+      }
+    },
+    {
+      "flavor_name": "瓜主判定局",
+      "mechanic": "判定",
+      "plain_rule": "瓜主爆完瓜后，全场投票『是瓜』或『不是瓜』。如果多数人认为是瓜，瓜主直接得 2 分；否则瓜主不扣分，但下一轮须再试一次。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "这个瓜够瓜吗？",
+        "verdict_options": ["够瓜", "不够瓜"],
+        "on": {
+          "过": { "scoring_ref": "瓜主当选" },
+          "不过": { "scoring_ref": "瓜主失败" }
+        }
+      }
+    },
+    {
+      "flavor_name": "闭环记分",
+      "mechanic": "加减分",
+      "plain_rule": "每次猜对标签得 1 分，猜错不扣分但触发惩罚；每次当选瓜主且判定通过得 2 分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "+1",
+        "scoring_ref": "猜对标签"
+      }
+    },
+    {
+      "flavor_name": "回合一键推进",
+      "mechanic": "回合推进",
+      "plain_rule": "按座位顺序从左到右依次成为出战者。",
+      "visibility": "全场公开",
+      "params": { "order": "round_robin" }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "猜对标签", "who": "actor", "effect": "+1" },
+      { "event": "猜错标签", "who": "actor", "effect": "惩罚(轻)" },
+      { "event": "挑战失败", "who": "actor", "effect": "惩罚(轻)" },
+      { "event": "瓜主当选", "who": "瓜主", "effect": "+2" },
+      { "event": "瓜主失败", "who": "瓜主", "effect": "0" }
+    ],
+    "win": "5 轮主循环结束后，总分最高者胜",
+    "tiebreak": "系统随机裁决（风味名: 对齐骰子）"
+  },
+  "reveal_text": "颗粒度对完了，闭环也闭了——今晚的八卦瓜，比任何周报都精彩。MBTI 标签撕下来那一刻，全组才发现：i 人疯起来，e 人都怕。",
+  "reveal_signature": "融合自 阿凯 的「MBTI」、老周 的「开会黑话」、小雨 的「爱吃瓜」、Tony 的「健身狂魔」",
+  "flavor_glossary": [
+    { "term": "对齐颗粒度", "means": "职场黑话，指把信息/标准拉齐，这里借指大家统一行动。" },
+    { "term": "闭环", "means": "指完成一个流程，这里指一轮结束。" },
+    { "term": "瓜主", "means": "八卦中心人物，指爆最有料的人。" },
+    { "term": "i人/e人", "means": "MBTI 里的内向/外向分类。" }
+  ],
+  "safety_note": "黄暴档 20/100(低): 惩罚为即兴喊话+健身动作，无身体接触或羞耻内容；八卦爆瓜有『跳过/换一个』拒绝权（由全场共识判定替代）；未点名任何真人、无版权引用。职场团建语境，已避开点名贴身指令与高羞耻惩罚。"
+}

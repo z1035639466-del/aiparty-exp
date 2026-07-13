@@ -1,0 +1,117 @@
+```json
+{
+  "game_title": "对齐颗粒度的闭环挑战",
+  "subtitle": "公司团建速局 · 5人开战",
+  "premise": "每人抽一张密语卡，上面写着一个内部黑话和一个秘密任务。轮到你时，你必须在公开聊天中把黑话自然地塞进去，并暗中完成你的任务。同时，所有人都在猜你的MBTI！猜对的人得分，完成秘密任务的人得分，最后看谁的瓜吃得最准。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "每张卡上写着一个黑话(如：对齐、颗粒度、闭环)和一个秘密任务(如：让3个人回应你的提议、在别人说黑话时点头至少2次、主动提及一个健身动作)。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "用于每轮结束后的MBTI阵营猜测投票。亮票时自动转全场公开。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录得分。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮限时60秒。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局：每人发一张密语卡，读取自己的黑话和秘密任务。",
+    "第一轮：每人轮流发言。发言必须包含卡上的黑话，同时暗中执行秘密任务。其他人要观察并判断他的MBTI（是i人还是e人？）",
+    "每轮结束后：匿名投票猜测本轮的发言者是什么MBTI。同时，所有玩家需秘密提交自己是否察觉到了他的秘密任务内容。",
+    "揭晓：亮票，公布猜测结果和任务察觉结果。猜对MBTI的人得分，任务被察觉者不得分，任务成功且未被察觉者得分。",
+    "重复3-4轮，直至所有人均完成一次发言。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "黑话密令",
+      "mechanic": "同时提交",
+      "plain_rule": "每轮结束后，所有人需秘密提交两件事：1. 猜测本轮发言者的MBTI（i人/e人）；2. 是否察觉到了他的秘密任务。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "请秘密提交：1. 你认为本轮发言者是 i人 还是 e人？ 2. 你察觉到他刚才在偷偷执行秘密任务了吗？",
+        "input_kind": "options",
+        "options": ["i人", "e人", "未察觉任务", "察觉任务"],
+        "timeout_s": 30,
+        "reveal": "simultaneous",
+        "scoring_ref": ["MBTI猜对", "任务被察觉", "任务成功且未被察觉"]
+      }
+    },
+    {
+      "flavor_name": "闭环验证",
+      "mechanic": "判定",
+      "plain_rule": "系统会自动判定你提交的MBTI猜测是否与发言者自己的秘密声明一致。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "expr",
+        "question": "猜对MBTI了吗？",
+        "expr": "guess == secret_mbti",
+        "on": {
+          "过": { "scoring_ref": "MBTI猜对" },
+          "不过": { "scoring_ref": "MBTI猜错" }
+        }
+      }
+    },
+    {
+      "flavor_name": "颗粒度对齐",
+      "mechanic": "加减分",
+      "plain_rule": "猜对别人MBTI的人，加1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "winner",
+        "delta": "+1",
+        "scoring_ref": "MBTI猜对"
+      }
+    },
+    {
+      "flavor_name": "健身主动轮",
+      "mechanic": "限时",
+      "plain_rule": "轮到Tony发言时，他必须在60秒内完成一个简短的即兴健身动作展示（如：10个俯卧撑），并同时将卡上的黑话说出来。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 60,
+        "visible_countdown": true,
+        "on_timeout": { "effect": "scoring", "scoring_ref": "发言超时" }
+      }
+    },
+    {
+      "flavor_name": "瓜田李下",
+      "mechanic": "揭示",
+      "plain_rule": "整局限一次：你可以私下查看任意一个其他人过去一轮的密语卡内容，了解他的黑话和任务。",
+      "visibility": "自己看",
+      "params": {
+        "reveal_of": "prop:密语卡",
+        "to": "actor",
+        "once": true
+      }
+    },
+    {
+      "flavor_name": "强制对齐",
+      "mechanic": "点名目标",
+      "plain_rule": "每轮结束后，由本轮发言者指定下一轮谁必须发言。如果指定的人已经完成过发言，则他可以选择跳过，并重新指定下一位。",
+      "visibility": "全场公开",
+      "params": {
+        "selector": "actor",
+        "target_pool": "all_others",
+        "on_named": { "scoring_ref": ["发言顺序指定"], "eliminate": false }
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "MBTI猜对", "who": "猜对者", "effect": "+1" },
+      { "event": "MBTI猜错", "who": "猜错者", "effect": "0" },
+      { "event": "任务被察觉", "who": "被察觉者", "effect": "0" },
+      { "event": "任务成功且未被察觉", "who": "任务执行者", "effect": "+2" },
+      { "event": "发言超时", "who": "Tony", "effect": "-1" },
+      { "event": "发言顺序指定", "who": "被点名者", "effect": "0" }
+    ],
+    "win": "终局时总分最高者胜",
+    "tiebreak": "系统随机裁决(风味名: 领导一拍板)"
+  },
+  "reveal_text": "会议纪要上写的是对齐颗粒度，实际上我们在健身房闭环了吃瓜的灵魂。",
+  "reveal_signature": "融合自 阿凯的MBTI × 琳琳的短视频挑战 × 老周的开会黑话 × 小雨的吃瓜 × Tony的健身",
+  "flavor_glossary": [
+    { "term": "对齐、颗粒度、闭环", "means": "互联网公司内部常见的‘黑话’，此处被用作游戏中的秘密口令。" },
+    { "term": "i人/e人", "means": "MBTI性格分类中的‘内向/外向’标签，玩家需猜测彼此的性格属性。" },
+    { "term": "吃瓜", "means": "指围观八卦或获取信息，这里代表成功察觉他人的秘密任务。" }
+  ],
+  "safety_note": "黄暴档20/100(低): 无任何涉黄涉暴内容，所有惩罚仅为0分或负分，不涉及身体接触或羞辱。已避开职场尴尬场景，不点名真人，任务内容均为轻度互动。"
+}
+```

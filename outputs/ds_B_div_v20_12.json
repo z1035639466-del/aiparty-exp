@@ -1,0 +1,145 @@
+{
+  "game_title": "对齐颗粒度 · 八卦吃瓜局",
+  "subtitle": "为团建包间现制 5 人快局",
+  "premise": "每人脑门上贴一张 MBTI 标签，别人看得见、自己看不见。你只有靠开会黑话套话、吃瓜、飙挑战来推断自己是谁——猜对了吃肉，猜错了再干一轮。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "额头", "note": "每人随机分配一个 MBTI 类型(共 5 个不同)，只有别人能看到你的标签。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "每轮结束后，用于同时提交你的猜测：'我是谁？'揭晓时自动公开。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮限时 45 秒，到点自动进入提交。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每位玩家猜对的次数。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 每人额头贴一张 MBTI 牌——别人看得见，自己看不见。宣读背景：'今晚的会，对齐颗粒度——猜出你是谁，才能闭环。'",
+    "每轮: ① 45 秒限时交流(沙漏)；② 所有人同时提交猜测(匿名投票器)；③ 亮票，猜对者 +1 分；④ 全猜完(5 人全部猜对)游戏结束，或 6 轮后强制终局。",
+    "交流规则: 所有人都可以说任何话——但只准用『开会黑话』和『短视频挑战』两种方式互动。黑话用于诱导别人描述你，挑战用于表演或出题(见规则)。",
+    "终局: 揭晓每个人的真实身份，最高分者获胜。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "对一下颗粒度",
+      "mechanic": "同时提交",
+      "plain_rule": "每轮结束时所有人各自在手机上提交一个选项：'你觉得你是哪个 MBTI？' 选项是你认为可能的类型。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "请选出你认为自己额头上贴的 MBTI 类型",
+        "input_kind": "options",
+        "options": ["INTJ","ENFP","ISTJ","ESTP","INFP"],
+        "timeout_s": 45,
+        "reveal": "simultaneous",
+        "scoring_ref": ["猜对加 1 分"]
+      }
+    },
+    {
+      "flavor_name": "闭环倒计时",
+      "mechanic": "限时",
+      "plain_rule": "每轮交流只有 45 秒，沙漏走完必须停嘴、进入投票。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 45,
+        "visible_countdown": true,
+        "on_timeout": {
+          "effect": "goto",
+          "goto": "同时提交"
+        }
+      }
+    },
+    {
+      "flavor_name": "对齐加分",
+      "mechanic": "加减分",
+      "plain_rule": "每轮猜对的人得到 +1 分，记在记分板上。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "winner",
+        "delta": "+1",
+        "scoring_ref": "猜对加 1 分"
+      }
+    },
+    {
+      "flavor_name": "吃瓜爆料",
+      "mechanic": "受限沟通",
+      "plain_rule": "交流期间，所有人只能说『开会黑话』(如：对齐、颗粒度、闭环、抓手、赋能、沉淀)，或做『短视频挑战』动作(如：说一句绕口令、模仿一个常见表情包)。说日常语言的人，其他人可以一键举报——但举报必须同时提交'他说的哪一句不是黑话/挑战'，由全场共识确认。",
+      "visibility": "全场公开",
+      "params": {
+        "channel": "one_word",
+        "enforce": "channel_only"
+      }
+    },
+    {
+      "flavor_name": "吃瓜判官",
+      "mechanic": "判定",
+      "plain_rule": "如果有人举报别人说了日常语言，发起一场全场共识确认：你举报的那个句子算不算违规？过半数同意算违规，被举报者受一次轻罚。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "刚才这句话算违规的日常语言吗？",
+        "verdict_options": ["违规", "不违规"],
+        "on": {
+          "过": { "scoring_ref": "被举报违规(轻罚)" },
+          "不过": { "scoring_ref": "举报失败(轻罚举报者)" }
+        }
+      }
+    },
+    {
+      "flavor_name": "关小黑屋",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "被裁定违规的人，做 10 秒平板支撑(Tony 最爱的动作)。不想做可以换成讲一个公司内部真瓜(不点名，只说事件)。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "loser",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "被举报违规(轻罚)"
+      }
+    },
+    {
+      "flavor_name": "举报反噬",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "举报不成立的人，同样做 10 秒平板支撑或讲一个真瓜(二选一)。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "loser",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "举报失败(轻罚举报者)"
+      }
+    },
+    {
+      "flavor_name": "终场全闭环",
+      "mechanic": "揭示",
+      "plain_rule": "游戏结束时，所有人的额头牌全部公开，大家看自己猜对了谁。",
+      "visibility": "全场公开",
+      "params": {
+        "reveal_of": "prop:身份牌",
+        "to": "all",
+        "once": true
+      }
+    },
+    {
+      "flavor_name": "回合推进",
+      "mechanic": "回合推进",
+      "plain_rule": "每轮结束后自动进入下一轮，直到满足终局条件(全猜对或满 6 轮)。",
+      "visibility": "全场公开",
+      "params": {
+        "order": "round_robin"
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "猜对加 1 分", "who": "猜对者", "effect": "+1" },
+      { "event": "被举报违规(轻罚)", "who": "被罚者", "effect": "惩罚(轻)" },
+      { "event": "举报失败(轻罚举报者)", "who": "举报者", "effect": "惩罚(轻)" }
+    ],
+    "win": "终局时得分最高者胜；若多人同分，并列第一者加赛一轮(重新贴牌限时一轮猜)决出唯一胜者",
+    "tiebreak": "系统随机裁决(风味名: 掷勺定C位)；若并列者同意，可加赛一轮(重新贴牌限时一轮猜)代替随机"
+  },
+  "reveal_text": "这场对齐大会，颗粒度拉满、闭环成功——MBTI 标签都贴明白了，吃瓜吃到了自己的瓜。健身、黑话、挑战，原来每个人都是自己的 i 人或 e 人。",
+  "reveal_signature": "融合自 阿凯 的「MBTI」× 琳琳 的「短视频挑战」× 老周 的「开会黑话」× 小雨 的「爱吃瓜」× Tony 的「健身狂魔」",
+  "flavor_glossary": [
+    { "term": "对齐颗粒度", "means": "职场黑话，统一信息/标准的意思，这里用作每轮交流的暗号风格。" },
+    { "term": "闭环", "means": "完成一个流程结束，这里指猜对身份就结束游戏。" },
+    { "term": "吃瓜", "means": "小雨的八卦爱好，这里指举报和爆料环节的趣味来源。" },
+    { "term": "平板支撑", "means": "Tony 的健身动作，用作轻惩罚。" }
+  ],
+  "safety_note": "黄暴档 20/100(极低): 无身体接触、无性暗示、无点名真人；惩罚可选讲真瓜但要求不点名；举报机制自带跳过选项(换成讲瓜)；全流程无饮酒、无羞辱。"
+}

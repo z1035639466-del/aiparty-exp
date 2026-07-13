@@ -1,0 +1,123 @@
+```json
+{
+  "game_title": "对齐颗粒度 · 闭环挑战",
+  "subtitle": "公司团建包间 · 5人速局",
+  "premise": "每人额头贴一张隐藏身份牌——别人看得到你的 MBTI 类型，你自己看不到。轮流抽签触发任务或挑战，用开会黑话诱导他人暴露身份，同时提交默契题，最后靠吃瓜雷达揪出真正的'闭环者'。节奏快、爆笑多、不尴尬。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "额头", "note": "「E人(外倾)」×2、「I人(内倾)」×2、「闭环者(特殊)」×1。别人看得到你的类型，你自己看不到。" },
+    { "prop": "抽签筒", "to": "公共区", "visibility": "全场公开", "note": "内置若干任务/挑战签（内容来自黑话与短视频挑战），每人轮抽一支，执行后放回。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "用于每轮默契比对与终局指认闭环者；亮票时自动转全场公开。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮限时 40 秒用于抽签任务或讨论。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 发额头身份牌，宣读 MBTI 与闭环者背景",
+    "每轮: 抽签筒抽签 → 40 秒限时执行(沙漏) → 同时提交一个默契题(猜某人的类型) → 亮票 → 公布默契得分",
+    "达到 3 轮或有人被指认为闭环者且正确 → 终局结算",
+    "终局: 每人同时匿名提交指认闭环者，亮票后结算"
+  ],
+  "rules": [
+    {
+      "flavor_name": "抽个闭环签",
+      "mechanic": "判定",
+      "plain_rule": "从抽签筒抽一支签，签上写着一个任务（比如用黑话说一段话、做一个短视频挑战动作）。由系统判定是否完成——全场一键表决，超半数通过才算完成。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "该玩家是否成功完成了签上的任务？",
+        "verdict_options": ["通过", "不通过"],
+        "on": {
+          "过": { "scoring_ref": ["任务完成"] },
+          "不过": { "scoring_ref": ["任务失败"] }
+        }
+      }
+    },
+    {
+      "flavor_name": "40 秒对齐",
+      "mechanic": "限时",
+      "plain_rule": "抽签后你有 40 秒时间执行任务或讨论；时间一到必须停止，进入提交。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 40,
+        "visible_countdown": true,
+        "on_timeout": { "effect": "goto", "goto": "同时提交默契题" }
+      }
+    },
+    {
+      "flavor_name": "默契出圈",
+      "mechanic": "同时提交",
+      "plain_rule": "每轮限时结束后，所有人同时私密提交一个你猜测的、场上某人的 MBTI 类型（E/I/闭环者）。然后一起亮票，猜对即得分。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "猜猜场上哪一个人的额头牌类型是什么？（E/I/闭环者）",
+        "input_kind": "options",
+        "options": ["阿凯是E", "阿凯是I", "阿凯是闭环者", "琳琳是E", "琳琳是I", "琳琳是闭环者", "老周是E", "老周是I", "老周是闭环者", "小雨是E", "小雨是I", "小雨是闭环者", "Tony是E", "Tony是I", "Tony是闭环者", "无人是闭环者"],
+        "timeout_s": 20,
+        "reveal": "simultaneous",
+        "scoring_ref": ["猜中类型"]
+      }
+    },
+    {
+      "flavor_name": "吃瓜雷达",
+      "mechanic": "声明质疑",
+      "plain_rule": "每局限一次：你可以公开声明‘我怀疑 X 是闭环者’，然后立即触发全场投票指认（不是直接翻牌）。如果超过半数同意，该玩家被强制揭示身份并结束游戏；如果未过半数，你受一次惩罚。",
+      "visibility": "全场公开",
+      "params": {
+        "claim_prompt": "我怀疑 [玩家名] 是闭环者！",
+        "challengers": "others",
+        "challenge_window_s": 15,
+        "verify_source": "judge",
+        "verify_reveals": "identity",
+        "identity_resolution": "terminal",
+        "on_liar": { "scoring_ref": ["吃瓜指认正确"] },
+        "on_false_accuse": { "scoring_ref": ["吃瓜指认错误"] }
+      }
+    },
+    {
+      "flavor_name": "闭环失败惩罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "如果你声明质疑但没被半数支持，你得做一件不痛不痒的搞笑动作（比如学一声动物叫，或即兴说一句黑话绕口令），全场可以用一键跳过帮你免掉。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": ["吃瓜指认错误"]
+      }
+    },
+    {
+      "flavor_name": "颗粒度加减",
+      "mechanic": "加减分",
+      "plain_rule": "完成一个任务得 +1 分，失败不得分；猜中他人类型得 +2 分；用吃瓜雷达正确指认闭环者得 +5 分；错误指认扣 -2 分（并触发轻惩罚）。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "+1",
+        "scoring_ref": ["任务完成"]
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "任务完成", "who": "actor", "effect": "+1" },
+      { "event": "任务失败", "who": "actor", "effect": "+0" },
+      { "event": "猜中类型", "who": "actor", "effect": "+2" },
+      { "event": "吃瓜指认正确", "who": "actor", "effect": "+5" },
+      { "event": "吃瓜指认错误", "who": "actor", "effect": "-2" },
+      { "event": "闭环者被正确指认", "who": "闭环者", "effect": "-3" },
+      { "event": "闭环者存活至终局", "who": "闭环者", "effect": "+4" }
+    ],
+    "win": "终局时总分最高者胜；若闭环者被指认正确，则指认者额外 +2 分并优先排名",
+    "tiebreak": "系统随机裁决（风味名：会议室掷硬币）"
+  },
+  "reveal_text": "MBTI 不过是个标签，开会黑话不过是空壳——谁能想到，真正的‘闭环’藏在最八卦的人眼里，而那个健身狂魔，其实最懂怎么‘对齐’全场。",
+  "reveal_signature": "融合自 阿凯 的「MBTI」× 琳琳 的「短视频挑战」× 老周 的「开会黑话」× 小雨 的「吃瓜」× Tony 的「健身」",
+  "flavor_glossary": [
+    { "term": "对齐", "means": "开会黑话，指协调一致，这里指猜中别人类型或完成任务" },
+    { "term": "颗粒度", "means": "开会黑话，指细节程度，这里指任务或默契的精细度" },
+    { "term": "闭环", "means": "开会黑话，指形成完整流程，这里特指隐藏身份" },
+    { "term": "E人/I人", "means": "MBTI 人格类型，E=外倾，I=内倾" }
+  ],
+  "safety_note": "黄暴档 20/100(极低): 惩罚轻到搞笑动作（学动物叫/黑话绕口令），可一键跳过；无性化、无羞辱、无饮酒逼量；不点名任何真人、无版权引用；指向个人的任务自带跳过选项。"
+}
+```

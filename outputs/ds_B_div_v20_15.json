@@ -1,0 +1,142 @@
+{
+  "game_title": "全对齐 · 八卦闭环",
+  "subtitle": "为团建包间现制 · 5人速局",
+  "premise": "每人额头一张MBTI标签，别人看得见、自己看不见。轮流发起「八卦闭环」挑战，猜自己的标签、或诱导别人说出黑话——猜对加血、猜错挨惩罚。节奏快，全靠嘴皮子和八卦雷达。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop":"身份牌","to":"全体","visibility":"额头","note":"每人额头一张 MBTI 身份牌(如INFP、ESTJ等)。别人看得见、自己看不见，全局只有这一张隐藏身份。"},
+    {"prop":"匿名投票器","to":"全体","visibility":"自己看","note":"用于「八卦闭环」环节的投票/猜测提交。亮票时自动转全场公开(道具内置)。"},
+    {"prop":"沙漏","to":"公共区","visibility":"全场公开","note":"每轮「八卦闭环」限时30秒。"},
+    {"prop":"记分板","to":"公共区","visibility":"全场公开","note":"记录每轮得分、惩罚次数。"}
+  ],
+  "props_required": [],
+  "flow": [
+    "开局：发额头MBTI身份牌，宣读本局背景：'今天我们把开会黑话、短视频挑战、MBTI标签全对齐，谁先闭环谁赢。'",
+    "每轮：轮到的玩家是「发起人」。发起人从两个行动中选一个：(A) 猜自己的MBTI标签，(B) 发起一次「八卦闭环」挑战。",
+    "选项A：发起人直接说出自己猜的标签。正确+2分，错误触发一轮惩罚(中)。",
+    "选项B：发起人从盲盒里抽一个「闭环卡」，上面写着需要其他玩家做到的事（说一句黑话/做10秒健身动作/模仿一个短视频挑战）。完成则发起人+1分，被叫到的人+1分；失败则触发惩罚(轻)。",
+    "每轮结束后按座位顺序轮换发起人。",
+    "终局：记分板分数最高者胜。"
+  ],
+  "rules": [
+    {
+      "flavor_name":"MBTI 自曝",
+      "mechanic":"声明质疑",
+      "plain_rule":"轮到你当发起人时，你可以公开声称自己的MBTI标签是什么，其他人可以质疑。如果质疑正确(你说谎)，你受罚；如果质疑错误(你说的是真话)，质疑者受罚。",
+      "visibility":"全场公开",
+      "params":{
+        "claim_prompt":"说出你猜测的自己的MBTI标签",
+        "challengers":"others",
+        "challenge_window_s":15,
+        "verify_source":"prop_reveal:身份牌",
+        "verify_reveals":"identity",
+        "identity_resolution":"terminal",
+        "on_liar":{"scoring_ref":"自曝说谎"},
+        "on_false_accuse":{"scoring_ref":"质疑冤枉"}
+      }
+    },
+    {
+      "flavor_name":"八卦闭环挑战",
+      "mechanic":"同时提交",
+      "plain_rule":"发起人从盲盒抽一张「闭环卡」，上面写着一个小任务。发起人选择一个玩家要求完成该任务。其他所有玩家(包括发起人)秘密投票认为该玩家能否完成——然后同时亮票。若多数票认为能且完成了，发起人与被叫者各加1分；若多数票认为不能但完成了，被叫者额外加1分；若未完成，被叫者触发惩罚(轻)。",
+      "visibility":"全场公开",
+      "params":{
+        "prompt":"你认为被叫玩家能完成这个任务吗？",
+        "input_kind":"options",
+        "options":["能","不能"],
+        "timeout_s":30,
+        "reveal":"simultaneous",
+        "scoring_ref":["发起人加分","被叫者加分","被叫者额外加分"]
+      }
+    },
+    {
+      "flavor_name":"对齐颗粒度",
+      "mechanic":"限时",
+      "plain_rule":"每轮「八卦闭环挑战」限时30秒，时间一到未完成视为失败。",
+      "visibility":"全场公开",
+      "params":{
+        "seconds":30,
+        "visible_countdown":true,
+        "on_timeout":{"effect":"scoring","scoring_ref":"挑战超时"}
+      }
+    },
+    {
+      "flavor_name":"闭环失败",
+      "mechanic":"惩罚(轻)",
+      "plain_rule":"当被叫玩家未完成闭环卡任务，触发一次轻度惩罚——比如做一个5秒的平板支撑、或者讲一个冷笑话。受罚者可以换成另一个同等轻度的替代惩罚。",
+      "visibility":"全场公开",
+      "params":{
+        "who":"target",
+        "pool":"$gen.penalty_内容池",
+        "scoring_ref":"挑战失败惩罚"
+      }
+    },
+    {
+      "flavor_name":"自曝说谎",
+      "mechanic":"惩罚(中)",
+      "plain_rule":"如果你在声明质疑环节说假话被捉住，需要做一个15秒的即兴表演(可以换成等时长的健身动作)。",
+      "visibility":"全场公开",
+      "params":{
+        "who":"actor",
+        "pool":"$gen.penalty_内容池",
+        "scoring_ref":"自曝说谎"
+      }
+    },
+    {
+      "flavor_name":"质疑冤枉",
+      "mechanic":"惩罚(轻)",
+      "plain_rule":"如果你质疑了说真话的发起人，你需要做一个5秒的搞笑表情（可以换成其他同等轻度惩罚）。",
+      "visibility":"全场公开",
+      "params":{
+        "who":"actor",
+        "pool":"$gen.penalty_内容池",
+        "scoring_ref":"质疑冤枉"
+      }
+    },
+    {
+      "flavor_name":"吃瓜加码",
+      "mechanic":"加减分",
+      "plain_rule":"当你在「八卦闭环挑战」中猜对被叫者能否完成任务(你的票与结果一致)，你额外+1分。",
+      "visibility":"全场公开",
+      "params":{
+        "who":"actor",
+        "delta":"+1",
+        "scoring_ref":"吃瓜猜对"
+      }
+    },
+    {
+      "flavor_name":"闭环卡盲盒",
+      "mechanic":"传递链",
+      "plain_rule":"闭环卡上的任务内容由系统从预设库抽取，但为了增加趣味，任务会沿座位顺序私密传递给每个玩家，每人只能看到上一棒的任务描述，最后在回合结束时对比首尾。",
+      "visibility":"自己看",
+      "params":{
+        "content_from":"$gen.事件池",
+        "order":"seat",
+        "each_sees":"prev_only",
+        "replay":"first_vs_last"
+      }
+    }
+  ],
+  "settlement":{
+    "scoring":[
+      {"event":"发起人加分","who":"发起人","effect":"+1"},
+      {"event":"被叫者加分","who":"被叫者","effect":"+1"},
+      {"event":"被叫者额外加分","who":"被叫者","effect":"+1"},
+      {"event":"吃瓜猜对","who":"猜对者","effect":"+1"},
+      {"event":"自曝说谎","who":"说谎者","effect":"惩罚(中)"},
+      {"event":"质疑冤枉","who":"质疑者","effect":"惩罚(轻)"},
+      {"event":"挑战失败惩罚","who":"被叫者","effect":"惩罚(轻)"},
+      {"event":"挑战超时","who":"被叫者","effect":"惩罚(轻)"}
+    ],
+    "win":"终局时记分板分数最高者胜",
+    "tiebreak":"系统随机裁决(风味名: 会议室抽签)"
+  },
+  "reveal_text":"今天颗粒度全对上了，八卦闭环，闭环了。你永远不知道自己额头上贴着啥——但所有人都替你看见了。",
+  "reveal_signature":"融合自 阿凯的MBTI × 老周的开会黑话 × 琳琳的短视频挑战 × 小雨的八卦雷达 × Tony的健身狂魔",
+  "flavor_glossary":[
+    {"term":"MBTI","means":"一种人格类型测试，这里用来做额头标签。"},
+    {"term":"对齐、颗粒度、闭环","means":"职场黑话，这里用作挑战任务的内容。"},
+    {"term":"闭环卡","means":"盲盒里抽的任务卡，内容包含开会黑话、短视频挑战或健身动作。"}
+  ],
+  "safety_note":"黄暴档20/100(低): 惩罚仅轻度(平板支撑/冷笑话/搞笑表情)，无身体接触、无性化内容、无指名道姓的真人言论。所有指向个人的任务均自带替代项(跳过/换一个)。职场语境下已避开高羞耻惩罚与贴身指令。"
+}

@@ -1,0 +1,117 @@
+{
+  "game_title": "对齐颗粒度 · 团建瓜田局",
+  "subtitle": "为五人群聊定制 · 5人速刷",
+  "premise": "每人脑门贴一张 MBTI 标签，自己看不到但别人看得到。你听到的八卦、刷到的挑战、拉练的邀请，全都得用黑话传递。三轮之后，猜对全场最多人标签的赢——猜错多的，来一轮健身惩罚。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "额头", "note": "每人一张 MBTI 标签，别人看得见、自己看不到。标签池: ENFP/INTJ/ESTP/ISFJ/ENTP。" },
+    { "prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "每轮抽一张密语卡，上面有一个任务（八卦挑战/黑话模仿/健身动作），做完有分。" },
+    { "prop": "匿名投票器", "to": "公共区", "visibility": "自己看", "note": "三轮结束后，每人私密提交自己对全场的标签猜测；揭晓时自动转全场公开。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮限时60秒完成密语卡任务。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每轮密语卡完成得分、终局猜测得分。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 每人脑门贴 MBTI 标签，介绍规则与黑话词典",
+    "三轮: 每轮抽密语卡 → 60 秒限时完成（沙漏） → 完成后由全场共识确认得分 → 进入下一轮",
+    "三轮结束: 匿名投票器提交最终猜测（每人提交自己对全场的标签判断）",
+    "揭晓: 同时揭晓标签与猜测，统计分数，宣布赢家与惩罚"
+  ],
+  "rules": [
+    {
+      "flavor_name": "黑话任务牌",
+      "mechanic": "同时提交",
+      "plain_rule": "每轮你抽一张密语卡，上面有一个任务（比如：用'对齐'造一句关于别人的话、模仿一个健身动作、分享一个关于某人的八卦）。你需要在60秒内完成，然后全场投票确认你是否完成。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "密语卡上的任务描述",
+        "input_kind": "options",
+        "options": ["完成", "未完成"],
+        "timeout_s": 60,
+        "reveal": "simultaneous",
+        "scoring_ref": ["任务完成"]
+      }
+    },
+    {
+      "flavor_name": "瓜田倒计时",
+      "mechanic": "限时",
+      "plain_rule": "每轮你只有 60 秒去完成密语卡任务。沙漏流完，任务自动失败。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 60,
+        "visible_countdown": true,
+        "on_timeout": {
+          "effect": "scoring",
+          "scoring_ref": "任务超时"
+        }
+      }
+    },
+    {
+      "flavor_name": "全员哔哔机",
+      "mechanic": "判定",
+      "plain_rule": "密语卡任务完成后，全场每人投票判定'完成'或'未完成'。过半票算完成，否则算未完成。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "此人是否完成了密语卡任务？",
+        "verdict_options": ["完成", "未完成"],
+        "on": {
+          "过": { "scoring_ref": "任务完成" },
+          "不过": { "scoring_ref": "任务超时" }
+        }
+      }
+    },
+    {
+      "flavor_name": "标签大竞猜",
+      "mechanic": "同时提交",
+      "plain_rule": "三轮结束后，每人私密提交你对全场所有人的 MBTI 标签猜测（包括你自己——猜你自己的标签）。猜对一个得 1 分。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "请为每位玩家（包括自己）选择一个 MBTI 标签",
+        "input_kind": "options",
+        "options": ["ENFP", "INTJ", "ESTP", "ISFJ", "ENTP"],
+        "timeout_s": 120,
+        "reveal": "simultaneous",
+        "scoring_ref": ["标签猜对(每人)"]
+      }
+    },
+    {
+      "flavor_name": "健身惩罚时间",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "猜对标签最少的两个人，一起做 15 秒的'开合跳'（可跳过，跳过不做惩罚）。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "loser",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "猜错最多的惩罚"
+      }
+    },
+    {
+      "flavor_name": "对齐颗粒度",
+      "mechanic": "回合推进",
+      "plain_rule": "按座位顺序轮流抽密语卡、做任务，顺时针推进。",
+      "visibility": "全场公开",
+      "params": {
+        "order": "round_robin"
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "任务完成", "who": "actor", "effect": "+1" },
+      { "event": "任务超时", "who": "actor", "effect": "0" },
+      { "event": "标签猜对(每人)", "who": "actor", "effect": "+1" },
+      { "event": "猜错最多的惩罚", "who": "loser", "effect": "惩罚(轻)" }
+    ],
+    "win": "终局时个人总分最高者胜（任务完成分 + 标签猜对分）",
+    "tiebreak": "系统随机裁决（风味名：董事会抽签）"
+  },
+  "reveal_text": "会议室里对齐了一下午的颗粒度，到晚上才发现——你们标签底下全是一群 i 人装 e。八卦没少传，拉练一个没成，闭环的是这局的快乐。",
+  "reveal_signature": "融合自 阿凯 的「MBTI」× 琳琳 的「短视频挑战」× 老周 的「开会黑话」× 小雨 的「爱吃瓜」× Tony 的「健身狂魔」",
+  "flavor_glossary": [
+    { "term": "对齐颗粒度", "means": "老周提到的开会黑话，指把大家的信息拉平。这里用作每轮推进的命名。" },
+    { "term": "哔哔机", "means": "网络梗，指集体发言/投票的热闹场面。" },
+    { "term": "瓜田", "means": "小雨的'爱吃瓜'衍生，指八卦集中地。" }
+  ],
+  "safety_note": "黄暴档 20/100(极低): 惩罚仅开合跳，可跳过；无性内容、无点名真人、无版权引用；职场语境下避开高羞耻与点名贴身指令。"
+}

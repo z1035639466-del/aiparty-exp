@@ -1,0 +1,130 @@
+```json
+{
+  "game_title": "对齐颗粒度 · 团建局",
+  "subtitle": "5人 高节奏八卦挑战",
+  "premise": "每人抽一张身份牌（I人/E人），但根本没人知道自己是哪个——靠一轮轮快速挑战和吃瓜投票，猜出全场谁是什么人格。猜对得分、猜错跳惩罚，最后人格谜底揭晓，决出真正的团建之王。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "额头", "note": "一张「E人」、四张「I人」。每人额头贴一张，只有别人看得到、自己看不到。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "每轮投票/挑战判定用；亮票时自动转全场公开。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮限时 60 秒。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每轮得分/惩罚。" },
+    { "prop": "盲盒", "to": "公共区", "visibility": "自己看开", "note": "每轮由「吃瓜位」抽一个盲盒，开出本轮的挑战/任务内容。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 发额头身份牌，宣读团建背景和MBTI规则。",
+    "每轮: 轮换一人当「吃瓜位」→ 抽盲盒(开出本轮的挑战/任务) → 60秒执行 → 匿名投票判定完成与否 → 亮票 → 记分/惩罚。",
+    "终局: 所有人猜测自己额头身份 → 揭晓谜底 → 结算分数，决出团建之王。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "吃瓜位点名",
+      "mechanic": "点名目标",
+      "plain_rule": "每轮由当前「吃瓜位」指定下一个「吃瓜位」，不能指定自己。",
+      "visibility": "全场公开",
+      "params": {
+        "selector": "actor",
+        "target_pool": "others",
+        "on_named": { "scoring_ref": ["吃瓜位转移"], "eliminate": false }
+      }
+    },
+    {
+      "flavor_name": "盲盒挑战",
+      "mechanic": "判定",
+      "plain_rule": "吃瓜位抽盲盒开出本轮的挑战内容（例：表演一个最近的短视频挑战 / 用三个词描述一个同事的八卦 / 现场做5个俯卧撑）。完成后全场匿名投票判定是否完成。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "该挑战完成了吗？",
+        "verdict_options": ["完成", "未完成"],
+        "on": {
+          "完成": { "scoring_ref": "挑战成功" },
+          "未完成": { "scoring_ref": "挑战失败" }
+        }
+      }
+    },
+    {
+      "flavor_name": "对齐粒度",
+      "mechanic": "限时",
+      "plain_rule": "每轮挑战执行与投票必须控制在60秒内完成，超时则判定为未完成。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 60,
+        "visible_countdown": true,
+        "on_timeout": { "effect": "scoring", "scoring_ref": "超时惩罚" }
+      }
+    },
+    {
+      "flavor_name": "闭环八卦",
+      "mechanic": "提交",
+      "plain_rule": "每轮挑战结束后，所有玩家同时私密提交「该玩家是I人还是E人」的猜测。揭晓后猜对者得分。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "你猜这个人是 I人 还是 E人？",
+        "input_kind": "options",
+        "options": ["I人", "E人"],
+        "timeout_s": 30,
+        "reveal": "simultaneous",
+        "scoring_ref": ["猜对人格", "猜错人格"]
+      }
+    },
+    {
+      "flavor_name": "颗粒度惩罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "挑战未完成或猜错人格的人，接受一轮趣味惩罚——例：用开会黑话讲一个段子。拒绝可换为：原地转5圈。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "loser",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "惩罚执行"
+      }
+    },
+    {
+      "flavor_name": "闭环加码",
+      "mechanic": "加减分",
+      "plain_rule": "猜对人格的玩家 +1 分，挑战成功的玩家 +1 分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "winner",
+        "delta": "+1",
+        "scoring_ref": "猜对人格"
+      }
+    },
+    {
+      "flavor_name": "终局扒皮",
+      "mechanic": "揭示",
+      "plain_rule": "最后一轮结束后，每人可以查看自己额头上的身份牌。",
+      "visibility": "自己看",
+      "params": {
+        "reveal_of": "prop:身份牌",
+        "to": "actor",
+        "once": true
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "挑战成功", "who": "执行者", "effect": "+1" },
+      { "event": "挑战失败", "who": "执行者", "effect": "惩罚(轻)" },
+      { "event": "超时惩罚", "who": "执行者", "effect": "惩罚(轻)" },
+      { "event": "猜对人格", "who": "猜对者", "effect": "+1" },
+      { "event": "猜错人格", "who": "猜错者", "effect": "惩罚(轻)" },
+      { "event": "惩罚执行", "who": "被惩罚者", "effect": "无分" },
+      { "event": "吃瓜位转移", "who": "新吃瓜位", "effect": "无分" }
+    ],
+    "win": "终局时总分最高者胜",
+    "tiebreak": "系统随机裁决（风味名：命运闭环节）"
+  },
+  "reveal_text": "开会黑话、短视频挑战、健身安利、MBTI人格、吃瓜雷达——今天全对齐了。颗粒度拉满，闭环成功，散会！",
+  "reveal_signature": "融合自 阿凯 的「MBTI」× 琳琳 的「短视频挑战」× 老周 的「开会黑话」× 小雨 的「吃瓜」× Tony 的「健身」",
+  "flavor_glossary": [
+    { "term": "对齐", "means": "开会黑话，意为让各方信息或步调一致。这里指整局游戏的规则与挑战节奏。" },
+    { "term": "颗粒度", "means": "开会黑话，指细节程度。这里被用作游戏内惩罚或挑战的形容——'颗粒度惩罚'就是细到好笑的惩罚。" },
+    { "term": "闭环", "means": "开会黑话，意为完成一个流程。这里指每轮挑战-投票-计分-惩罚的完整循环。" },
+    { "term": "吃瓜位", "means": "指每轮负责抽盲盒、发起挑战的玩家，隐喻小雨的八卦人设。" },
+    { "term": "I人/E人", "means": "MBTI人格分类的两种基本倾向：内向(I)和外向(E)。本局游戏核心谜底。" }
+  ],
+  "safety_note": "黄暴档 20/100(极低): 惩罚为趣味表演/转圈，无身体接触、无羞辱内容；不点名真人、无版权引用；职场语境下无越界任务，全员可跳过。"
+}
+```

@@ -1,0 +1,126 @@
+```json
+{
+  "game_title": "对齐颗粒度的瓜田挑战",
+  "subtitle": "公司团建·5人快节奏默契局",
+  "premise": "每人获得一个隐藏身份——你是「i人」、「e人」，还是那个到处吃瓜的「吃瓜群众」？通过快手短视频挑战和默契考验，一边拉人健身，一边用黑话忽悠别人，揪出那个偷偷吃瓜的家伙。节奏超快，不冷场。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "自己看", "note": "三张「e人」、一张「i人」、一张「吃瓜群众」。各持秘密身份，局末揭晓。" },
+    { "prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "每轮开始时每人私发一张「指令卡」，内容为短视频挑战动作或黑话任务。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "每轮结束时用于「默契比对」和「吃瓜指认」的匿名提交。亮票自动公开。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "计时90秒，用于限时挑战。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每轮得分。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 发身份牌，宣读规则与背景",
+    "每轮: ① 系统私发密语卡(挑战/黑话任务) → ② 沙漏限时90秒执行/表演 → ③ 匿名投票器提交默契比对 → ④ 亮票计分 → ⑤ 吃瓜群众可在任意轮次发动技能(见规则)",
+    "终局: 得分最高者胜出，揭晓所有身份，吃瓜群众若从未被指认则额外加分"
+  ],
+  "rules": [
+    {
+      "flavor_name": "MBTI默契比对",
+      "mechanic": "同时提交",
+      "plain_rule": "每轮系统出一个题目，比如'谁最像e人？'，所有人匿名提交一个人的名字，然后同时揭晓。猜中最多人选的得1分。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "本轮的题目（系统生成：如'谁会第一个做这个挑战？'）",
+        "input_kind": "options",
+        "options": ["$派生:玩家列表"],
+        "timeout_s": 90,
+        "reveal": "simultaneous",
+        "scoring_ref": ["默契得分"]
+      }
+    },
+    {
+      "flavor_name": "黑话闭环挑战",
+      "mechanic": "判定",
+      "plain_rule": "每人抽到一句黑话（如'对齐颗粒度'），要在90秒内，在随便聊天中自然地说出来，说完不许承认。其他人在结束后投票：谁说得最自然/最假？系统判定'过'或'不过'。",
+      "visibility": "自己看",
+      "params": {
+        "source": "consensus",
+        "question": "这个人把黑话说出来了吗？",
+        "verdict_options": ["过了", "没过"],
+        "on": {
+          "过": { "scoring_ref": ["黑话通关"] },
+          "不过": { "scoring_ref": [] }
+        }
+      }
+    },
+    {
+      "flavor_name": "拉人健身",
+      "mechanic": "点名目标",
+      "plain_rule": "每轮有一个人可以指定一个别人，要求他现场做一个10秒的健身动作（如深蹲、抬手）。被点名的人必须做，做了得1分；拒绝做则扣1分。",
+      "visibility": "全场公开",
+      "params": {
+        "selector": "actor",
+        "target_pool": "alive_others",
+        "on_named": {
+          "scoring_ref": ["健身完成", "健身拒绝"],
+          "eliminate": false
+        }
+      }
+    },
+    {
+      "flavor_name": "吃瓜雷达",
+      "mechanic": "声明质疑",
+      "plain_rule": "在任何一轮，如果你觉得有人是「吃瓜群众」，可以公开声明'我怀疑你是吃瓜群众'，然后你俩各自匿名提交'是/不是'。系统核对：如果你猜对(对方真是吃瓜群众)，你+2分，对方-1分；如果你猜错(对方不是)，你-1分，对方免罚。",
+      "visibility": "自己看",
+      "params": {
+        "claim_prompt": "你公开指认XX是吃瓜群众",
+        "challengers": "others",
+        "challenge_window_s": 30,
+        "verify_source": "prop_reveal:身份牌",
+        "verify_reveals": "identity",
+        "identity_resolution": "terminal",
+        "on_liar": { "scoring_ref": ["吃瓜指认正确"] },
+        "on_false_accuse": { "scoring_ref": ["吃瓜指认错误"] }
+      }
+    },
+    {
+      "flavor_name": "挑战接力",
+      "mechanic": "限时",
+      "plain_rule": "每轮挑战开始后，沙漏倒计时90秒。时间一到，所有人必须停止当前动作，进入提交阶段。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 90,
+        "visible_countdown": true,
+        "on_timeout": { "effect": "goto", "goto": "匿名投票阶段" }
+      }
+    },
+    {
+      "flavor_name": "计分板更新",
+      "mechanic": "加减分",
+      "plain_rule": "每轮结束后，根据规则记录每个人的得分变化，更新记分板。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "winner",
+        "delta": "+1",
+        "scoring_ref": ["默契得分", "黑话通关", "健身完成"]
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "默契得分", "who": "猜中多数者", "effect": "+1" },
+      { "event": "黑话通关", "who": "通过者", "effect": "+1" },
+      { "event": "健身完成", "who": "完成动作的被点名者", "effect": "+1" },
+      { "event": "健身拒绝", "who": "拒绝者", "effect": "-1" },
+      { "event": "吃瓜指认正确", "who": "指认者", "effect": "+2" },
+      { "event": "吃瓜指认错误", "who": "指认者", "effect": "-1" },
+      { "event": "吃瓜群众终局未指认", "who": "吃瓜群众", "effect": "+3" }
+    ],
+    "win": "终局时总分最高者胜；若吃瓜群众存活且未被指认，额外+3分后参与排名",
+    "tiebreak": "平局由系统随机裁决（风味名：抓阄吃瓜）"
+  },
+  "reveal_text": "团建结束，瓜田里最沉默的瓜被挖出来了——原来那个天天拉人健身的Tony，才是躲在健身动作后面偷吃瓜的群众。颗粒度对不齐，但笑点闭环了。",
+  "reveal_signature": "融合自 阿凯 的「MBTI」 × 琳琳 的「短视频挑战」 × 老周 的「开会黑话」 × 小雨 的「爱吃瓜」 × Tony 的「健身狂魔」",
+  "flavor_glossary": [
+    { "term": "对齐颗粒度", "means": "某互联网公司黑话，意思是把细节沟通清楚，这里被用作任务关键词。" },
+    { "term": "闭环", "means": "黑话，指完成一个完整流程，这里指挑战完成。" },
+    { "term": "i人/e人", "means": "MBTI人格分类，i=内向，e=外向，大家互相贴标签用。" },
+    { "term": "吃瓜群众", "means": "网络用语，指围观八卦、不主动参与的人，这里是本局的一个隐藏身份。" }
+  ],
+  "safety_note": "黄暴档20/100(低): 所有任务仅限口头/简单健身动作（深蹲抬手）；健身点名带拒绝权（扣1分）；无饮酒/羞辱/身体接触；职场语境下已避开点名贴身指令与高羞耻惩罚；素材均来源于玩家且无版权争议。"
+}
+```

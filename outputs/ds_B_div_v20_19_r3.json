@@ -1,0 +1,54 @@
+```json
+{
+  "game_title": "对齐·闭环·颗粒度",
+  "subtitle": "公司团建包间 · 5人速局",
+  "premise": "每人私密收到一张密语卡，上面写着一个『开会黑话』。你的任务是通过『受限沟通』——只能用一个词——引诱别人说出你卡上的词。谁说的词被点中，谁出局。最后一人的黑话没被触发，就是瓜王。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "每人一张，上面写着一个开会黑话词（对齐、颗粒度、闭环、抓手、赋能）。别人不知道你的词。" },
+    { "prop": "匿名投票器", "to": "公共区", "visibility": "自己看", "note": "用于『质疑指认』环节，亮票自动公开。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮发言限时。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每轮被‘闭环’出局的人。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 每人发一张密语卡（黑话），沙漏设定90秒。",
+    "第一轮: 每人依次发言，只能用『一个词』（不能是密语卡上的词），尽力引诱别人说出你卡上的词。",
+    "每轮限时90秒，时间到进入『质疑指认』：你怀疑谁说了你的词？匿名投票一次。",
+    "投对: 被指的人出局（被闭环）。投错: 你被『反闭环』出局。",
+    "最后一轮只剩2人时，改为一对一『哑语对决』：只做动作，不能说任何词。先让对方说出自己词的人胜。",
+    "终局: 最后一个没被闭环的玩家成为『瓜王』。"
+  ],
+  "rules": [
+    { "flavor_name": "闭环指认", "mechanic": "声明质疑", "plain_rule": "你觉得有人说了你的密语卡上的词，就用匿名投票器指认他。指错了，你自己出局。", "visibility": "自己看",
+      "params": { "claim_prompt": "你怀疑谁说了你的黑话词？", "challengers": "others", "challenge_window_s": 10, "verify_source": "judge", "verify_reveals": "prop_state", "identity_resolution": "terminal", "on_liar": { "scoring_ref": "闭环成功" }, "on_false_accuse": { "scoring_ref": "反闭环" } } },
+    { "flavor_name": "一词定音", "mechanic": "受限沟通", "plain_rule": "轮到你的回合，你只能说一个词。不能是你密语卡上的词。可以用任何词（包括闲聊、emoji音译、动作拟声词）。", "visibility": "全场公开",
+      "params": { "channel": "one_word", "enforce": "channel_only" } },
+    { "flavor_name": "瓜王封顶", "mechanic": "惩罚(轻)", "plain_rule": "最后一个出局的人，要接受一个轻惩罚：模仿短视频挑战里最火的一个动作（10秒）。", "visibility": "全场公开",
+      "params": { "who": "loser", "pool": "$gen.penalty_内容池", "scoring_ref": "最终出局" } },
+    { "flavor_name": "哑语终局", "mechanic": "限时", "plain_rule": "最后一轮变成2人对决，每人只能用肢体动作比划，不能出声。限时30秒，时间到进入『质疑指认』。", "visibility": "全场公开",
+      "params": { "seconds": 30, "visible_countdown": true, "on_timeout": { "effect": "goto", "goto": "质疑指认" } } },
+    { "flavor_name": "反闭环出局", "mechanic": "点名目标", "plain_rule": "如果你指认错了（对方实际没说你词），你就被『反闭环』出局。", "visibility": "全场公开",
+      "params": { "selector": "vote", "target_pool": "actor", "on_named": { "scoring_ref": "反闭环", "eliminate": true } } }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "闭环成功", "who": "指认者", "effect": "+1" },
+      { "event": "反闭环", "who": "被指认者", "effect": "+1" },
+      { "event": "最终出局", "who": "最后出局者", "effect": "惩罚(轻)" },
+      { "event": "瓜王", "who": "无人被闭环到终局", "effect": "+2" }
+    ],
+    "win": "终局时得分最高者胜。得分相同则再开一轮『一词定音』加赛。",
+    "tiebreak": "加赛一轮『一词定音』，系统随机出题词，先让对方说出该词的人胜。"
+  },
+  "reveal_text": "今晚的会议室没有PPT，只有『对齐』被闭环、『颗粒度』被反杀。最后那个没被『闭环』的，不是i人也不是e人——是瓜王。",
+  "reveal_signature": "融合自 老周 的『开会黑话』 × 琳琳 的『短视频挑战』 × 小雨 的『爱吃瓜』",
+  "flavor_glossary": [
+    { "term": "闭环", "means": "开会黑话，指完整走完一个流程并反馈。这里指‘指认成功，对方出局’。" },
+    { "term": "反闭环", "means": "指认失败，自己出局。" },
+    { "term": "瓜王", "means": "小雨爱吃瓜的梗，指最后一个存活、没人能闭环他的人，全场最大八卦赢家。" },
+    { "term": "一词定音", "means": "改编自‘一锤定音’，每回合只能说一个词，极度受限的沟通。" }
+  ],
+  "safety_note": "黄暴档 20/100(低): 惩罚为短视频动作模仿（轻），无身体接触、无露骨内容、无点名真人。职场语境安全：黑话梗属内部调侃，不冒犯任何人。拒绝权：每轮指认前可声明‘跳过此轮’（不指认也不被罚），代价为自动进入下一轮，不羞辱。"
+}
+```

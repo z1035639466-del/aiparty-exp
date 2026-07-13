@@ -1,0 +1,55 @@
+```json
+{
+  "game_title": "对齐颗粒度：闭环节奏挑战",
+  "subtitle": "为团建包间现制 · 5人速配局",
+  "premise": "每人额头上贴着一个MBTI标签——别人看得见，你自己看不见。每人轮流在限时内完成一个短视频挑战（随机任务，可跳过重抽），其他人在你表演时投票猜测你的MBTI，猜对猜错都有分。三轮后揭晓，猜对别人最多的人胜。黑话和健身梗混在任务里当调味品。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "额头", "note": "每张牌写一个MBTI类型（从ISTJ/ENFP/INTJ/ESFJ/INTP中随机分配各一张）。只有别人看得见。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "每轮表演后，每人私密提交对该人的MBTI猜测。亮票时自动全场公开。" },
+    { "prop": "盲盒", "to": "公共区", "visibility": "自己看(表演者开盒)", "note": "内含本轮挑战卡：短视频挑战题目，表演者抽一张并执行。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮挑战限时45秒。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每位玩家猜对别人MBTI的次数。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 每人额头贴一张MBTI身份牌，自己看不见；宣读背景：'今天对齐一下大家的颗粒度——你到底是个i还是e？'",
+    "第一轮: 按座位顺序(阿凯→琳琳→老周→小雨→Tony)轮流当表演者",
+    "表演者抽盲盒 → 看挑战卡 → 45秒沙漏倒计时内完成挑战(可申请换一张，跳过权:1次/局)",
+    "表演中，其余4人用匿名投票器私密提交对该人MBTI的猜测（单选）",
+    "表演结束 -> 同时亮票 -> 记分：猜对者+1分；表演者无论猜对他的人有多少都不加分也不扣分",
+    "三轮后 -> 结算 -> 揭幕",
+    "平局规则: 系统随机裁决(风味名：闭环抽签)"
+  ],
+  "rules": [
+    { "flavor_name": "MBTI打卡", "mechanic": "点名目标", "plain_rule": "每轮按座位顺序指定一人当表演者，其他人猜他的MBTI。", "visibility": "全场公开",
+      "params": { "selector": "actor", "target_pool": "轮替顺序", "on_named": { "scoring_ref": [], "eliminate": false } } },
+    { "flavor_name": "短视频挑战", "mechanic": "限时", "plain_rule": "表演者抽到一张挑战卡，45秒内完成（可申请换卡一次）。沙漏走完必须停止。", "visibility": "全场公开",
+      "params": { "seconds": 45, "visible_countdown": true, "on_timeout": { "effect": "goto", "goto": "投票阶段" } } },
+    { "flavor_name": "吃瓜雷达", "mechanic": "同时提交", "plain_rule": "表演者表演时，其余4人私密选择你认为他额头上的MBTI类型，同时揭晓。", "visibility": "自己看",
+      "params": { "prompt": "你认为 <表演者> 的MBTI是什么？", "input_kind": "options", "options": ["ISTJ","ENFP","INTJ","ESFJ","INTP"], "timeout_s": 30, "reveal": "simultaneous", "scoring_ref": ["猜对他人MBTI"] } },
+    { "flavor_name": "对齐得分", "mechanic": "加减分", "plain_rule": "每轮猜对表演者MBTI类型的人，得1分。记分板累计。", "visibility": "全场公开",
+      "params": { "who": "猜对的人", "delta": "+1", "scoring_ref": "猜对他人MBTI" } },
+    { "flavor_name": "换一卡", "mechanic": "判定", "plain_rule": "表演者每局有一次机会申请换挑战卡：从盲盒再抽一张，原卡作废，新卡替代。", "visibility": "全场公开",
+      "params": { "source": "consensus", "question": "表演者想换卡，全场同意吗？", "verdict_options": ["同意","不同意"], "on": { "过": { "scoring_ref": [] }, "不过": { "scoring_ref": [] } } } },
+    { "flavor_name": "健身狂魔的尊严", "mechanic": "惩罚(轻)", "plain_rule": "表演者若拒绝挑战且已用掉换卡机会，必须当众做5个俯卧撑（或跳5个开合跳）代替表演。", "visibility": "全场公开",
+      "params": { "who": "actor", "pool": "$gen.penalty_健身动作", "scoring_ref": [] } }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "猜对他人MBTI", "who": "猜对者", "effect": "+1" }
+    ],
+    "win": "三轮结束后，总分最高者获胜",
+    "tiebreak": "系统随机裁决（风味名：闭环抽签）"
+  },
+  "reveal_text": "一轮对齐下来，i人e人全暴露——原来最八卦的那个是INTJ，最疯的那个是ISTJ。颗粒度对完了，闭环也合上了。",
+  "reveal_signature": "融合自 阿凯的MBTI × 琳琳的短视频挑战 × 小雨的吃瓜雷达 × Tony的健身狂魔",
+  "flavor_glossary": [
+    { "term": "对齐/颗粒度/闭环", "means": "公司会议黑话，此处作为背景风味词，不改变规则。'对齐'指猜对，'颗粒度'指细节，'闭环'指结束。" },
+    { "term": "i人/e人", "means": "MBTI人格分类常用说法，i=内向，e=外向，此处用于身份标签。" },
+    { "term": "吃瓜雷达", "means": "小雨的八卦特质，被用作投票机制的风味名。" },
+    { "term": "健身狂魔的尊严", "means": "Tony的健身习惯，被用作惩罚替代动作名称。" }
+  ],
+  "safety_note": "黄暴档20/100(低)：无身体接触、无饮酒、无羞辱内容。惩罚只有俯卧撑/开合跳，且可跳过（换卡机制）。未点名任何真人/版权内容。MBTI标签为虚构分配，不对应真实人格。"
+}
+```

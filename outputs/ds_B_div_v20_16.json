@@ -1,0 +1,121 @@
+```json
+{
+  "game_title": "对齐颗粒度 · 团建挑战赛",
+  "subtitle": "比拼默契、挑战反应、用黑话赚分",
+  "premise": "一个快节奏的派对游戏——黑话接龙、默契挑战、健身惩罚轮番上阵，看看谁才是团建局真正的大厂E人。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "骰子", "to": "公共区", "visibility": "全场公开", "note": "用于决定每轮挑战的类型。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "用于默契比对和吃瓜竞猜，亮票自动公开(道具内置)。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "限制每轮挑战的时间。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每位玩家的累计得分。" },
+    { "prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "每轮挑战前随机发给每人一张，内容为'任务指令'或'吃瓜选题'。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局：每人领一张密语卡（初始任务），宣读规则，骰子决定第一轮类型。",
+    "每轮：掷骰子（1-3黑话挑战，4-5默契挑战，6健身挑战）→ 沙漏限时 → 结算得分",
+    "三轮后：进入'吃瓜竞猜'收尾轮，所有人匿名猜测一个关于今晚的八卦，揭晓结果。",
+    "终局：最高分者获胜，平局随机裁决。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "对齐一下颗粒度",
+      "mechanic": "同时提交",
+      "plain_rule": "系统出题'一个黑话'(如'闭环')，所有人同时提交一个与它同义或押韵的词。30秒内一起揭晓。每有一个人的词与你的词意思相同，你+1分。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "请提交一个与【闭环】意思相近或押韵的词。",
+        "input_kind": "free_text",
+        "timeout_s": 30,
+        "reveal": "simultaneous",
+        "scoring_ref": ["黑话默契得分"]
+      }
+    },
+    {
+      "flavor_name": "拉人练练",
+      "mechanic": "限时",
+      "plain_rule": "系统显示一个健身动作(如'平板支撑')。所有人同时做，坚持到最后的人+1分。限时60秒，提前放弃者不得分。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 60,
+        "visible_countdown": true,
+        "on_timeout": {
+          "effect": "scoring",
+          "scoring_ref": "健身达人奖"
+        }
+      }
+    },
+    {
+      "flavor_name": "i人e人鉴定器",
+      "mechanic": "同时提交",
+      "plain_rule": "系统给出一个场景(如'团建时谁最先打破冷场')，每人私密选一个人名提交。揭晓后，被选次数最多的人+1分。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "团建时，谁是第一个打破冷场的人？",
+        "input_kind": "options",
+        "options": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+        "timeout_s": 20,
+        "reveal": "simultaneous",
+        "scoring_ref": ["人气王得分"]
+      }
+    },
+    {
+      "flavor_name": "吃瓜时间",
+      "mechanic": "同时提交",
+      "plain_rule": "最后一个环节：每人匿名提交一个'关于今晚的八卦'(一句话)。然后所有人对每个八卦投票('真的'或'假的')。猜对八卦真假最多的两个人各+2分。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "请写一个关于今晚团建的八卦（一句话，真假不限）。",
+        "input_kind": "free_text",
+        "timeout_s": 45,
+        "reveal": "simultaneous",
+        "scoring_ref": ["吃瓜侦探奖"]
+      }
+    },
+    {
+      "flavor_name": "闭环惩罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "每轮黑话接龙中，提交的词与所有人都不匹配且被判定为'最离谱'的人，做10个深蹲(跳过权：可用一次'换一个'替代为讲一个冷笑话)。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "loser",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "最离谱黑话奖"
+      }
+    },
+    {
+      "flavor_name": "颗粒度加码",
+      "mechanic": "加减分",
+      "plain_rule": "在任意一次同时提交中，如果你的回答与其他人的匹配数≥3，你额外+1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "+1",
+        "scoring_ref": "颗粒度加成"
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "黑话默契得分", "who": "匹配者", "effect": "+1" },
+      { "event": "健身达人奖", "who": "坚持最久者", "effect": "+1" },
+      { "event": "人气王得分", "who": "被选最多者", "effect": "+1" },
+      { "event": "吃瓜侦探奖", "who": "猜对最多的两人", "effect": "+2" },
+      { "event": "最离谱黑话奖", "who": "最离谱者", "effect": "惩罚(轻)" },
+      { "event": "颗粒度加成", "who": "匹配≥3的人", "effect": "+1" }
+    ],
+    "win": "终局时总分最高者获胜",
+    "tiebreak": "系统随机裁决（风味名：命运掷骰）"
+  },
+  "reveal_text": "团建结束，颗粒度对齐了，闭环也拉满了。i人终于承认自己是e人，健身狂魔拉人练了五轮深蹲，吃瓜王挖出了今晚最大的八卦——『原来老周私底下偷偷练舞』。",
+  "reveal_signature": "融合自 阿凯 的「MBTI」× 琳琳 的「短视频挑战」× 老周 的「开会黑话」× 小雨 的「吃瓜」× Tony 的「健身狂魔」",
+  "flavor_glossary": [
+    { "term": "对齐颗粒度", "means": "公司黑话，指让各方信息或目标保持一致。" },
+    { "term": "闭环", "means": "公司黑话，指一个项目或任务从开始到结束形成完整循环。" },
+    { "term": "i人e人", "means": "MBTI人格分类，i人偏内向，e人偏外向。" },
+    { "term": "吃瓜", "means": "网络用语，指围观或参与八卦讨论。" }
+  ],
+  "safety_note": "黄暴档 20/100(低): 惩罚仅限深蹲/冷笑话，无身体接触或羞辱；未点名任何真人、无版权引用；全程不涉及个人隐私过度暴露。"
+}
+```

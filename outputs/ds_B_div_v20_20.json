@@ -1,0 +1,129 @@
+```json
+{
+  "game_title": "对齐颗粒度的瓜田轮盘",
+  "subtitle": "公司团建限定 · 5人竞技局",
+  "premise": "五个人轮流发言：用一句‘黑话’掩盖自己拿到的‘八卦秘密’。其他人同时提交猜测——谁是那个秘密持有者？猜对加分，被猜中者扣分。每轮转盘随机决定谁拿秘密，节奏快，不冷场。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "命运转盘", "to": "公共区", "visibility": "全场公开", "note": "扇区写着每位玩家的名字，配一个‘空转’区。转到谁，谁就是本轮的‘秘密持有者’。" },
+    { "prop": "密语卡", "to": "每轮转盘选中的一人", "visibility": "自己看", "note": "密语卡上写一条八卦式秘密（如：'我偷偷把同事的健身水壶装成了奶茶'），该玩家持有并需要拿黑话掩护。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "每轮所有非持有者同时提交：秘密在谁手里。揭晓时自动公开。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每轮猜对与猜错的结果。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开场：宣读规则 + 黑话词汇表预热",
+    "每轮：转盘选秘密持有者 → 私发密语卡 → 持有者用一句黑话发言（不限真假，只需包含一个黑话词） → 其余四人同时提交猜测 → 亮票 → 结算",
+    "三轮后进入终局，按总分排名",
+    "若有平局，系统随机裁决（风味名：吃瓜抽签）"
+  ],
+  "rules": [
+    {
+      "flavor_name": "转盘选瓜人",
+      "mechanic": "点名目标",
+      "plain_rule": "转盘停下来，指针指向谁，谁就是这一轮的‘秘密持有者’。",
+      "visibility": "全场公开",
+      "params": {
+        "selector": "actor",
+        "target_pool": "all_players",
+        "on_named": { "scoring_ref": ["被选中成为秘密持有者"], "eliminate": false }
+      }
+    },
+    {
+      "flavor_name": "瓜田密语",
+      "mechanic": "同时提交",
+      "plain_rule": "秘密持有者之外的四个人，同时匿名提交：你们觉得秘密在谁手里。提交后一起揭晓。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "你觉得本轮秘密持有者是谁？",
+        "input_kind": "options",
+        "options": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+        "timeout_s": 15,
+        "reveal": "simultaneous",
+        "scoring_ref": ["猜对秘密持有者", "猜错秘密持有者"]
+      }
+    },
+    {
+      "flavor_name": "黑话掩护",
+      "mechanic": "声明质疑",
+      "plain_rule": "秘密持有者说一句带黑话的话（如‘这个项目要闭环对齐’），别人可以质疑他是不是在打掩护。质疑后系统揭示密语卡上的秘密内容，判断谁说谎。",
+      "visibility": "全场公开",
+      "params": {
+        "claim_prompt": "说一句包含黑话的话，用作掩护你的秘密。",
+        "challengers": "others",
+        "challenge_window_s": 10,
+        "verify_source": "prop_reveal:密语卡",
+        "verify_reveals": "prop_state",
+        "identity_resolution": "terminal",
+        "on_liar": { "scoring_ref": "秘密持有者被质疑，且确实在说谎" },
+        "on_false_accuse": { "scoring_ref": "质疑者冤枉了秘密持有者" }
+      }
+    },
+    {
+      "flavor_name": "吃瓜记账",
+      "mechanic": "加减分",
+      "plain_rule": "每轮结算时，猜对的人加分，猜错的人扣分。秘密持有者若被全票猜中，额外扣分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "winner",
+        "delta": "+2",
+        "scoring_ref": "猜对秘密持有者"
+      }
+    },
+    {
+      "flavor_name": "吃瓜扣分",
+      "mechanic": "加减分",
+      "plain_rule": "猜错的人每人扣1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "loser",
+        "delta": "-1",
+        "scoring_ref": "猜错秘密持有者"
+      }
+    },
+    {
+      "flavor_name": "瓜皮惩罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "被全票猜中的秘密持有者，接受一个10秒小惩罚：做一个指定健身动作（如10个深蹲）或模仿一个同事的口头禅二选一。可以选跳过，跳过则无事发生。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "loser",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "秘密持有者被全票猜中"
+      }
+    },
+    {
+      "flavor_name": "倒计时对齐",
+      "mechanic": "限时",
+      "plain_rule": "每个人发言和提交猜测都有时间限制，超时自动跳过。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 10,
+        "visible_countdown": true,
+        "on_timeout": { "effect": "goto", "goto": "下一环节" }
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "被选中成为秘密持有者", "who": "每轮转盘选中者", "effect": "无分，仅标志身份" },
+      { "event": "猜对秘密持有者", "who": "猜对的非持有者", "effect": "+2" },
+      { "event": "猜错秘密持有者", "who": "猜错的非持有者", "effect": "-1" },
+      { "event": "秘密持有者被质疑，且确实在说谎", "who": "质疑成功的玩家", "effect": "+1" },
+      { "event": "质疑者冤枉了秘密持有者", "who": "秘密持有者", "effect": "+1" },
+      { "event": "秘密持有者被全票猜中", "who": "秘密持有者", "effect": "惩罚(轻)" }
+    ],
+    "win": "三轮结束后，总分最高的玩家获胜",
+    "tiebreak": "系统随机裁决（风味名：吃瓜抽签）"
+  },
+  "reveal_text": "瓜田里没有闭环，只有对齐完一轮又一轮的颗粒度——最后大家发现，最会吃瓜的人，其实一直是那个最沉默的健身狂魔。",
+  "reveal_signature": "融合自 老周 的「黑话」× 小雨 的「吃瓜」× Tony 的「健身狂魔」",
+  "flavor_glossary": [
+    { "term": "对齐", "means": "公司黑话，指让各方信息同步。这里指大家同时提交猜测。" },
+    { "term": "颗粒度", "means": "黑话，指细节的精细程度。这里借指猜测的准确度。" },
+    { "term": "闭环", "means": "黑话，指从开始到完成的全流程。这里指一轮游戏从转盘到结算的完整流程。" },
+    { "term": "吃瓜", "means": "指围观八卦事件。这里指猜秘密的过程。" }
+  ],
+  "safety_note": "黄暴档 20/100(低): 无涉黄涉暴内容；惩罚为健身动作/模仿口头禅，二选一且可跳过；未点名任何真人、无版权引用；职场语境下避开点名贴身指令，全员以猜代指，无直接针对个人的羞辱环节。"
+}
+```

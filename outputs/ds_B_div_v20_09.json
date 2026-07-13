@@ -1,0 +1,139 @@
+```json
+{
+  "game_title": "对齐颗粒度·瓜田挑战赛",
+  "subtitle": "团建包间·5人速局",
+  "premise": "一轮接一轮的限时短视频挑战，抽中任务就开演，演完全场一键投票判定。同时暗藏八卦密令，完成者可悄悄加分——但有人可能在说谎。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "盲盒", "to": "公共区", "visibility": "自己看开", "note": "每轮由当前玩家从盲盒中抽出一个挑战任务纸条，抽完即开。" },
+    { "prop": "密语卡", "to": "每人", "visibility": "自己看", "note": "开局每人私发一张密令卡——八卦密令：内容是针对在场某人的一道八卦问题或一个需要表演的动作。完成即加1分。可拒绝，跳过无惩罚。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮任务限时30秒。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "用于表演后的判定投票：『过』或『不过』，同时揭晓。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录个人分数。" },
+    { "prop": "抽签筒", "to": "公共区", "visibility": "全场公开", "note": "开局每人抽一根签决定出场顺序；不放回。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 抽签定出场顺序; 每人私发一张密语卡(八卦密令); 宣读背景",
+    "每轮按顺序: 当前玩家从盲盒抽挑战 → 30秒限时表演 → 其余四人匿名投票(过/不过) → 开票记分",
+    "密令可在轮到自己或他人的回合执行(限一次); 完成密令则私密举手, 全场一键确认后加分",
+    "五轮后终局结算"
+  ],
+  "rules": [
+    {
+      "flavor_name": "盲盒挑战·颗粒度对齐",
+      "mechanic": "同时提交",
+      "plain_rule": "当前玩家表演结束后，其他四人同时匿名投票——选『过』表示挑战成功，『不过』表示失败。投票结束后一起公开结果。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "这个挑战成功了吗？",
+        "input_kind": "options",
+        "options": ["过", "不过"],
+        "timeout_s": 10,
+        "reveal": "simultaneous",
+        "scoring_ref": ["挑战成功得分", "挑战失败无分"]
+      }
+    },
+    {
+      "flavor_name": "30秒闭环",
+      "mechanic": "限时",
+      "plain_rule": "从抽到挑战纸条开始，只有30秒来完成表演。时间一到必须停下，立即进入投票环节。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 30,
+        "visible_countdown": true,
+        "on_timeout": { "effect": "goto", "goto": "匿名投票" }
+      }
+    },
+    {
+      "flavor_name": "挑战过/不过判定",
+      "mechanic": "判定",
+      "plain_rule": "四人投票结束后，系统自动统计——『过』超过半数(3票及以上)则挑战成功，否则失败。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "expr",
+        "expr": "count('过') >= 3",
+        "on": {
+          "过": { "scoring_ref": "挑战成功得分" },
+          "不过": { "scoring_ref": "挑战失败无分" }
+        }
+      }
+    },
+    {
+      "flavor_name": "八卦密令·吃瓜任务",
+      "mechanic": "声明质疑",
+      "plain_rule": "你有一次机会，秘密向全场宣布你完成了密语卡上的任务。其他人可以质疑你在说谎。若质疑，则必须验证你的密语卡内容；如果真完成了，质疑者扣分；如果撒谎，你扣分。",
+      "visibility": "自己看",
+      "params": {
+        "claim_prompt": "你声称完成了密语卡上的任务，请向所有人简要描述你做了什么。",
+        "challengers": "others",
+        "challenge_window_s": 15,
+        "verify_source": "prop_reveal:密语卡",
+        "verify_reveals": "prop_state",
+        "on_liar": { "scoring_ref": "撒谎被揭穿" },
+        "on_false_accuse": { "scoring_ref": "质疑错误被罚" }
+      }
+    },
+    {
+      "flavor_name": "加练时间",
+      "mechanic": "限时",
+      "plain_rule": "当有人完成密令并声明时，全场有15秒时间决定是否质疑。15秒后默认为无人质疑，密令自动确认通过。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 15,
+        "visible_countdown": true,
+        "on_timeout": { "effect": "scoring", "scoring_ref": "密令完成加分" }
+      }
+    },
+    {
+      "flavor_name": "加练加分",
+      "mechanic": "加减分",
+      "plain_rule": "成功完成密语卡任务，并无人质疑或质疑失败，即可获得1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "+1",
+        "scoring_ref": "密令完成加分"
+      }
+    },
+    {
+      "flavor_name": "翻车扣分",
+      "mechanic": "加减分",
+      "plain_rule": "如果密令声明被质疑且验证为假(撒谎)，则声明者扣1分；如果验证为真，则质疑者扣1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "loser",
+        "delta": "-1",
+        "scoring_ref": "撒谎被揭穿"
+      }
+    },
+    {
+      "flavor_name": "谁先来",
+      "mechanic": "回合推进",
+      "plain_rule": "按开局抽签的顺序轮流当『挑战者』，从左到右依次进行。",
+      "visibility": "全场公开",
+      "params": { "order": "round_robin" }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "挑战成功得分", "who": "挑战者", "effect": "+1" },
+      { "event": "挑战失败无分", "who": "挑战者", "effect": "+0" },
+      { "event": "密令完成加分", "who": "完成者", "effect": "+1" },
+      { "event": "撒谎被揭穿", "who": "声明者", "effect": "-1" },
+      { "event": "质疑错误被罚", "who": "质疑者", "effect": "-1" }
+    ],
+    "win": "五轮结束后，总分最高者获胜",
+    "tiebreak": "系统随机裁决(风味名: 茶歇命运签)"
+  },
+  "reveal_text": "五轮颗粒度对齐完毕，瓜田里的八卦终于闭环——原来最会开会的不是老周，是那个暗中吃瓜吃到满分的家伙。",
+  "reveal_signature": "融合自 老周 的「开会黑话」× 小雨 的「爱吃瓜」× 琳琳 的「短视频挑战」",
+  "flavor_glossary": [
+    { "term": "对齐颗粒度", "means": "互联网黑话，指把细节统一对齐。这里借指大家对挑战完成标准达成共识(投票)。" },
+    { "term": "闭环", "means": "黑话，指完成一个业务流程。这里指完成一轮挑战或密令。" },
+    { "term": "吃瓜", "means": "网络流行语，指围观八卦或趣事。" },
+    { "term": "密令", "means": "秘密任务，借自特工题材，这里指每个人开局拿到的八卦任务。" }
+  ],
+  "safety_note": "黄暴档 20/100(极低): 无身体接触、无饮酒、无羞辱性内容。密令内容由系统从『八卦问题池』中随机生成，均为无害趣味问题(如『模仿阿凯的招牌动作』)，且自带拒绝权(跳过无惩罚)。挑战内容从盲盒中抽出，均为短视频模仿/创意表演类，无身体或语言攻击。职场友好，不点名任何真人或版权内容。"
+}
+```

@@ -1,0 +1,64 @@
+```json
+{
+  "game_title": "对齐颗粒度的闭环挑战 (i人e人瓜田版)",
+  "subtitle": "公司团建包间 · 5人速局",
+  "premise": "每人抽到一张秘密身份牌——i人、e人、还是瓜王。全场轮流发起短视频挑战，用黑话指令指挥别人做事，同时要猜出谁的MBTI是假的。挑战输赢加减分，猜对身份额外得分。节奏快、热闹、不尴尬。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "自己看", "note": "MBTI身份牌：3张e人、1张i人、1张瓜王。只有自己知道自己的牌。" },
+    { "prop": "盲盒", "to": "公共区", "visibility": "全场公开", "note": "装有6张『挑战卡』，每张写一个短视频挑战动作+一个黑话指令词。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "每轮猜身份时提交指认，同时揭晓。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每个人的得分和身份指认结果。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "挑战限时用。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 每人抽一张身份牌（自己看），宣读规则。",
+    "共进行6轮，每轮流程:",
+    "  ① 轮到的『发起人』从盲盒抽一张挑战卡，念出挑战内容+黑话指令。",
+    "  ② 发起人指定一位『执行人』（不能是本人），执行人必须在沙漏30秒内完成挑战。",
+    "  ③ 完成挑战→执行人+1分；失败→发起人+1分。",
+    "  ④ 所有人同时提交『这人是不是装的？』指认当前执行人是否真实身份与表面一致。",
+    "  ⑤ 揭晓指认结果，猜对+2分，猜错不扣分。",
+    "  ⑥ 轮到下一位发起人。",
+    "6轮结束后，瓜王身份揭晓——瓜王存活至终局额外+3分。结算总分。"
+  ],
+  "rules": [
+    { "flavor_name": "黑话指令卡", "mechanic": "判定", "plain_rule": "从盲盒抽出挑战卡，上面写着：一个短视频动作（如'原地转三圈+比心'）和一个黑话词（如'对齐'）。执行人必须一边做动作一边喊出黑话词，才算完成。", "visibility": "全场公开",
+      "params": { "source": "consensus", "question": "执行人是否完成了动作+喊黑话？", "verdict_options": ["完成", "未完成"], "on": { "过": { "scoring_ref": "挑战成功" }, "不过": { "scoring_ref": "挑战失败" } } } },
+    { "flavor_name": "执行人指定", "mechanic": "点名目标", "plain_rule": "轮到你当发起人时，从其他四人中选一个来执行挑战。", "visibility": "全场公开",
+      "params": { "selector": "actor", "target_pool": "others", "on_named": { "scoring_ref": [], "eliminate": false } } },
+    { "flavor_name": "30秒倒计时", "mechanic": "限时", "plain_rule": "执行人拿到挑战后，沙漏开始计时30秒，必须在时间内完成。", "visibility": "全场公开",
+      "params": { "seconds": 30, "visible_countdown": true, "on_timeout": { "effect": "scoring", "scoring_ref": "挑战失败" } } },
+    { "flavor_name": "i人还是e人？", "mechanic": "同时提交", "plain_rule": "每人私下选一个选项：『他/她是装出来的』或『他/她是真实的』，然后同时揭晓。猜对加2分。", "visibility": "自己看",
+      "params": { "prompt": "你觉得刚才的执行人，他的MBTI身份是装出来的吗？", "input_kind": "options", "options": ["是装的", "真实的"], "timeout_s": 20, "reveal": "simultaneous", "scoring_ref": ["身份猜对", "身份猜错"] } },
+    { "flavor_name": "瓜王存活奖金", "mechanic": "加减分", "plain_rule": "终局时瓜王（真实身份）如果没有被任何人指认对过，额外加3分。", "visibility": "全场公开",
+      "params": { "who": "瓜王", "delta": "+3", "scoring_ref": "瓜王存活" } },
+    { "flavor_name": "挑战成功奖励", "mechanic": "加减分", "plain_rule": "执行人完成挑战，执行人+1分。", "visibility": "全场公开",
+      "params": { "who": "actor", "delta": "+1", "scoring_ref": "挑战成功" } },
+    { "flavor_name": "发起人偷分", "mechanic": "加减分", "plain_rule": "执行人挑战失败，发起人+1分。", "visibility": "全场公开",
+      "params": { "who": "actor", "delta": "+1", "scoring_ref": "挑战失败" } },
+    { "flavor_name": "身份猜对加分", "mechanic": "加减分", "plain_rule": "你猜对了执行人的真实身份（是装的还是真实的），+2分。", "visibility": "自己看",
+      "params": { "who": "actor", "delta": "+2", "scoring_ref": "身份猜对" } }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "挑战成功", "who": "执行人", "effect": "+1" },
+      { "event": "挑战失败", "who": "发起人", "effect": "+1" },
+      { "event": "身份猜对", "who": "猜对者", "effect": "+2" },
+      { "event": "身份猜错", "who": "猜错者", "effect": "0" },
+      { "event": "瓜王存活", "who": "瓜王（唯一）", "effect": "+3" }
+    ],
+    "win": "终局时总分最高者胜，并列由系统随机裁决",
+    "tiebreak": "系统随机裁决（风味名：部门抽签）"
+  },
+  "reveal_text": "今晚的i人e人瓜田，有人装得像真的一样，有人真得像个假的一样。最后发现——那个最安静的，才是最会带节奏的。",
+  "reveal_signature": "融合自 阿凯 的「MBTI」× 琳琳 的「短视频挑战」× 老周 的「开会黑话」× 小雨 的「吃瓜」",
+  "flavor_glossary": [
+    { "term": "i人 / e人", "means": "MBTI人格类型中内向/外向的简称，这里用作游戏身份。" },
+    { "term": "瓜王", "means": "网络用语指八卦消息最多的人，这里指一个特殊身份，被猜中会扣分。" },
+    { "term": "对齐 / 颗粒度 / 闭环", "means": "职场黑话，分别指协调一致、细节拆分、形成闭环。这里被写进挑战动作里，必须喊出来。" }
+  ],
+  "safety_note": "本局黄暴档20/100(极低): 挑战动作限于搞笑/简易短视频常见内容（转圈、比心、模仿动物叫声等），不涉身体接触、不点名任何人、无性别/外貌指向。所有挑战有『跳过/换一张卡』选项，拒绝代价=发起人自动得分（温和替代）。"
+}
+```

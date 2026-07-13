@@ -1,0 +1,89 @@
+{
+  "game_title": "团建黑话挑战·标签之夜",
+  "subtitle": "5人快节奏默契加挑战",
+  "premise": "每人一个秘密标签（I人／E人）。每轮一人当焦点，完成一个融合MBTI、黑话、短视频和健身的挑战，同时其他人猜他的标签。猜对得分，挑战通过加分。五轮后得分最高者胜。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "自己看", "note": "每人一张，写有'I人'或'E人'，只有自己知道。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "每轮猜测焦点标签时使用，提交后自动翻转公开。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮限时30秒用于焦点准备。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每人得分。" },
+    { "prop": "密语卡", "to": "每轮焦点", "visibility": "自己看", "note": "系统每轮私发一张挑战卡片给焦点，内容从素材池抽取（黑话造句、短视频模仿、健身动作、吃瓜任务等）。" },
+    { "prop": "公共看板", "to": "公共区", "visibility": "全场公开", "note": "显示当前轮次、焦点名字和规则提示。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局：每人发一张身份牌（I/E），公开本局规则与计分方式。",
+    "每轮（共5轮）：1. 按座位顺序指定焦点（回合推进）；2. 焦点收到一张密语卡（挑战内容）；3. 沙漏限时30秒准备；4. 焦点执行挑战；5. 全场一键表决挑战是否通过（判定‑consensus）；6. 其他玩家通过匿名投票器提交对焦点I/E的猜测（同时提交）；7. 系统揭示焦点真实I/E（揭示）；8. 猜对者+1分，若挑战通过则猜对者额外+1分，若挑战失败则焦点本人−1分（均由判定和同时提交的scoring_ref触发）；9. 更新记分板，进入下一轮。",
+    "终局：5轮后总分最高者胜，平局由系统随机裁决（风味：转尺子）。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "接棒！",
+      "mechanic": "回合推进",
+      "plain_rule": "按座位顺序（阿凯→琳琳→老周→小雨→Tony）轮流当焦点。",
+      "visibility": "全场公开",
+      "params": { "order": "round_robin" }
+    },
+    {
+      "flavor_name": "倒计时准备",
+      "mechanic": "限时",
+      "plain_rule": "焦点收到挑战后，有30秒时间准备，时间到立即执行。",
+      "visibility": "全场公开",
+      "params": { "seconds": 30, "visible_countdown": true, "on_timeout": { "effect": "goto", "goto": "执行挑战" } }
+    },
+    {
+      "flavor_name": "挑战成功？",
+      "mechanic": "判定",
+      "plain_rule": "焦点执行完挑战后，所有玩家一键表决（通过/不通过），多数通过视为成功。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "焦点是否成功完成了挑战？",
+        "verdict_options": ["通过", "不通过"],
+        "on": {
+          "通过": { "scoring_ref": ["挑战通过奖励"] },
+          "不通过": { "scoring_ref": ["挑战失败惩罚"] }
+        }
+      }
+    },
+    {
+      "flavor_name": "偷偷猜你",
+      "mechanic": "同时提交",
+      "plain_rule": "除焦点外，其他玩家通过匿名投票器秘密选择你认为焦点的标签是'I人'还是'E人'，全部提交后同时揭晓。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "猜猜焦点的标签是？",
+        "input_kind": "options",
+        "options": ["I人", "E人"],
+        "timeout_s": 15,
+        "reveal": "simultaneous",
+        "scoring_ref": ["猜对焦点身份"]
+      }
+    },
+    {
+      "flavor_name": "标签揭示",
+      "mechanic": "揭示",
+      "plain_rule": "系统公布焦点的真实I/E标签（从身份牌读取），所有人同时看到。",
+      "visibility": "全场公开",
+      "params": { "reveal_of": "prop:身份牌", "to": "all", "once": false }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "猜对焦点身份", "who": "猜对者", "effect": "+1" },
+      { "event": "挑战通过奖励", "who": "猜对者（该轮）", "effect": "+1" },
+      { "event": "挑战失败惩罚", "who": "焦点", "effect": "-1" }
+    ],
+    "win": "终局时总分最高者胜",
+    "tiebreak": "系统随机裁决（风味：转尺子）"
+  },
+  "reveal_text": "今晚的标签没有一个贴在额头上，全贴在笑声里。黑话终于闭环到健身房，短视频挑战变成了平板支撑——顺便把八卦也对齐了。",
+  "reveal_signature": "融合自 阿凯 的 MBTI、琳琳 的短视频挑战、老周 的会议黑话、小雨 的吃瓜、Tony 的健身",
+  "flavor_glossary": [
+    { "term": "I人/E人", "means": "MBTI性格维度，I为内向（Introvert），E为外向（Extravert），这里作为标签使用。" },
+    { "term": "焦点", "means": "每轮的中心人物，由座位顺序指定，负责执行挑战并作为猜测目标。" },
+    { "term": "对齐/颗粒度/闭环", "means": "内部使用的职场黑话，这里借用到挑战造句中。" }
+  ],
+  "safety_note": "黄暴档20/100（安全）: 无任何敏感内容，所有挑战可替换（跳过权），无需身体接触，惩罚仅扣分，无饮酒或羞辱环节。"
+}

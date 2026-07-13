@@ -1,0 +1,120 @@
+{
+  "game_title": "对齐颗粒度的I人E人大挑战",
+  "subtitle": "公司团建包间·5人速局",
+  "premise": "每人额头一张身份牌——别人看得到，你自己看不到。每轮一位'主持人'发起一个短视频挑战，大家同时提交自己愿意做的程度（1-5分），然后按分数分组执行。过程中可以质疑别人的'人设'，揪出伪装者！",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "额头", "note": "三张「E人」、两张「I人」。E人做什么都敢上，I人必须装怂——但可以撒谎。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "每轮同时提交愿意挑战的分数；亮票时自动转全场公开。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮提交限时。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记每次挑战得分和质疑胜负。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 发额头身份牌，宣读'对齐颗粒度'背景——每个人都要证明自己是真正的E人/I人",
+    "每轮: 主持人(按座位轮换)选一个短视频挑战 → 所有人同时提交1-5愿意程度(沙漏30秒) → 揭晓后，按分数分组：5分者必须执行挑战，1分者必须接受一个惩罚替代，2-4分可自愿跟",
+    "挑战执行后，任何玩家可'质疑'某人的表现是否符合其身份(声明质疑)",
+    "若质疑正确(被质疑者是I人装E或E人装I)，被质疑者受罚并扣分；若质疑错误，质疑者受罚",
+    "5轮后结算，总分最高者胜"
+  ],
+  "rules": [
+    {
+      "flavor_name": "人设打分",
+      "mechanic": "同时提交",
+      "plain_rule": "每轮主持人宣布一个挑战后，所有人同时用私密提交选一个1到5的数字（1=完全不想做，5=立刻做）。所有人提交后同时揭晓。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "对这个挑战，你愿意做的程度？",
+        "input_kind": "options",
+        "options": ["1", "2", "3", "4", "5"],
+        "timeout_s": 30,
+        "reveal": "simultaneous",
+        "scoring_ref": ["挑战执行(5分)", "挑战执行(2-4分自愿)", "惩罚替代(1分)"]
+      }
+    },
+    {
+      "flavor_name": "开箱挑战",
+      "mechanic": "判定",
+      "plain_rule": "提交5分的人必须执行主持人说的挑战（比如做20个深蹲、模仿一段短视频、大声说一句开会黑话等）。执行后由全场共识确认是否算通过。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "这个挑战执行得算不算完成？",
+        "verdict_options": ["完成", "未完成"],
+        "on": {
+          "完成": { "scoring_ref": "挑战执行(5分)" },
+          "未完成": { "scoring_ref": "挑战执行(2-4分自愿)" }
+        }
+      }
+    },
+    {
+      "flavor_name": "喊停换人",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "提交1分的人，必须做一件替代惩罚（比如喝一口水、做5个开合跳、说一个冷知识）。可以拒绝，拒绝则改成原地转三圈。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "loser",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "惩罚替代(1分)"
+      }
+    },
+    {
+      "flavor_name": "扒皮大会",
+      "mechanic": "声明质疑",
+      "plain_rule": "挑战执行后，任何玩家可以公开声称'某人的行为不符合他额头上那个身份'。被点名的人必须亮出额头牌（系统揭示验证）。如果质疑对了，被质疑者受罚；如果错了，质疑者受罚。",
+      "visibility": "全场公开",
+      "params": {
+        "claim_prompt": "你觉得谁在伪装？",
+        "challengers": "others",
+        "challenge_window_s": 30,
+        "verify_source": "prop_reveal:身份牌",
+        "verify_reveals": "identity",
+        "identity_resolution": "reshuffle",
+        "on_liar": { "scoring_ref": "质疑正确" },
+        "on_false_accuse": { "scoring_ref": "质疑错误" }
+      }
+    },
+    {
+      "flavor_name": "颗粒度计时",
+      "mechanic": "限时",
+      "plain_rule": "每轮提交只有30秒，沙漏漏完自动收卷，未提交者按1分处理。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 30,
+        "visible_countdown": true,
+        "on_timeout": { "effect": "scoring", "scoring_ref": "惩罚替代(1分)" }
+      }
+    },
+    {
+      "flavor_name": "闭环记分",
+      "mechanic": "加减分",
+      "plain_rule": "每次挑战执行得2分，惩罚替代得-1分，质疑正确得3分，质疑错误得-2分。分数实时记在记分板上。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "+2",
+        "scoring_ref": "挑战执行(5分)"
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "挑战执行(5分)", "who": "actor", "effect": "+2" },
+      { "event": "挑战执行(2-4分自愿)", "who": "actor", "effect": "+1" },
+      { "event": "惩罚替代(1分)", "who": "actor", "effect": "-1" },
+      { "event": "质疑正确", "who": "actor", "effect": "+3" },
+      { "event": "质疑错误", "who": "actor", "effect": "-2" }
+    ],
+    "win": "5轮后总分最高者胜",
+    "tiebreak": "系统随机裁决（风味名：命运对齐）"
+  },
+  "reveal_text": "五个人，五种标签。对齐了颗粒度才明白——最I的那个一直在带头挑战，最E的那个偷偷选了1分。会议室里那套闭环，今晚被闭环成了笑话。",
+  "reveal_signature": "融合自 阿凯 的「MBTI」× 老周 的「开会黑话」× 琳琳 的「短视频挑战」",
+  "flavor_glossary": [
+    { "term": "对齐", "means": "开会黑话，指统一意见或目标，这里用来指统一评分标准。" },
+    { "term": "颗粒度", "means": "开会黑话，指细节的精细程度，这里用来形容挑战难度分级。" },
+    { "term": "闭环", "means": "开会黑话，指从开始到结束形成完整流程，这里借指记分和结算的完整流程。" },
+    { "term": "E人/I人", "means": "MBTI人格分类，E=外向爱社交，I=内向爱独处，这里用来设计身份博弈。" }
+  ],
+  "safety_note": "黄暴档20/100(低): 挑战全为短视频模仿/健身动作/说黑话等轻度内容，无身体接触或露骨内容；惩罚替代可拒绝并换成转圈；未点名任何真人、无版权引用。"
+}
