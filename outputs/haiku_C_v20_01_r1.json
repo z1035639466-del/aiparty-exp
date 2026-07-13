@@ -1,0 +1,99 @@
+{
+  "game_title": "第七排靠窗·记忆碎片",
+  "subtitle": "为毕业旅行的民宿现制·4人亲密局",
+  "premise": "每人心中藏着一段只有你们四个知道的黑历史。轮流讲述，可以加油添醋、也可以掩盖真相——但你们比任何人都清楚哪些是真、哪些是谎。通过质疑和验证，找出谁的记忆最诚实。",
+  "players": ["蛋蛋", "老猫", "阿宁", "十三"],
+  "props_dealt": [
+    { "prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "每人一张私密记忆卡——一个只有你知道的细节（天台烤肠的某个细节、老猫外号的某个版本、'第七排靠窗'的具体场景、'谁先怂'的真相）。整局只给你自己看。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "讲故事时限时30秒。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "每轮大家同时投票：'这个人讲的是真的吗？'。亮票时自动转全场公开(道具内置)。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记每人的分数。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 发每人一张私密记忆卡，宣读本局的'黑历史回忆录'设定",
+    "第1-4轮: 轮流讲故事(30秒) → 匿名投票判真假 → 质疑环节(可选) → 计分",
+    "结算: 统计总分，最高分获胜；平手由系统随机裁决"
+  ],
+  "rules": [
+    {
+      "flavor_name": "讲故事·加油添醋",
+      "mechanic": "限时",
+      "plain_rule": "轮到你时，用30秒讲述一个黑历史的版本。可以全部真实、也可以编造、也可以遗漏关键细节。其他人只能听，不能打断。",
+      "visibility": "全场公开",
+      "params": { "seconds": 30, "visible_countdown": true, "on_timeout": { "effect": "goto", "goto": "投票环节" } }
+    },
+    {
+      "flavor_name": "众议院·投票信任度",
+      "mechanic": "同时提交",
+      "plain_rule": "讲故事者讲完，其他三人同时私密投票：'这个人讲的是真的吗？'投票完后一起亮票。",
+      "visibility": "自己看",
+      "params": { "prompt": "这个讲故事者讲的是真的吗？", "input_kind": "options", "options": ["是真的", "是编造的"], "timeout_s": 15, "reveal": "simultaneous", "scoring_ref": ["投票正确", "投票错误"] }
+    },
+    {
+      "flavor_name": "翻卡·对答记忆",
+      "mechanic": "揭示",
+      "plain_rule": "投票后，讲故事者翻开自己的记忆卡。系统大声念出那个只有你知道的细节。大家一起验证：这个细节在他讲的故事里吗？",
+      "visibility": "自己看",
+      "params": { "reveal_of": "prop:密语卡", "to": "actor", "once": false }
+    },
+    {
+      "flavor_name": "质疑·追问细节",
+      "mechanic": "声明质疑",
+      "plain_rule": "讲故事者翻卡后，任何人可以公开质疑某个细节：'你说的第七排靠窗是真的吗？'讲故事者必须当众声明'是'或'不是'。对方可以质疑他是否说真话。质疑成立，讲故事者受罚；质疑失败，质疑者受罚。",
+      "visibility": "全场公开",
+      "params": { "claim_prompt": "声明一个细节的真实性：你讲的关于[黑历史细节]是真实的吗？", "challengers": "others", "challenge_window_s": 20, "verify_source": "judge", "verify_reveals": "identity", "identity_resolution": "terminal", "on_liar": { "scoring_ref": "说谎被抓" }, "on_false_accuse": { "scoring_ref": "冤枉诚实人" } }
+    },
+    {
+      "flavor_name": "加分·投票正确",
+      "mechanic": "加减分",
+      "plain_rule": "每个投票正确的人得1分。",
+      "visibility": "全场公开",
+      "params": { "who": "actor", "delta": "+1", "scoring_ref": "投票正确" }
+    },
+    {
+      "flavor_name": "细节判定·第七排靠窗",
+      "mechanic": "判定",
+      "plain_rule": "讲故事者翻卡后，系统问一个关于黑历史的细节问题。讲故事者给出答案。系统根据其他三人的共识判定答案是否正确。答案正确则讲故事者得2分；错误则扣1分。",
+      "visibility": "全场公开",
+      "params": { "source": "consensus", "question": "系统提出一个关于这个黑历史的细节问题，讲故事者给出答案。其他三人投票：这个答案对吗？", "verdict_options": ["对", "错"], "on": { "过": { "scoring_ref": "细节答对" }, "不过": { "scoring_ref": "细节答错" } } }
+    },
+    {
+      "flavor_name": "诚实奖·讲得真实",
+      "mechanic": "加减分",
+      "plain_rule": "如果讲故事者讲的全是真话（投票多数认为是真），额外加3分作为诚实奖。",
+      "visibility": "全场公开",
+      "params": { "who": "actor", "delta": "+3", "scoring_ref": "讲故事诚实加分" }
+    },
+    {
+      "flavor_name": "主动跳过·拒绝权",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "任何人在任何时刻，如果感到不适，可以主动说'跳过'，系统替他换一个温和替代（如唱一句歌、讲一个无关的笑话）。跳过不扣分，替代内容不影响游戏进行。",
+      "visibility": "全场公开",
+      "params": { "who": "actor", "pool": "$gen.penalty_替代池", "scoring_ref": "主动跳过" }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "投票正确", "who": "voter", "effect": "+1" },
+      { "event": "投票错误", "who": "voter", "effect": "+0" },
+      { "event": "说谎被抓", "who": "actor", "effect": "惩罚(轻)" },
+      { "event": "冤枉诚实人", "who": "challenger", "effect": "惩罚(轻)" },
+      { "event": "细节答对", "who": "actor", "effect": "+2" },
+      { "event": "细节答错", "who": "actor", "effect": "-1" },
+      { "event": "讲故事诚实加分", "who": "actor", "effect": "+3" },
+      { "event": "主动跳过", "who": "actor", "effect": "惩罚(轻)" }
+    ],
+    "win": "四轮结束后，总分最高的人获胜",
+    "tiebreak": "平分时，系统随机裁决（风味名：第七排靠窗的天意）"
+  },
+  "reveal_text": "十年间，你们四个人对那些黑历史的记忆各有各的版本。有人记得每一个细节到骨头里；有人早已柔和了棱角。今晚，在毕业旅行的民宿里，那些故事被逐一讲述、投票、验证——最后赢的，是记忆最诚实的那个人。",
+  "reveal_signature": "融合自 蛋蛋 的「高中天台烤肠事件」× 老猫 的「外号之谜」× 阿宁 的「第七排靠窗」× 十三 的「谁先怂之争」",
+  "flavor_glossary": [
+    { "term": "天台烤肠", "means": "他们四个高中时发生的一个共同黑历史，只有这四个人知道整个过程，是本局的主要回忆源。" },
+    { "term": "第七排靠窗", "means": "他们四人之间的一个私密暗号，说起来就会绷不住。被当成本局的'记忆碎片'的具象。" },
+    { "term": "老猫外号之谜", "means": "关于'老猫'这个外号，存在两个版本的由来，没人肯认其中哪一个，是一个十年悬案。" },
+    { "term": "谁先怂", "means": "十年间的一个重复吵架话题——在黑历史事件中，到底谁最先退缩，一直没有定论。" }
+  ],
+  "safety_note": "黄暴档 65/100(中高): 黑历史内容由玩家自己提供，系统不生成具体内容；任何人可以随时'跳过'选择温和替代，不扣分；拒绝权有效，不会被羞辱或强迫。"
+}
