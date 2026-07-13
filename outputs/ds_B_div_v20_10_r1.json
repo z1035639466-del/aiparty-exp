@@ -1,0 +1,166 @@
+```json
+{
+  "game_title": "对齐颗粒度 · 闭环挑战",
+  "subtitle": "公司团建包间 · 5 人速局",
+  "premise": "每人一个秘密身份，轮流发起短视频挑战，其他人同时提交能否完成；猜对别人的身份、躲过黑话陷阱，最后瓜分分数。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "自己看", "note": "五张身份牌：i人(e人想装i)、e人(i人想装e)、吃瓜群众(爱八卦)、健身狂魔(爱运动)、开会黑话王(爱说黑话)，每人一张，自己知道。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "每轮同时提交用：挑战能否完成、以及身份猜测。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "挑战限时 30 秒。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每轮得分。" },
+    { "prop": "抽签筒", "to": "公共区", "visibility": "全场公开", "note": "抽出每轮的挑战内容，不放回。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 每人抽取一张身份牌，自己看，记住自己的身份。",
+    "每轮: 从抽签筒抽一个挑战 → 挑战者发起挑战(描述怎么做) → 其余 4 人同时提交"能完成/不能完成" → 挑战者执行(30 秒限时) → 揭示实际结果 → 猜身份环节(同时提交猜测别人的身份) → 结算分数",
+    "共 5 轮，每轮换一个人当挑战者(顺序: 阿凯→琳琳→老周→小雨→Tony)。",
+    "终局: 总分最高者胜。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "挑战发起",
+      "mechanic": "同时提交",
+      "plain_rule": "挑战者描述一个短视频挑战(必须 30 秒内可完成、不危险不违规)。其余 4 人在匿名投票器上同时选择'能完成'或'不能完成'。",
+      "visibility": "全场公开",
+      "params": {
+        "prompt": "你能完成这个挑战吗？",
+        "input_kind": "options",
+        "options": ["能完成", "不能完成"],
+        "timeout_s": 15,
+        "reveal": "simultaneous",
+        "scoring_ref": ["挑战成功", "挑战失败"]
+      }
+    },
+    {
+      "flavor_name": "限时执行",
+      "mechanic": "限时",
+      "plain_rule": "挑战者必须在 30 秒内完成挑战，否则视为失败。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 30,
+        "visible_countdown": true,
+        "on_timeout": { "effect": "scoring", "scoring_ref": "挑战超时" }
+      }
+    },
+    {
+      "flavor_name": "猜人环节",
+      "mechanic": "同时提交",
+      "plain_rule": "每轮挑战结束后，每人秘密提交一个猜测：你认为其他人中谁是哪个身份？(每人只能猜一个人，猜中别人身份即可得分)",
+      "visibility": "全场公开",
+      "params": {
+        "prompt": "你猜谁是哪个身份？(格式: 人名 → 身份名)",
+        "input_kind": "free_text",
+        "timeout_s": 20,
+        "reveal": "simultaneous",
+        "scoring_ref": ["身份猜对", "身份猜错"]
+      }
+    },
+    {
+      "flavor_name": "开会黑话陷阱",
+      "mechanic": "判定",
+      "plain_rule": "挑战者描述挑战时，如果故意说出'对齐、颗粒度、闭环、赋能、抓手'中的任何一个词，则此轮所有提交'能完成'的人视为失败(因为黑话让人听不懂)，且挑战者本人额外扣分。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "ai",
+        "question": "挑战者描述中是否出现了黑话词(对齐/颗粒度/闭环/赋能/抓手)？",
+        "ai_overridable": true,
+        "on": {
+          "过": { "scoring_ref": "黑话触发" },
+          "不过": { "scoring_ref": "黑话未触发" }
+        }
+      }
+    },
+    {
+      "flavor_name": "身份猜对加分",
+      "mechanic": "加减分",
+      "plain_rule": "每猜对一个人(即别人的实际身份与你猜的一致)，猜对人得 2 分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "+2",
+        "scoring_ref": "身份猜对"
+      }
+    },
+    {
+      "flavor_name": "身份猜错扣分",
+      "mechanic": "加减分",
+      "plain_rule": "每猜错一个人(即别人的实际身份与你猜的不一致)，猜错人扣 1 分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "-1",
+        "scoring_ref": "身份猜错"
+      }
+    },
+    {
+      "flavor_name": "挑战成功得分",
+      "mechanic": "加减分",
+      "plain_rule": "如果挑战者实际完成了挑战，挑战者得 3 分；同时提交时猜对(即选'能完成'且实际完成，或选'不能完成'且实际失败)的人，每人得 1 分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "winner",
+        "delta": "+3",
+        "scoring_ref": "挑战成功"
+      }
+    },
+    {
+      "flavor_name": "挑战失败扣分",
+      "mechanic": "加减分",
+      "plain_rule": "如果挑战者实际没完成挑战，挑战者扣 2 分；同时提交时猜错(即选'能完成'但实际失败，或选'不能完成'但实际完成)的人，每人扣 1 分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "loser",
+        "delta": "-2",
+        "scoring_ref": "挑战失败"
+      }
+    },
+    {
+      "flavor_name": "黑话触发惩罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "挑战者说出黑话词时，此轮所有选'能完成'的人视为失败(按失败规则扣分)，挑战者本人额外扣 1 分并接受一个小惩罚：下一轮第一个发言。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "黑话触发"
+      }
+    },
+    {
+      "flavor_name": "超时惩罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "挑战者 30 秒内未完成挑战，直接视为挑战失败(按失败规则扣分)，并额外接受一个小惩罚：下一轮负责抽签。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "挑战超时"
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "挑战成功", "who": "挑战者", "effect": "+3" },
+      { "event": "挑战失败", "who": "挑战者", "effect": "-2" },
+      { "event": "挑战超时", "who": "挑战者", "effect": "惩罚(轻)" },
+      { "event": "身份猜对", "who": "猜对人", "effect": "+2" },
+      { "event": "身份猜错", "who": "猜错人", "effect": "-1" },
+      { "event": "黑话触发", "who": "挑战者", "effect": "-1" },
+      { "event": "黑话未触发", "who": "全部", "effect": "0" }
+    ],
+    "win": "5 轮结束后，总分最高者胜。",
+    "tiebreak": "系统随机裁决(风味名: 抽签定胜负)"
+  },
+  "reveal_text": "这桌人的 MBTI 全是假的——i人装了e人，e人装了i人，吃瓜群众假装健身，健身狂魔偷偷开会，开会黑话王只想下班。对齐完颗粒度，闭环了。",
+  "reveal_signature": "融合自 阿凯 的「MBTI」、琳琳 的「短视频挑战」、老周 的「开会黑话」、小雨 的「爱吃瓜」、Tony 的「健身狂魔」",
+  "flavor_glossary": [
+    { "term": "i人/e人", "means": "MBTI 人格分类：i人偏内向，e人偏外向。" },
+    { "term": "对齐/颗粒度/闭环", "means": "公司开会常用黑话，意思是'统一意见/细节/完成'。" },
+    { "term": "短视频挑战", "means": "短视频平台上流行的各种挑战玩法，比如 30 秒做某个动作。" },
+    { "term": "吃瓜群众", "means": "爱围观、爱八卦的人。" },
+    { "term": "健身狂魔", "means": "特别爱运动、爱健身的人。" }
+  ],
+  "safety_note": "黄暴档 20/100(低): 惩罚仅限'下一轮第一个发言/负责抽签'，无身体接触或羞辱；未点名任何真人、无版权引用；挑战内容由玩家自己描述，系统只限时和判定黑话，不干预内容。"
+}
+```
