@@ -21,6 +21,14 @@ OUTPUTS_DIR = ROOT / "outputs"
 WHITELIST_PATH = ROOT / "whitelist.json"
 EXCLUSIONS_PATH = ROOT / "check_exclusions.json"
 
+# 本校验器实现的规范版本——供运行链路版本直接核验。
+SPEC_VERSION = "v2.0"
+SPEC_SOURCES = (
+    "docs/specs/DM-skill-v2.0.md",
+    "docs/specs/design-layer-v2.0.md",
+    "docs/specs/spec-prop-library-v0-final.md",
+)
+
 REQUIRED_FIELDS = (
     "game_title",
     "players",
@@ -174,6 +182,17 @@ def load_whitelist() -> dict[str, set[str]]:
     with WHITELIST_PATH.open("r", encoding="utf-8") as file:
         data = json.load(file)
     return {key: set(data[key]) for key in ("props", "mechanics", "visibility")}
+
+
+def whitelist_declared_version() -> str | None:
+    """读取白名单自声明的 schema_version（缺失返回 None），用于运行链路版本对账。"""
+    try:
+        with WHITELIST_PATH.open("r", encoding="utf-8") as file:
+            data = json.load(file)
+    except (OSError, json.JSONDecodeError):
+        return None
+    version = data.get("schema_version")
+    return version if isinstance(version, str) else None
 
 
 def load_exclusions(path: Path = EXCLUSIONS_PATH) -> dict[str, str]:
@@ -687,6 +706,12 @@ def main() -> int:
     except (OSError, KeyError, TypeError, json.JSONDecodeError) as error:
         print(f"挂检查配置: 无法读取白名单或排除清单: {error}")
         return 1
+
+    # 运行链路版本自述：校验器实现版本 + 白名单声明版本，供直接核验
+    wl_version = whitelist_declared_version()
+    print(f"check.py 实现规范: {SPEC_VERSION}（正典 {SPEC_SOURCES[0]}）；白名单声明: {wl_version or '未声明'}")
+    if wl_version is not None and wl_version != SPEC_VERSION:
+        print(f"⚠ 版本漂移: 白名单 schema_version={wl_version!r} ≠ 校验器 SPEC_VERSION={SPEC_VERSION!r}")
 
     all_files = sorted(OUTPUTS_DIR.glob("*.json")) if OUTPUTS_DIR.is_dir() else []
     files = [path for path in all_files if path.name not in exclusions]

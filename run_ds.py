@@ -21,7 +21,9 @@ from typing import Any, Callable, Iterable
 
 ROOT = Path(__file__).resolve().parent
 OUTPUTS_DIR = ROOT / "outputs"
-SYSTEM_PATH = ROOT / "DM-skill-开局生成-v2.0.md"
+# 单一正典：生成系统提示只读 docs/specs/DM-skill-v2.0.md（根目录同名文件已降级为指针存根）。
+SPEC_RELPATH = Path("docs") / "specs" / "DM-skill-v2.0.md"
+SYSTEM_PATH = ROOT / SPEC_RELPATH
 INPUTS_DIR = ROOT / "inputs"
 USAGE_PATH = ROOT / "usage_log.csv"
 
@@ -321,7 +323,7 @@ def run_feedback_job(
     max_tokens: int,
     budget_controller: BudgetController,
 ) -> FeedbackResult:
-    system_text = (root / SYSTEM_PATH.name).read_text(encoding="utf-8")
+    system_text = (root / SPEC_RELPATH).read_text(encoding="utf-8")
     original_input = (root / "inputs" / f"input_{job.input_name}.json").read_text(encoding="utf-8")
     outputs_dir = root / "outputs"
     outputs_dir.mkdir(exist_ok=True)
@@ -436,7 +438,7 @@ def run_job(
     budget: float,
     spent: float,
 ) -> JobResult:
-    system_text = (root / SYSTEM_PATH.name).read_text(encoding="utf-8")
+    system_text = (root / SPEC_RELPATH).read_text(encoding="utf-8")
     user_text = (root / "inputs" / f"input_{job.input_name}.json").read_text(encoding="utf-8")
     outputs_dir = root / "outputs"
     outputs_dir.mkdir(exist_ok=True)
@@ -589,7 +591,7 @@ def run_full_check(root: Path) -> int:
 def estimate_batches(
     root: Path, max_tokens: int, thinking_mode: str = "both"
 ) -> tuple[float, list[tuple[Job, float]]]:
-    system_text = (root / SYSTEM_PATH.name).read_text(encoding="utf-8")
+    system_text = (root / SPEC_RELPATH).read_text(encoding="utf-8")
     estimates: list[tuple[Job, float]] = []
     for job in select_jobs(thinking_mode):
         user_text = (root / "inputs" / f"input_{job.input_name}.json").read_text(encoding="utf-8")
