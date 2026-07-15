@@ -24,6 +24,7 @@ OUTPUTS_DIR = ROOT / "outputs"
 # 单一正典：生成系统提示只读 docs/specs/DM-skill-v2.1.md（根目录同名文件已降级为指针存根）。
 SPEC_RELPATH = Path("docs") / "specs" / "DM-skill-v2.1.md"
 SYSTEM_PATH = ROOT / SPEC_RELPATH
+SYSTEM_PROMPT_MARKER = "## 【系统提示】（整段复制为 system）"
 INPUTS_DIR = ROOT / "inputs"
 USAGE_PATH = ROOT / "usage_log.csv"
 
@@ -147,13 +148,53 @@ class BudgetController:
 _USAGE_LOCK = threading.Lock()
 
 
+def extract_system_prompt(document: str) -> str:
+    """Extract the first fenced code block following the canonical marker."""
+    lines = document.splitlines()
+    try:
+        marker_index = next(
+            index for index, line in enumerate(lines) if line.strip() == SYSTEM_PROMPT_MARKER
+        )
+    except StopIteration as exc:
+        raise ValueError(f"系统提示正典缺少标记：{SYSTEM_PROMPT_MARKER}") from exc
+
+    fence_character = ""
+    fence_length = 0
+    content_start = 0
+    for index in range(marker_index + 1, len(lines)):
+        match = re.fullmatch(r"[ \t]*(`{3,}|~{3,})[^`~]*", lines[index])
+        if match:
+            fence = match.group(1)
+            fence_character = fence[0]
+            fence_length = len(fence)
+            content_start = index + 1
+            break
+    else:
+        raise ValueError("系统提示标记后缺少 fenced code block")
+
+    closing_pattern = re.compile(
+        rf"[ \t]*{re.escape(fence_character)}{{{fence_length},}}[ \t]*"
+    )
+    for index in range(content_start, len(lines)):
+        if closing_pattern.fullmatch(lines[index]):
+            prompt = "\n".join(lines[content_start:index])
+            if not prompt:
+                raise ValueError("系统提示 fenced code block 为空")
+            return prompt
+    raise ValueError("系统提示 fenced code block 未闭合")
+
+
+def load_system_prompt(path: Path) -> str:
+    return extract_system_prompt(path.read_text(encoding="utf-8"))
+
+
 def build_jobs() -> list[Job]:
     jobs: list[Job] = []
     for name in "ABCD":
         for sequence in range(1, 3):
-            jobs.append(Job(name, f"dsT_{name}_v21_{sequence:02d}.json", True, "high"))
+            jobs.append(Job(name, f"dsT_{name}_v21r1_{sequence:02d}.json", True, "high"))
     for sequence in range(1, 21):
-        jobs.append(Job("B", f"ds_B_div_v21_{sequence:02d}.json", False, ""))
+        jobs.append(Job("B", f"ds_B_div_v21r1_{sequence:02d}.json", False, ""))
     return jobs
 
 
@@ -323,7 +364,7 @@ def run_feedback_job(
     max_tokens: int,
     budget_controller: BudgetController,
 ) -> FeedbackResult:
-    system_text = (root / SPEC_RELPATH).read_text(encoding="utf-8")
+    system_text = load_system_prompt(root / SPEC_RELPATH)
     original_input = (root / "inputs" / f"input_{job.input_name}.json").read_text(encoding="utf-8")
     outputs_dir = root / "outputs"
     outputs_dir.mkdir(exist_ok=True)
@@ -438,7 +479,7 @@ def run_job(
     budget: float,
     spent: float,
 ) -> JobResult:
-    system_text = (root / SPEC_RELPATH).read_text(encoding="utf-8")
+    system_text = load_system_prompt(root / SPEC_RELPATH)
     user_text = (root / "inputs" / f"input_{job.input_name}.json").read_text(encoding="utf-8")
     outputs_dir = root / "outputs"
     outputs_dir.mkdir(exist_ok=True)
@@ -591,7 +632,7 @@ def run_full_check(root: Path) -> int:
 def estimate_batches(
     root: Path, max_tokens: int, thinking_mode: str = "both"
 ) -> tuple[float, list[tuple[Job, float]]]:
-    system_text = (root / SPEC_RELPATH).read_text(encoding="utf-8")
+    system_text = load_system_prompt(root / SPEC_RELPATH)
     estimates: list[tuple[Job, float]] = []
     for job in select_jobs(thinking_mode):
         user_text = (root / "inputs" / f"input_{job.input_name}.json").read_text(encoding="utf-8")
@@ -602,8 +643,8 @@ def estimate_batches(
 def print_estimate(root: Path, max_tokens: int, budget: float, thinking_mode: str = "both") -> float:
     total, estimates = estimate_batches(root, max_tokens, thinking_mode)
     batches = [
-        ("dsT v2.1 思考主批", [item for item in estimates if item[0].filename.startswith("dsT_")]),
-        ("B v2.1 非思考多样性批", [item for item in estimates if "_div_" in item[0].filename]),
+        ("dsT v2.1r1 思考主批", [item for item in estimates if item[0].filename.startswith("dsT_")]),
+        ("B v2.1r1 非思考多样性批", [item for item in estimates if "_div_" in item[0].filename]),
     ]
     print(f"模型: {MODEL}  max_tokens: {max_tokens}  硬顶: ${budget:.2f}")
     for label, items in batches:

@@ -11,15 +11,15 @@ import run_ds
 
 
 class PlanningTests(unittest.TestCase):
-    def test_build_jobs_has_frozen_v20_thinking_and_diversity_batches(self):
+    def test_build_jobs_has_frozen_v21r1_thinking_and_diversity_batches(self):
         jobs = run_ds.build_jobs()
         self.assertEqual(28, len(jobs))
-        self.assertEqual("dsT_A_v21_01.json", jobs[0].filename)
-        self.assertEqual("dsT_D_v21_02.json", jobs[7].filename)
+        self.assertEqual("dsT_A_v21r1_01.json", jobs[0].filename)
+        self.assertEqual("dsT_D_v21r1_02.json", jobs[7].filename)
         self.assertTrue(all(job.thinking for job in jobs[:8]))
         self.assertTrue(all(job.reasoning_effort == "high" for job in jobs[:8]))
-        self.assertEqual("ds_B_div_v21_01.json", jobs[8].filename)
-        self.assertEqual("ds_B_div_v21_20.json", jobs[-1].filename)
+        self.assertEqual("ds_B_div_v21r1_01.json", jobs[8].filename)
+        self.assertEqual("ds_B_div_v21r1_20.json", jobs[-1].filename)
         self.assertFalse(any(job.thinking for job in jobs[8:]))
 
     def test_estimate_uses_utf8_upper_bound_and_full_maximum_output(self):
@@ -47,6 +47,36 @@ class PlanningTests(unittest.TestCase):
             run_ds.require_call_budget(spent=4.99, call_ceiling=0.02, budget=5.0)
 
 
+class SystemPromptTests(unittest.TestCase):
+    def test_extracts_only_first_fenced_block_after_exact_marker(self):
+        document = """# 前言
+```
+WRONG BEFORE MARKER
+```
+
+## 【系统提示】（整段复制为 system）
+
+说明文字不应进入 system
+```text
+SYSTEM LINE 1
+
+SYSTEM LINE 3
+```
+
+```
+WRONG SECOND BLOCK
+```
+"""
+        self.assertEqual(
+            "SYSTEM LINE 1\n\nSYSTEM LINE 3",
+            run_ds.extract_system_prompt(document),
+        )
+
+    def test_missing_marker_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "缺少标记"):
+            run_ds.extract_system_prompt("```\nSYSTEM\n```\n")
+
+
 class RequestAndRetryTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -56,7 +86,12 @@ class RequestAndRetryTests(unittest.TestCase):
         # 单一正典：系统提示只从 docs/specs/DM-skill-v2.1.md 读取
         spec_path = self.root / run_ds.SPEC_RELPATH
         spec_path.parent.mkdir(parents=True, exist_ok=True)
-        spec_path.write_text("SYSTEM", encoding="utf-8")
+        spec_path.write_text(
+            "# 正典\n\n"
+            f"{run_ds.SYSTEM_PROMPT_MARKER}\n\n"
+            "```\nSYSTEM\n```\n",
+            encoding="utf-8",
+        )
         (self.root / "inputs" / "input_A.json").write_text('{"input":"A"}', encoding="utf-8")
         (self.root / "inputs" / "input_B.json").write_text('{"input":"B"}', encoding="utf-8")
 
