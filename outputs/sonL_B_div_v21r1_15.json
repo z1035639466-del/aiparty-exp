@@ -1,0 +1,102 @@
+{
+  "game_title": "团建局长夜：黑话瓜田健身房",
+  "subtitle": "一桌人的五种花活儿，全靠这局给你现编",
+  "premise": "五个人轮着上场：先测你是不是嘴上说i身体很e，再全员切换黑话结界不许说人话，接着传一手离谱瓜看它怎么走样，再来一段网红挑战全场公投过不过，最后拉练到抽筋为止——谁先绷不住谁先扣分。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop":"匿名投票器","to":"全体","visibility":"自己看","note":"每轮同时提交入口，各自私密锁定选项，到点自动转公开揭晓"},
+    {"prop":"密语卡","to":"当轮挑战者","visibility":"自己看","note":"私发本轮专属的挑战动作/表演题面，仅本人可见"},
+    {"prop":"盲盒","to":"当轮挑战者","visibility":"全场公开开","note":"装健身动作与'抽筋'牌，抽中即触发续押喊停的爆掉"},
+    {"prop":"沙漏","to":"全体","visibility":"全场公开","note":"每轮限时用，到点强制进入下一阶段"},
+    {"prop":"记分板","to":"全体","visibility":"全场公开","note":"实时显示各人得分与排名"},
+    {"prop":"公共看板","to":"全体","visibility":"全场公开","note":"显示当前轮次名称与'黑话结界'生效中的词库提示"}
+  ],
+  "props_required": [],
+  "flow": [
+    "阶段0 开局: 发放匿名投票器/记分板/公共看板，宣布规则，按现实座位顺序定好轮值表（不重排）",
+    "阶段1 轮次·i人e人测谎室: 按座位顺序推进到本轮挑战者，全员含挑战者同时提交，沙漏计时，到点揭晓结算",
+    "阶段2 轮次·黑话结界开启: 从本阶段起该常驻规则生效——沟通只准用黑话词，任何人可举报，举报触发共识判定与惩罚(轻)",
+    "阶段3 轮次·瓜从口出: 由挑战者领到一句瓜料起头，按座位顺序私密逐人传递，终局对比首尾是否走样，AI鉴定并可被全场一键推翻",
+    "阶段4 轮次·起号挑战王: 挑战者领密语卡任务，当众表演，沙漏计时，全场共识判定过关与否",
+    "阶段5 轮次·擼铁续命: 挑战者开盲盒抽健身动作，可选继续加练或见好就收，抽中抽筋牌即爆掉清零",
+    "阶段6 结算: 记分板揭晓最终排名，平局按全局约定由系统随机裁决"
+  ],
+  "rules": [
+    {
+      "flavor_name":"轮值挑战席",
+      "mechanic":"回合推进",
+      "plain_rule":"每轮谁是'挑战者/被测者'按大家现实坐的座位顺序依次轮换，不在虚拟里重新排座位。",
+      "visibility":"全场公开",
+      "params": {"order":"round_robin"}
+    },
+    {
+      "flavor_name":"i人e人测谎室",
+      "mechanic":"同时提交",
+      "plain_rule":"挑战者和其他所有人同时私密选一个选项：挑战者选自己真实会怎么做，其他人猜挑战者会选哪个。沙漏走完统一揭晓，猜中一次算命中。",
+      "visibility":"自己看",
+      "params": {"prompt":"周五被拉着继续团建，挑战者的真实反应更接近哪一种？","input_kind":"options","options":["闭麦装忙型","营业接梗型"],"timeout_s":20,"reveal":"simultaneous","scoring_ref":"猜中加分"}
+    },
+    {
+      "flavor_name":"黑话结界",
+      "mechanic":"受限沟通",
+      "plain_rule":"从这轮开始，所有提示性发言只能用'对齐/颗粒度/复盘/闭环'这类词去表达意思，不许直接说大白话；说没说人话全靠自觉，被发现算不算由全场表决。",
+      "visibility":"全场公开",
+      "params": {"channel":"synonym","enforce":"channel_only"}
+    },
+    {
+      "flavor_name":"人话哨兵",
+      "mechanic":"判定",
+      "plain_rule":"任何人喊一声'举报'，指认某人刚才说了人话破坏结界，全场一起表决这一次算不算违规。",
+      "visibility":"全场公开",
+      "params": {"source":"consensus","question":"他刚才说的算不算破坏黑话结界（说了人话）？","verdict_options":["算","不算"],"on":{"算":{"scoring_ref":"违规受罚"},"不算":{"scoring_ref":[]}}}
+    },
+    {
+      "flavor_name":"闭环惩罚",
+      "mechanic":"惩罚(轻)",
+      "plain_rule":"被判违规的人从惩罚池里抽一个轻度任务执行；不想做可以选跳过或换一个，代价只是换个更温和的任务，没有羞辱性惩罚。",
+      "visibility":"全场公开",
+      "params": {"who":"loser","pool":"$gen.职场向轻惩罚池","scoring_ref":"违规受罚"}
+    },
+    {
+      "flavor_name":"瓜从口出",
+      "mechanic":"传递链",
+      "plain_rule":"挑战者先看到一句离谱的瓜料起头，然后按座位顺序一个一个私下传给下一位，每个人只能看到上一位传给你的内容，最后对比第一句和最后一句差了多少。",
+      "visibility":"自己看",
+      "params": {"content_from":"$gen.瓜料起头池","order":"seat","each_sees":"prev_only","replay":"first_vs_last"}
+    },
+    {
+      "flavor_name":"瓜味鉴定",
+      "mechanic":"判定",
+      "plain_rule":"传完之后，由系统对比首尾两句话判断'走样没走样'，判定结果全场可以一键推翻重判。",
+      "visibility":"全场公开",
+      "params": {"source":"ai","ai_overridable":true,"question":"首尾两句瓜，意思走样了吗？","verdict_options":["走样","保真"],"on":{"走样":{"scoring_ref":"传话失真"},"保真":{"scoring_ref":[]}}}
+    },
+    {
+      "flavor_name":"起号挑战王",
+      "mechanic":"判定",
+      "plain_rule":"挑战者按密语卡上的题面当众完成一个'网红挑战风'的小任务，沙漏计时内完成，全场表决这次算不算过关。",
+      "visibility":"额头",
+      "params": {"source":"consensus","question":"挑战者这个动作做到位了吗？","verdict_options":["过","不过"],"on":{"过":{"scoring_ref":"挑战成功"},"不过":{"scoring_ref":"挑战失败"}}}
+    },
+    {
+      "flavor_name":"擼铁续命",
+      "mechanic":"续押喊停",
+      "plain_rule":"挑战者从盲盒里一次次抽健身动作，每抽一次就要当场做完；可以选'继续加练'冲更高分，也可以随时'见好就收'把已攒的分收进兜里；一旦抽到抽筋牌，这轮攒的全部清零。",
+      "visibility":"全场公开",
+      "params": {"draw_from":"$gen.健身动作与抽筋池","continue_prompt":"继续加练还是见好就收？","bust_when":"抽中抽筋牌","cap":6,"on_cap":"force_settle","bank_on_stop":true,"scoring_ref":["落袋为安","爆掉清零"]}
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      {"event":"猜中加分","who":"guesser_or_target_on_hit","delta":"+1"},
+      {"event":"违规受罚","who":"loser","delta":"-1","effect":"触发惩罚(轻)"},
+      {"event":"传话失真","who":"last_in_chain","delta":"-1"},
+      {"event":"挑战成功","who":"actor","delta":"+2"},
+      {"event":"挑战失败","who":"actor","delta":"0","effect":"触发惩罚(轻)"},
+      {"event":"落袋为安","who":"actor","delta":"+banked_amount"},
+      {"event":"爆掉清零","who":"actor","delta":"reset_round_bank_to_0"}
+    ],
+    "win": "全部轮次结束后，记分板总分最高者获胜",
+    "tiebreak": "平局与并列默认由系统随机裁决（可穿'命运一掷'风味皮）"
+  }
+}
