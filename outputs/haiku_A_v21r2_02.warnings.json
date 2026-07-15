@@ -1,0 +1,8 @@
+{
+  "file": "haiku_A_v21r2_02.json",
+  "spec_version": "v2.1.1",
+  "warnings": [
+    "prose_param_mismatch:rules[1].challenge_window_s=15",
+    "dead_prop:命运转盘"
+  ]
+}

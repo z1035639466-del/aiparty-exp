@@ -1,0 +1,7 @@
+{
+  "file": "dsT_A_v21r2_02.json",
+  "spec_version": "v2.1.1",
+  "warnings": [
+    "dead_ledger:说谎扣分"
+  ]
+}

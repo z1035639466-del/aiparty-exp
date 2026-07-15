@@ -1,0 +1,9 @@
+{
+  "file": "dsT_A_v21r2_01.json",
+  "spec_version": "v2.1.1",
+  "warnings": [
+    "dead_prop:密语卡",
+    "dead_prop:虚拟左轮",
+    "dead_ledger:左轮命中惩罚"
+  ]
+}

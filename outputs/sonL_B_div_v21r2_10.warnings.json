@@ -1,0 +1,8 @@
+{
+  "file": "sonL_B_div_v21r2_10.json",
+  "spec_version": "v2.1.1",
+  "warnings": [
+    "dead_prop:密语卡",
+    "dead_prop:抽签筒"
+  ]
+}
