@@ -53,7 +53,7 @@ class RequestAndRetryTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         (self.root / "outputs").mkdir()
         (self.root / "inputs").mkdir()
-        # 单一正典：系统提示只从 docs/specs/DM-skill-v2.0.md 读取
+        # 单一正典：系统提示只从 docs/specs/DM-skill-v2.1.md 读取
         spec_path = self.root / run_ds.SPEC_RELPATH
         spec_path.parent.mkdir(parents=True, exist_ok=True)
         spec_path.write_text("SYSTEM", encoding="utf-8")
