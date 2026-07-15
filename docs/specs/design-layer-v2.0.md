@@ -61,7 +61,7 @@
   "source": "consensus | expr | ai",   // expr(规则表达式) / ai(语义仲裁,可被全场一键推翻) → 暂不可编译
   "question": "判定什么",
   "verdict_options": ["过", "不过"],     // source=consensus：全场共识确认的选项
-  "expr": "<判定表达式>",                // source=expr 专用（MVP 未启用；判别器现在留，免 v2.1 破坏性改）
+  "expr": "<判定表达式>",                // source=expr 专用（MVP 未启用；判别器现在留）。v2.1 硬闸：须为可解析表达式且引用 state 键（如 "state:虚假声明数 > 0"），散文自由文本拒
   "ai_overridable": true,              // source=ai 固定 true（人类共识永远最高）
   "on": { "过": { "scoring_ref": "…" }, "不过": { "scoring_ref": "…" } }
 }
@@ -214,7 +214,7 @@
 | 沙漏 | `hourglass` | ✅ |
 | 密语卡 / 盲盒 / 虚拟左轮 / 定时炸弹 / 命运转盘 / 扑克牌 / 骰子 / 抽签筒 / 匿名投票器 / 公共看板 | 待编译器覆盖时登记 | ✗ |
 
-**桥表注（C5 · 数字道具引用，字段键冻结）**：params 内 `prop:<名>` / `prop_reveal:<名>` 引用的道具名，须落在上表设计层道具名（14 库）内且属本局 `props_dealt` 实发清单。check.py 以与 `scoring_ref` 收集器同构的 **`prop_ref` 收集器**递归校验：引用名 ∈ 14 库 → 硬闸；引用 ∈ props_dealt 实发 → 硬闸（引用未发 = 空引用）；实发道具无任何 params 引用 → 软闸 `dead_prop:<道具>`（供裁判第 1 项确认，不拒件）。桥表随编译器覆盖逐步补 id，不影响设计层引用合法性——数字道具经 `PROP_REGISTRY` 归约到六原语（§2 C7），机器槽引用它合法。
+**桥表注（C5 · 数字道具引用，字段键冻结）**：params 内 `prop:<名>` / `prop_reveal:<名>` 引用的道具名，须落在上表设计层道具名（14 库）内且属本局 `props_dealt` 实发清单。check.py 以与 `scoring_ref` 收集器同构的 **`prop_ref` 收集器**递归校验：引用名 ∈ 14 库 → 硬闸；引用 ∈ props_dealt 实发 → 硬闸（引用未发 = 空引用）；实发道具无任何 params 引用 → 软闸 `dead_prop:<道具>`（供裁判第 1 项确认，不拒件）——**v2.1 口径修正**：`dead_prop` 只对**可引用**道具计；**免引用**道具（匿名投票器/沙漏/记分板/公共看板，见 `spec-prop-library-v0-final.md` §5「引用类型」列 + `whitelist.json` `prop_reference_types`）靠机制结构消费、不经 `prop:` 引用，实发未引用**不记** `dead_prop`；validator/check.py **读表派生免引用集、不硬编码**。桥表随编译器覆盖逐步补 id，不影响设计层引用合法性——数字道具经 `PROP_REGISTRY` 归约到六原语（§2 C7），机器槽引用它合法。
 
 **`props_required` 字段（C6 · 现实物品 / 新增顶层字段，字段键就此冻结）**：自由字符串数组，线下真实道具的备物清单，**不建受控词表**（词表 v2.1 由真实字符串反向构建，先收后建）；空列表 = 纯数字局（旧「纯数字须为空」条废弃）。与 `props_dealt`（14 库数字道具）**命名空间隔离**。check.py 对字段本体只判类型（字符串数组），另加四道箍：①**机器槽隔离**——props_required 项永不被任何机器槽解析（§2 C7，硬闸）；②每项须在 plain_rule / 任务 / 惩罚内容中被引用，否则软闸 `dead_real_prop:<物>`；③自由串过 contentFilter、safety_note 联动（硬闸——自由词表的代价是安全滤前置）；④编译器透传为开局备物清单（纯展示数据，不产生 Script 节点）。供给侧闭环 `props_required ⊆ 配局库存` 归 prompt 纪律 + 配局 UI 确认，**不归 check.py**。
 
@@ -239,4 +239,24 @@ v2.0 后 `plain_rule` **不再驮任何机器参数**——秒数进 `params.sec
 
 ---
 
-*本 v2.0 为定稿，先交用户。产品侧据同一份升级 golden set 与 check.py，引擎侧据同一份建编译器与 schema v0.4。字段键就此冻结，两侧改动前如需调整，回本文件改、双侧同步。*
+## 7. v2.1 增量（validator / check.py 两侧同规格移植 · 字段键冻结）
+
+> 两条增改：机械可判、口径统一。产品侧 `check.py` 与引擎侧 AiParty `validator` 以本节为唯一权威源同步移植。
+
+### ① expr 可解析硬闸（判定 source=expr）
+
+`判定` 机制 `source=expr` 时，`params.expr` **须为可解析表达式且引用 state 键**，否则硬闸拒。
+
+- **文法**：`expr` 至少含一个 `state:<键>` 引用；把 `state:<键>` / `prop:<名>` / `prop_reveal:<名>` 折成占位标识符后，余下须能解析为**单个表达式**，且只含**比较 / 布尔 / 算术 / 一元 / 常量 / 标识符**结点。`$gen.` / `$派生:` 填装点放行（交内容层填实后再校验）。
+- **拒的形态**：散文自由文本（无 state 引用、或解析失败、或含函数调用/语句等非法结点）。**活证 `dsT_A_v20_01`**：其 `判定` 规则 `expr="该轮中有未被质疑的虚假声明"` 为散文，无 `state:` 引用 → 硬闸拒。
+- **理由**：`source=expr` 是"引擎按规则表达式自动判"的判源（§2 C7 账本须纯原语可达）；散文表达式不可编译、不可静态归约，混入即在 expr 判源开一条散文旁路，与 consensus/ai 判源边界糊掉。
+
+### ② dead_prop 口径修正 + 软闸旁车文件
+
+**口径**：14 道具正典表新增「引用类型」列（`spec-prop-library-v0-final.md` §5；机读镜像 `whitelist.json` `prop_reference_types`）。`dead_prop` 软闸只对**可引用**道具计；**免引用**道具（匿名投票器 / 沙漏 / 记分板 / 公共看板）靠机制结构消费、不经 `prop:` 引用，实发未引用**不记** `dead_prop`。validator/check.py **读表派生免引用集、不硬编码**（新增/改判引用类型只改表、双侧同步）。
+
+**软闸输出载体**：软闸 warning **改写入旁车文件 `<件名>.warnings.json`**（同目录，机读 `{file, spec_version, warnings[]}`），**不回写件内**——被检件保持纯设计层。裁判读『JSON + 旁车 warning』两件。扫描时 `*.warnings.json` 自身排除、不当设计层件回检；无软闸则清掉旧旁车件。
+
+---
+
+*本 v2.0 为定稿，先交用户；v2.1 两条增改见 §7。产品侧据同一份升级 golden set 与 check.py，引擎侧据同一份建编译器与 schema v0.4、validator 同步 §7 两条。字段键就此冻结，两侧改动前如需调整，回本文件改、双侧同步。*

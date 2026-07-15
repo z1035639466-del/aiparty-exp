@@ -18,6 +18,8 @@ WHITELIST = {
         "限时", "回合推进", "声明质疑", "同时提交", "续押喊停", "受限沟通", "判定", "传递链",
     },
     "visibility": {"自己看", "额头", "全场公开"},
+    # v2.1 ②：正典表「引用类型」列=免引用的道具（结构性消费、不经 prop: 引用），dead_prop 豁免。
+    "reference_exempt": {"匿名投票器", "沙漏", "记分板", "公共看板"},
 }
 
 
@@ -205,9 +207,26 @@ class PropTrackTests(unittest.TestCase):
 
     def test_dead_prop_soft_warning(self):
         doc = valid_doc()
-        doc["props_dealt"].append({"prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "x"})
-        self.assertIn("dead_prop:沙漏", warnings_of(doc))
+        # 密语卡=可引用道具，实发却无 prop: 引用 → dead_prop 软闸
+        doc["props_dealt"].append({"prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "x"})
+        self.assertIn("dead_prop:密语卡", warnings_of(doc))
         self.assertEqual([], errors_of(doc))  # 软闸不拒件
+
+    def test_dead_prop_exempt_props_no_warning(self):
+        """v2.1 ②：免引用道具（沙漏/记分板/匿名投票器/公共看板）实发未引用不记 dead_prop。"""
+        doc = valid_doc()
+        for prop in ("沙漏", "记分板", "匿名投票器", "公共看板"):
+            doc["props_dealt"].append({"prop": prop, "to": "公共区", "visibility": "全场公开", "note": "x"})
+        warnings = warnings_of(doc)
+        self.assertEqual([], [w for w in warnings if w.startswith("dead_prop:")])
+        self.assertEqual([], errors_of(doc))
+
+    def test_dead_prop_exempt_read_from_table_not_hardcoded(self):
+        """check 读表不硬编码：白名单不声明豁免时，同一免引用名照记 dead_prop。"""
+        doc = valid_doc()
+        doc["props_dealt"].append({"prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "x"})
+        whitelist_no_exempt = {**WHITELIST, "reference_exempt": set()}
+        self.assertIn("dead_prop:沙漏", check.check_document(doc, whitelist_no_exempt).warnings)
 
     def test_props_required_type_hard_fails(self):
         doc = valid_doc()
@@ -265,6 +284,117 @@ class ProseTests(unittest.TestCase):
         doc["rules"][2]["plain_rule"] = "最多 5 轮，到顶强制结算。"  # 散文 5 ≠ params cap 8
         self.assertIn("prose_param_mismatch:rules[3].cap=8", warnings_of(doc))
         self.assertEqual([], errors_of(doc))
+
+
+def _verdict_expr_doc(expr) -> dict:
+    """在基线件上追加一条 判定/source=expr 规则，expr 由入参给定。"""
+    doc = valid_doc()
+    doc["rules"].append({
+        "flavor_name": "表达式判定", "mechanic": "判定",
+        "plain_rule": "按状态表达式自动判过或不过。", "visibility": "全场公开",
+        "params": {
+            "source": "expr", "question": "本轮是否成立", "expr": expr,
+            "on": {"过": {"scoring_ref": "得分事件"}, "不过": {"scoring_ref": "得分事件"}},
+        },
+    })
+    return doc
+
+
+class ExprGateTests(unittest.TestCase):
+    """v2.1 ①：判定 source=expr 的 expr 须为可解析表达式且引用 state 键。"""
+
+    def test_parseable_expr_referencing_state_passes(self):
+        doc = _verdict_expr_doc("state:虚假声明数 > 0")
+        self.assertEqual([], errors_of(doc))
+
+    def test_boolean_state_expr_passes(self):
+        doc = _verdict_expr_doc("state:甲得分 >= state:乙得分 and state:轮次 < 8")
+        self.assertEqual([], errors_of(doc))
+
+    def test_dsT_A_v20_01_prose_expr_hard_rejected(self):
+        """活证 dsT_A_v20_01：expr 为散文自由文本『该轮中有未被质疑的虚假声明』→ 硬闸拒。"""
+        doc = _verdict_expr_doc("该轮中有未被质疑的虚假声明")
+        errors = errors_of(doc)
+        self.assertTrue(any("expr" in e and "state" in e for e in errors))
+
+    def test_expr_without_state_ref_rejected(self):
+        doc = _verdict_expr_doc("1 > 0")  # 可解析但不引用 state
+        self.assertTrue(any("未引用任何 state 键" in e for e in errors_of(doc)))
+
+    def test_unparseable_expr_with_state_ref_rejected(self):
+        doc = _verdict_expr_doc("state:得分 最高 的人")  # 含 state 引用但非可解析表达式
+        self.assertTrue(any("非可解析表达式" in e for e in errors_of(doc)))
+
+    def test_gen_placeholder_expr_passes(self):
+        doc = _verdict_expr_doc("$派生:判定表达式")  # 填装点放行
+        self.assertEqual([], errors_of(doc))
+
+    def test_empty_expr_still_rejected(self):
+        doc = _verdict_expr_doc("")
+        self.assertTrue(any("expr" in e for e in errors_of(doc)))
+
+
+class WarningsSidecarTests(unittest.TestCase):
+    """v2.1 ②：软闸写旁车文件 <件名>.warnings.json，被检件保持纯设计层。"""
+
+    def test_sidecar_path_is_stem_dot_warnings_json(self):
+        path = Path("outputs/dsT_A_v20_01.json")
+        self.assertEqual("dsT_A_v20_01.warnings.json", check.warnings_sidecar_path(path).name)
+
+    def test_sidecar_written_and_source_untouched(self):
+        with tempfile.TemporaryDirectory() as directory:
+            src = Path(directory) / "g.json"
+            body = json.dumps({"x": 1})
+            src.write_text(body, encoding="utf-8")
+            sidecar = check.write_warnings_sidecar(src, ["dead_prop:密语卡", "dead_ledger:X"])
+            self.assertIsNotNone(sidecar)
+            self.assertEqual("g.warnings.json", sidecar.name)
+            payload = json.loads(sidecar.read_text(encoding="utf-8"))
+            self.assertEqual("g.json", payload["file"])
+            self.assertEqual(check.SPEC_VERSION, payload["spec_version"])
+            self.assertEqual(["dead_prop:密语卡", "dead_ledger:X"], payload["warnings"])
+            # 被检件保持纯设计层：内容一字未动
+            self.assertEqual(body, src.read_text(encoding="utf-8"))
+
+    def test_no_warnings_removes_stale_sidecar(self):
+        with tempfile.TemporaryDirectory() as directory:
+            src = Path(directory) / "g.json"
+            src.write_text("{}", encoding="utf-8")
+            stale = check.warnings_sidecar_path(src)
+            stale.write_text("{}", encoding="utf-8")
+            self.assertIsNone(check.write_warnings_sidecar(src, []))
+            self.assertFalse(stale.exists())
+
+    def test_main_writes_sidecar_and_skips_sidecar_on_scan(self):
+        with tempfile.TemporaryDirectory() as directory:
+            outputs = Path(directory)
+            doc = valid_doc()
+            doc["props_dealt"].append({"prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "x"})
+            (outputs / "g.json").write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+            with (
+                patch.object(check, "OUTPUTS_DIR", outputs),
+                patch.object(check, "load_whitelist", return_value=WHITELIST),
+                patch.object(check, "load_exclusions", return_value={}),
+            ):
+                self.assertEqual(0, check.main())  # 软闸不拒件
+                sidecar = outputs / "g.warnings.json"
+                self.assertTrue(sidecar.exists())
+                self.assertIn("dead_prop:密语卡", json.loads(sidecar.read_text(encoding="utf-8"))["warnings"])
+                # 二次运行：旁车件不得被当设计层件回检（*.warnings.json 扫描时排除）
+                self.assertEqual(0, check.main())
+
+
+class LoadWhitelistTests(unittest.TestCase):
+    def test_reference_exempt_derived_from_table(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "wl.json"
+            path.write_text(json.dumps({
+                "props": ["沙漏", "骰盅"], "mechanics": ["判定"], "visibility": ["自己看"],
+                "prop_reference_types": {"沙漏": "免引用", "骰盅": "可引用"},
+            }), encoding="utf-8")
+            with patch.object(check, "WHITELIST_PATH", path):
+                wl = check.load_whitelist()
+            self.assertEqual({"沙漏"}, wl["reference_exempt"])
 
 
 class LegacyV18Tests(unittest.TestCase):
