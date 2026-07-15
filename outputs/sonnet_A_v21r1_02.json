@@ -1,0 +1,151 @@
+{
+  "game_title": "食堂三楼·金属忏悔夜",
+  "subtitle": "老王家客厅重金属真假审判",
+  "premise": "三个大学室友挤在同一张沙发上，把当年'食堂三楼'的黑历史吼成重金属忏悔——说真话的留香，编瞎话的挨罚，读心抓包的封神。",
+  "players": ["疯子明", "小静", "大鹏"],
+  "props_dealt": [
+    {"prop": "密语卡", "to": "当轮主唱（终章时全体）", "visibility": "自己看", "note": "主唱回合：写一句真实的食堂三楼细节，可自选夹带0~1处编造/夸大，并在卡背标记哪部分是真哪部分是编；终章回合：由座位起点的玩家另写一条新的食堂三楼词条，作为传递链源头。"},
+    {"prop": "沙漏", "to": "全体", "visibility": "全场公开", "note": "每轮主唱表演限时45秒，最后5秒进入警示倒数。"},
+    {"prop": "命运转盘", "to": "全体", "visibility": "全场公开", "note": "配置两组扇区：'金属重罚池'（说谎被抓时转）与'轻罚池'（冤枉指控/超时破音时转）。"},
+    {"prop": "记分板", "to": "全体", "visibility": "全场公开", "note": "实时显示三人分数，终局据此加冕。"}
+  ],
+  "props_required": [],
+  "flow": [
+    "阶段1 开场：讲清规则与安全底线（任何惩罚都可'跳过/换一个'温和替代），架起记分板，密语卡发给第一位主唱。",
+    "阶段2 第一轮金属忏悔：当轮主唱由现场座位顺序确定——密语卡写真话/掺假 → 其余两人读心预判 → 45秒死嗓限时唱出 → 全场声明质疑，抓谎/冤枉分别计分或触发命运转盘惩罚。",
+    "阶段3 第二轮金属忏悔：轮到下一位主唱，流程同阶段2。",
+    "阶段4 第三轮金属忏悔：最后一位主唱补完全场，流程同阶段2。",
+    "阶段5 终章·三楼回声：座位起点玩家私写一条新的食堂三楼词条，按座位顺序悄悄耳语传递，每人只凭上一人说的往下传，最后一人当众复述，全场共识判定'像不像原意'，猜中的最后一人加分。",
+    "阶段6 结算：记分板报总分，最高分者加冕'金属之王'；若并列，命运转盘随机裁决。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "台下听审团",
+      "mechanic": "同时提交",
+      "plain_rule": "主唱表演前，其余两人各自悄悄猜'他这次会不会掺假'，同时公开答案，不看对方也不许改口。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "你猜当轮主唱这次全说真话，还是掺了假？",
+        "input_kind": "options",
+        "options": ["全真", "有假"],
+        "timeout_s": 15,
+        "reveal": "simultaneous",
+        "scoring_ref": ["预测命中", "预测落空"]
+      }
+    },
+    {
+      "flavor_name": "45秒死嗓限时",
+      "mechanic": "限时",
+      "plain_rule": "主唱必须在沙漏倒数结束前，把密语卡上的细节喊成一句像重金属歌词的宣言；喊不完算破音掉链子。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 45,
+        "visible_countdown": true,
+        "on_timeout": {"effect": "scoring", "scoring_ref": "超时受罚"}
+      }
+    },
+    {
+      "flavor_name": "食堂三楼忏悔录",
+      "mechanic": "声明质疑",
+      "plain_rule": "主唱喊完后，当众说清楚这段词里哪句是真的食堂三楼往事、哪句是自己编的。其余两人若不信，可当场质疑某一句；质疑后翻开密语卡背面验证：主唱说谎被抓包就受罚，抓对的人加分；冤枉了老实主唱的质疑者自己受罚。",
+      "visibility": "全场公开",
+      "params": {
+        "claim_prompt": "我刚才唱的哪几句是真的食堂三楼往事？",
+        "challengers": "others",
+        "challenge_window_s": 30,
+        "verify_source": "prop_reveal:密语卡",
+        "verify_reveals": "prop_state",
+        "on_liar": {"scoring_ref": ["主唱说谎受罚", "抓包成功"]},
+        "on_false_accuse": {"scoring_ref": "冤枉指控受罚"}
+      }
+    },
+    {
+      "flavor_name": "金属审判转盘",
+      "mechanic": "惩罚(重)",
+      "plain_rule": "被抓包说谎的主唱，转一次命运转盘，转到哪条重罚就照做；不想做也可以'跳过/换一个'更温和的替代，没有额外代价。",
+      "visibility": "全场公开",
+      "params": {"who": "vocalist", "pool": "$gen.penalty_金属重罚池", "scoring_ref": "主唱说谎受罚"}
+    },
+    {
+      "flavor_name": "抓谎吉他手",
+      "mechanic": "加减分",
+      "plain_rule": "成功抓到主唱说谎的那位质疑者，直接加分。",
+      "visibility": "全场公开",
+      "params": {"who": "challenger", "delta": "+1", "scoring_ref": "抓包成功"}
+    },
+    {
+      "flavor_name": "冤枉税",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "冤枉了老实主唱的质疑者，受一个轻罚；同样可以'跳过/换一个'温和替代。",
+      "visibility": "全场公开",
+      "params": {"who": "challenger", "pool": "$gen.penalty_轻罚池", "scoring_ref": "冤枉指控受罚"}
+    },
+    {
+      "flavor_name": "破音掉链子",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "沙漏走完还没喊完词的主唱，算破音掉链子，受一个轻罚；可'跳过/换一个'温和替代。",
+      "visibility": "全场公开",
+      "params": {"who": "vocalist", "pool": "$gen.penalty_轻罚池", "scoring_ref": "超时受罚"}
+    },
+    {
+      "flavor_name": "三楼回声",
+      "mechanic": "传递链",
+      "plain_rule": "座位起点的玩家偷偷写一条新的食堂三楼词条（不公开），按座位顺序悄悄耳语传给下一人，下一人只凭听到的内容往下传，最后一人当众公布传到自己耳朵里的版本。",
+      "visibility": "自己看",
+      "params": {
+        "content_from": "$gen.座位起点玩家新写的食堂三楼终章词条",
+        "order": "seat",
+        "each_sees": "prev_only",
+        "replay": "first_vs_last"
+      }
+    },
+    {
+      "flavor_name": "回声鉴定团",
+      "mechanic": "判定",
+      "plain_rule": "全场公议：最后一人复述的版本，和最初那句意思接不接近？举手表决，接近算最后一人猜中。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "最后一人复述的版本，和最初那句意思接近吗？",
+        "verdict_options": ["接近", "走样"],
+        "on": {
+          "接近": {"scoring_ref": "回声猜中"},
+          "走样": {"scoring_ref": []}
+        }
+      }
+    },
+    {
+      "flavor_name": "麦克风传递",
+      "mechanic": "回合推进",
+      "plain_rule": "主唱轮位按现场座位顺序来，三人各当一次主唱，轮完一圈进入终章。",
+      "visibility": "全场公开",
+      "params": {"order": "round_robin"}
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      {"event": "预测命中", "effect": "+1", "who": "guesser"},
+      {"event": "预测落空", "effect": "+0", "who": "guesser"},
+      {"event": "抓包成功", "effect": "+1", "who": "challenger"},
+      {"event": "冤枉指控受罚", "effect": "惩罚(轻)", "who": "challenger"},
+      {"event": "主唱说谎受罚", "effect": "惩罚(重)", "who": "vocalist"},
+      {"event": "超时受罚", "effect": "惩罚(轻)", "who": "vocalist"},
+      {"event": "回声猜中", "effect": "+1", "who": "last_in_chain"}
+    ],
+    "win": {"basis": "score", "desc": "三轮忏悔加终章回声的总分最高者获胜，加冕'金属之王'。"},
+    "tiebreak": "分数并列时由系统随机裁决——命运转盘转出的那位摘得'金属之王'桂冠。"
+  },
+  "fx": [
+    "每轮开场：低音鼓点+吉他刷弦音效渐强",
+    "沙漏倒数最后5秒：心跳式震动提示",
+    "声明质疑判定瞬间：全场爆闪灯",
+    "命运转盘转动：金属齿轮咔哒音效",
+    "终章耳语传递：环境音压到最低，只留气声提示"
+  ],
+  "reveal_text": "当三段食堂三楼的碎片被吼成重金属忏悔、又被命运转盘审判过一轮之后，最后一人复述出的那句耳语，才是今晚真正封神的食堂三楼。",
+  "reveal_signature": [
+    "重金属，越吵越好 → 全局氛围、命名与fx感官标签",
+    "食堂三楼黑历史梗 → 声明质疑的忏悔内容与传递链终章",
+    "狼人杀真假博弈内核 → 声明质疑的抓谎/冤枉判定"
+  ]
+}
