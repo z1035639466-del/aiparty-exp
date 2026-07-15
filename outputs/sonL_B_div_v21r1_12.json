@@ -1,0 +1,88 @@
+{
+  "game_title": "黑话闭环挑战局",
+  "subtitle": "团建包间限定·i人e人对齐现场",
+  "premise": "一句黑话传下去面目全非，一段限时挑战砸下来全员应战，八卦真假全场来断——闭环，只在心跳快的人手里。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "开局每人领一张密语卡，写着系统生成的本轮真实证词（自己的挑战完成情况/MBTI真实标签），仅在被质疑时开卡验证，平时不公开"},
+    {"prop": "沙漏", "to": "全场公开", "note": "限时挑战阶段计时使用"},
+    {"prop": "记分板", "to": "全场公开", "note": "记录每轮加减分，决定垫底惩罚对象与终局胜负"}
+  ],
+  "props_required": [],
+  "flow": [
+    "阶段1 定传令官：按现实座位顺序回合推进选出本轮传令官",
+    "阶段2 黑话传递链：系统悄悄把一句夹杂'对齐/颗粒度/闭环'黑话与MBTI梗的怪句子告诉传令官，沿座位顺序贴耳传递，最后一人大声说出自己听到的版本",
+    "阶段3 走样度竞猜：全员同时提交猜最终版本比原句走样了几档，一起亮牌，系统按传递链回放判定实际档位",
+    "阶段4 限时挑战：传令官的密语卡上写着一条限时动作任务，60秒沙漏倒计时内完成，可选跳过换成温和替代",
+    "阶段5 达标判定：倒计时后全场共识判定挑战是否达标",
+    "阶段6 八卦对质：任意玩家可指认某人挑战没做到位或MBTI有诈，发起质疑，开密语卡验证真伪",
+    "阶段7 垫底惩罚：本轮记分板最低分者做一次轻度惩罚，可一键换成温和替代",
+    "阶段8 循环判断：五轮（每人轮完一次传令官）后进入终局，记分板最高分获胜，平局系统随机裁决"
+  ],
+  "rules": [
+    {
+      "flavor_name": "黑话闭环谜",
+      "mechanic": "传递链",
+      "plain_rule": "系统悄悄告诉传令官一句夹杂职场黑话和性格标签梗的怪句子，传令官只能贴耳小声传给下一位，一路传到底，最后一位大声说出自己听到的版本，中途不许澄清或重复。",
+      "visibility": "自己看",
+      "params": {"content_from": "$gen.黑话原句池", "order": "seat", "each_sees": "prev_only", "replay": "first_vs_last"}
+    },
+    {
+      "flavor_name": "走样度竞猜",
+      "mechanic": "同时提交",
+      "plain_rule": "所有人各自悄悄选一个档位，猜最终版本比原句走样了多少（没走样/小变/面目全非），一起亮出答案，猜中系统实际判定档位的人加分。",
+      "visibility": "自己看",
+      "params": {"prompt": "最终版本和原句差了几档？", "input_kind": "options", "options": ["没走样", "小变", "面目全非"], "timeout_s": 20, "reveal": "simultaneous", "scoring_ref": ["猜中走样度", "猜错走样度"]}
+    },
+    {
+      "flavor_name": "挑战倒计时",
+      "mechanic": "限时",
+      "plain_rule": "传令官的密语卡任务有60秒时间限制，沙漏可见倒计时，时间到自动进入共识判定，做不完也不受额外惩罚。",
+      "visibility": "全场公开",
+      "params": {"seconds": 60, "visible_countdown": true, "on_timeout": {"effect": "goto", "goto": "达标判定"}}
+    },
+    {
+      "flavor_name": "达标共识",
+      "mechanic": "判定",
+      "plain_rule": "密语卡上的动作任务可以直接跳过，换成原地转圈喊一句本轮口号，不算失败也不受罚；没跳过的，倒计时结束后全场一起表决动作做到位没有。",
+      "visibility": "全场公开",
+      "params": {"source": "consensus", "question": "挑战动作做到位了吗？", "verdict_options": ["过", "不过"], "on": {"过": {"scoring_ref": "挑战成功"}, "不过": {"scoring_ref": "挑战失败"}}}
+    },
+    {
+      "flavor_name": "八卦authenticate",
+      "mechanic": "声明质疑",
+      "plain_rule": "任何人可以公开说'我觉得TA挑战没做到/TA的性格标签有诈'，被点名的人先自己表态认不认，其余人也可以跟着质疑，最后开密语卡验证真假，说谎的人受罚，冤枉别人的人也要担代价。",
+      "visibility": "全场公开",
+      "params": {"claim_prompt": "你觉得TA的挑战完成情况或性格标签有诈？公开质疑", "challengers": "others", "challenge_window_s": 30, "verify_source": "prop_reveal:密语卡", "verify_reveals": "prop_state", "on_liar": {"scoring_ref": ["撒谎受罚", "揭穿加分"]}, "on_false_accuse": {"scoring_ref": ["冤枉受罚", "被冤枉补偿"]}}
+    },
+    {
+      "flavor_name": "垫底轻罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "每轮结束后记分板最低分的人做一个轻惩罚（比如十个开合跳），不想做可以直接换成喝一口水暂停，没有嘲笑也没有加罚，谁都能跳过。",
+      "visibility": "全场公开",
+      "params": {"who": "loser", "pool": "$gen.penalty_健身池", "scoring_ref": "垫底受罚"}
+    },
+    {
+      "flavor_name": "传令轮转",
+      "mechanic": "回合推进",
+      "plain_rule": "传令官按现实座位顺序轮流当，每人轮到一次，五轮轮完游戏结束。",
+      "visibility": "全场公开",
+      "params": {"order": "round_robin"}
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      {"event": "猜中走样度", "who": "guesser", "delta": "+1"},
+      {"event": "猜错走样度", "who": "guesser", "delta": "0"},
+      {"event": "挑战成功", "who": "传令官", "delta": "+2"},
+      {"event": "挑战失败", "who": "传令官", "delta": "0"},
+      {"event": "撒谎受罚", "who": "liar", "delta": "-2"},
+      {"event": "揭穿加分", "who": "challenger", "delta": "+1"},
+      {"event": "冤枉受罚", "who": "false_accuser", "delta": "-1"},
+      {"event": "被冤枉补偿", "who": "accused", "delta": "+1"},
+      {"event": "垫底受罚", "who": "loser", "effect": "惩罚(轻)"}
+    ],
+    "win": "五轮（每人当过一次传令官）结束后，记分板总分最高者获胜",
+    "tiebreak": "平局与并列默认由系统随机裁决"
+  }
+}
