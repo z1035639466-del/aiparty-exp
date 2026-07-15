@@ -1,0 +1,154 @@
+{
+  "game_title": "对齐颗粒度求生夜",
+  "subtitle": "黑话钓鱼 · 瓜田传声 · MBTI破译 · 拉练加时",
+  "premise": "今晚在包间里，你们要在黑话陷阱里全身而退、在瓜田传闻里对不上口径、在人格局气里读懂彼此，最后看谁分最高——输的人去补给站领一个不伤和气的小惩罚。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "每人一张，写着一个开会黑话词(对齐/颗粒度/闭环/抓手/拉齐认知，任选其一)"},
+    {"prop": "抽签筒", "to": "全体", "visibility": "全场公开", "note": "每轮开场每人抽一个号，定当轮的传声链顺序"},
+    {"prop": "命运转盘", "to": "全体", "visibility": "全场公开", "note": "扇区写玩家名，转到谁谁就是本轮流量挑战人"},
+    {"prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "MBTI破译环节用它私密提交猜测，统一揭晓"},
+    {"prop": "沙漏", "to": "全体", "visibility": "全场公开", "note": "限时挑战与传声环节计时"},
+    {"prop": "记分板", "to": "全体", "visibility": "全场公开", "note": "全程累计个人分"},
+    {"prop": "公共看板", "to": "全体", "visibility": "全场公开", "note": "显示当前轮次、当轮竞猜目标、剩余轮数"}
+  ],
+  "props_required": [],
+  "flow": [
+    "阶段0 开局: 主持人私发密语卡(每人一个黑话词)，摆好命运转盘/沙漏/记分板/公共看板，讲清规则与拒绝权。",
+    "阶段1 黑话钓鱼(常驻,贯穿全场三轮): 大家自由聊团建话题，谁想把自己卡上的黑话词自然说出口都行；任何人怀疑某人在刻意完成任务，可当场举报发起声明质疑。",
+    "阶段2 瓜田传声: 抽签筒定链条顺序，第一人拿到小雨提供的瓜句原文(私密)，沙漏计时下按链条顺序悄悄逐人传递，末位当众复述，全场共识判定与原句核心信息是否一致。",
+    "阶段3 MBTI破译: 公共看板公布本轮竞猜目标，全员用匿名投票器同时私密提交'ta是i人还是e人'，统一揭晓计分。",
+    "阶段4 流量挑战轮盘: 转动命运转盘选出挑战人，主持人从热梗挑战池抽一个动作给他，沙漏限时30秒完成，全场共识判定是否过审；过审者可选择续押喊停再加练一组搏更高分。",
+    "阶段5 惩罚执行: 本轮挑战落败者、或黑话谎言被戳穿者，从补给站惩罚池抽一个轻惩罚，可跳过换一个，绝不强迫。",
+    "阶段6 循环: 阶段2~5再走两遍，共三轮完整循环，每轮结束记分板刷新排名。",
+    "阶段7 终局: 三轮循环结束，记分板最高分者获胜；平局由系统随机裁决(命运转盘一转定胜负皮)。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "黑话钓鱼卡",
+      "mechanic": "声明质疑",
+      "plain_rule": "你手里的密语卡写着一个指定黑话词。整场聊天里找机会把它自然说出口，别让人看出是刻意的。一旦有人当场怀疑你是在完成任务并提出质疑，你必须公开声明'是'或'不是'(可以撒谎)；如果被戳穿说谎，你受罚；如果对方冤枉了你，对方受罚。",
+      "visibility": "自己看",
+      "params": {
+        "claim_prompt": "你是不是在故意说出密语卡上的那个词？",
+        "challengers": "others",
+        "challenge_window_s": 20,
+        "verify_source": "prop_reveal:密语卡",
+        "verify_reveals": "prop_state",
+        "on_liar": {"scoring_ref": ["撒谎受罚", "揭穿加分"]},
+        "on_false_accuse": {"scoring_ref": ["冤枉受罚", "被冤枉补偿"]}
+      }
+    },
+    {
+      "flavor_name": "瓜田传声筒",
+      "mechanic": "传递链",
+      "plain_rule": "小雨爆的瓜从链条第一人开始，按抽到的顺序，每人只能悄悄告诉下一位你听到的内容(不能回头问上家)，传到最后一位后，最后一位当众复述，大家对比开头和结尾的差异。",
+      "visibility": "自己看",
+      "params": {
+        "content_from": "$gen.瓜田种子池",
+        "order": "seat",
+        "each_sees": "prev_only",
+        "replay": "first_vs_last"
+      }
+    },
+    {
+      "flavor_name": "瓜田对账",
+      "mechanic": "判定",
+      "plain_rule": "复述完毕后，全场一键表决：末位复述的内容和原句的核心信息还算一致吗？一致算这条链子'零失真'加分，不一致就当个笑话过，谁都不扣分。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "末位复述和原句核心信息还一致吗？",
+        "verdict_options": ["过", "不过"],
+        "on": {
+          "过": {"scoring_ref": "传声零失真"},
+          "不过": {"scoring_ref": []}
+        }
+      }
+    },
+    {
+      "flavor_name": "MBTI破译局",
+      "mechanic": "同时提交",
+      "plain_rule": "看板公布这轮要猜的人是谁，所有人同时私下提交'我觉得ta是i人还是e人'，提交完统一揭晓，猜中的每人加分，猜错不扣分。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "看板上这位，你觉得ta是i人还是e人？",
+        "input_kind": "options",
+        "options": ["i人", "e人"],
+        "timeout_s": 20,
+        "reveal": "simultaneous",
+        "scoring_ref": ["猜中加分"]
+      }
+    },
+    {
+      "flavor_name": "转盘抽人上场",
+      "mechanic": "点名目标",
+      "plain_rule": "转动命运转盘，指针停在谁，谁就是本轮的挑战人，起身准备接受主持人抽给他的热梗挑战。",
+      "visibility": "全场公开",
+      "params": {
+        "selector": "wheel",
+        "target_pool": "all",
+        "on_named": {"scoring_ref": "挑战登场"}
+      }
+    },
+    {
+      "flavor_name": "流量挑战过审",
+      "mechanic": "判定",
+      "plain_rule": "挑战人在沙漏限时内完成主持人抽给他的动作(具体挑战内容由主持人现场随机发放，无需真的很会跳)，全场一键表决过没过审：过了算挑战成功加分，没过算挑战失败，进补给站惩罚池。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "这个挑战动作过审了吗？",
+        "verdict_options": ["过", "不过"],
+        "on": {
+          "过": {"scoring_ref": "挑战成功"},
+          "不过": {"scoring_ref": "挑战失败"}
+        }
+      }
+    },
+    {
+      "flavor_name": "拉练加时赛",
+      "mechanic": "续押喊停",
+      "plain_rule": "挑战过审的人可以选择'再加练一组'搏更高分，或者'见好就收'锁住到手的分。加练有概率抽到'姿势变形'，一旦变形，这组加练的分全部清零；选择收手则稳拿已得分。",
+      "visibility": "全场公开",
+      "params": {
+        "draw_from": "$gen.拉练事件池",
+        "continue_prompt": "要不要再加练一组？",
+        "bust_when": "抽中姿势变形牌",
+        "cap": 3,
+        "on_cap": "force_settle",
+        "bank_on_stop": true,
+        "scoring_ref": ["拉练落袋", "拉练变形清零"]
+      }
+    },
+    {
+      "flavor_name": "补给站微惩罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "挑战失败或黑话撒谎被戳穿的人，从补给站惩罚池里抽一个轻惩罚(比如原地开合跳5个、讲一件今天的糗事、喝一口水)，不想做可以换一个，绝不强迫。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "loser",
+        "pool": "$gen.补给站惩罚池",
+        "scoring_ref": "微惩罚执行"
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      {"event": "撒谎受罚", "who": "actor", "delta": "-2", "effect": "scoring"},
+      {"event": "揭穿加分", "who": "challenger", "delta": "+1", "effect": "scoring"},
+      {"event": "冤枉受罚", "who": "challenger", "delta": "-1", "effect": "scoring"},
+      {"event": "被冤枉补偿", "who": "actor", "delta": "+1", "effect": "scoring"},
+      {"event": "传声零失真", "who": "all", "delta": "+1", "effect": "scoring"},
+      {"event": "猜中加分", "who": "guesser", "delta": "+1", "effect": "scoring"},
+      {"event": "挑战登场", "who": "actor", "delta": "+0", "effect": "scoring"},
+      {"event": "挑战成功", "who": "actor", "delta": "+2", "effect": "scoring"},
+      {"event": "挑战失败", "who": "actor", "delta": "-1", "effect": "scoring"},
+      {"event": "拉练落袋", "who": "actor", "delta": "+2", "effect": "scoring"},
+      {"event": "拉练变形清零", "who": "actor", "delta": "+0", "effect": "scoring"},
+      {"event": "微惩罚执行", "who": "loser", "delta": "+0", "effect": "scoring"}
+    ],
+    "win": {"basis": "三轮循环结束后，记分板个人累计分最高者获胜", "source": "state:个人总分"},
+    "tiebreak": "平局与并列默认由系统随机裁决(命运转盘一转定胜负皮)"
+  }
+}
