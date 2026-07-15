@@ -1,18 +1,18 @@
 {
   "version": "v2.1.1-r2-retry-batch-2026-07-16",
-  "scope": "DM-skill v2.1.1 ??? r2?SOP ?????",
+  "scope": "DM-skill v2.1.1 验证批 r2；SOP 抽审已放行",
   "frozen_inputs": {
-    "system_prompt_source": "docs/specs/DM-skill-v2.1.1.md????????",
+    "system_prompt_source": "docs/specs/DM-skill-v2.1.1.md【系统提示】整段",
     "canonical_sha256": "90d7d323d8ec3fe53b1fa35688ce842a54a1cdf15ee7e82ec6d43a35e2b5dd13",
     "check": "v2.1.1",
     "judge": "spec-judge-v0.3.md"
   },
   "policy": {
-    "main_verdict": "?????? _r1???? 1 ?",
-    "main_structure": "???????? _r1???? 1 ?",
-    "b_structure": "SonL B?20 ???????????_r2 ?",
-    "source_retention": "????????????",
-    "target_rule": "???? _rN ?????? _r{attempt}"
+    "main_verdict": "判破判词回喂 _r1；每件最多 1 次",
+    "main_structure": "结构报错原文回喂 _r1；每件最多 1 次",
+    "b_structure": "SonL B×20 仅结构拒件重试至有效；_r2 止",
+    "source_retention": "原件与失败重试留档，不删件",
+    "target_rule": "剥除既有 _rN 后缀后追加 _r{attempt}"
   },
   "counts": {
     "jobs_total": 29,
@@ -43,8 +43,8 @@
       "start_retry": 1,
       "max_new_attempts": 1,
       "web_model": "Sonnet 5",
-      "effort": "???????????????",
-      "channel_note": "ADS ???"
+      "effort": "网页通道·参数不可控",
+      "channel_note": "ADS 网页端"
     },
     {
       "group": "main_verdict",
@@ -65,8 +65,8 @@
       "start_retry": 1,
       "max_new_attempts": 1,
       "web_model": "Sonnet 5",
-      "effort": "???????????????",
-      "channel_note": "ADS ???"
+      "effort": "网页通道·参数不可控",
+      "channel_note": "ADS 网页端"
     },
     {
       "group": "main_verdict",
@@ -87,8 +87,8 @@
       "start_retry": 1,
       "max_new_attempts": 1,
       "web_model": "Sonnet 5",
-      "effort": "???????????????",
-      "channel_note": "ADS ???"
+      "effort": "网页通道·参数不可控",
+      "channel_note": "ADS 网页端"
     },
     {
       "group": "main_verdict",
@@ -109,8 +109,8 @@
       "start_retry": 1,
       "max_new_attempts": 1,
       "web_model": "Sonnet 5",
-      "effort": "???????????????",
-      "channel_note": "ADS ???"
+      "effort": "网页通道·参数不可控",
+      "channel_note": "ADS 网页端"
     },
     {
       "group": "main_verdict",
@@ -132,8 +132,8 @@
       "start_retry": 1,
       "max_new_attempts": 1,
       "web_model": "Sonnet 5",
-      "effort": "???????????????",
-      "channel_note": "ADS ???"
+      "effort": "网页通道·参数不可控",
+      "channel_note": "ADS 网页端"
     },
     {
       "group": "main_verdict",
@@ -152,8 +152,8 @@
       "start_retry": 1,
       "max_new_attempts": 1,
       "web_model": "Sonnet 5",
-      "effort": "???????????????",
-      "channel_note": "ADS ???"
+      "effort": "网页通道·参数不可控",
+      "channel_note": "ADS 网页端"
     },
     {
       "group": "main_verdict",
@@ -172,8 +172,8 @@
       "start_retry": 1,
       "max_new_attempts": 1,
       "web_model": "Sonnet 5",
-      "effort": "???????????????",
-      "channel_note": "ADS ???"
+      "effort": "网页通道·参数不可控",
+      "channel_note": "ADS 网页端"
     },
     {
       "group": "main_verdict",
@@ -194,8 +194,8 @@
       "start_retry": 1,
       "max_new_attempts": 1,
       "web_model": "Haiku 4.5",
-      "effort": "???????????????",
-      "channel_note": "ADS ???"
+      "effort": "网页通道·参数不可控",
+      "channel_note": "ADS 网页端"
     },
     {
       "group": "main_verdict",
@@ -218,8 +218,8 @@
       "start_retry": 1,
       "max_new_attempts": 1,
       "web_model": "Haiku 4.5",
-      "effort": "???????????????",
-      "channel_note": "ADS ???"
+      "effort": "网页通道·参数不可控",
+      "channel_note": "ADS 网页端"
     },
     {
       "group": "main_structure",
@@ -234,8 +234,8 @@
       "start_retry": 1,
       "max_new_attempts": 1,
       "web_model": "Sonnet 5",
-      "effort": "???????????????",
-      "channel_note": "ADS ???"
+      "effort": "网页通道·参数不可控",
+      "channel_note": "ADS 网页端"
     },
     {
       "group": "main_structure",
@@ -250,8 +250,8 @@
       "start_retry": 1,
       "max_new_attempts": 1,
       "web_model": "Haiku 4.5",
-      "effort": "???????????????",
-      "channel_note": "ADS ???"
+      "effort": "网页通道·参数不可控",
+      "channel_note": "ADS 网页端"
     },
     {
       "group": "main_structure",
@@ -266,8 +266,8 @@
       "start_retry": 1,
       "max_new_attempts": 1,
       "web_model": "Haiku 4.5",
-      "effort": "???????????????",
-      "channel_note": "ADS ???"
+      "effort": "网页通道·参数不可控",
+      "channel_note": "ADS 网页端"
     },
     {
       "group": "main_structure",
@@ -282,8 +282,8 @@
       "start_retry": 1,
       "max_new_attempts": 1,
       "web_model": "Haiku 4.5",
-      "effort": "???????????????",
-      "channel_note": "ADS ???"
+      "effort": "网页通道·参数不可控",
+      "channel_note": "ADS 网页端"
     },
     {
       "group": "main_structure",
@@ -298,8 +298,8 @@
       "start_retry": 1,
       "max_new_attempts": 1,
       "web_model": "Haiku 4.5",
-      "effort": "???????????????",
-      "channel_note": "ADS ???"
+      "effort": "网页通道·参数不可控",
+      "channel_note": "ADS 网页端"
     },
     {
       "group": "main_structure",
@@ -314,8 +314,8 @@
       "start_retry": 1,
       "max_new_attempts": 1,
       "web_model": "Haiku 4.5",
-      "effort": "???????????????",
-      "channel_note": "ADS ???"
+      "effort": "网页通道·参数不可控",
+      "channel_note": "ADS 网页端"
     },
     {
       "group": "main_structure",
@@ -330,8 +330,8 @@
       "start_retry": 1,
       "max_new_attempts": 1,
       "web_model": "Haiku 4.5",
-      "effort": "???????????????",
-      "channel_note": "ADS ???"
+      "effort": "网页通道·参数不可控",
+      "channel_note": "ADS 网页端"
     },
     {
       "group": "main_structure",
@@ -476,7 +476,7 @@
       "max_new_attempts": 2,
       "web_model": "Sonnet 5",
       "effort": "Low",
-      "channel_note": "ADS ????Low ???"
+      "channel_note": "ADS 网页端·Low 档明示"
     },
     {
       "group": "b_structure",
@@ -493,7 +493,7 @@
       "max_new_attempts": 2,
       "web_model": "Sonnet 5",
       "effort": "Low",
-      "channel_note": "ADS ????Low ???"
+      "channel_note": "ADS 网页端·Low 档明示"
     },
     {
       "group": "b_structure",
@@ -510,7 +510,7 @@
       "max_new_attempts": 2,
       "web_model": "Sonnet 5",
       "effort": "Low",
-      "channel_note": "ADS ????Low ???"
+      "channel_note": "ADS 网页端·Low 档明示"
     },
     {
       "group": "b_structure",
@@ -527,7 +527,7 @@
       "max_new_attempts": 2,
       "web_model": "Sonnet 5",
       "effort": "Low",
-      "channel_note": "ADS ????Low ???"
+      "channel_note": "ADS 网页端·Low 档明示"
     },
     {
       "group": "b_structure",
@@ -544,7 +544,7 @@
       "max_new_attempts": 2,
       "web_model": "Sonnet 5",
       "effort": "Low",
-      "channel_note": "ADS ????Low ???"
+      "channel_note": "ADS 网页端·Low 档明示"
     }
   ]
 }

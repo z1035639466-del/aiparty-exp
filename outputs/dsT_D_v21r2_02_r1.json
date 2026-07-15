@@ -1,0 +1,88 @@
+{
+  "game_title": "暗号密室 — 眼神与纸条的默契",
+  "subtitle": "谁是最懂我的人？",
+  "premise": "用手势、眼神和传纸条的技巧，测试你和搭档的默契指数。每轮随机配对，同时对同样的话题做选择，答案一致就有分！",
+  "players": ["阿哲", "毛毛", "西西", "老练"],
+  "props_dealt": [],
+  "props_required": [],
+  "flow": [
+    "热身：系统解释规则，每轮系统随机选出一对搭档，他们对同一个话题同时提交答案，答案相同则各得1分。进行4轮。",
+    "第1轮：系统先选搭档A，再从其余人中选搭档B。公共看板显示话题和选项，搭档A和B用匿名投票器同时提交各选项。提交后系统揭示答案，并自动判断是否相同，相同则各+1分。",
+    "第2轮：重复第1轮流程，搭档重新随机抽取。",
+    "第3轮：同上。",
+    "第4轮：同上。",
+    "结算：记分板展示最终分数，最高分者获胜。如平局，系统随机裁决。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "命运之手·初选",
+      "mechanic": "点名目标",
+      "plain_rule": "系统从所有玩家中随机抽取一位作为本轮搭档A。",
+      "visibility": "全场公开",
+      "params": {
+        "selector": "random",
+        "target_pool": "all",
+        "on_named": {}
+      }
+    },
+    {
+      "flavor_name": "命运之手·次选",
+      "mechanic": "点名目标",
+      "plain_rule": "系统从剩余玩家中随机抽取一位作为本轮搭档B。",
+      "visibility": "全场公开",
+      "params": {
+        "selector": "random",
+        "target_pool": "others",
+        "on_named": {}
+      }
+    },
+    {
+      "flavor_name": "暗号同步提交",
+      "mechanic": "同时提交",
+      "plain_rule": "搭档A和搭档B在公共看板看到话题和选项后，各自私密选择一个选项。提交限时20秒，超时视为放弃，答案为空。",
+      "visibility": "全场公开",
+      "params": {
+        "prompt": "请选择一个你认为是今天最想做的：",
+        "input_kind": "options",
+        "options": ["吃火锅", "看电影", "玩密室"],
+        "timeout_s": 20,
+        "reveal": "simultaneous",
+        "scoring_ref": []
+      }
+    },
+    {
+      "flavor_name": "灵魂判断",
+      "mechanic": "判定",
+      "plain_rule": "系统自动比较搭档A和B的答案，如果相同，则双方各得1分；否则不得分。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "expr",
+        "question": "两人答案相同吗？",
+        "expr": "state:partnerA_answer == state:partnerB_answer",
+        "verdict_options": ["过", "不过"],
+        "on": {
+          "过": {
+            "scoring_ref": ["默契一致得分"]
+          },
+          "不过": {
+            "scoring_ref": []
+          }
+        }
+      }
+    }
+  ],
+  "reveal_text": "终极默契测试——看看你们是不是真正的灵魂搭档！",
+  "reveal_signature": ["手势暗号", "眼神交流", "传纸条"],
+  "safety_note": "本游戏无惩罚环节，所有选择基于自愿。每次提交有20秒时限，若不想参与可以选择随机选项或跳过。游戏不包含任何黄暴内容。",
+  "settlement": {
+    "scoring": [
+      {
+        "event": "默契一致得分",
+        "effect": "+1",
+        "apply_to": "both_partners"
+      }
+    ],
+    "win": "总分最高的玩家获胜",
+    "tiebreak": "若平局，由系统随机裁决"
+  }
+}

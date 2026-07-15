@@ -167,3 +167,11 @@ dsT_C_v21r2_01.json,deepseek-v4-flash,true,high,7243,12160,10330,169.146047,0.00
 dsT_C_v21r2_02.json,deepseek-v4-flash,true,high,7243,9932,8797,129.371002,0.003794980,success
 dsT_D_v21r2_01.json,deepseek-v4-flash,true,high,7223,6925,5279,96.237126,0.002950220,success
 dsT_D_v21r2_02.json,deepseek-v4-flash,true,high,7223,11513,10392,148.355758,0.004234860,success
+dsT_A_v21r2_02_r1.json,deepseek-v4-flash,true,high,7357,2174,489,24.767438,0.001638700,success
+dsT_A_v21r2_01_r1.json,deepseek-v4-flash,true,high,7233,7268,6487,87.739343,0.003047660,success
+dsT_B_v21r2_02_r1.json,deepseek-v4-flash,true,high,7383,8913,7644,113.758118,0.003529260,success
+dsT_C_v21r2_02_r1.json,deepseek-v4-flash,true,high,7304,9384,8000,115.791867,0.003650080,success
+dsT_B_v21r2_01_r1.json,deepseek-v4-flash,true,high,7409,9504,8364,118.846790,0.003698380,success
+dsT_D_v21r2_02_r1.json,deepseek-v4-flash,true,high,7284,9714,8808,122.383372,0.003739680,success
+dsT_C_v21r2_01_r1.json,deepseek-v4-flash,true,high,7291,11198,10133,144.282023,0.004156180,success
+dsT_D_v21r2_01_r1.json,deepseek-v4-flash,true,high,7316,11929,10450,144.252710,0.004364360,success
