@@ -25,3 +25,22 @@
 - 首发 44 件通道投递完整；信封 43/44，`haiku_C_v21r1_01.json` 因字符串内双引号未转义而不可解析。
 - check v2.1 结构首过 0/44：43 个可解析件均触发结构硬闸，另 1 件停在信封层；依裁判站协议无件进入 v0.3 判级，SOP 四件抽审集无法组成。
 - 本轮不改 skill v2.1、check v2.1、裁判 v0.3、golden、白名单或五条阈值；不做重试、不算 pass@2，根因归析与处置候选留待抽审门后另行裁定。
+
+## v2.1.1 教材 CI 新发现（2026-07-15，出处 tools/textbook_ci.py）
+
+- **限时扣分变体 × check v2.1 数组闸缺口（教材 CI 红档，阻断 v2.1.1 入库）**：v2.1.1 正典
+  【params 全示例】第 2 条「限时·扣分变体（完整）」写作
+  `{"seconds":45,"visible_countdown":true,"on_timeout":{"effect":"scoring","scoring_ref":["超时扣分"]}}`
+  ——`scoring_ref` 为**数组**，与 v2.1.1 修正案 ④「scoring_ref 统一数组、一律非空」及
+  §0「scoring_ref 铁则：一律数组（单值写 `["x"]`）」自洽。但 check.py v2.1
+  `_check_scoring_ref_presence` 的 `limit` 分支判定为
+  `is_nonempty(on_timeout.get("scoring_ref"))`，仅收**非空字符串**，数组被判「缺失」→ 硬闸拒。
+  check 报错原文：`rules[1].params.on_timeout.scoring_ref 缺失（effect=scoring 时必填）`。
+- 复核已钉死：同一变体改字符串形 `"scoring_ref":"超时扣分"` 即零错通过；`is_nonempty(["超时扣分"])==False`；
+  `collect_scoring_refs` 能取到数组项（故 §2 正向对账不受影响，唯 `limit` 存在性闸误判）。其余
+  scoring_ref 落点（top/verdict/claim/named）均已用 `is_nonempty(ref) or (isinstance(ref, list) and ref)`
+  兼容数组，**`limit` 分支是唯一遗漏点**。
+- 与 v2.1.1「check 闸零改动」claim 冲突：数组化 scoring_ref 铁则要么要求 check `limit` 分支同步
+  兼容数组（则闸非零改），要么该示例回退字符串形（则违 ④「一律数组」）。二者取舍属教材/闸修改权，
+  **在 Fable**——教材 CI 停工，未入库 v2.1.1 任何件（正典/边车/run_ds 切换/存根/README 均未动），
+  仅落 gate 脚本 `tools/textbook_ci.py` 与本条。其余 14/15 机制（惩罚三档、判定三源含）逐块全绿。
