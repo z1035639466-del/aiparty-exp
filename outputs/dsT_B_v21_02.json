@@ -1,0 +1,139 @@
+{
+  "game_title": "团建黑话挑战 · 颗粒度全开",
+  "subtitle": "对齐·闭环·谁最e？",
+  "premise": "每轮抽一人当主角——抽到老天给的挑战，做完让大伙判过没过；过关+2，不过做5个深蹲。然后全场吃瓜押他的MBTI，猜对+1。套着黑话的皮，干着健身的活，谁嘴不瓢谁赢。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop":"抽签筒","to":"公共区","visibility":"全场公开","note":"放五支签，每人代表一支；每轮由非主角者抽一人。"},
+    {"prop":"盲盒","to":"公共区","visibility":"全场公开","note":"内置挑战卡若干(深蹲10个且说两句黑话/平板支撑20秒且用黑话描述/对墙挤肩说对齐等)，每张卡写清楚动作+黑话要求。"},
+    {"prop":"沙漏","to":"公共区","visibility":"全场公开","note":"限时60秒。"},
+    {"prop":"匿名投票器","to":"全体","visibility":"自己看","note":"用于两件事：①挑战判定(过/不过)②猜MBTI时投选项。"},
+    {"prop":"公共看板","to":"公共区","visibility":"全场公开","note":"列出所有玩家的名字+MBTI选项(INTP/ESFJ/ENFP/ISTJ)+黑话词库(对齐/颗粒度/闭环/抓手/底层逻辑)。"},
+    {"prop":"记分板","to":"公共区","visibility":"全场公开","note":"实时显示各人总分。"}
+  ],
+  "props_required": [],
+  "flow": [
+    "开局：每人自我介绍时的MBTI贴到看板对应名字旁；黑话词库公开；抽签筒放五签。",
+    "每轮(共10轮，每人当2次主角)",
+    "① 非主角者从抽签筒抽一支签→主角诞生(抽空重放)。",
+    "② 主角从盲盒抽一张挑战卡→60秒内完成动作+黑话台词(可换一张，换后无第二次)。",
+    "③ 其他四人通过匿名投票器一键判定【过/不过】，多数为过则主角挑战成功(+2分)，否则惩罚(轻)【做5个深蹲或说一个冷笑话，主角可二选一】。",
+    "④ 判定结束后，其他四人通过匿名投票器同时提交：猜主角的MBTI(四选一)。揭晓后猜对者+1分。",
+    "⑤ 记分板更新，进入下一轮。",
+    "终局：总分最高者胜；平局由系统随机裁决(风味名: 抽签决胜负)。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "天选打工人",
+      "mechanic": "点名目标",
+      "plain_rule": "每轮由非主角的人从抽签筒中抽一支签，签上的名字就是本轮主角。",
+      "visibility": "全场公开",
+      "params": {
+        "selector": "random",  
+        "target_pool": "all",
+        "on_named": {"scoring_ref":[], "eliminate":false}
+      }
+    },
+    {
+      "flavor_name": "闭环挑战",
+      "mechanic": "判定",
+      "plain_rule": "主角完成挑战后，其他四人每人通过匿名投票器投一票：挑战是否成功（过/不过）。得票过半视为成功。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "这位主角的挑战算完成了吗？",
+        "verdict_options": ["过", "不过"],
+        "on": {
+          "过": {"scoring_ref": "挑战成功"},
+          "不过": {"scoring_ref": "挑战失败"}
+        }
+      }
+    },
+    {
+      "flavor_name": "deadline 压身",
+      "mechanic": "限时",
+      "plain_rule": "从挑战卡亮出开始倒计时60秒，沙漏漏完主角必须停止，未完成则自动判不过。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 60,
+        "visible_countdown": true,
+        "on_timeout": {"effect": "goto", "goto": "判定"}
+      }
+    },
+    {
+      "flavor_name": "赢家通吃",
+      "mechanic": "加减分",
+      "plain_rule": "挑战判定通过，主角加2分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "主角",
+        "delta": "+2",
+        "scoring_ref": "挑战成功"
+      }
+    },
+    {
+      "flavor_name": "加班套餐",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "挑战判定不过，主角需做5个深蹲或说一个能让大家尬笑的笑话（二选一）。如果不想做，可以拒绝并改做另一个。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "主角",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "挑战失败"
+      }
+    },
+    {
+      "flavor_name": "猜他对号入座",
+      "mechanic": "同时提交",
+      "plain_rule": "挑战结束后，其他四人每人从公共看板上的四个MBTI中选一个，猜测主角的类型。各自私密提交，然后同时揭晓所有投票。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "猜猜主角的MBTI是什么？",
+        "input_kind": "options",
+        "options": ["INTP", "ESFJ", "ENFP", "ISTJ"],
+        "timeout_s": 20,
+        "reveal": "simultaneous",
+        "scoring_ref": ["猜对加分", "猜错无分"]
+      }
+    },
+    {
+      "flavor_name": "吃瓜有奖",
+      "mechanic": "加减分",
+      "plain_rule": "猜MBTI环节中猜对主角类型的人加1分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "猜对者",
+        "delta": "+1",
+        "scoring_ref": "猜对加分"
+      }
+    },
+    {
+      "flavor_name": "各回各位",
+      "mechanic": "回合推进",
+      "plain_rule": "一轮结束后，自动换下一轮，流程从头开始，用抽签筒重新抽主角。",
+      "visibility": "全场公开",
+      "params": {
+        "order": "random_per_round"
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      {"event": "挑战成功", "who": "主角", "effect": "+2"},
+      {"event": "挑战失败", "who": "主角", "effect": "惩罚(轻)"},
+      {"event": "猜对加分", "who": "猜对者", "effect": "+1"},
+      {"event": "猜错无分", "who": "猜错者", "effect": "+0"}
+    ],
+    "win": "终局时总分最高者胜",
+    "tiebreak": "系统随机裁决（风味名: 抽签决胜负）"
+  },
+  "reveal_text": "开会黑话说了一万遍，今天才知道——最能对齐颗粒度的那个，原来一直是个隐形e人。",
+  "reveal_signature": "融合自 阿凯·MBTI、琳琳·短视频挑战、老周·开会黑话、小雨·吃瓜、Tony·健身",
+  "flavor_glossary": [
+    {"term": "对齐", "means": "开会黑话，指协调一致；这里借指挑战中需将动作与台词对应。"},
+    {"term": "闭环", "means": "黑话，指完成一个流程；这里是挑战的正式名称。"},
+    {"term": "颗粒度", "means": "黑话，指细节层次；挑战要求用黑话描述动作，强调精细。"},
+    {"term": "e人", "means": "MBTI 中的外倾型；吃瓜猜测环节围绕它展开。"}
+  ],
+  "safety_note": "黄暴档20/100(低): 惩罚仅限深蹲/冷笑话，有双选拒绝权；不涉及真人八卦、无酒精；所有黑话词为常见正经词汇，不冒犯。"
+}
