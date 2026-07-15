@@ -1,0 +1,112 @@
+{
+  "game_title": "对齐颗粒度：i人e人生存赛",
+  "subtitle": "包间限定·今晚闭环你的社死",
+  "premise": "团建包间里，MBTI标签、开会黑话、吃瓜雷达和Tony的深蹲邀请轮番袭来，五个人边扛边抢分，看谁笑到记分板亮灯。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop":"身份牌","to":"全体","visibility":"自己看","note":"开局每人自填一张真实/自认的MBTI标签(如INFP、ESTJ)，扣好放自己面前，别人看不到"},
+    {"prop":"密语卡","to":"全体","visibility":"自己看","note":"私发一条短视频挑战任务(动作/台词任选其一)，只有本人看得到"},
+    {"prop":"匿名投票器","to":"全体","visibility":"自己看","note":"用于'传歪战犯'投票，各自私密提交，统一揭晓"},
+    {"prop":"沙漏","to":"全体","visibility":"全场公开","note":"短视频挑战倒计时用"},
+    {"prop":"记分板","to":"全体","visibility":"全场公开","note":"实时显示每人当前分数"}
+  ],
+  "props_required": [],
+  "flow": [
+    "阶段1｜领牌：每人自填身份牌(自认MBTI标签)扣好，领一张密语卡(短视频挑战任务)，主持人宣布记分板规则与平局随机裁决约定",
+    "阶段2｜黑话通道(2轮)：主持人随机点两人对答，问答只准用'对齐/颗粒度/闭环'三词之一回答，说人话作废重来",
+    "阶段3｜标签风暴(按座位顺序，每人各一轮)：轮到的人公开声称自己的MBTI标签(可以撒谎)，其他人15秒内可举手质疑，质疑触发翻身份牌验证",
+    "阶段4｜茶水间小道消息(全员一次)：一句八卦按座位顺序私密逐人传递，每人只看得到上一棒传来的内容，终局对比首尾版本",
+    "阶段5｜揪战犯：全员用匿名投票器私密提交'谁传歪了'，同时揭晓，得票最高者受罚(可喊'跳过/换一个'换成等价温和惩罚)",
+    "阶段6｜短视频挑战(按座位顺序，每人各一次)：本人打开密语卡任务，45秒沙漏倒计时内完成(可喊'跳过/换一个'换一条等价任务)，全场共识确认算不算过关",
+    "阶段7｜卷王加练(按座位顺序，每人各一次)：Tony出题，轮到的人选择'再来一组'还是'见好就收'，抽到教练突击检查即爆掉清零(可随时喊停保住已得，任务本身也可喊'换一个')",
+    "阶段8｜结算：记分板公布最终分数，最高分获胜；并列由系统随机裁决"
+  ],
+  "rules": [
+    {
+      "flavor_name":"标签风暴",
+      "mechanic":"声明质疑",
+      "plain_rule":"轮到你时，公开说一个你的MBTI标签，可以是真的也可以是编的。别人有15秒时间举手质疑。一旦被质疑，翻开你的身份牌验真假：说谎被抓包扣分，质疑对的人加分；如果质疑错了，质疑的人反而扣分，被冤枉的人得到补偿分。",
+      "visibility":"自己看",
+      "params": {
+        "claim_prompt":"公开声称你的MBTI标签（允许撒谎）",
+        "challengers":"others",
+        "challenge_window_s":15,
+        "verify_source":"prop_reveal:身份牌",
+        "verify_reveals":"identity",
+        "identity_resolution":"terminal",
+        "on_liar":{"scoring_ref":["撒谎受罚","揭穿加分"]},
+        "on_false_accuse":{"scoring_ref":["冤枉受罚","被冤枉补偿"]}
+      }
+    },
+    {
+      "flavor_name":"闭环黑话通道",
+      "mechanic":"受限沟通",
+      "plain_rule":"这一轮不管主持人问你什么，你只能用'对齐'、'颗粒度'、'闭环'这三个词里的一个来回答，说别的话算违规，重来一次。",
+      "visibility":"全场公开",
+      "params": { "channel":"one_word", "enforce":"channel_only" }
+    },
+    {
+      "flavor_name":"茶水间小道消息",
+      "mechanic":"传递链",
+      "plain_rule":"主持人只告诉第一个人一句话，这个人小声传给下一个人，下一个人再传给下一个，每人只能听到上一个人说的版本，不能问、不能重复。最后一个人说出自己听到的版本，跟第一句话对比看走样了多少。",
+      "visibility":"自己看",
+      "params": { "content_from":"$gen.茶水间八卦种子池", "order":"seat", "each_sees":"prev_only", "replay":"first_vs_last" }
+    },
+    {
+      "flavor_name":"揪出传歪战犯",
+      "mechanic":"点名目标",
+      "plain_rule":"传话结束、对比完首尾版本后，所有人各自悄悄选一个你认为把话传歪的人，同时公布结果，票最多的人受罚。这个人可以喊'跳过/换一个'，换成一个不尴尬的温和惩罚。",
+      "visibility":"自己看",
+      "params": { "selector":"vote", "target_pool":"others", "on_named":{"scoring_ref":["战犯受罚"], "eliminate": false} }
+    },
+    {
+      "flavor_name":"短视频限时挑战",
+      "mechanic":"限时",
+      "plain_rule":"轮到你时打开自己的密语卡任务，沙漏倒计时45秒，时间到了不管做完没做完都进入下一步的过关判定。",
+      "visibility":"自己看",
+      "params": { "seconds":45, "visible_countdown":true, "on_timeout":{"effect":"goto","goto":"过关共识判定"} }
+    },
+    {
+      "flavor_name":"过关共识判定",
+      "mechanic":"判定",
+      "plain_rule":"倒计时结束后，全场一起投票'这条挑战算不算完成'，多数说过就算过关加分，多数说不过就算失败扣分。不想接这条任务的人可以在开始前喊'跳过/换一个'，主持人换一条等价任务，没有额外惩罚。",
+      "visibility":"全场公开",
+      "params": {
+        "source":"consensus",
+        "question":"这条短视频挑战完成得算数吗？",
+        "verdict_options":["过","不过"],
+        "on":{ "过":{"scoring_ref":"挑战成功"}, "不过":{"scoring_ref":"挑战失败"} }
+      }
+    },
+    {
+      "flavor_name":"卷王加练",
+      "mechanic":"续押喊停",
+      "plain_rule":"轮到你时，Tony会出一个动作(比如深蹲、开合跳)，你可以选择'再来一组'继续攒收益，也可以'见好就收'把已经攒下的分保住。如果抽到'教练突击检查'就直接清零，最多加练6组必须停手结算。这轮任务本身也可以喊'换一个'换成等价动作。",
+      "visibility":"全场公开",
+      "params": {
+        "draw_from":"$gen.健身加练事件池",
+        "continue_prompt":"要不要跟Tony肝多一组？",
+        "bust_when":"抽中'教练突击检查'",
+        "cap":6,
+        "on_cap":"force_settle",
+        "bank_on_stop":true,
+        "scoring_ref":["肝出成果","加练崩盘"]
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      {"event":"撒谎受罚","who":"actor","delta":"-2"},
+      {"event":"揭穿加分","who":"challenger","delta":"+2"},
+      {"event":"冤枉受罚","who":"challenger","delta":"-1"},
+      {"event":"被冤枉补偿","who":"actor","delta":"+1"},
+      {"event":"战犯受罚","who":"target","delta":"-2"},
+      {"event":"挑战成功","who":"actor","delta":"+2"},
+      {"event":"挑战失败","who":"actor","delta":"-1"},
+      {"event":"肝出成果","who":"actor","delta":"+3"},
+      {"event":"加练崩盘","who":"actor","delta":"-3"}
+    ],
+    "win": "全部阶段结束后，记分板个人总分最高者获胜",
+    "tiebreak": "分数并列时由系统随机裁决(命运一掷)"
+  }
+}
