@@ -1,0 +1,103 @@
+{
+  "game_title": "颗粒度告急：办公室黑话闭环大逃杀",
+  "subtitle": "献给阿凯、琳琳、老周、小雨、Tony的团建限定夜",
+  "premise": "包间里五个人轮流被抽签筒点将，扛着一颗随时会爆的\"甩锅炸弹\"闯过黑话结界、吃瓜爆料、短视频续命挑战和教练查岗，记分板说了算，谁先把这一晚的颗粒度对齐清楚。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop": "定时炸弹", "to": "全体", "visibility": "全场公开", "note": "每轮开局重新点燃，倒计时对所有人隐藏，持有者可随时把它传给任意一位队友"},
+    {"prop": "密语卡", "to": "每人一张", "visibility": "自己看", "note": "开局各自写下一条属于自己的\"专属瓜料\"（内容自定、不必真实），用于吃瓜环节的声明质疑"},
+    {"prop": "盲盒", "to": "全体共用", "visibility": "自己看开", "note": "短视频挑战连击环节的抽取来源"},
+    {"prop": "抽签筒", "to": "全体共用", "visibility": "自己看", "note": "放入五人姓名签，不放回抽取，决定每轮登场主角"},
+    {"prop": "命运转盘", "to": "全体共用", "visibility": "全场公开", "note": "炸弹到点未拆时，用来转出这次惩罚内容池"},
+    {"prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "MBTI闪电竞猜环节的同时私密提交"},
+    {"prop": "记分板", "to": "全体", "visibility": "全场公开", "note": "实时显示每人累计分数"}
+  ],
+  "props_required": [],
+  "flow": [
+    "阶段1 开局：每人领一张密语卡写下自己的\"瓜\"，讲解黑话结界（常驻规则）；五人姓名签放入抽签筒。",
+    "阶段2 每轮循环（共5轮，抽签筒不放回，保证五人各登场一次）：a) 重新点燃定时炸弹并暗中倒计时，期间持有者可随意传递；b) 从抽签筒抽出本轮主角；c) 倒计时结束时炸弹在谁手上，谁先接受\"颗粒度爆炸\"惩罚判定；d) 主角从（吃瓜爆料 / 短视频挑战连击 / 教练查岗 / MBTI闪电竞猜）四个环节中由局长口头指定一个未用过的环节执行；e) 记分板即时结算。",
+    "阶段3 常驻背景：黑话结界全程生效，任何人可随时举报某人说了\"人话\"，触发一次共识判定。",
+    "阶段4 终局：五轮全部走完，记分板分数最高者获胜；分数并列由系统（命运转盘）随机裁决。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "抽签点将：今晚的主角是你",
+      "mechanic": "点名目标",
+      "plain_rule": "每轮开始前从抽签筒里抽一根签，抽到谁谁就是本轮主角，去执行局长指定的环节；抽过的签不放回，保证五轮内每人都当一次主角。",
+      "visibility": "全场公开",
+      "params": {"selector": "random", "target_pool": "$派生:本轮未登场玩家"}
+    },
+    {
+      "flavor_name": "甩锅警报：这个问题不归我对齐",
+      "mechanic": "转移",
+      "plain_rule": "炸弹在暗中倒数，拿着它的人可以随时把它塞给任意一位队友，模拟\"甩锅\"，可以来回传，没有次数限制，直到倒计时结束。",
+      "visibility": "全场公开",
+      "params": {"what": "prop", "from": "actor", "to": "chosen"}
+    },
+    {
+      "flavor_name": "颗粒度爆炸",
+      "mechanic": "惩罚(中)",
+      "plain_rule": "倒计时归零时炸弹在谁手里，谁就转一次命运转盘决定惩罚内容并当场执行；惩罚内容都是温和整活项（如报菜名、即兴编一句黑话土味情话），被罚者可行使一次\"换一个\"权换成等效温和项，不受羞辱。",
+      "visibility": "全场公开",
+      "params": {"who": "loser", "pool": "$gen.penalty_内容池", "scoring_ref": "炸弹到手受罚"}
+    },
+    {
+      "flavor_name": "黑话结界",
+      "mechanic": "受限沟通",
+      "plain_rule": "从开局到终局，所有人日常交流只能夹带\"对齐、颗粒度、闭环、抓手、拉齐、复盘、同步\"这类黑话词，说人话会被当场举报；这条规则全程后台生效，不占用单独回合。",
+      "visibility": "全场公开",
+      "params": {"channel": "jargon_word", "enforce": "channel_only"}
+    },
+    {
+      "flavor_name": "举报查处：你刚才说人话了",
+      "mechanic": "判定",
+      "plain_rule": "任何人觉得有人违反了黑话结界，可当场举报，全场举手表决\"算不算说人话\"；表决通过则违规者受罚，表决不通过则无事发生。",
+      "visibility": "全场公开",
+      "params": {"source": "consensus", "question": "他刚才那句算说人话吗？", "verdict_options": ["违规", "不违规"], "on": {"违规": {"scoring_ref": "违规受罚"}, "不违规": {"scoring_ref": []}}}
+    },
+    {
+      "flavor_name": "全场吃瓜：爆个料",
+      "mechanic": "声明质疑",
+      "plain_rule": "本轮主角当众念出密语卡上写的\"瓜\"（可以瞎编），其他人可以选择质疑是不是编的；一旦有人质疑，翻开密语卡核实原始内容对不上就算说谎，说谎者受罚、揭穿者加分；如果核实内容其实对得上，质疑者就是冤枉人，冤枉者受罚、被冤枉者得到补偿分。",
+      "visibility": "自己看",
+      "params": {"claim_prompt": "当众声称你密语卡上的瓜（允许瞎编）", "challengers": "others", "challenge_window_s": 30, "verify_source": "prop_reveal:密语卡", "verify_reveals": "prop_state", "on_liar": {"scoring_ref": ["吃瓜说谎受罚", "吃瓜揭穿加分"]}, "on_false_accuse": {"scoring_ref": ["吃瓜冤枉受罚", "吃瓜被冤枉补偿"]}}
+    },
+    {
+      "flavor_name": "挑战连击：什么火跟什么",
+      "mechanic": "续押喊停",
+      "plain_rule": "本轮主角从盲盒里抽一个挑战继续挑，每挑成功一个可以选择\"见好就收\"把已攒的分数收进记分板，或者\"继续冲更火的\"再抽一个；一旦抽到翻车牌，本轮累计的分数直接清零；最多连抽5个必须停手结算。",
+      "visibility": "全场公开",
+      "params": {"draw_from": "$gen.短视频挑战池", "continue_prompt": "继续挑战更火的还是见好就收？", "bust_when": "抽中翻车牌", "cap": 5, "on_cap": "force_settle", "bank_on_stop": true, "scoring_ref": ["连击达成加分", "挑战翻车清零"]}
+    },
+    {
+      "flavor_name": "教练查岗",
+      "mechanic": "判定",
+      "plain_rule": "本轮主角当场完成一个简单健身动作（如10秒平板支撑、10个开合跳），全场举手表决动作是否合格；合格无事发生，不合格则接受一次轻度惩罚；主角可跳过本环节换成非运动的温和替代项。",
+      "visibility": "全场公开",
+      "params": {"source": "consensus", "question": "这组动作合格吗？", "verdict_options": ["过", "不过"], "on": {"过": {"scoring_ref": []}, "不过": {"scoring_ref": "查岗失败惩罚"}}}
+    },
+    {
+      "flavor_name": "i人e人闪电竞猜",
+      "mechanic": "同时提交",
+      "plain_rule": "全场对本轮主角同时私密提交一个猜测：这人此刻更像\"i人\"还是\"e人\"，同时揭晓，猜中的人加分，猜错不扣分；不强制主角公开自己真实类型。",
+      "visibility": "自己看",
+      "params": {"prompt": "猜Ta现在更像i人还是e人？", "input_kind": "options", "options": ["i人", "e人"], "timeout_s": 20, "reveal": "simultaneous", "scoring_ref": "MBTI猜中加分"}
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      {"event": "炸弹到手受罚", "effect": "惩罚(中)", "target": "prop_holder"},
+      {"event": "违规受罚", "effect": "惩罚(轻)", "target": "violator"},
+      {"event": "吃瓜说谎受罚", "effect": "delta:-1", "target": "claimant"},
+      {"event": "吃瓜揭穿加分", "effect": "delta:+1", "target": "challenger"},
+      {"event": "吃瓜冤枉受罚", "effect": "delta:-1", "target": "challenger"},
+      {"event": "吃瓜被冤枉补偿", "effect": "delta:+1", "target": "claimant"},
+      {"event": "连击达成加分", "effect": "delta:+2", "target": "actor"},
+      {"event": "挑战翻车清零", "effect": "bank_reset", "target": "actor"},
+      {"event": "查岗失败惩罚", "effect": "惩罚(轻)", "target": "actor"},
+      {"event": "MBTI猜中加分", "effect": "delta:+1", "target": "guesser"}
+    ],
+    "win": {"metric": "记分板总分", "rule": "五轮全部结束后，记分板分数最高者获胜"},
+    "tiebreak": "分数并列时，由系统转动命运转盘随机裁决胜者"
+  }
+}
