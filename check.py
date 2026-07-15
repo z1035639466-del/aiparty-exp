@@ -10,6 +10,11 @@ v2.1 两条增改（正典同规格，AiParty validator 侧同步移植）：
   ① expr 可解析硬闸：判定 source=expr 的 expr 须为可解析表达式且引用 state 键，散文自由文本拒（活证 dsT_A_v20_01）。
   ② dead_prop 口径修正：读道具正典表「引用类型」列，免引用道具（沙漏/记分板/匿名投票器/公共看板）不记 dead_prop；
      check 读表不硬编码。软闸输出改旁车文件 <件名>.warnings.json，被检件保持纯设计层。
+
+v2.1.1 一处修闸（Fable §14 裁决；AiParty designValidator.ts 同步同一行）：
+  · scoring_ref 一律非空数组（单值 ["x"]）落地：_check_scoring_ref_presence 的 limit 落点
+    （限时/on_timeout.effect=scoring）改与其余四落点（top/verdict/claim/named）同式——
+    收非空串或非空数组，不再独排数组形（活证 教材 限时扣分变体 ["超时扣分"]）。
 """
 
 from __future__ import annotations
@@ -28,7 +33,7 @@ WHITELIST_PATH = ROOT / "whitelist.json"
 EXCLUSIONS_PATH = ROOT / "check_exclusions.json"
 
 # 本校验器实现的规范版本——供运行链路版本直接核验。
-SPEC_VERSION = "v2.1"
+SPEC_VERSION = "v2.1.1"
 SPEC_SOURCES = (
     "docs/specs/DM-skill-v2.0.md",
     "docs/specs/design-layer-v2.0.md",
@@ -407,8 +412,12 @@ def _check_scoring_ref_presence(mechanic: str, params: dict, index: int, errors:
                 errors.append(f"{tag}.on_timeout.effect 必须为 goto|scoring，实为 {effect!r}")
             elif effect == "goto" and not is_nonempty(on_timeout.get("goto")):
                 errors.append(f"{tag}.on_timeout.goto 缺失（effect=goto 时必填）")
-            elif effect == "scoring" and not is_nonempty(on_timeout.get("scoring_ref")):
-                errors.append(f"{tag}.on_timeout.scoring_ref 缺失（effect=scoring 时必填）")
+            elif effect == "scoring":
+                # v2.1.1：scoring_ref 一律非空数组（单值 ["x"]），limit 落点与其余四处
+                # （top/verdict/claim/named）同式收非空串或非空数组，不再独排数组形。
+                ref = on_timeout.get("scoring_ref")
+                if not (is_nonempty(ref) or (isinstance(ref, list) and ref)):
+                    errors.append(f"{tag}.on_timeout.scoring_ref 缺失（effect=scoring 时必填）")
     elif where == "verdict":
         _require_nested(params, ["on", "过"], f"{tag}.on.过", errors, must_ref=True)
         _require_nested(params, ["on", "不过"], f"{tag}.on.不过", errors, must_ref=True)

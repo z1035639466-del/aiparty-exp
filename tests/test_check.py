@@ -156,6 +156,34 @@ class ParamsStructureTests(unittest.TestCase):
         self.assertTrue(any("on.不过" in e for e in errors_of(doc)))
 
 
+class LimitScoringRefArrayTests(unittest.TestCase):
+    """v2.1.1 修闸：限时 on_timeout.effect=scoring 的 scoring_ref 与其余四落点同式，
+    收非空串或非空数组（活证 教材 限时扣分变体 ["超时扣分"]）。"""
+
+    @staticmethod
+    def _limit_doc(scoring_ref) -> dict:
+        doc = valid_doc()
+        doc["rules"].append({
+            "flavor_name": "闷麦扣分", "mechanic": "限时",
+            "plain_rule": "到点未完成接一次扣分。", "visibility": "全场公开",
+            "params": {"seconds": 45, "visible_countdown": True,
+                       "on_timeout": {"effect": "scoring", "scoring_ref": scoring_ref}},
+        })
+        doc["settlement"]["scoring"].append({"event": "超时扣分", "who": "all", "effect": "-2"})
+        return doc
+
+    def test_limit_scoring_ref_array_passes(self):
+        self.assertEqual([], errors_of(self._limit_doc(["超时扣分"])))
+
+    def test_limit_scoring_ref_string_still_passes(self):
+        self.assertEqual([], errors_of(self._limit_doc("超时扣分")))
+
+    def test_limit_scoring_ref_empty_array_rejected(self):
+        self.assertTrue(any(
+            "on_timeout.scoring_ref 缺失" in e for e in errors_of(self._limit_doc([]))
+        ))
+
+
 class InvariantTests(unittest.TestCase):
     def test_av18_on_cap_must_be_force_settle(self):
         doc = valid_doc()

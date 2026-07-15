@@ -1,5 +1,5 @@
 {
-  "schema_version": "v2.1",
+  "schema_version": "v2.1.1",
   "spec_source": "docs/specs/DM-skill-v2.0.md",
   "library_frozen_since": "DM-skill-v1.3",
   "props": [

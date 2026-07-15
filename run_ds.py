@@ -21,8 +21,8 @@ from typing import Any, Callable, Iterable
 
 ROOT = Path(__file__).resolve().parent
 OUTPUTS_DIR = ROOT / "outputs"
-# 单一正典：生成系统提示只读 docs/specs/DM-skill-v2.1.md（根目录同名文件已降级为指针存根）。
-SPEC_RELPATH = Path("docs") / "specs" / "DM-skill-v2.1.md"
+# 单一正典：生成系统提示只读 docs/specs/DM-skill-v2.1.1.md（根目录同名文件已降级为指针存根）。
+SPEC_RELPATH = Path("docs") / "specs" / "DM-skill-v2.1.1.md"
 SYSTEM_PATH = ROOT / SPEC_RELPATH
 SYSTEM_PROMPT_MARKER = "## 【系统提示】（整段复制为 system）"
 INPUTS_DIR = ROOT / "inputs"

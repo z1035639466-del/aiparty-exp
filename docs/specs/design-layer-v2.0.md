@@ -257,6 +257,13 @@ v2.0 后 `plain_rule` **不再驮任何机器参数**——秒数进 `params.sec
 
 **软闸输出载体**：软闸 warning **改写入旁车文件 `<件名>.warnings.json`**（同目录，机读 `{file, spec_version, warnings[]}`），**不回写件内**——被检件保持纯设计层。裁判读『JSON + 旁车 warning』两件。扫描时 `*.warnings.json` 自身排除、不当设计层件回检；无软闸则清掉旧旁车件。
 
+### ③ scoring_ref 法定形态（v2.1.1 修闸 · Fable §14）
+
+**法定形态一行**：`scoring_ref` 一律非空数组（v2.1.1 起，单值 `["x"]`）。
+
+- 落地：`scoring_ref` 的五处存在性落点（顶层 top / 判定 verdict `on.过|不过` / 声明质疑 claim `on_liar|on_false_accuse` / 点名 named `on_named` / **限时 limit `on_timeout.effect=scoring`**）**同式收非空串或非空数组**：`is_nonempty(x) or (isinstance(x, list) and x)`。v2.1.1 前 `limit` 落点独判「仅非空串」，数组形被误判缺失——本次修闸使其归队。**活证 教材『限时扣分变体』`{"on_timeout":{"effect":"scoring","scoring_ref":["超时扣分"]}}`**。
+- 版本戳：check `SPEC_VERSION` / `whitelist.schema_version` 升 `v2.1.1`；AiParty `designValidator.ts` 同步同一行。r1 判级永挂 check v2.1 版本戳，不因本次修闸重写（追溯：r1 44 件 `on_timeout.scoring_ref` 数组形 = 0 件，修闸不触及任何 r1 判决）。
+
 ---
 
 *本 v2.0 为定稿，先交用户；v2.1 两条增改见 §7。产品侧据同一份升级 golden set 与 check.py，引擎侧据同一份建编译器与 schema v0.4、validator 同步 §7 两条。字段键就此冻结，两侧改动前如需调整，回本文件改、双侧同步。*

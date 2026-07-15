@@ -41,6 +41,11 @@
   scoring_ref 落点（top/verdict/claim/named）均已用 `is_nonempty(ref) or (isinstance(ref, list) and ref)`
   兼容数组，**`limit` 分支是唯一遗漏点**。
 - 与 v2.1.1「check 闸零改动」claim 冲突：数组化 scoring_ref 铁则要么要求 check `limit` 分支同步
-  兼容数组（则闸非零改），要么该示例回退字符串形（则违 ④「一律数组」）。二者取舍属教材/闸修改权，
-  **在 Fable**——教材 CI 停工，未入库 v2.1.1 任何件（正典/边车/run_ds 切换/存根/README 均未动），
-  仅落 gate 脚本 `tools/textbook_ci.py` 与本条。其余 14/15 机制（惩罚三档、判定三源含）逐块全绿。
+  兼容数组（则闸非零改），要么该示例回退字符串形（则违 ④「一律数组」）。二者取舍属教材/闸修改权。
+- **裁决＝修闸（Fable §14）**：`limit` 落点改与其余四落点（top/verdict/claim/named）同式
+  `is_nonempty(x) or (isinstance(x, list) and x)`；SPEC_VERSION 升 v2.1.1（whitelist schema_version
+  随之升 v2.1.1 保版本对账不漂移）；test_check 补 limit 数组/字符串/空数组三用例。AiParty
+  designValidator.ts 同步同一行。design-layer §7 增法定形态一行「scoring_ref 一律非空数组
+  （v2.1.1 起，单值 `["x"]`）」，双仓同步。教材件未动，sha `90d7d323` 不变。教材 CI 重跑 15/15 全绿。
+- **追溯统计（只报数不改判）**：r1 首发 44 件中 `on_timeout.scoring_ref` 为数组形者 **= 0 件**
+  ——本次修闸不触及任何 r1 判决；r1 判级永挂 check v2.1 版本戳，不重写。
