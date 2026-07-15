@@ -1,0 +1,78 @@
+{
+  "game_title": "闭环之夜：职场人设摊牌大会",
+  "subtitle": "黑话通道 · 挑战传送带 · 健身闯关 · 人设摊牌",
+  "premise": "这一晚不开会,但黑话照说;不刷手机,但挑战照传。五个人轮流被架上台面,看谁先把自己的\"人设\"绷不住。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop":"密语卡","to":"全体","visibility":"自己看","note":"开局每人悄悄发一张\"职场人设标签\"卡(风味化自拟,如\"闭环型人格\"\"对齐达人\"\"颗粒度控\",与真实MBTI量表无关,纯本局原创称号),只有自己看得到"},
+    {"prop":"匿名投票器","to":"全体","visibility":"自己看","note":"用于健身闯关的\"过/不过\"表决与挑战传送带的\"像/不像\"表决,各自私密提交,同时揭晓自动转公开"},
+    {"prop":"沙漏","to":"全体","visibility":"全场公开","note":"对齐通道轮计时,到点该轮结束"},
+    {"prop":"记分板","to":"全体","visibility":"全场公开","note":"全程加减分实时显示,终局揭晓最高分"}
+  ],
+  "props_required": [],
+  "flow": [
+    "阶段1 开局: 主持人发密语卡(职场人设标签,自己看),说明四个环节顺序与记分板归零。",
+    "阶段2 对齐通道轮: 沙漏开始计时,本轮所有人回答别人提问只准用一个黑话词,违规不判罚只记趣味,计时到点结束本轮。",
+    "阶段3 挑战传送带轮: 第一人按题目卡做一个短视频挑战动作,按现实座位顺序逐人只看上一人模仿传递,传到最后用匿名投票器表决首尾像不像,按结果加减分。",
+    "阶段4 健身闯关轮: Tony出一个健身挑战动作,挑战者当众完成,全场用匿名投票器一键表决过不过,按结果加分或触发轻惩罚(可跳过换一个,不涉酒)。",
+    "阶段5 人设摊牌轮: 任意时刻任何人可公开声称自己的职场人设标签(允许撒谎),他人可当场质疑,质疑后翻开密语卡验真假,按结果加减分。",
+    "阶段6 终局结算: 记分板揭晓总分最高者获胜;若有并列,由系统随机裁决(命运一掷)。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "对齐通道",
+      "mechanic": "受限沟通",
+      "plain_rule": "本轮计时期间,不管别人问你什么,你只能用一个词回答(不限定具体是哪个词),说别的不算数,自觉遵守。",
+      "visibility": "全场公开",
+      "params": {"channel":"one_word","enforce":"channel_only"}
+    },
+    {
+      "flavor_name": "挑战传送带",
+      "mechanic": "传递链",
+      "plain_rule": "第一个人按抽到的题目卡做一个挑战动作,下一个人只看得到上一个人做的样子,原样模仿再传给下一位,以此类推直到最后一人。",
+      "visibility": "自己看",
+      "params": {"content_from":"$gen.挑战动作池","order":"seat","each_sees":"prev_only","replay":"first_vs_last"}
+    },
+    {
+      "flavor_name": "传得准不准",
+      "mechanic": "判定",
+      "plain_rule": "传递结束后,全场用投票器一键表决:最后一人做的和第一人最初的样子像不像。",
+      "visibility": "全场公开",
+      "params": {"source":"consensus","question":"首尾动作像不像?","verdict_options":["像","不像"],"on":{"像":{"scoring_ref":"传得准"},"不像":{"scoring_ref":[]}}}
+    },
+    {
+      "flavor_name": "健身闯关",
+      "mechanic": "判定",
+      "plain_rule": "Tony出一个健身动作挑战,挑战者当众完成一次,全场用投票器一键表决这次完成算不算达标。",
+      "visibility": "全场公开",
+      "params": {"source":"consensus","question":"挑战动作达标吗?","verdict_options":["过","不过"],"on":{"过":{"scoring_ref":"挑战成功"},"不过":{"scoring_ref":"挑战失败"}}}
+    },
+    {
+      "flavor_name": "闯关未达标",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "健身闯关没达标的人,从轻惩罚池里抽一个非罚酒的小惩罚执行,不想做可以跳过换一个,没有嘲讽或羞辱内容。",
+      "visibility": "全场公开",
+      "params": {"who":"actor","pool":"$gen.penalty_内容池","scoring_ref":"挑战失败"}
+    },
+    {
+      "flavor_name": "人设摊牌",
+      "mechanic": "声明质疑",
+      "plain_rule": "任何时候你都可以公开声称自己的职场人设标签是什么(可以说谎),别人觉得不对可以当场质疑,质疑后翻开你的密语卡验真假。",
+      "visibility": "自己看",
+      "params": {"claim_prompt":"公开声称你的职场人设标签","challengers":"others","challenge_window_s":20,"verify_source":"prop_reveal:密语卡","verify_reveals":"prop_state","on_liar":{"scoring_ref":["撒谎受罚","揭穿加分"]},"on_false_accuse":{"scoring_ref":["冤枉受罚","被冤枉补偿"]}}
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      {"event":"传得准","effect":"delta:+2","who":"chain_all"},
+      {"event":"挑战成功","effect":"delta:+2","who":"actor"},
+      {"event":"挑战失败","effect":"penalty:轻","who":"actor"},
+      {"event":"撒谎受罚","effect":"delta:-2","who":"actor"},
+      {"event":"揭穿加分","effect":"delta:+2","who":"challenger"},
+      {"event":"冤枉受罚","effect":"delta:-1","who":"challenger"},
+      {"event":"被冤枉补偿","effect":"delta:+1","who":"actor"}
+    ],
+    "win": "终局记分板得分最高者获胜(个人计分)",
+    "tiebreak": "平局/并列默认由系统随机裁决(命运一掷)"
+  }
+}
