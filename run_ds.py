@@ -192,9 +192,9 @@ def build_jobs() -> list[Job]:
     jobs: list[Job] = []
     for name in "ABCD":
         for sequence in range(1, 3):
-            jobs.append(Job(name, f"dsT_{name}_v21r1_{sequence:02d}.json", True, "high"))
+            jobs.append(Job(name, f"dsT_{name}_v21r2_{sequence:02d}.json", True, "high"))
     for sequence in range(1, 21):
-        jobs.append(Job("B", f"ds_B_div_v21r1_{sequence:02d}.json", False, ""))
+        jobs.append(Job("B", f"ds_B_div_v21r2_{sequence:02d}.json", False, ""))
     return jobs
 
 
@@ -643,8 +643,8 @@ def estimate_batches(
 def print_estimate(root: Path, max_tokens: int, budget: float, thinking_mode: str = "both") -> float:
     total, estimates = estimate_batches(root, max_tokens, thinking_mode)
     batches = [
-        ("dsT v2.1r1 思考主批", [item for item in estimates if item[0].filename.startswith("dsT_")]),
-        ("B v2.1r1 非思考多样性批", [item for item in estimates if "_div_" in item[0].filename]),
+        ("dsT v2.1.1 r2 思考主批", [item for item in estimates if item[0].filename.startswith("dsT_")]),
+        ("B v2.1.1 r2 非思考多样性批", [item for item in estimates if "_div_" in item[0].filename]),
     ]
     print(f"模型: {MODEL}  max_tokens: {max_tokens}  硬顶: ${budget:.2f}")
     for label, items in batches:
