@@ -151,3 +151,11 @@ dsT_B_v21_01.json,deepseek-v4-flash,true,high,9659,8769,7285,119.433244,0.003807
 dsT_D_v21_01.json,deepseek-v4-flash,true,high,9621,9100,7770,120.295010,0.003894940,invalid_json: Expecting value: line 1 column 1 (char 0)
 dsT_C_v21_01.json,deepseek-v4-flash,true,high,9641,9774,8201,134.150227,0.004086460,invalid_json: Expecting property name enclosed in double quotes: line 100 column 5 (char 2918)
 dsT_A_v21_01.json,deepseek-v4-flash,true,high,9585,13143,11714,163.125917,0.005021940,success
+dsT_C_v21r1_02.json,deepseek-v4-flash,true,high,6624,8647,7379,105.769431,0.003348520,success
+dsT_C_v21r1_01.json,deepseek-v4-flash,true,high,6624,8168,6598,107.459716,0.003214400,success
+dsT_D_v21r1_02.json,deepseek-v4-flash,true,high,6604,8431,6569,111.380385,0.003285240,success
+dsT_B_v21r1_02.json,deepseek-v4-flash,true,high,6642,9790,8306,127.250263,0.003671080,success
+dsT_A_v21r1_01.json,deepseek-v4-flash,true,high,6568,9828,8828,128.199798,0.003671360,success
+dsT_D_v21r1_01.json,deepseek-v4-flash,true,high,6604,10324,8441,137.351873,0.003815280,success
+dsT_A_v21r1_02.json,deepseek-v4-flash,true,high,6568,10934,10012,141.689002,0.003981040,success
+dsT_B_v21r1_01.json,deepseek-v4-flash,true,high,6642,12561,11176,150.288657,0.004446960,success
