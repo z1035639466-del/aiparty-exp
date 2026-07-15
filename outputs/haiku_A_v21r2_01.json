@@ -1,0 +1,161 @@
+{
+  "game_title": "三楼金属风暴",
+  "subtitle": "为老王家客厅现制 · 3 人极限秀",
+  "premise": "每轮一个荒诞挑战降临，你有 20 秒用最嘈杂、最夸张、最金属的方式回应。别人投票：过关还是失格？快速积分、高潮迭起，最终谁的'金属指数'最爆炸。",
+  "players": ["疯子明", "小静", "大鹏"],
+  "props_dealt": [
+    {
+      "prop": "密语卡",
+      "to": "全体轮用",
+      "visibility": "自己看",
+      "note": "每轮一张，只有当前挑战者看得到具体内容。出题者(系统)发送。"
+    },
+    {
+      "prop": "匿名投票器",
+      "to": "全体",
+      "visibility": "自己看",
+      "note": "每轮评分用。三人同时投票：'过关(+1 金属值)'或'失格(0 分)'。亮票时自动转公开。"
+    },
+    {
+      "prop": "沙漏",
+      "to": "公共区",
+      "visibility": "全场公开",
+      "note": "20 秒计时，挑战者倒数自己表现。"
+    },
+    {
+      "prop": "记分板",
+      "to": "公共区",
+      "visibility": "全场公开",
+      "note": "实时记每人金属值与回合进度。"
+    }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局：宣读规则，食堂三楼的传说——那些最离谱的时刻今晚再现。",
+    "每轮：密语卡发向当前挑战者 → 20 秒表演 → 其他两人投票 → 计分 → 下一个人",
+    "3 轮循环(每人各挑一次) → 累积金属值最高者胜",
+    "若有并列：系统掷骰裁决胜者"
+  ],
+  "rules": [
+    {
+      "flavor_name": "金属狂飙",
+      "mechanic": "限时",
+      "plain_rule": "挑战者按密语卡内容，用最疯狂的语调、肢体、音效回应(吼叫/摇头/踏脚)。20 秒必须停。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 20,
+        "visible_countdown": true,
+        "on_timeout": {
+          "effect": "goto",
+          "goto": "投票评分"
+        }
+      }
+    },
+    {
+      "flavor_name": "群众裁决",
+      "mechanic": "同时提交",
+      "plain_rule": "旁观的两人各自私密投票(过关或失格)，然后一起亮票。投票结果即为该轮得分。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "这波表现够'金属'吗？",
+        "input_kind": "options",
+        "options": ["过关(+1 金属值)", "失格(0 分)"],
+        "timeout_s": 15,
+        "reveal": "simultaneous",
+        "scoring_ref": ["投票过关", "投票失格"]
+      }
+    },
+    {
+      "flavor_name": "积分爆表",
+      "mechanic": "加减分",
+      "plain_rule": "过关时，挑战者加 1 个金属值。失格归 0。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "+1",
+        "scoring_ref": ["投票过关"]
+      }
+    },
+    {
+      "flavor_name": "三楼传说",
+      "mechanic": "声明质疑",
+      "plain_rule": "任何人可在表演后质疑'这段根本不够嘈杂/你作弊了/重来一次'。被质疑者必须再演一遍，投票重算；诬陷者若被推翻则本轮零分。",
+      "visibility": "全场公开",
+      "params": {
+        "claim_prompt": "声称你刚才的表现已全力以赴且足够金属（允许狡辩）",
+        "challengers": "others",
+        "challenge_window_s": 30,
+        "verify_source": "prop_reveal:密语卡",
+        "verify_reveals": "prop_state",
+        "on_liar": {
+          "scoring_ref": ["质疑成功", "被揭穿扣分"]
+        },
+        "on_false_accuse": {
+          "scoring_ref": ["诬陷反扣", "被冤枉补偿"]
+        }
+      }
+    },
+    {
+      "flavor_name": "回合轮转",
+      "mechanic": "回合推进",
+      "plain_rule": "按座位顺序轮流做挑战者。3 轮后进入结算。",
+      "visibility": "全场公开",
+      "params": {
+        "order": "round_robin"
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      {
+        "event": "投票过关",
+        "who": "actor",
+        "effect": "+1"
+      },
+      {
+        "event": "投票失格",
+        "who": "actor",
+        "effect": "+0"
+      },
+      {
+        "event": "质疑成功",
+        "who": "challenger",
+        "effect": "+1"
+      },
+      {
+        "event": "被揭穿扣分",
+        "who": "actor",
+        "effect": "-1"
+      },
+      {
+        "event": "诬陷反扣",
+        "who": "challenger",
+        "effect": "-1"
+      },
+      {
+        "event": "被冤枉补偿",
+        "who": "actor",
+        "effect": "+1"
+      }
+    ],
+    "win": "3 轮后，金属值最高者胜。",
+    "tiebreak": "系统随机掷骰裁决（风味名：命运之音）"
+  },
+  "reveal_text": "散场了，老王客厅还回荡着三人疯狂的回音。食堂三楼那段黑历史，今晚被演绎成了最嘈杂的金属秀。他们各自摇头、狂吼、踏脚，谁最拼、谁最狂，一票一票说清楚。",
+  "reveal_signature": "融合自 小静 的「食堂三楼」× 疯子明 的「重金属·越吵越好」× 大鹏 的「竞争与现场感」",
+  "flavor_glossary": [
+    {
+      "term": "金属值",
+      "means": "衡量表现有多'金属'（疯狂、嘈杂、夸张）的计分单位。完全源自同行两人的投票。"
+    },
+    {
+      "term": "食堂三楼",
+      "means": "他们仨大学时的内部黑历史发生地，整局用这个虚拟舞台作背景，每个挑战都暗示这是'三楼才能见证的疯狂时刻'。"
+    },
+    {
+      "term": "群众裁决",
+      "means": "演员表现谁说了算？投票的两人。民主制胜。"
+    }
+  ],
+  "safety_note": "黄暴档 52/100(中)：表演类任务纯肢体与音声，无身体接触或羞辱；无点名真人、无版权内容；质疑权利对等（被质疑者可反驳），不激化冲突。"
+}
