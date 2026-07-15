@@ -1,0 +1,135 @@
+{
+  "game_title": "对齐失败：茶水间瓜田大乱斗",
+  "subtitle": "转盘定题·瓜田爆料·闭环传声·i/e速配，五轮定胜负",
+  "premise": "命运转盘每轮抛一个主题，全员当场应对；黑话哨兵整场潜伏，一开口就可能扣分，记分板5轮见真章。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop":"命运转盘","to":"全体","visibility":"全场公开","note":"配置3个扇区：瓜田爆料 / 挑战闪战 / 标签速配，每轮开局转一次定主题"},
+    {"prop":"匿名投票器","to":"全体","visibility":"自己看","note":"用于标签速配的同时提交、以及所有共识判定的私密表决与揭晓"},
+    {"prop":"沙漏","to":"全体","visibility":"全场公开","note":"挑战闪战环节倒计时30秒"},
+    {"prop":"记分板","to":"全体","visibility":"全场公开","note":"全程累计个人分，终局排名"},
+    {"prop":"密语卡","to":"当值玩家","visibility":"自己看","note":"瓜田爆料环节，轮到谁由系统私发一条'爆料任务'内容，供其编真假发言"}
+  ],
+  "props_required": [],
+  "flow": [
+    "阶段1 开局：摆好命运转盘/沙漏/记分板/匿名投票器；宣布黑话哨兵常驻规则整场生效——只要有人说出'对齐/颗粒度/闭环'类工作黑话，任何人可随时喊'警报'触发判定；挑战闪战题库里也埋了'用一句黑话夸旁边的人'这类主动诱导题，别光等人自己犯规",
+    "阶段2 每轮开局：转动命运转盘，转到哪个扇区就进入对应环节",
+    "阶段3a 若转到'瓜田爆料'：系统私发密语卡给当值玩家，其公开发言一句瓜(真假自定)，其他人可发起质疑",
+    "阶段3b 若转到'挑战闪战'：系统公布一个30秒即兴挑战(动作/表演/健身类由局长现场选定)，沙漏计时，超时自动进入表决；玩家随时可'跳过换一个挑战'，不算失败不受罚",
+    "阶段3c 若转到'标签速配'：转盘先随机点出一位'考题'玩家，其余人匿名同时提交'i人/e人'猜测，同时揭晓",
+    "阶段4 结算：本轮涉及输赢的判定/提交结果通过 scoring_ref 记入记分板",
+    "阶段5 重复阶段2-4共5轮，记分板得分最高者获胜；分数并列时按settlement.tiebreak随机裁决",
+    "阶段6 终局：公开对比谣言传声环节(若触发)的首尾版本，纯搞笑回放，不计入胜负"
+  ],
+  "rules": [
+    {
+      "flavor_name": "对齐警报",
+      "mechanic": "判定",
+      "plain_rule": "整局中，只要有人说出'对齐/颗粒度/闭环'这类工作黑话，任何人都可以喊一声'警报'。系统立刻发起全场表决，大家投票这句话算不算数；算数的话，说这句话的人扣1分。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "这句黑话算命中吗？",
+        "verdict_options": ["算", "不算"],
+        "on": {
+          "算": {"scoring_ref": "黑话中招"},
+          "不算": {"scoring_ref": []}
+        }
+      }
+    },
+    {
+      "flavor_name": "瓜田快报",
+      "mechanic": "声明质疑",
+      "plain_rule": "轮到你时，系统会私发给你一条关于本桌某人的悄悄话任务卡，让你当众编一句'爆料'(可以是真的也可以是编的)。别人可以选择'质疑'你；一旦有人质疑，系统翻开你的密语卡验真假：被抓到撒谎扣1分，揭穿你的人加1分；如果冤枉了你(你其实说的是真的)，冤枉你的人扣1分，你获得1分补偿。你随时可以选择'跳过这轮换个人'，不受任何惩罚。",
+      "visibility": "自己看",
+      "params": {
+        "claim_prompt": "公开说出你的瓜(真假自定)",
+        "challengers": "others",
+        "challenge_window_s": 20,
+        "verify_source": "prop_reveal:密语卡",
+        "verify_reveals": "prop_state",
+        "on_liar": {"scoring_ref": ["说谎受罚", "揭穿加分"]},
+        "on_false_accuse": {"scoring_ref": ["冤枉受罚", "被冤枉补偿"]}
+      }
+    },
+    {
+      "flavor_name": "倒计时哨",
+      "mechanic": "限时",
+      "plain_rule": "挑战开始，系统开始30秒倒计时，所有人都看得到；超时挑战自动结束，直接进入表决环节。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 30,
+        "visible_countdown": true,
+        "on_timeout": {"effect": "goto", "goto": "全网通过认证"}
+      }
+    },
+    {
+      "flavor_name": "全网通过认证",
+      "mechanic": "判定",
+      "plain_rule": "挑战结束后，其他玩家现场表决这次挑战算不算过关；过关的人加2分，不过关不扣分。你随时可以选择'跳过换一个挑战'，不算失败，不受罚。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "这次挑战算过关吗？",
+        "verdict_options": ["过", "不过"],
+        "on": {
+          "过": {"scoring_ref": "挑战成功"},
+          "不过": {"scoring_ref": []}
+        }
+      }
+    },
+    {
+      "flavor_name": "转盘选题",
+      "mechanic": "点名目标",
+      "plain_rule": "命运转盘转到'标签速配'时，转盘随机指定一位玩家作为本轮的'考题对象'，获得1分出场分。",
+      "visibility": "全场公开",
+      "params": {
+        "selector": "random",
+        "target_pool": "alive_others",
+        "on_named": {"scoring_ref": "考题登场分", "eliminate": false}
+      }
+    },
+    {
+      "flavor_name": "i/e 测谎机",
+      "mechanic": "同时提交",
+      "plain_rule": "其他人各自私下猜'考题对象'是i人还是e人，系统同时收齐所有人的答案，一起公开。猜中的人各加1分；如果超过一半的人都猜中了，说明这人'活得很真实'，本人也加1分。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "你觉得TA是i人还是e人？",
+        "input_kind": "options",
+        "options": ["i人", "e人"],
+        "timeout_s": 15,
+        "reveal": "simultaneous",
+        "scoring_ref": ["猜中加分", "真实加分"]
+      }
+    },
+    {
+      "flavor_name": "闭环传声筒",
+      "mechanic": "传递链",
+      "plain_rule": "系统给第一个人一句由大家的黑话拼成的话，按现实座位顺序依次悄悄传递，每人只能看到上一个人传来的版本，记下自己听到的内容再往下传。传到最后，系统把最初那句和最后那句放在一起展示给大家看走样了多少，纯搞笑，不计入胜负。",
+      "visibility": "自己看",
+      "params": {
+        "content_from": "$gen.黑话原句池",
+        "order": "seat",
+        "each_sees": "prev_only",
+        "replay": "first_vs_last"
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      {"event": "黑话中招", "who": "speaker", "delta": "-1"},
+      {"event": "说谎受罚", "who": "claimer", "delta": "-1"},
+      {"event": "揭穿加分", "who": "challenger", "delta": "+1"},
+      {"event": "冤枉受罚", "who": "challenger", "delta": "-1"},
+      {"event": "被冤枉补偿", "who": "claimer", "delta": "+1"},
+      {"event": "挑战成功", "who": "actor", "delta": "+2"},
+      {"event": "考题登场分", "who": "named", "delta": "+1"},
+      {"event": "猜中加分", "who": "guesser", "delta": "+1"},
+      {"event": "真实加分", "who": "named", "delta": "+1"}
+    ],
+    "win": "5轮结束后，记分板个人得分最高者获胜",
+    "tiebreak": "并列时由系统随机裁决(命运一掷)"
+  },
+  "reveal_signature": ["阿凯", "琳琳", "老周", "小雨", "Tony"]
+}
