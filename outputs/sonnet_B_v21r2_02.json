@@ -1,0 +1,193 @@
+{
+  "game_title": "今晚闭环认证局",
+  "subtitle": "额头贴牌 · 黑话闪电战 · 小道消息传送带",
+  "premise": "团建包间里，局长把这仨月攒的梗全炒了一遍——阿凯的MBTI贴额头、老周的开会黑话现挂、琳琳的全网挑战当场演、小雨的八卦传成新版本、Tony的深蹲硬核冲刺，五人各扛自己的梗坐庄一关，垫底那位负责闭环收尾。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop": "身份牌", "to": "阿凯", "visibility": "额头", "note": "一张MBTI人格牌（i/e任一极向+自定义词条），贴在阿凯额头上，他自己看不到，其余四人看得到；本关结束后揭示给阿凯本人再收走，不再重发。"},
+    {"prop": "密语卡", "to": "小雨", "visibility": "自己看", "note": "小雨在卡上写一句纯属虚构的办公室趣闻，只有她自己先看一眼，作为传递链的原句底牌。"},
+    {"prop": "盲盒", "to": "琳琳", "visibility": "自己看开", "note": "塞入若干短视频挑战任务卡，琳琳当场抽一张，抽完立即执行。"},
+    {"prop": "骰盅", "to": "Tony", "visibility": "自己看", "note": "续押喊停用，骰盅里暗藏约定的『抽筋』点数组合，只有Tony自己开盅确认摇没摇到。"},
+    {"prop": "沙漏", "to": "全场公开", "visibility": "全场公开", "note": "各关限时环节的倒计时器，立在桌上人人可见。"},
+    {"prop": "记分板", "to": "全场公开", "visibility": "全场公开", "note": "实时显示每人累计分数，五关轮完后揭晓。"}
+  ],
+  "props_required": [],
+  "flow": [
+    "开场：五人按 阿凯→琳琳→老周→小雨→Tony 的座位顺序轮流坐庄，每人只坐庄玩一关，自己的梗自己扛；记分板归零，沙漏摆好当节拍器。",
+    "第1关·额头认证（阿凯坐庄）：其余四人给阿凯贴一张MBTI额头牌，只能用一词提示帮他猜，60秒沙漏封顶，时间到或猜完后全场一键共识判定猜没猜对，随后把牌翻给阿凯自己看一眼再收走。",
+    "第2关·全网挑战（琳琳坐庄）：琳琳从短视频挑战盲盒抽一张任务卡；开演前其余人各自悄悄押『稳了』或『翻车』，15秒后同时公开，猜中的人加分；琳琳表演完，全场一键共识判定她算不算过关。",
+    "第3关·黑话闪电战（老周坐庄）：沙漏倒扣10秒，老周必须现编一句带『对齐/颗粒度/闭环』任一词的黑话金句，AI判断够不够格，全场可一键推翻AI的判断。",
+    "第4关·小道消息传送带（小雨坐庄）：小雨编好的密语卡不公开，按座位顺序（小雨→Tony→阿凯→琳琳→老周）悄声一个传一个，每人只听得到上一棒，传到最后一位老周当众说出他听到的版本，翻开原卡对比，全场一键共识判断像不像。",
+    "第5关·颗粒度冲刺（Tony坐庄）：Tony做深蹲，每5个一组，做完一组可选『继续加注』或『见好就收』；继续前开一次骰盅，摇到约定的『抽筋』点数本轮累计清零，喊停则把攒的组数存进记分板。",
+    "收官：五关轮完，记分板揭晓总分，最低分者从惩罚池抽一个非难堪任务当场完成，可一键换一个更温和的替代；总分并列按系统随机裁决。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "坐庄按座位来",
+      "mechanic": "回合推进",
+      "plain_rule": "谁坐庄、坐庄玩哪一关，都按大家现实里坐的顺序走（阿凯→琳琳→老周→小雨→Tony），不额外排座位、不在app里重排。",
+      "visibility": "全场公开",
+      "params": {"order": "round_robin"}
+    },
+    {
+      "flavor_name": "一词点拨",
+      "mechanic": "受限沟通",
+      "plain_rule": "阿凯猜额头牌时，其余四人每人每次只能说一个词提示，不能说整句话、不能比划手势、不能直接念出牌面文字。",
+      "visibility": "额头",
+      "params": {"channel": "one_word", "enforce": "channel_only"}
+    },
+    {
+      "flavor_name": "认证读秒",
+      "mechanic": "限时",
+      "plain_rule": "沙漏一倒扣，60秒内阿凯必须给出最终猜测；时间到还没猜出，直接进入过关判定按当时情况走。",
+      "visibility": "全场公开",
+      "params": {"seconds": 60, "visible_countdown": true, "on_timeout": {"effect": "goto", "goto": "认证过关判定"}}
+    },
+    {
+      "flavor_name": "认证过关判定",
+      "mechanic": "判定",
+      "plain_rule": "阿凯说出最终猜测后，全场一键表决『猜对了吗』，多数人认为对就算过关。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "阿凯的额头认证猜对了吗？",
+        "verdict_options": ["过", "不过"],
+        "on": {
+          "过": {"scoring_ref": ["认证成功"]},
+          "不过": {"scoring_ref": ["认证失败"]}
+        }
+      }
+    },
+    {
+      "flavor_name": "摘牌大揭晓",
+      "mechanic": "揭示",
+      "plain_rule": "不管猜没猜对，判定一结束就把额头牌摘下来，翻给阿凯自己看一眼，然后收回，这张牌本局不再使用。",
+      "visibility": "自己看",
+      "params": {"reveal_of": "prop:身份牌", "to": "actor", "once": true, "identity_resolution": "terminal"}
+    },
+    {
+      "flavor_name": "全网风向预测",
+      "mechanic": "同时提交",
+      "plain_rule": "琳琳抽到挑战卡、还没开始表演前，其余人各自悄悄按『稳了』或『翻车』提交预测，15秒倒计时一到同时公开，猜中算赢。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "琳琳这个挑战会翻车吗？",
+        "input_kind": "options",
+        "options": ["稳了", "翻车"],
+        "timeout_s": 15,
+        "reveal": "simultaneous",
+        "scoring_ref": ["押中加分", "押错不扣"]
+      }
+    },
+    {
+      "flavor_name": "现场过审",
+      "mechanic": "判定",
+      "plain_rule": "琳琳当场表演完抽到的挑战任务，全场一键表决算不算过关。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "琳琳这个挑战完成得算不算过关？",
+        "verdict_options": ["过", "不过"],
+        "on": {
+          "过": {"scoring_ref": ["挑战成功"]},
+          "不过": {"scoring_ref": ["挑战失败"]}
+        }
+      }
+    },
+    {
+      "flavor_name": "黑话读秒",
+      "mechanic": "限时",
+      "plain_rule": "沙漏倒扣10秒，老周编不出黑话金句就直接算不过。",
+      "visibility": "全场公开",
+      "params": {"seconds": 10, "visible_countdown": true, "on_timeout": {"effect": "scoring", "scoring_ref": ["黑话拉胯"]}}
+    },
+    {
+      "flavor_name": "黑话闪电战",
+      "mechanic": "判定",
+      "plain_rule": "老周要在10秒内当场编一句像模像样的话，里面必须出现『对齐』『颗粒度』『闭环』三个词里至少一个；AI判断够不够黑话范儿，全场都可以一键推翻AI的判断。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "ai",
+        "question": "老周这句话够不够黑话范儿？",
+        "ai_overridable": true,
+        "verdict_options": ["过", "不过"],
+        "on": {
+          "过": {"scoring_ref": ["黑话达标"]},
+          "不过": {"scoring_ref": ["黑话拉胯"]}
+        }
+      }
+    },
+    {
+      "flavor_name": "小道消息传送带",
+      "mechanic": "传递链",
+      "plain_rule": "小雨写好一句纯属虚构的办公室趣闻，按座位顺序一个一个凑耳朵小声传给下一位，谁都不能让隔壁以外的人听到；传到最后一位老周，当众大声说出他听到的版本。",
+      "visibility": "自己看",
+      "params": {"content_from": "prop:密语卡", "order": "seat", "each_sees": "prev_only", "replay": "first_vs_last"}
+    },
+    {
+      "flavor_name": "传声筒验收",
+      "mechanic": "判定",
+      "plain_rule": "传递链结束后，把小雨的原卡打开对比老周说出的版本，全场一键表决『像不像』，多数觉得像就算传声筒奇迹。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "老周说出的版本和小雨的原句像不像？",
+        "verdict_options": ["过", "不过"],
+        "on": {
+          "过": {"scoring_ref": ["传声筒奇迹"]},
+          "不过": {"scoring_ref": ["传声筒失真"]}
+        }
+      }
+    },
+    {
+      "flavor_name": "颗粒度冲刺",
+      "mechanic": "续押喊停",
+      "plain_rule": "Tony做深蹲，每做完5个一组，可以选『继续冲』或『见好就收』；选继续就先开一次骰盅，摇到约定的『抽筋』点数，本轮累计的组数直接清零；喊停就把已攒的组数存进记分板。",
+      "visibility": "全场公开",
+      "params": {
+        "draw_from": "prop:骰盅",
+        "continue_prompt": "继续冲还是见好就收？",
+        "bust_when": "骰盅摇出约定的抽筋点数",
+        "cap": 6,
+        "on_cap": "force_settle",
+        "bank_on_stop": true,
+        "scoring_ref": ["落袋为安", "抽筋清零"]
+      }
+    },
+    {
+      "flavor_name": "垫底闭环认罚",
+      "mechanic": "惩罚(中)",
+      "plain_rule": "五关全部结束、记分板揭晓总分后，最低分的人从惩罚池抽一个非难堪任务当场完成；不想抽也可以直接换一个更温和的替代，没有饮酒选项，拒绝不扣分不群嘲。",
+      "visibility": "全场公开",
+      "params": {"who": "loser", "pool": "$gen.penalty_中_内容池", "scoring_ref": ["垫底认罚"]}
+    }
+  ],
+  "reveal_text": "今晚，颗粒度对齐了吗？阿凯额头上的标签摘下来，i人e人当场现出原形；老周的黑话金句封神几句、拉胯几句，记分板全程见证；琳琳的挑战有没有翻车，押对的人笑了；小雨那句办公室趣闻传了一圈，到老周嘴里走没走样众目睽睽；Tony深蹲冲到第几组、抽没抽筋，全场一起数。分数揭晓——垫底的那位，闭环认罚，谁都别想跑。",
+  "reveal_signature": [
+    "阿凯：MBTI额头贴标签 → 额头认证（受限沟通+限时+判定+揭示）",
+    "老周：开会黑话（对齐/颗粒度/闭环）→ 黑话闪电战（限时+判定·AI）",
+    "琳琳：短视频挑战 → 全网挑战（短视频挑战盲盒+判定·共识）与全网风向预测（同时提交）",
+    "小雨：八卦雷达 → 小道消息传送带（传递链+传声筒验收判定）",
+    "Tony：健身狂魔 → 颗粒度冲刺（续押喊停+骰盅）"
+  ],
+  "safety_note": "全程无饮酒惩罚；所有点名到个人的坐庄任务（额头认证、全网挑战、黑话闪电战、颗粒度冲刺、垫底认罚）都可以当场说『换一个』直接跳过或替换成更温和的选项，不扣分、不群嘲；职场团建场合，惩罚池只含轻度趣味任务，不涉及外貌评价、身体隐私或职场关系相关的羞辱性内容；颗粒度冲刺环节量力而行，身体不适可随时喊停，不计入『抽筋』惩罚。",
+  "settlement": {
+    "scoring": [
+      {"event": "认证成功", "who": "actor", "delta": "+1"},
+      {"event": "认证失败", "who": "actor", "delta": "+0"},
+      {"event": "挑战成功", "who": "actor", "delta": "+1"},
+      {"event": "挑战失败", "who": "actor", "delta": "+0"},
+      {"event": "押中加分", "who": "predictor", "delta": "+1"},
+      {"event": "押错不扣", "who": "predictor", "delta": "+0"},
+      {"event": "黑话达标", "who": "actor", "delta": "+1"},
+      {"event": "黑话拉胯", "who": "actor", "delta": "-1"},
+      {"event": "传声筒奇迹", "who": "chain_ends", "delta": "+1"},
+      {"event": "传声筒失真", "who": "none", "delta": "+0"},
+      {"event": "落袋为安", "who": "actor", "delta": "+bank_count"},
+      {"event": "抽筋清零", "who": "actor", "delta": "reset_bank"},
+      {"event": "垫底认罚", "who": "actor", "effect": "惩罚(中)"}
+    ],
+    "win": "五关全部轮完后，记分板累计分数最高者获胜；最低分者需完成收尾认罚，不影响谁是赢家。",
+    "tiebreak": "总分并列时由系统随机裁决（可包一层『命运一掷』的风味皮）。"
+  }
+}
