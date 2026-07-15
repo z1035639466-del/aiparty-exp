@@ -1,0 +1,8 @@
+{
+  "file": "sonL_B_div_v21r2_15_r1.json",
+  "spec_version": "v2.1.1",
+  "warnings": [
+    "prose_param_mismatch:rules[2].timeout_s=15",
+    "prose_param_mismatch:rules[3].challenge_window_s=25"
+  ]
+}
