@@ -1,0 +1,116 @@
+{
+  "game_title": "人设对齐会 · 卷王速配局",
+  "subtitle": "为公司团建包间现制 · 5 人快节奏局",
+  "premise": "每人轮流当一次'谜面人'：先经一条混入开会黑话的话考验大家的传声闭环，再让全员同时提交猜他的 MBTI 字母，中间穿插吃瓜爆料真假辨和卷王计时挑战，五轮转完，总分最高者当选本场最卷 MVP。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "密语卡", "to": "本轮传声第一棒", "visibility": "自己看", "note": "写着一句混入 2-3 个开会黑话词的原句，只有拿到的人能看，看完不准写下来只能口述给下一位。" },
+    { "prop": "抽签筒", "to": "公共区", "visibility": "全场公开", "note": "每轮开局抽一张，决定这轮传声筒用哪句黑话原句。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "MBTI 字母速配环节用，各自私密提交，揭晓时自动转全场公开(道具内置)。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "吃瓜爆料与卷王挑战各计时一次。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每轮所有加分来源，实时显示排名。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 讲清四个环节(传声筒/MBTI速配/吃瓜真假/卷王挑战)如何循环，并宣布任何指向个人的任务惩罚都可以喊'换一个'跳过，没有代价。",
+    "每轮(按现实座位顺序轮流当谜面人，共 5 轮): 抽签筒抽本轮黑话原句 → 密语卡口述传声到底 → 全场表决最后一棒是否'对上了' → 记分",
+    "同轮: 本轮谜面人保持不变 → 全员私密同时提交猜他的 MBTI 字母组合 → 揭晓对比谜面人自报类型 → 猜中字母最多者加分",
+    "同轮: 谜面人 60 秒即兴讲一个关于在场某人的无害趣闻(编的也行) → 全场表决像真的还是编的 → 按方向计分",
+    "同轮: 谜面人 30 秒安全健身动作计时挑战(可随时喊换一个换成轻松版) → 全场表决是否完成 → 完成加分/未完成给轻度非羞辱惩罚",
+    "五轮全部轮完(每人都当过一次谜面人) → 终局: 记分板总分最高者获胜；分数并列时系统随机裁决"
+  ],
+  "rules": [
+    {
+      "flavor_name": "闭环传声筒",
+      "mechanic": "传递链",
+      "plain_rule": "第一个人看密语卡上的一句话(里面混了几个'对齐/颗粒度/闭环'一类的黑话词)，记住内容后不准写下来，只能小声口述给下一个人，一路传到最后一个人，最后一个人大声说出他听到的版本。",
+      "visibility": "自己看",
+      "params": { "content_from": "$gen.黑话原句池", "order": "seat", "each_sees": "prev_only", "replay": "first_vs_last" }
+    },
+    {
+      "flavor_name": "对没对上",
+      "mechanic": "判定",
+      "plain_rule": "最后一棒说完后，全场一键表决这个版本算不算和抽签筒抽到的原句对上了。",
+      "visibility": "全场公开",
+      "params": { "source": "consensus", "question": "最后一棒的版本算不算和原句对上了？", "verdict_options": ["对上了", "传崩了"], "on": { "对上了": { "scoring_ref": "传声精准" }, "传崩了": { "scoring_ref": "传声失真好笑" } } }
+    },
+    {
+      "flavor_name": "人设速配",
+      "mechanic": "同时提交",
+      "plain_rule": "本轮谜面人先正常说几句话，其余每人各自私密提交一个词——你觉得这人反应最像哪种 MBTI 字母组合，同时揭晓。",
+      "visibility": "自己看",
+      "params": { "prompt": "这人刚才的反应最像哪个 MBTI 字母组合？", "input_kind": "options", "options": "$派生:MBTI十六型", "timeout_s": 20, "reveal": "simultaneous", "scoring_ref": ["字母猜中加分"] }
+    },
+    {
+      "flavor_name": "对齐结算",
+      "mechanic": "加减分",
+      "plain_rule": "谜面人念出自己真实/自称的 MBTI 类型，字母猜中数最多的人(可并列)每人加分。",
+      "visibility": "全场公开",
+      "params": { "who": "winner", "delta": "+2", "scoring_ref": "字母猜中加分" }
+    },
+    {
+      "flavor_name": "瓜田限时",
+      "mechanic": "限时",
+      "plain_rule": "谜面人有 60 秒即兴讲一个关于在场某人的无害趣闻(编的也行)当'瓜'，时间一到必须收尾。",
+      "visibility": "全场公开",
+      "params": { "seconds": 60, "visible_countdown": true, "on_timeout": { "effect": "goto", "goto": "瓜是真是假表决" } }
+    },
+    {
+      "flavor_name": "瓜是真是假",
+      "mechanic": "判定",
+      "plain_rule": "讲完后全场一键表决这个瓜'像真的'还是'编的'，猜对方向的人加分。",
+      "visibility": "全场公开",
+      "params": { "source": "consensus", "question": "这个瓜像真的还是编的？", "verdict_options": ["像真的", "编的"], "on": { "像真的": { "scoring_ref": "瓜判真" }, "编的": { "scoring_ref": "瓜判假" } } }
+    },
+    {
+      "flavor_name": "卷王计时挑战",
+      "mechanic": "限时",
+      "plain_rule": "谜面人 30 秒内做一个安全的健身动作(比如平板支撑或深蹲)挑战，随时可以喊'换一个'换成不涉及运动的轻松版，没有代价。",
+      "visibility": "全场公开",
+      "params": { "seconds": 30, "visible_countdown": true, "on_timeout": { "effect": "goto", "goto": "挑战完成确认" } }
+    },
+    {
+      "flavor_name": "挑战完成确认",
+      "mechanic": "判定",
+      "plain_rule": "时间到后全场一键表决这个动作算不算完成。",
+      "visibility": "全场公开",
+      "params": { "source": "consensus", "question": "这个健身挑战算完成了吗？", "verdict_options": ["完成", "没完成"], "on": { "完成": { "scoring_ref": "挑战完成" }, "没完成": { "scoring_ref": "挑战失败" } } }
+    },
+    {
+      "flavor_name": "友情轻惩罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "挑战没完成的人接受一个轻度惩罚(比如学一句搞笑口头禅)，不想做可以直接喊'换一个'换成同等轻松的替代项，没有代价。",
+      "visibility": "全场公开",
+      "params": { "who": "actor", "pool": "$gen.penalty_轻度池", "scoring_ref": "挑战失败" }
+    },
+    {
+      "flavor_name": "轮值官",
+      "mechanic": "回合推进",
+      "plain_rule": "每轮谁当谜面人/挑战人，按现实里大家坐的顺序轮流来，不用系统重排座位。",
+      "visibility": "全场公开",
+      "params": { "order": "round_robin" }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "传声精准", "who": "全体", "effect": "+1" },
+      { "event": "传声失真好笑", "who": "first_link", "effect": "+1" },
+      { "event": "字母猜中加分", "who": "winner", "effect": "+2" },
+      { "event": "瓜判真", "who": "correct_guessers", "effect": "+1" },
+      { "event": "瓜判假", "who": "correct_guessers", "effect": "+1" },
+      { "event": "挑战完成", "who": "actor", "effect": "+2" },
+      { "event": "挑战失败", "who": "actor", "effect": "惩罚(轻)" }
+    ],
+    "win": "五轮跑完后，记分板总分最高者获胜",
+    "tiebreak": "系统随机裁决(风味名：黑话轮盘)"
+  },
+  "reveal_text": "五轮下来，谁的字母被猜得最准、谁的瓜最像真的、谁的黑话传得最离谱，记分板上写得明明白白——最后卷到榜首的那个，才是这届团建真正的对齐楷模。",
+  "reveal_signature": "融合自 阿凯 的「MBTI 贴标签」× 老周 的「开会黑话」× 小雨 的「爱吃瓜」× Tony 的「健身狂魔」",
+  "flavor_glossary": [
+    { "term": "MBTI / i人e人", "means": "一种性格类型测试的简称，i人e人指内向/外向倾向，这里借指'猜这人是哪种类型'。" },
+    { "term": "对齐 / 颗粒度 / 闭环", "means": "职场开会常用词，这里被塞进传声筒的原句里，纯当传话素材，不代表真的开会。" },
+    { "term": "吃瓜", "means": "网络用语，指围观八卦，这里指讲一段无害趣闻。" },
+    { "term": "卷王", "means": "形容特别拼、爱较劲的人，这里指健身挑战环节的称呼。" }
+  ],
+  "safety_note": "黄暴档 20/100(低)：所有任务止于语言游戏与安全健身动作，不涉及身体接触、露骨内容或职场敏感点名；讲的瓜与传声原句均为编造/中性内容，未指向任何真人隐私；每个指向个人的任务都自带'换一个'跳过权，代价仅为轻度替代项。"
+}
