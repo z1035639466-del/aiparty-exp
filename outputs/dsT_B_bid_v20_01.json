@@ -1,0 +1,118 @@
+{
+  "game_title": "团建生态圈 · MBTI挑战派对",
+  "subtitle": "5人快节奏 · 开会黑话 × 短视频挑战 × 健身吃瓜",
+  "premise": "每人额头贴一张MBTI标签（别人可见，自己不知），每轮系统抛出一个小挑战（开黑话造句、爆八卦、健身动作……），敢接受的人同时报名，抽一人执行，全场投票判定成败。赢加分，输受轻惩，10轮后积分最高者胜。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "额头", "note": "每人一张MBTI类型（随机分配），别人看得到，自己看不见。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "用于判定挑战成败的全场表决，同时揭晓。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每轮环节限时参考。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "实时记录每人累计分数。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局：每人发额头MBTI身份牌，公开宣读各类挑战示例。",
+    "每轮：系统从素材池（黑话造句、短视频动作、八卦爆料、健身姿势等）随机选一个挑战。",
+    "所有玩家通过同时提交（限时10秒）选择“接受”或“跳过”；超时视为跳过。",
+    "从接受者中系统随机点一人执行挑战（限时30秒）。",
+    "执行结束后，全体通过匿名投票器表决“成功”或“失败”；多数通过即成功。",
+    "成功：执行者+2分；失败：执行者接受一次轻度惩罚（可跳过换替代）。",
+    "一轮结束，进入下一轮。共10轮。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "接不接？",
+      "mechanic": "同时提交",
+      "plain_rule": "每轮系统公布挑战任务后，所有玩家同时私密提交自己的选择（接受或跳过），超时未提交默认跳过。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "你是否接受本次挑战？",
+        "input_kind": "options",
+        "options": ["接受", "跳过"],
+        "timeout_s": 10,
+        "reveal": "simultaneous",
+        "scoring_ref": []
+      }
+    },
+    {
+      "flavor_name": "前锋点将",
+      "mechanic": "点名目标",
+      "plain_rule": "在提交“接受”的玩家中，系统随机选出一人执行挑战。若无人接受，本轮跳过。",
+      "visibility": "全场公开",
+      "params": {
+        "selector": "vote",
+        "target_pool": "those_who_accepted",
+        "on_named": {
+          "scoring_ref": [],
+          "eliminate": false
+        }
+      }
+    },
+    {
+      "flavor_name": "目击判定",
+      "mechanic": "判定",
+      "plain_rule": "被选中的玩家执行挑战后，全体通过匿名投票器表决挑战是否成功，多数通过即为成功。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "该玩家挑战成功了吗？",
+        "verdict_options": ["成功", "失败"],
+        "on": {
+          "过": { "scoring_ref": "挑战成功" },
+          "不过": { "scoring_ref": "挑战失败" }
+        }
+      }
+    },
+    {
+      "flavor_name": "成就+1",
+      "mechanic": "加减分",
+      "plain_rule": "挑战成功者获得2分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "winner",
+        "delta": "+2",
+        "scoring_ref": "挑战成功"
+      }
+    },
+    {
+      "flavor_name": "社死一刻",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "挑战失败者接受一个轻度惩罚（如做一个搞笑动作或说一句开会黑话），执行后可以要求跳过换一个替代惩罚。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "pool": "$gen.penalty_内容池",
+        "scoring_ref": "挑战失败"
+      }
+    },
+    {
+      "flavor_name": "类型解剖",
+      "mechanic": "揭示",
+      "plain_rule": "整局限一次：你可以私密查看任意一名其他人的额头标签（即他的MBTI类型），只有你自己知道结果。",
+      "visibility": "自己看",
+      "params": {
+        "reveal_of": "prop:身份牌",
+        "to": "actor",
+        "once": true
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "挑战成功", "who": "执行者", "effect": "+2" },
+      { "event": "挑战失败", "who": "执行者", "effect": "惩罚(轻)" }
+    ],
+    "win": "10轮后总分最高者获胜",
+    "tiebreak": "系统随机裁决（风味名：冲水马桶抽签）"
+  },
+  "reveal_text": "10轮挑战结束：有人用黑话拿下全场最高分，有人因八卦爆料成了最后的赢家。MBTI？在团建面前，人人都是e人。",
+  "reveal_signature": "融合自 阿凯 的「MBTI」、琳琳 的「短视频挑战」、老周 的「开会黑话」、小雨 的「吃瓜」、Tony 的「健身」",
+  "flavor_glossary": [
+    { "term": "MBTI", "means": "一种性格分类测试，四个字母代表不同维度（如E外倾/I内倾）。这里用额头标签增加社交趣味。" },
+    { "term": "i人/e人", "means": "网络梗，指MBTI中I（内倾）和E（外倾）的人。" },
+    { "term": "对齐、颗粒度、闭环", "means": "典型的职场开（废）会黑话，常用于夸张或吐槽。" },
+    { "term": "吃瓜", "means": "网络用语，指围观八卦、感兴趣的内幕消息。" },
+    { "term": "健身狂魔", "means": "Tony的人设，这里挑战中可能出现简易健身动作（如俯卧撑描述、空中深蹲等）。" }
+  ],
+  "safety_note": "黄暴档20/100（低）：所有惩罚仅限轻度搞笑/黑话/动作，可跳过替代；不含任何性化、侮辱或暴力内容；挑战内容不指向真人隐私，八卦可虚构。"
+}

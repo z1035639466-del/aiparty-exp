@@ -140,3 +140,6 @@ ds_B_div_v20_18_r3.json,deepseek-v4-flash,false,,8674,1870,0,18.297604,0.0017379
 ds_B_div_v20_20_r4.json,deepseek-v4-flash,false,,8628,2339,0,25.044660,0.001862840,invalid_json: Expecting value: line 1 column 1 (char 0)
 ds_B_div_v20_19_r5.json,deepseek-v4-flash,false,,8628,1744,0,18.311825,0.001696240,invalid_json: Expecting value: line 1 column 1 (char 0)
 ds_B_div_v20_20_r5.json,deepseek-v4-flash,false,,8628,2420,0,22.022302,0.001885520,invalid_json: Expecting value: line 1 column 1 (char 0)
+dsT_B_bid_v20_01.json,deepseek-v4-flash,true,high,8581,6958,5378,91.447494,0.003149580,success
+dsT_B_bid_v20_03.json,deepseek-v4-flash,true,high,8581,7489,6142,105.809494,0.003298260,success
+dsT_B_bid_v20_02.json,deepseek-v4-flash,true,high,8581,10035,8551,151.091497,0.004011140,success

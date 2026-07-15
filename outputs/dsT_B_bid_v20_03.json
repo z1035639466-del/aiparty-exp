@@ -1,0 +1,82 @@
+{
+  "game_title": "对齐颗粒度·团建特别篇",
+  "subtitle": "5分钟一轮，快节奏职场黑话对战",
+  "premise": "每轮一位「组长」发起挑战——短视频、黑话、健身、八卦、MBTI，任选一种。组员用自己最骚的方案回应，全场匿名投票选出最佳。是戏精也是健身狂，是八卦之王也是I人/E人，全看这一轮。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop":"命运转盘","to":"公共区","visibility":"全场公开","note":"配置挑战类型扇区：短视频、黑话、健身、八卦、MBTI"},
+    {"prop":"沙漏","to":"公共区","visibility":"全场公开","note":"每轮准备限时60秒"},
+    {"prop":"骰子","to":"公共区","visibility":"全场公开","note":"开局决定首任组长"},
+    {"prop":"匿名投票器","to":"全体","visibility":"自己看","note":"每人一个，用于提交方案和投票"},
+    {"prop":"记分板","to":"公共区","visibility":"全场公开","note":"记录累计分数"}
+  ],
+  "props_required": [],
+  "flow": [
+    "开局：每人公开自己的MBTI（通过匿名投票器提交并揭晓）",
+    "掷骰子确定首轮组长（点数最大者，平局则命运一掷）",
+    "每轮流程：组长转命运转盘确定挑战类型 → 沙漏倒计时60秒准备方案 → 每人用匿名投票器提交自由文本方案 → 同时揭晓 → 每人投一票选最佳方案（不能投自己） → 得票最高者+2分，组长+1分 → 记分板更新",
+    "按座位顺序逆时针轮换组长，共进行5轮",
+    "终局：总分最高者获胜，平局系统随机裁决"
+  ],
+  "rules": [
+    {
+      "flavor_name": "轮庄",
+      "mechanic": "回合推进",
+      "plain_rule": "每轮结束后，组长按座位逆时针顺序传给下一位玩家。",
+      "visibility": "全场公开",
+      "params": {"order":"round_robin"}
+    },
+    {
+      "flavor_name": "倒计时开始",
+      "mechanic": "限时",
+      "plain_rule": "组长宣布挑战后，沙漏倒计时60秒。时间到立即停止准备，进入方案提交。",
+      "visibility": "全场公开",
+      "params": {"seconds":60,"visible_countdown":true,"on_timeout":{"effect":"goto","goto":"方案提交"}}
+    },
+    {
+      "flavor_name": "秀出你自己",
+      "mechanic": "同时提交",
+      "plain_rule": "用你的匿名投票器输入你的挑战方案（可以是任何内容——一段话、一个动作描述、一个黑话词、一个健身动作名称等）。不想做可以输入“过”。提交后等所有人完成，一起揭晓。",
+      "visibility":"自己看",
+      "params": {"prompt":"输入你的挑战方案（自由文本）","input_kind":"free_text","timeout_s":0,"reveal":"simultaneous","scoring_ref":[]}
+    },
+    {
+      "flavor_name": "最佳投喂",
+      "mechanic": "同时提交",
+      "plain_rule": "所有方案揭晓后，每人用匿名投票器投票选出你认为本轮最好的方案。不能投给自己。投票后同步揭晓得票结果。",
+      "visibility":"自己看",
+      "params": {"prompt":"选出你心中最好的方案","input_kind":"options","options":"$派生:所有提交的方案","timeout_s":30,"reveal":"simultaneous","scoring_ref":["本轮最佳"]}
+    },
+    {
+      "flavor_name": "加鸡腿",
+      "mechanic": "加减分",
+      "plain_rule": "得票最高的玩家加2分。",
+      "visibility":"全场公开",
+      "params": {"who":"winner","delta":"+2","scoring_ref":"本轮最佳"}
+    },
+    {
+      "flavor_name": "组长津贴",
+      "mechanic": "加减分",
+      "plain_rule": "本轮组长加1分（与最佳得票者加分可叠加）。",
+      "visibility":"全场公开",
+      "params": {"who":"actor","delta":"+1","scoring_ref":"组长贡献"}
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      {"event":"本轮最佳","who":"得票最高者","effect":"+2"},
+      {"event":"组长贡献","who":"本轮组长","effect":"+1"}
+    ],
+    "win": "5轮结束后总分最高者获胜。若出现平局，按默认规则由系统随机裁决。",
+    "tiebreak": "系统随机裁决（风味名：命运一掷）"
+  },
+  "reveal_text": "MBTI的标签、黑话的颗粒、短视频的sao操作、健身房的嘶吼、八卦的雷达——今晚你们对得很齐。团建的最后一刻，每个人都是自己的项目负责人。",
+  "reveal_signature": "融合自 阿凯的MBTI × 琳琳的短视频挑战 × 老周的开会黑话 × 小雨的八卦雷达 × Tony的健身狂魔",
+  "flavor_glossary": [
+    {"term":"对齐","means":"职场黑话，指团队目标一致、信息同步。"},
+    {"term":"颗粒度","means":"细化的程度，这里借指游戏中的挑战细节。"},
+    {"term":"i人 / e人","means":"MBTI性格分类，内倾型/外倾型。"},
+    {"term":"组长津贴","means":"对组长额外加分，模拟项目负责人的绩效奖励。"}
+  ],
+  "safety_note": "黄暴档20/100（极低）：所有挑战均为自选动作，不强制任何人；方案可输入“过”表示放弃；无任何性/暴力/羞辱内容，符合职场团建场合。"
+}
