@@ -14,12 +14,12 @@ class PlanningTests(unittest.TestCase):
     def test_build_jobs_has_frozen_v20_thinking_and_diversity_batches(self):
         jobs = run_ds.build_jobs()
         self.assertEqual(28, len(jobs))
-        self.assertEqual("dsT_A_v20_01.json", jobs[0].filename)
-        self.assertEqual("dsT_D_v20_02.json", jobs[7].filename)
+        self.assertEqual("dsT_A_v21_01.json", jobs[0].filename)
+        self.assertEqual("dsT_D_v21_02.json", jobs[7].filename)
         self.assertTrue(all(job.thinking for job in jobs[:8]))
         self.assertTrue(all(job.reasoning_effort == "high" for job in jobs[:8]))
-        self.assertEqual("ds_B_div_v20_01.json", jobs[8].filename)
-        self.assertEqual("ds_B_div_v20_20.json", jobs[-1].filename)
+        self.assertEqual("ds_B_div_v21_01.json", jobs[8].filename)
+        self.assertEqual("ds_B_div_v21_20.json", jobs[-1].filename)
         self.assertFalse(any(job.thinking for job in jobs[8:]))
 
     def test_estimate_uses_utf8_upper_bound_and_full_maximum_output(self):
