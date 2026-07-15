@@ -1,0 +1,96 @@
+{
+  "game_title": "颗粒度对齐大会·闭环之夜",
+  "subtitle": "公司团建包间限定：i人e人贴标签 × 黑话急救 × 全网judge挑战轮",
+  "premise": "五轮「频道轮盘」决定今晚打哪张牌——健身怒练、短视频挑战、吃瓜谣言、黑话哨兵轮番上阵，全场共识判过关，攒分定胜负，谁先被抓到「没对齐」就先掉血。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "命运转盘", "to": "全体", "visibility": "全场公开", "note": "开局配置四扇区：健身频道/短视频频道/吃瓜频道/黑话频道，每轮转一次决定本轮频道" },
+    { "prop": "抽签筒", "to": "全体", "visibility": "自己看", "note": "转到的频道对应一个签筒，被点名者抽一支签得到本轮具体挑战内容" },
+    { "prop": "密语卡", "to": "每人各一张", "visibility": "自己看", "note": "开局私发，内容是一个隐藏的「MBTI人设任务」，如'这局你要表现得像INTJ一样对每个人的表现冷静打分'" },
+    { "prop": "沙漏", "to": "全体", "visibility": "全场公开", "note": "每轮挑战限时用" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "用于全场共识判定过关/失败，以及举报核实" },
+    { "prop": "记分板", "to": "全体", "visibility": "全场公开", "note": "记录五轮累计得分" }
+  ],
+  "props_required": [],
+  "flow": [
+    "阶段1 开局：每人领一张密语卡（隐藏MBTI人设任务，自己看不外传）；命运转盘配置四扇区（健身/短视频/吃瓜/黑话）；记分板归零",
+    "阶段2 主循环（共5轮，每轮）：转命运转盘定出本轮频道 → 点名一名玩家抽签筒抽出本轮具体挑战内容 → 沙漏开始限时 → 玩家当众完成挑战并作挑战宣告 → 全场用匿名投票器共识判定'过关'或'失败'，按结果计分",
+    "阶段3 黑话哨兵（常驻，贯穿全程）：每轮挑战宣告中若未提及「对齐/颗粒度/闭环」三词之一，任何人可当场举报，全场共识判定举报是否属实，属实则该轮当值玩家受罚(轻)",
+    "阶段4 健身频道特例（轮到健康频道时触发）：不设过关/失败，改用续押喊停——玩家从健身动作池连续抽取加练，可随时喊停保住已得分，抽到'抽筋卡'则清零",
+    "阶段5 吃瓜频道特例（轮到吃瓜频道时触发）：传递链接力——一句瓜料按座位顺序私密传递，每人只看得到上一棒写的内容，终局对比首尾差异，全场笑点回放",
+    "阶段6 终局：所有人依次公开声称自己密语卡上的MBTI人设任务完成了多少（允许夸大/撒谎），任何人可质疑，质疑触发密语卡内容对质核实并计分；核对完毕，记分板揭晓最终名次，平局按系统随机裁决"
+  ],
+  "rules": [
+    {
+      "flavor_name": "闭环警报",
+      "mechanic": "判定",
+      "plain_rule": "轮到你完成挑战时，你在宣告环节说的话里必须提到「对齐」「颗粒度」「闭环」这三个词里至少一个。如果你没说，任何人都可以当场举报，全场投票表决你到底说没说；如果表决认定你确实没说，你要受一次轻罚。",
+      "visibility": "全场公开",
+      "params": { "source": "consensus", "question": "他这轮挑战宣告里说了「对齐/颗粒度/闭环」中至少一个词吗？", "verdict_options": ["说了", "没说"], "on": { "说了": { "scoring_ref": [] }, "没说": { "scoring_ref": "漏词受罚" } } }
+    },
+    {
+      "flavor_name": "漏词受罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "被表决认定漏说黑话词的人，接受一次轻度惩罚（可跳过换成温和替代项，比如帮全场倒一轮水）。",
+      "visibility": "全场公开",
+      "params": { "who": "actor", "pool": "$gen.penalty_轻_内容池", "scoring_ref": "漏词受罚" }
+    },
+    {
+      "flavor_name": "频道过关认证",
+      "mechanic": "判定",
+      "plain_rule": "沙漏时间到，你要当场完成抽到的挑战内容（比如模仿某个短视频动作、完成一个健身动作组、讲清一件八卦）。时间到之后全场匿名投票，多数认为'过关'就算过关加分，认为'翻车'就算失败扣分。",
+      "visibility": "全场公开",
+      "params": { "source": "consensus", "question": "他这轮挑战算过关吗？", "verdict_options": ["过关", "翻车"], "on": { "过关": { "scoring_ref": "挑战过关加分" }, "翻车": { "scoring_ref": "挑战失败受罚" } } }
+    },
+    {
+      "flavor_name": "挑战限时",
+      "mechanic": "限时",
+      "plain_rule": "每轮挑战沙漏倒计时60秒，时间到了不管做没做完都要立刻停下进入投票认定环节。",
+      "visibility": "全场公开",
+      "params": { "seconds": 60, "visible_countdown": true, "on_timeout": { "effect": "goto", "goto": "频道过关认证" } }
+    },
+    {
+      "flavor_name": "i人e人贴标签",
+      "mechanic": "声明质疑",
+      "plain_rule": "终局环节，每人依次当众说出自己密语卡上写的隐藏任务完成了几次（可以夸大甚至撒谎）。任何人有权当场质疑'你真做到了吗'。一旦被质疑，就要打开密语卡内容核对，说谎的人受罚，冤枉了别人的人也要受罚。",
+      "visibility": "自己看",
+      "params": { "claim_prompt": "公开声称你的密语卡人设任务完成了几次（允许夸大）", "challengers": "others", "challenge_window_s": 30, "verify_source": "prop_reveal:密语卡", "verify_reveals": "prop_state", "on_liar": { "scoring_ref": ["撒谎受罚", "揭穿加分"] }, "on_false_accuse": { "scoring_ref": ["冤枉受罚", "被冤枉补偿"] } }
+    },
+    {
+      "flavor_name": "陪练贪心榜",
+      "mechanic": "续押喊停",
+      "plain_rule": "轮到健身频道时，被点名者从动作池里连续抽动作做（比如深蹲十个、平板支撑十秒），每做完一组可以选'继续加练拿更多分'或'见好就收保住已得分'，如果抽到'抽筋卡'就前功尽弃清零。",
+      "visibility": "全场公开",
+      "params": { "draw_from": "$gen.健身动作池", "continue_prompt": "继续加练还是见好就收？", "bust_when": "抽中抽筋卡", "cap": 6, "on_cap": "force_settle", "bank_on_stop": true, "scoring_ref": ["落袋为安", "爆掉清零"] }
+    },
+    {
+      "flavor_name": "小道消息传送带",
+      "mechanic": "传递链",
+      "plain_rule": "轮到吃瓜频道时，第一个人悄悄写一句瓜料传给下一位，下一位只能看到上一位写的内容，照着理解再往下传，传完一圈后系统展示首尾对比，看瓜料走样成什么样。",
+      "visibility": "自己看",
+      "params": { "content_from": "$gen.瓜料起始池", "order": "seat", "each_sees": "prev_only", "replay": "first_vs_last" }
+    },
+    {
+      "flavor_name": "频道轮盘揭晓",
+      "mechanic": "回合推进",
+      "plain_rule": "每轮开始前先转命运转盘定出本轮频道，再按现实座位顺序决定这一轮谁是被点名的当值玩家。",
+      "visibility": "全场公开",
+      "params": { "order": "round_robin" }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "挑战过关加分", "who": "actor", "delta": "+2" },
+      { "event": "挑战失败受罚", "who": "actor", "delta": "-2" },
+      { "event": "漏词受罚", "who": "actor", "delta": "-1" },
+      { "event": "撒谎受罚", "who": "actor", "delta": "-2" },
+      { "event": "揭穿加分", "who": "challenger", "delta": "+2" },
+      { "event": "冤枉受罚", "who": "challenger", "delta": "-1" },
+      { "event": "被冤枉补偿", "who": "actor", "delta": "+1" },
+      { "event": "落袋为安", "who": "actor", "delta": "bank" },
+      { "event": "爆掉清零", "who": "actor", "delta": "reset" }
+    ],
+    "win": "五轮主循环加终局环节结束后，记分板累计个人得分最高者获胜",
+    "tiebreak": "平局或并列由系统随机裁决（可穿'命运一掷'风味皮）"
+  }
+}
