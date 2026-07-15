@@ -1,14 +1,20 @@
-"""只读检查 outputs/ 中的游戏 JSON；本脚本不会修改任何待检查文件。
+"""检查 outputs/ 中的游戏 JSON；本脚本永不修改任何待检查件（被检件保持纯设计层）。
 
-check.py v2.0——分层闸：
+check.py v2.1——分层闸：
   · 硬闸 = 机械可判、误杀率零，拒件（沿用现有错误结构）。
-  · 软闸 = 启发式 warning，不拒件、不影响 pass 判定，但写进每份件头供裁判读取。
+  · 软闸 = 启发式 warning，不拒件、不影响 pass 判定，改写入旁车文件 <件名>.warnings.json 供裁判读取。
 权威源：docs/specs/design-layer-v2.0.md §1–§4 + spec-prop-library-v0-final.md（C5/C6/C7 正典回写）。
 白名单一律不变：mechanic 15 串 / visibility 3 原子 / props 14 件 / effect 形态 +N|-N|惩罚(轻|中|重)。
+
+v2.1 两条增改（正典同规格，AiParty validator 侧同步移植）：
+  ① expr 可解析硬闸：判定 source=expr 的 expr 须为可解析表达式且引用 state 键，散文自由文本拒（活证 dsT_A_v20_01）。
+  ② dead_prop 口径修正：读道具正典表「引用类型」列，免引用道具（沙漏/记分板/匿名投票器/公共看板）不记 dead_prop；
+     check 读表不硬编码。软闸输出改旁车文件 <件名>.warnings.json，被检件保持纯设计层。
 """
 
 from __future__ import annotations
 
+import ast
 import json
 import re
 from collections import namedtuple
@@ -22,7 +28,7 @@ WHITELIST_PATH = ROOT / "whitelist.json"
 EXCLUSIONS_PATH = ROOT / "check_exclusions.json"
 
 # 本校验器实现的规范版本——供运行链路版本直接核验。
-SPEC_VERSION = "v2.0"
+SPEC_VERSION = "v2.1"
 SPEC_SOURCES = (
     "docs/specs/DM-skill-v2.0.md",
     "docs/specs/design-layer-v2.0.md",
@@ -67,6 +73,23 @@ MACHINE_SLOT_KEYS = {
 WIN_SCORE_KEYWORDS = ("分", "总分", "最高", "最低", "得分", "名次", "积分")
 # C4 散文↔参数数字一致性抽查涉及的参数键
 PROSE_NUMBER_KEYS = ("seconds", "timeout_s", "cap", "delta", "challenge_window_s")
+
+# —— v2.1 ① 判定 source=expr 的 expr 硬闸 ——
+# state:<键> / prop:<名> / prop_reveal:<名> 机器槽引用形态（用于折成占位标识符后解析）
+EXPR_STATE_REF_RE = re.compile(r"state:[^\s()><=!&|+\-*/%,]+")
+EXPR_PROP_REF_RE = re.compile(r"(?:prop|prop_reveal):[^\s()><=!&|+\-*/%,]+")
+# 可解析判定表达式只许比较/布尔/算术/一元/常量/标识符结构——散文自由文本会解析失败或含非法结点
+_ALLOWED_EXPR_NODES = (
+    ast.Expression, ast.BoolOp, ast.BinOp, ast.UnaryOp, ast.Compare,
+    ast.Name, ast.Load, ast.Constant,
+    ast.And, ast.Or, ast.Not,
+    ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE,
+    ast.Add, ast.Sub, ast.Mult, ast.Div, ast.Mod, ast.FloorDiv, ast.Pow,
+    ast.USub, ast.UAdd,
+)
+
+# —— v2.1 ② 软闸旁车文件 ——
+WARNINGS_SIDECAR_SUFFIX = ".warnings.json"
 
 CheckResult = namedtuple("CheckResult", ["errors", "warnings"])
 
@@ -178,10 +201,19 @@ for _tier in PENALTY_MECHANICS:
 
 
 def load_whitelist() -> dict[str, set[str]]:
-    """读取白名单；只读取配置文件，不写入任何文件。"""
+    """读取白名单；只读取配置文件，不写入任何文件。
+
+    v2.1 ②：另从道具正典表「引用类型」列（prop_reference_types）派生免引用道具集
+    （沙漏/记分板/匿名投票器/公共看板等——读表不硬编码），供 dead_prop 软闸豁免。
+    """
     with WHITELIST_PATH.open("r", encoding="utf-8") as file:
         data = json.load(file)
-    return {key: set(data[key]) for key in ("props", "mechanics", "visibility")}
+    result: dict[str, set[str]] = {key: set(data[key]) for key in ("props", "mechanics", "visibility")}
+    ref_types = data.get("prop_reference_types", {})
+    result["reference_exempt"] = {
+        name for name, kind in ref_types.items() if kind == "免引用"
+    } if isinstance(ref_types, dict) else set()
+    return result
 
 
 def whitelist_declared_version() -> str | None:
@@ -314,6 +346,30 @@ def as_number_token(value: Any) -> str | None:
     return None
 
 
+def expr_gate_reason(expr: Any) -> str | None:
+    """v2.1 ①：判定 source=expr 的 expr 硬闸。返回 None=合法；否则返回错因短语。
+
+    expr 须为可解析表达式且引用 state 键：散文自由文本（无 state 引用 / 解析失败 / 含非法结点）一律拒。
+    `$gen.`/`$派生:` 填装点放行（与全脚本口径一致，交由内容层填实后再校验）。
+    """
+    if is_gen(expr):
+        return None
+    if not is_nonempty(expr):
+        return "缺失或为空"
+    if not EXPR_STATE_REF_RE.search(expr):
+        return "未引用任何 state 键（须含 state:<键>，散文自由文本拒）"
+    # 把 state:/prop: 引用折成占位标识符，其余结构须能解析为一个表达式
+    normalized = EXPR_STATE_REF_RE.sub("_s", expr)
+    normalized = EXPR_PROP_REF_RE.sub("_p", normalized)
+    try:
+        tree = ast.parse(normalized.strip(), mode="eval")
+    except SyntaxError:
+        return "非可解析表达式（疑似散文自由文本）"
+    if not all(isinstance(node, _ALLOWED_EXPR_NODES) for node in ast.walk(tree)):
+        return "含非法表达式结构（仅许比较/布尔/算术/常量/state 引用）"
+    return None
+
+
 # ----------------------------------------------------------------------------
 # §1 params 结构校验（硬闸）
 # ----------------------------------------------------------------------------
@@ -372,8 +428,10 @@ def _check_conditional_required(mechanic: str, params: dict, index: int, errors:
         source = params.get("source")
         if source == "consensus" and not params.get("verdict_options"):
             errors.append(f"{tag}.verdict_options 缺失（source=consensus 时必填）")
-        elif source == "expr" and not is_nonempty(params.get("expr")):
-            errors.append(f"{tag}.expr 缺失（source=expr 时必填）")
+        elif source == "expr":
+            reason = expr_gate_reason(params.get("expr"))
+            if reason is not None:
+                errors.append(f"{tag}.expr {reason}（source=expr 须为可解析表达式且引用 state 键）")
         elif source == "ai" and params.get("ai_overridable") is not True:
             errors.append(f"{tag}.ai_overridable 必须为 true（source=ai 时人类共识永远最高）")
     elif mechanic == "声明质疑":
@@ -564,7 +622,12 @@ def check_document(data: Any, whitelist: dict[str, set[str]]) -> CheckResult:
             errors.append(f"道具引用 {kind}:{name} 未在 props_dealt 实发（空引用，C5）")
         else:
             referenced_props.add(name)
+    # v2.1 ②：免引用道具（正典表「引用类型」列=免引用，如沙漏/记分板/匿名投票器/公共看板）
+    # 靠机制结构性消费、不经 prop:/prop_reveal: 引用，实发未引用不算死道具，读表豁免、不硬编码。
+    reference_exempt = whitelist.get("reference_exempt", set())
     for prop in sorted(dealt_props - referenced_props):
+        if prop in reference_exempt:
+            continue
         warnings.append(f"dead_prop:{prop}")
 
     # —— §2 反向死账目（软闸） ——
@@ -699,6 +762,32 @@ def check_file(path: Path, whitelist: dict[str, set[str]]) -> CheckResult:
     return check_document(data, whitelist)
 
 
+def warnings_sidecar_path(path: Path) -> Path:
+    """被检件 <件名>.json → 旁车软闸件 <件名>.warnings.json（同目录）。"""
+    return path.with_name(path.stem + WARNINGS_SIDECAR_SUFFIX)
+
+
+def write_warnings_sidecar(path: Path, warnings: list[str]) -> Path | None:
+    """v2.1 ②：软闸写入旁车文件，被检件保持纯设计层（永不回写件内）。
+
+    有软闸→写/覆盖旁车件并返回其路径；无软闸→清掉可能存在的旧旁车件并返回 None。
+    """
+    sidecar = warnings_sidecar_path(path)
+    if not warnings:
+        if sidecar.exists():
+            sidecar.unlink()
+        return None
+    payload = {
+        "file": path.name,
+        "spec_version": SPEC_VERSION,
+        "warnings": list(warnings),
+    }
+    with sidecar.open("w", encoding="utf-8") as file:
+        json.dump(payload, file, ensure_ascii=False, indent=2)
+        file.write("\n")
+    return sidecar
+
+
 def main() -> int:
     try:
         whitelist = load_whitelist()
@@ -713,7 +802,11 @@ def main() -> int:
     if wl_version is not None and wl_version != SPEC_VERSION:
         print(f"⚠ 版本漂移: 白名单 schema_version={wl_version!r} ≠ 校验器 SPEC_VERSION={SPEC_VERSION!r}")
 
-    all_files = sorted(OUTPUTS_DIR.glob("*.json")) if OUTPUTS_DIR.is_dir() else []
+    # 旁车软闸件本身也是 *.json，扫描时先排除，免被当设计层件回检。
+    all_files = sorted(
+        path for path in OUTPUTS_DIR.glob("*.json")
+        if not path.name.endswith(WARNINGS_SIDECAR_SUFFIX)
+    ) if OUTPUTS_DIR.is_dir() else []
     files = [path for path in all_files if path.name not in exclusions]
     for path in all_files:
         if path.name in exclusions:
@@ -726,9 +819,10 @@ def main() -> int:
             print(f"挂 {path.name}: {'；'.join(result.errors)}")
         else:
             print(f"过 {path.name}: 检查通过")
-        # 软闸 warning 写进件头：单列一节，不影响 pass 判定，供裁判 v0.3 读取
-        if result.warnings:
-            print(f"  ⚠ 软闸(件头) {path.name}: {'；'.join(result.warnings)}")
+        # 软闸 warning 改写入旁车文件 <件名>.warnings.json，不回写件内、不影响 pass 判定，供裁判 v0.3 读取
+        sidecar = write_warnings_sidecar(path, list(result.warnings))
+        if sidecar is not None:
+            print(f"  ⚠ 软闸 {path.name}: {len(result.warnings)} 条 → 旁车 {sidecar.name}")
     return 1 if failed else 0
 
 
