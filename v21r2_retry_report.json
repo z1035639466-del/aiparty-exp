@@ -1,0 +1,2052 @@
+{
+  "header": {
+    "target_conversation": "DM-skill v2.1.1 验证批 r2",
+    "repository": "aiparty-exp",
+    "data_head": "bec32f4aea26415905e2f47bb3b755e651b87586"
+  },
+  "versions": {
+    "skill": {
+      "version": "v2.1.1",
+      "normalized_sha256": "90d7d323d8ec3fe53b1fa35688ce842a54a1cdf15ee7e82ec6d43a35e2b5dd13"
+    },
+    "check": {
+      "SPEC_VERSION": "v2.1.1",
+      "normalized_sha256": "f8a008845cef039cc7f5d8d97ab61d5426441544c01979ea24d71dc316a173d7"
+    },
+    "judge": {
+      "version": "v0.3",
+      "normalized_sha256": "df36b2c8922c6692ce47bbc3602254cb3703776589c1cc125eadaf997db6ec25"
+    },
+    "whitelist": {
+      "schema_version": "v2.1.1",
+      "normalized_sha256": "f73fda57d776d2f56f116fbeb64170e0e496abc1d00cb00c3265b260a57bcb6b"
+    },
+    "golden": {
+      "A": "aa495da9ce57a05625cb85bf2c401d44fc9e6a3807904850e0bcbf92869d9721",
+      "B": "cb53686e950a55cef59a72373a227965d9e60e35a9df4ba4af38177983ccdd57",
+      "C": "a3319c50a50cdc56ee7402c799d1f34334a9c0ae4a2ee9dd0556222c15ed6200",
+      "D": "5b1e8f1337cb52e0983dfac89245928b099ffa0e9e66aa24b2b14e2d30fe5be8"
+    }
+  },
+  "population": {
+    "main_initial": 24,
+    "b20_initial": 20,
+    "main_denominator": 44,
+    "probe": 2,
+    "retry_jobs": 29,
+    "retry_attempts_present": 34
+  },
+  "pass": [
+    {
+      "model": "Sonnet 5",
+      "key": "sonnet",
+      "pass_at_1": {
+        "passed": 0,
+        "total": 8,
+        "rate": 0.0
+      },
+      "verdict_retry": {
+        "jobs": 7,
+        "attempts_present": 7,
+        "r1_structure_pass": 6,
+        "r2_additional_structure_pass": 0,
+        "reviewed": 6,
+        "judge_pass": 0,
+        "exhausted_invalid": 1
+      },
+      "structure_retry": {
+        "jobs": 1,
+        "attempts_present": 1,
+        "r1_structure_pass": 1,
+        "r2_additional_structure_pass": 0,
+        "reviewed": 1,
+        "judge_pass": 0,
+        "exhausted_invalid": 0
+      },
+      "pass_at_2": {
+        "passed": 0,
+        "total": 8,
+        "rate": 0.0
+      }
+    },
+    {
+      "model": "Haiku 4.5",
+      "key": "haiku",
+      "pass_at_1": {
+        "passed": 0,
+        "total": 8,
+        "rate": 0.0
+      },
+      "verdict_retry": {
+        "jobs": 2,
+        "attempts_present": 2,
+        "r1_structure_pass": 1,
+        "r2_additional_structure_pass": 0,
+        "reviewed": 1,
+        "judge_pass": 1,
+        "exhausted_invalid": 1
+      },
+      "structure_retry": {
+        "jobs": 6,
+        "attempts_present": 6,
+        "r1_structure_pass": 1,
+        "r2_additional_structure_pass": 0,
+        "reviewed": 1,
+        "judge_pass": 0,
+        "exhausted_invalid": 5
+      },
+      "pass_at_2": {
+        "passed": 1,
+        "total": 8,
+        "rate": 0.125
+      }
+    },
+    {
+      "model": "dsT",
+      "key": "dsT",
+      "pass_at_1": {
+        "passed": 0,
+        "total": 8,
+        "rate": 0.0
+      },
+      "verdict_retry": {
+        "jobs": 0,
+        "attempts_present": 0,
+        "r1_structure_pass": 0,
+        "r2_additional_structure_pass": 0,
+        "reviewed": 0,
+        "judge_pass": 0,
+        "exhausted_invalid": 0
+      },
+      "structure_retry": {
+        "jobs": 8,
+        "attempts_present": 8,
+        "r1_structure_pass": 1,
+        "r2_additional_structure_pass": 0,
+        "reviewed": 1,
+        "judge_pass": 0,
+        "exhausted_invalid": 7
+      },
+      "pass_at_2": {
+        "passed": 0,
+        "total": 8,
+        "rate": 0.0
+      }
+    },
+    {
+      "model": "Sonnet 5 Low (B×20)",
+      "key": "sonL",
+      "pass_at_1": {
+        "passed": 0,
+        "total": 20,
+        "rate": 0.0
+      },
+      "verdict_retry": {
+        "jobs": 0,
+        "attempts_present": 0,
+        "r1_structure_pass": 0,
+        "r2_additional_structure_pass": 0,
+        "reviewed": 0,
+        "judge_pass": 0,
+        "exhausted_invalid": 0
+      },
+      "structure_retry": {
+        "jobs": 5,
+        "attempts_present": 9,
+        "r1_structure_pass": 1,
+        "r2_additional_structure_pass": 0,
+        "reviewed": 1,
+        "judge_pass": 0,
+        "exhausted_invalid": 4
+      },
+      "pass_at_2": {
+        "passed": 0,
+        "total": 20,
+        "rate": 0.0
+      }
+    }
+  ],
+  "structure": [
+    {
+      "model": "Sonnet 5",
+      "key": "sonnet",
+      "first_pass": {
+        "passed": 7,
+        "total": 8,
+        "rate": 0.875
+      },
+      "after_structure_repair": {
+        "passed": 8,
+        "total": 8,
+        "rate": 1.0
+      },
+      "terminal_artifact": {
+        "passed": 7,
+        "total": 8,
+        "rate": 0.875
+      },
+      "warning_count_first_pass": 8,
+      "warnings_per_design": 1.0
+    },
+    {
+      "model": "Haiku 4.5",
+      "key": "haiku",
+      "first_pass": {
+        "passed": 2,
+        "total": 8,
+        "rate": 0.25
+      },
+      "after_structure_repair": {
+        "passed": 3,
+        "total": 8,
+        "rate": 0.375
+      },
+      "terminal_artifact": {
+        "passed": 2,
+        "total": 8,
+        "rate": 0.25
+      },
+      "warning_count_first_pass": 5,
+      "warnings_per_design": 0.625
+    },
+    {
+      "model": "dsT",
+      "key": "dsT",
+      "first_pass": {
+        "passed": 0,
+        "total": 8,
+        "rate": 0.0
+      },
+      "after_structure_repair": {
+        "passed": 1,
+        "total": 8,
+        "rate": 0.125
+      },
+      "terminal_artifact": {
+        "passed": 1,
+        "total": 8,
+        "rate": 0.125
+      },
+      "warning_count_first_pass": 14,
+      "warnings_per_design": 1.75
+    },
+    {
+      "model": "Sonnet 5 Low (B×20)",
+      "key": "sonL",
+      "first_pass": {
+        "passed": 15,
+        "total": 20,
+        "rate": 0.75
+      },
+      "after_structure_repair": {
+        "passed": 16,
+        "total": 20,
+        "rate": 0.8
+      },
+      "terminal_artifact": {
+        "passed": 16,
+        "total": 20,
+        "rate": 0.8
+      },
+      "warning_count_first_pass": 24,
+      "warnings_per_design": 1.2
+    }
+  ],
+  "textbook_effect": [
+    {
+      "model": "Sonnet 5",
+      "key": "sonnet",
+      "v20": {
+        "passed": 5,
+        "total": 8,
+        "rate": 0.625
+      },
+      "r1_v21": {
+        "passed": 0,
+        "total": 8,
+        "rate": 0.0
+      },
+      "r2_v211": {
+        "passed": 7,
+        "total": 8,
+        "rate": 0.875
+      },
+      "r2_minus_r1_percentage_points": 87.5,
+      "only_variable": "教材 v2.1→v2.1.1"
+    },
+    {
+      "model": "Haiku 4.5",
+      "key": "haiku",
+      "v20": {
+        "passed": 2,
+        "total": 8,
+        "rate": 0.25
+      },
+      "r1_v21": {
+        "passed": 0,
+        "total": 8,
+        "rate": 0.0
+      },
+      "r2_v211": {
+        "passed": 2,
+        "total": 8,
+        "rate": 0.25
+      },
+      "r2_minus_r1_percentage_points": 25.0,
+      "only_variable": "教材 v2.1→v2.1.1"
+    },
+    {
+      "model": "dsT",
+      "key": "dsT",
+      "v20": {
+        "passed": 2,
+        "total": 8,
+        "rate": 0.25
+      },
+      "r1_v21": {
+        "passed": 0,
+        "total": 8,
+        "rate": 0.0
+      },
+      "r2_v211": {
+        "passed": 0,
+        "total": 8,
+        "rate": 0.0
+      },
+      "r2_minus_r1_percentage_points": 0.0,
+      "only_variable": "教材 v2.1→v2.1.1"
+    },
+    {
+      "model": "Sonnet 5 Low (B×20)",
+      "key": "sonL",
+      "v20": null,
+      "r1_v21": {
+        "passed": 0,
+        "total": 20,
+        "rate": 0.0
+      },
+      "r2_v211": {
+        "passed": 15,
+        "total": 20,
+        "rate": 0.75
+      },
+      "r2_minus_r1_percentage_points": 75.0,
+      "only_variable": "教材 v2.1→v2.1.1"
+    }
+  ],
+  "review_metrics": {
+    "first_pass": {
+      "sonnet": {
+        "reviews": 7,
+        "judge_pass": 0,
+        "judge_break": 7,
+        "causes": {
+          "死规则": 0,
+          "坍缩": 0,
+          "真空": 2,
+          "伪猜": 1,
+          "占优": 2,
+          "终局": 2,
+          "结算": 5,
+          "落点": 7,
+          "融合": 0
+        },
+        "doubts": {
+          "终局": 0,
+          "结算": 2,
+          "落点": 0,
+          "融合": 0
+        },
+        "cause_labels_total": 19,
+        "no_channel": {
+          "passed": 7,
+          "total": 7,
+          "rate": 1.0
+        },
+        "overreach": {
+          "passed": 7,
+          "total": 7,
+          "rate": 1.0
+        },
+        "item10_hard_veto": 0,
+        "inflation": {
+          "original_y": 53,
+          "effective_x": 29,
+          "x_per_review": 4.142857,
+          "x_over_y": 0.54717
+        },
+        "files": [
+          "sonnet_A_v21r2_01.json",
+          "sonnet_A_v21r2_02.json",
+          "sonnet_B_v21r2_01.json",
+          "sonnet_C_v21r2_01.json",
+          "sonnet_C_v21r2_02.json",
+          "sonnet_D_v21r2_01.json",
+          "sonnet_D_v21r2_02.json"
+        ]
+      },
+      "haiku": {
+        "reviews": 2,
+        "judge_pass": 0,
+        "judge_break": 2,
+        "causes": {
+          "死规则": 1,
+          "坍缩": 1,
+          "真空": 1,
+          "伪猜": 0,
+          "占优": 1,
+          "终局": 0,
+          "结算": 2,
+          "落点": 2,
+          "融合": 0
+        },
+        "doubts": {
+          "终局": 0,
+          "结算": 0,
+          "落点": 0,
+          "融合": 0
+        },
+        "cause_labels_total": 8,
+        "no_channel": {
+          "passed": 2,
+          "total": 2,
+          "rate": 1.0
+        },
+        "overreach": {
+          "passed": 2,
+          "total": 2,
+          "rate": 1.0
+        },
+        "item10_hard_veto": 0,
+        "inflation": {
+          "original_y": 11,
+          "effective_x": 8,
+          "x_per_review": 4.0,
+          "x_over_y": 0.727273
+        },
+        "files": [
+          "haiku_A_v21r2_01.json",
+          "haiku_B_v21r2_02.json"
+        ]
+      },
+      "dsT": {
+        "reviews": 0,
+        "judge_pass": 0,
+        "judge_break": 0,
+        "causes": {},
+        "doubts": {},
+        "cause_labels_total": 0,
+        "no_channel": {
+          "passed": 0,
+          "total": 0,
+          "rate": null
+        },
+        "overreach": {
+          "passed": 0,
+          "total": 0,
+          "rate": null
+        },
+        "item10_hard_veto": 0,
+        "inflation": {
+          "original_y": 0,
+          "effective_x": 0,
+          "x_per_review": null,
+          "x_over_y": null
+        },
+        "files": []
+      },
+      "sonL": {
+        "reviews": 15,
+        "judge_pass": 0,
+        "judge_break": 15,
+        "causes": {
+          "死规则": 0,
+          "坍缩": 0,
+          "真空": 8,
+          "伪猜": 4,
+          "占优": 4,
+          "终局": 0,
+          "结算": 11,
+          "落点": 12,
+          "融合": 0
+        },
+        "doubts": {
+          "终局": 0,
+          "结算": 2,
+          "落点": 0,
+          "融合": 1
+        },
+        "cause_labels_total": 39,
+        "no_channel": {
+          "passed": 12,
+          "total": 15,
+          "rate": 0.8
+        },
+        "overreach": {
+          "passed": 11,
+          "total": 15,
+          "rate": 0.733333
+        },
+        "item10_hard_veto": 0,
+        "inflation": {
+          "original_y": 124,
+          "effective_x": 76,
+          "x_per_review": 5.066667,
+          "x_over_y": 0.612903
+        },
+        "files": [
+          "sonL_B_div_v21r2_01.json",
+          "sonL_B_div_v21r2_02.json",
+          "sonL_B_div_v21r2_03.json",
+          "sonL_B_div_v21r2_04.json",
+          "sonL_B_div_v21r2_06.json",
+          "sonL_B_div_v21r2_07.json",
+          "sonL_B_div_v21r2_08.json",
+          "sonL_B_div_v21r2_09.json",
+          "sonL_B_div_v21r2_10.json",
+          "sonL_B_div_v21r2_11.json",
+          "sonL_B_div_v21r2_14.json",
+          "sonL_B_div_v21r2_17.json",
+          "sonL_B_div_v21r2_18.json",
+          "sonL_B_div_v21r2_19.json",
+          "sonL_B_div_v21r2_20.json"
+        ]
+      }
+    },
+    "retry": {
+      "sonnet": {
+        "reviews": 7,
+        "judge_pass": 0,
+        "judge_break": 7,
+        "causes": {
+          "死规则": 0,
+          "坍缩": 1,
+          "真空": 2,
+          "伪猜": 0,
+          "占优": 2,
+          "终局": 0,
+          "结算": 3,
+          "落点": 3,
+          "融合": 0
+        },
+        "doubts": {
+          "终局": 0,
+          "结算": 0,
+          "落点": 0,
+          "融合": 0
+        },
+        "cause_labels_total": 11,
+        "no_channel": {
+          "passed": 3,
+          "total": 7,
+          "rate": 0.428571
+        },
+        "overreach": {
+          "passed": 3,
+          "total": 7,
+          "rate": 0.428571
+        },
+        "item10_hard_veto": 0,
+        "inflation": {
+          "original_y": 67,
+          "effective_x": 30,
+          "x_per_review": 4.285714,
+          "x_over_y": 0.447761
+        },
+        "files": [
+          "sonnet_A_v21r2_01_r1.json",
+          "sonnet_B_v21r2_01_r1.json",
+          "sonnet_B_v21r2_02_r1.json",
+          "sonnet_C_v21r2_01_r1.json",
+          "sonnet_C_v21r2_02_r1.json",
+          "sonnet_D_v21r2_01_r1.json",
+          "sonnet_D_v21r2_02_r1.json"
+        ]
+      },
+      "haiku": {
+        "reviews": 2,
+        "judge_pass": 1,
+        "judge_break": 1,
+        "causes": {
+          "死规则": 0,
+          "坍缩": 0,
+          "真空": 0,
+          "伪猜": 0,
+          "占优": 0,
+          "终局": 0,
+          "结算": 1,
+          "落点": 1,
+          "融合": 0
+        },
+        "doubts": {
+          "终局": 0,
+          "结算": 0,
+          "落点": 0,
+          "融合": 1
+        },
+        "cause_labels_total": 2,
+        "no_channel": {
+          "passed": 1,
+          "total": 2,
+          "rate": 0.5
+        },
+        "overreach": {
+          "passed": 0,
+          "total": 2,
+          "rate": 0.0
+        },
+        "item10_hard_veto": 0,
+        "inflation": {
+          "original_y": 9,
+          "effective_x": 7,
+          "x_per_review": 3.5,
+          "x_over_y": 0.777778
+        },
+        "files": [
+          "haiku_A_v21r2_01_r1.json",
+          "haiku_D_v21r2_01_r1.json"
+        ]
+      },
+      "dsT": {
+        "reviews": 1,
+        "judge_pass": 0,
+        "judge_break": 1,
+        "causes": {
+          "死规则": 0,
+          "坍缩": 0,
+          "真空": 1,
+          "伪猜": 1,
+          "占优": 0,
+          "终局": 0,
+          "结算": 1,
+          "落点": 1,
+          "融合": 0
+        },
+        "doubts": {
+          "终局": 0,
+          "结算": 0,
+          "落点": 0,
+          "融合": 0
+        },
+        "cause_labels_total": 4,
+        "no_channel": {
+          "passed": 1,
+          "total": 1,
+          "rate": 1.0
+        },
+        "overreach": {
+          "passed": 1,
+          "total": 1,
+          "rate": 1.0
+        },
+        "item10_hard_veto": 0,
+        "inflation": {
+          "original_y": 2,
+          "effective_x": 2,
+          "x_per_review": 2.0,
+          "x_over_y": 1.0
+        },
+        "files": [
+          "dsT_C_v21r2_01_r1.json"
+        ]
+      },
+      "sonL": {
+        "reviews": 1,
+        "judge_pass": 0,
+        "judge_break": 1,
+        "causes": {
+          "死规则": 0,
+          "坍缩": 0,
+          "真空": 1,
+          "伪猜": 0,
+          "占优": 1,
+          "终局": 0,
+          "结算": 1,
+          "落点": 1,
+          "融合": 0
+        },
+        "doubts": {
+          "终局": 0,
+          "结算": 0,
+          "落点": 0,
+          "融合": 0
+        },
+        "cause_labels_total": 4,
+        "no_channel": {
+          "passed": 1,
+          "total": 1,
+          "rate": 1.0
+        },
+        "overreach": {
+          "passed": 1,
+          "total": 1,
+          "rate": 1.0
+        },
+        "item10_hard_veto": 0,
+        "inflation": {
+          "original_y": 7,
+          "effective_x": 6,
+          "x_per_review": 6.0,
+          "x_over_y": 0.857143
+        },
+        "files": [
+          "sonL_B_div_v21r2_13_r1.json"
+        ]
+      }
+    },
+    "terminal": {
+      "sonnet": {
+        "reviews": 7,
+        "judge_pass": 0,
+        "judge_break": 7,
+        "causes": {
+          "死规则": 0,
+          "坍缩": 1,
+          "真空": 2,
+          "伪猜": 0,
+          "占优": 2,
+          "终局": 0,
+          "结算": 3,
+          "落点": 3,
+          "融合": 0
+        },
+        "doubts": {
+          "终局": 0,
+          "结算": 0,
+          "落点": 0,
+          "融合": 0
+        },
+        "cause_labels_total": 11,
+        "no_channel": {
+          "passed": 3,
+          "total": 7,
+          "rate": 0.428571
+        },
+        "overreach": {
+          "passed": 3,
+          "total": 7,
+          "rate": 0.428571
+        },
+        "item10_hard_veto": 0,
+        "inflation": {
+          "original_y": 67,
+          "effective_x": 30,
+          "x_per_review": 4.285714,
+          "x_over_y": 0.447761
+        },
+        "files": [
+          "sonnet_A_v21r2_01_r1.json",
+          "sonnet_B_v21r2_01_r1.json",
+          "sonnet_B_v21r2_02_r1.json",
+          "sonnet_C_v21r2_01_r1.json",
+          "sonnet_C_v21r2_02_r1.json",
+          "sonnet_D_v21r2_01_r1.json",
+          "sonnet_D_v21r2_02_r1.json"
+        ]
+      },
+      "haiku": {
+        "reviews": 2,
+        "judge_pass": 1,
+        "judge_break": 1,
+        "causes": {
+          "死规则": 0,
+          "坍缩": 0,
+          "真空": 0,
+          "伪猜": 0,
+          "占优": 0,
+          "终局": 0,
+          "结算": 1,
+          "落点": 1,
+          "融合": 0
+        },
+        "doubts": {
+          "终局": 0,
+          "结算": 0,
+          "落点": 0,
+          "融合": 1
+        },
+        "cause_labels_total": 2,
+        "no_channel": {
+          "passed": 1,
+          "total": 2,
+          "rate": 0.5
+        },
+        "overreach": {
+          "passed": 0,
+          "total": 2,
+          "rate": 0.0
+        },
+        "item10_hard_veto": 0,
+        "inflation": {
+          "original_y": 9,
+          "effective_x": 7,
+          "x_per_review": 3.5,
+          "x_over_y": 0.777778
+        },
+        "files": [
+          "haiku_A_v21r2_01_r1.json",
+          "haiku_D_v21r2_01_r1.json"
+        ]
+      },
+      "dsT": {
+        "reviews": 1,
+        "judge_pass": 0,
+        "judge_break": 1,
+        "causes": {
+          "死规则": 0,
+          "坍缩": 0,
+          "真空": 1,
+          "伪猜": 1,
+          "占优": 0,
+          "终局": 0,
+          "结算": 1,
+          "落点": 1,
+          "融合": 0
+        },
+        "doubts": {
+          "终局": 0,
+          "结算": 0,
+          "落点": 0,
+          "融合": 0
+        },
+        "cause_labels_total": 4,
+        "no_channel": {
+          "passed": 1,
+          "total": 1,
+          "rate": 1.0
+        },
+        "overreach": {
+          "passed": 1,
+          "total": 1,
+          "rate": 1.0
+        },
+        "item10_hard_veto": 0,
+        "inflation": {
+          "original_y": 2,
+          "effective_x": 2,
+          "x_per_review": 2.0,
+          "x_over_y": 1.0
+        },
+        "files": [
+          "dsT_C_v21r2_01_r1.json"
+        ]
+      },
+      "sonL": {
+        "reviews": 16,
+        "judge_pass": 0,
+        "judge_break": 16,
+        "causes": {
+          "死规则": 0,
+          "坍缩": 0,
+          "真空": 9,
+          "伪猜": 4,
+          "占优": 5,
+          "终局": 0,
+          "结算": 12,
+          "落点": 13,
+          "融合": 0
+        },
+        "doubts": {
+          "终局": 0,
+          "结算": 2,
+          "落点": 0,
+          "融合": 1
+        },
+        "cause_labels_total": 43,
+        "no_channel": {
+          "passed": 13,
+          "total": 16,
+          "rate": 0.8125
+        },
+        "overreach": {
+          "passed": 12,
+          "total": 16,
+          "rate": 0.75
+        },
+        "item10_hard_veto": 0,
+        "inflation": {
+          "original_y": 131,
+          "effective_x": 82,
+          "x_per_review": 5.125,
+          "x_over_y": 0.625954
+        },
+        "files": [
+          "sonL_B_div_v21r2_01.json",
+          "sonL_B_div_v21r2_02.json",
+          "sonL_B_div_v21r2_03.json",
+          "sonL_B_div_v21r2_04.json",
+          "sonL_B_div_v21r2_06.json",
+          "sonL_B_div_v21r2_07.json",
+          "sonL_B_div_v21r2_08.json",
+          "sonL_B_div_v21r2_09.json",
+          "sonL_B_div_v21r2_10.json",
+          "sonL_B_div_v21r2_11.json",
+          "sonL_B_div_v21r2_13_r1.json",
+          "sonL_B_div_v21r2_14.json",
+          "sonL_B_div_v21r2_17.json",
+          "sonL_B_div_v21r2_18.json",
+          "sonL_B_div_v21r2_19.json",
+          "sonL_B_div_v21r2_20.json"
+        ]
+      }
+    }
+  },
+  "prop_health_first_pass": {
+    "sonnet": {
+      "designs": 8,
+      "json_parsed": 8,
+      "canonical_coverage": 11,
+      "literal_coverage": 11,
+      "canonical_occurrences": 44,
+      "literal_occurrences": 44,
+      "top4": [
+        {
+          "prop": "记分板",
+          "count": 8
+        },
+        {
+          "prop": "密语卡",
+          "count": 8
+        },
+        {
+          "prop": "匿名投票器",
+          "count": 7
+        },
+        {
+          "prop": "沙漏",
+          "count": 6
+        }
+      ],
+      "top4_count": 29,
+      "top4_share": 0.659091,
+      "top4_baseline": 0.787,
+      "outside_library_unique": 0,
+      "outside_library_occurrences": 0,
+      "outside_library": {},
+      "referencable_occurrences": 21,
+      "true_dead_prop": 7,
+      "true_dead_prop_rate": 0.333333,
+      "dead_over_canonical": 0.159091,
+      "dead_over_literal": 0.159091,
+      "dead_prop_by_name": {
+        "命运转盘": 1,
+        "定时炸弹": 3,
+        "盲盒": 1,
+        "密语卡": 2
+      },
+      "warning_count": 8,
+      "warnings_per_design": 1.0,
+      "warning_types": {
+        "dead_prop": 7,
+        "prose_param_mismatch": 1
+      }
+    },
+    "haiku": {
+      "designs": 8,
+      "json_parsed": 8,
+      "canonical_coverage": 6,
+      "literal_coverage": 11,
+      "canonical_occurrences": 16,
+      "literal_occurrences": 21,
+      "top4": [
+        {
+          "prop": "密语卡",
+          "count": 4
+        },
+        {
+          "prop": "匿名投票器",
+          "count": 4
+        },
+        {
+          "prop": "沙漏",
+          "count": 3
+        },
+        {
+          "prop": "记分板",
+          "count": 3
+        }
+      ],
+      "top4_count": 14,
+      "top4_share": 0.875,
+      "top4_baseline": 0.787,
+      "outside_library_unique": 5,
+      "outside_library_occurrences": 5,
+      "outside_library": {
+        "任务卡": 1,
+        "投票骰": 1,
+        "挑战计时器": 1,
+        "记分卡": 1,
+        "身份令牌": 1
+      },
+      "referencable_occurrences": 6,
+      "true_dead_prop": 3,
+      "true_dead_prop_rate": 0.5,
+      "dead_over_canonical": 0.1875,
+      "dead_over_literal": 0.142857,
+      "dead_prop_by_name": {
+        "命运转盘": 1,
+        "密语卡": 2
+      },
+      "warning_count": 5,
+      "warnings_per_design": 0.625,
+      "warning_types": {
+        "prose_param_mismatch": 2,
+        "dead_prop": 3
+      }
+    },
+    "dsT": {
+      "designs": 8,
+      "json_parsed": 7,
+      "canonical_coverage": 11,
+      "literal_coverage": 11,
+      "canonical_occurrences": 31,
+      "literal_occurrences": 31,
+      "top4": [
+        {
+          "prop": "记分板",
+          "count": 7
+        },
+        {
+          "prop": "沙漏",
+          "count": 5
+        },
+        {
+          "prop": "匿名投票器",
+          "count": 5
+        },
+        {
+          "prop": "密语卡",
+          "count": 4
+        }
+      ],
+      "top4_count": 21,
+      "top4_share": 0.677419,
+      "top4_baseline": 0.787,
+      "outside_library_unique": 0,
+      "outside_library_occurrences": 0,
+      "outside_library": {},
+      "referencable_occurrences": 11,
+      "true_dead_prop": 9,
+      "true_dead_prop_rate": 0.818182,
+      "dead_over_canonical": 0.290323,
+      "dead_over_literal": 0.290323,
+      "dead_prop_by_name": {
+        "密语卡": 4,
+        "虚拟左轮": 1,
+        "抽签筒": 2,
+        "盲盒": 1,
+        "骰子": 1
+      },
+      "warning_count": 14,
+      "warnings_per_design": 1.75,
+      "warning_types": {
+        "dead_prop": 9,
+        "dead_ledger": 3,
+        "prose_param_mismatch": 2
+      }
+    },
+    "sonL": {
+      "designs": 20,
+      "json_parsed": 20,
+      "canonical_coverage": 11,
+      "literal_coverage": 11,
+      "canonical_occurrences": 93,
+      "literal_occurrences": 93,
+      "top4": [
+        {
+          "prop": "密语卡",
+          "count": 18
+        },
+        {
+          "prop": "记分板",
+          "count": 15
+        },
+        {
+          "prop": "沙漏",
+          "count": 13
+        },
+        {
+          "prop": "匿名投票器",
+          "count": 13
+        }
+      ],
+      "top4_count": 59,
+      "top4_share": 0.634409,
+      "top4_baseline": 0.787,
+      "outside_library_unique": 0,
+      "outside_library_occurrences": 0,
+      "outside_library": {},
+      "referencable_occurrences": 45,
+      "true_dead_prop": 19,
+      "true_dead_prop_rate": 0.422222,
+      "dead_over_canonical": 0.204301,
+      "dead_over_literal": 0.204301,
+      "dead_prop_by_name": {
+        "身份牌": 1,
+        "密语卡": 6,
+        "命运转盘": 6,
+        "抽签筒": 5,
+        "骰子": 1
+      },
+      "warning_count": 24,
+      "warnings_per_design": 1.2,
+      "warning_types": {
+        "prose_param_mismatch": 5,
+        "dead_prop": 19
+      }
+    }
+  },
+  "b20": {
+    "summary": {
+      "initial_structure": {
+        "passed": 15,
+        "total": 20,
+        "rate": 0.75
+      },
+      "terminal_structure": {
+        "passed": 16,
+        "total": 20,
+        "rate": 0.8
+      },
+      "r1_restored": 1,
+      "r2_additional_restored": 0,
+      "exhausted_invalid": 4,
+      "shape_frequency": {
+        "其他": 15,
+        "社推": 1
+      },
+      "largest_shape_share": 0.9375,
+      "family_coverage": 6,
+      "top1_family_share": 0.3125,
+      "top2_family_share": 0.5625,
+      "triggers": {
+        "single_shape_ge_40pct": true,
+        "top2_families_ge_50pct": true,
+        "family_coverage_lt_6": false,
+        "套皮未解": true
+      },
+      "dual_confound": "skill v1.8→v2.1.1 × 生成模型 DS→Sonnet 5 Low；Low 与主批 Sonnet 默认档亦异"
+    },
+    "terminal_rows": [
+      {
+        "index": 1,
+        "source": "sonL_B_div_v21r2_01.json",
+        "terminal": "sonL_B_div_v21r2_01.json",
+        "state": "initial_valid",
+        "structure": "PASS",
+        "judge": "破",
+        "shape": "其他",
+        "family_id": 41,
+        "family": "随时喊停胆小鬼",
+        "terminal_errors": []
+      },
+      {
+        "index": 2,
+        "source": "sonL_B_div_v21r2_02.json",
+        "terminal": "sonL_B_div_v21r2_02.json",
+        "state": "initial_valid",
+        "structure": "PASS",
+        "judge": "破",
+        "shape": "其他",
+        "family_id": 41,
+        "family": "随时喊停胆小鬼",
+        "terminal_errors": []
+      },
+      {
+        "index": 3,
+        "source": "sonL_B_div_v21r2_03.json",
+        "terminal": "sonL_B_div_v21r2_03.json",
+        "state": "initial_valid",
+        "structure": "PASS",
+        "judge": "破",
+        "shape": "其他",
+        "family_id": 7,
+        "family": "大冒险/表演挑战",
+        "terminal_errors": []
+      },
+      {
+        "index": 4,
+        "source": "sonL_B_div_v21r2_04.json",
+        "terminal": "sonL_B_div_v21r2_04.json",
+        "state": "initial_valid",
+        "structure": "PASS",
+        "judge": "破",
+        "shape": "其他",
+        "family_id": 41,
+        "family": "随时喊停胆小鬼",
+        "terminal_errors": []
+      },
+      {
+        "index": 5,
+        "source": "sonL_B_div_v21r2_05.json",
+        "terminal": "sonL_B_div_v21r2_05_r2.json",
+        "state": "exhausted_invalid_r2",
+        "structure": "REJECT",
+        "judge": null,
+        "shape": null,
+        "family_id": null,
+        "family": null,
+        "terminal_errors": [
+          "settlement.win 引用分数/名次，但 scoring 无 ±N 数值增减来源（C3；惩罚(档) 不计作来源）"
+        ]
+      },
+      {
+        "index": 6,
+        "source": "sonL_B_div_v21r2_06.json",
+        "terminal": "sonL_B_div_v21r2_06.json",
+        "state": "initial_valid",
+        "structure": "PASS",
+        "judge": "破",
+        "shape": "其他",
+        "family_id": 40,
+        "family": "押注同桌答案",
+        "terminal_errors": []
+      },
+      {
+        "index": 7,
+        "source": "sonL_B_div_v21r2_07.json",
+        "terminal": "sonL_B_div_v21r2_07.json",
+        "state": "initial_valid",
+        "structure": "PASS",
+        "judge": "破",
+        "shape": "其他",
+        "family_id": 4,
+        "family": "命运扑克轮饮",
+        "terminal_errors": []
+      },
+      {
+        "index": 8,
+        "source": "sonL_B_div_v21r2_08.json",
+        "terminal": "sonL_B_div_v21r2_08.json",
+        "state": "initial_valid",
+        "structure": "PASS",
+        "judge": "破",
+        "shape": "其他",
+        "family_id": 7,
+        "family": "大冒险/表演挑战",
+        "terminal_errors": []
+      },
+      {
+        "index": 9,
+        "source": "sonL_B_div_v21r2_09.json",
+        "terminal": "sonL_B_div_v21r2_09.json",
+        "state": "initial_valid",
+        "structure": "PASS",
+        "judge": "破",
+        "shape": "其他",
+        "family_id": 41,
+        "family": "随时喊停胆小鬼",
+        "terminal_errors": []
+      },
+      {
+        "index": 10,
+        "source": "sonL_B_div_v21r2_10.json",
+        "terminal": "sonL_B_div_v21r2_10.json",
+        "state": "initial_valid",
+        "structure": "PASS",
+        "judge": "破",
+        "shape": "其他",
+        "family_id": 7,
+        "family": "大冒险/表演挑战",
+        "terminal_errors": []
+      },
+      {
+        "index": 11,
+        "source": "sonL_B_div_v21r2_11.json",
+        "terminal": "sonL_B_div_v21r2_11.json",
+        "state": "initial_valid",
+        "structure": "PASS",
+        "judge": "破",
+        "shape": "其他",
+        "family_id": 40,
+        "family": "押注同桌答案",
+        "terminal_errors": []
+      },
+      {
+        "index": 12,
+        "source": "sonL_B_div_v21r2_12.json",
+        "terminal": "sonL_B_div_v21r2_12_r2.json",
+        "state": "exhausted_invalid_r2",
+        "structure": "REJECT",
+        "judge": null,
+        "shape": null,
+        "family_id": null,
+        "family": null,
+        "terminal_errors": [
+          "settlement.win 缺失或为空（v1.9 三键必填）"
+        ]
+      },
+      {
+        "index": 13,
+        "source": "sonL_B_div_v21r2_13.json",
+        "terminal": "sonL_B_div_v21r2_13_r1.json",
+        "state": "valid_r1",
+        "structure": "PASS",
+        "judge": "破",
+        "shape": "其他",
+        "family_id": 41,
+        "family": "随时喊停胆小鬼",
+        "terminal_errors": []
+      },
+      {
+        "index": 14,
+        "source": "sonL_B_div_v21r2_14.json",
+        "terminal": "sonL_B_div_v21r2_14.json",
+        "state": "initial_valid",
+        "structure": "PASS",
+        "judge": "破",
+        "shape": "其他",
+        "family_id": 7,
+        "family": "大冒险/表演挑战",
+        "terminal_errors": []
+      },
+      {
+        "index": 15,
+        "source": "sonL_B_div_v21r2_15.json",
+        "terminal": "sonL_B_div_v21r2_15_r2.json",
+        "state": "exhausted_invalid_r2",
+        "structure": "REJECT",
+        "judge": null,
+        "shape": null,
+        "family_id": null,
+        "family": null,
+        "terminal_errors": [
+          "settlement.win 引用分数/名次，但 scoring 无 ±N 数值增减来源（C3；惩罚(档) 不计作来源）"
+        ]
+      },
+      {
+        "index": 16,
+        "source": "sonL_B_div_v21r2_16.json",
+        "terminal": "sonL_B_div_v21r2_16_r2.json",
+        "state": "exhausted_invalid_r2",
+        "structure": "REJECT",
+        "judge": null,
+        "shape": null,
+        "family_id": null,
+        "family": null,
+        "terminal_errors": [
+          "rules[1].params.order 必须为 'round_robin'，实为 'seat'",
+          "settlement.win 引用分数/名次，但 scoring 无 ±N 数值增减来源（C3；惩罚(档) 不计作来源）"
+        ]
+      },
+      {
+        "index": 17,
+        "source": "sonL_B_div_v21r2_17.json",
+        "terminal": "sonL_B_div_v21r2_17.json",
+        "state": "initial_valid",
+        "structure": "PASS",
+        "judge": "破",
+        "shape": "社推",
+        "family_id": 8,
+        "family": "身份心理战/隐藏角色社交推理",
+        "terminal_errors": []
+      },
+      {
+        "index": 18,
+        "source": "sonL_B_div_v21r2_18.json",
+        "terminal": "sonL_B_div_v21r2_18.json",
+        "state": "initial_valid",
+        "structure": "PASS",
+        "judge": "破",
+        "shape": "其他",
+        "family_id": 8,
+        "family": "身份心理战/隐藏角色社交推理",
+        "terminal_errors": []
+      },
+      {
+        "index": 19,
+        "source": "sonL_B_div_v21r2_19.json",
+        "terminal": "sonL_B_div_v21r2_19.json",
+        "state": "initial_valid",
+        "structure": "PASS",
+        "judge": "破",
+        "shape": "其他",
+        "family_id": 6,
+        "family": "真心话/自曝陈述",
+        "terminal_errors": []
+      },
+      {
+        "index": 20,
+        "source": "sonL_B_div_v21r2_20.json",
+        "terminal": "sonL_B_div_v21r2_20.json",
+        "state": "initial_valid",
+        "structure": "PASS",
+        "judge": "破",
+        "shape": "其他",
+        "family_id": 40,
+        "family": "押注同桌答案",
+        "terminal_errors": []
+      }
+    ],
+    "family_frequency_41": [
+      {
+        "family_id": 1,
+        "family": "数字接龙惩罚",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 2,
+        "family": "词语/类别接龙",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 3,
+        "family": "记忆链复述/传话失真",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 4,
+        "family": "命运扑克轮饮",
+        "count": 1,
+        "share_of_valid": 0.0625,
+        "pieces": [
+          "sonL_B_div_v21r2_07.json"
+        ]
+      },
+      {
+        "family_id": 5,
+        "family": "骰牌随机博彩",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 6,
+        "family": "真心话/自曝陈述",
+        "count": 1,
+        "share_of_valid": 0.0625,
+        "pieces": [
+          "sonL_B_div_v21r2_19.json"
+        ]
+      },
+      {
+        "family_id": 7,
+        "family": "大冒险/表演挑战",
+        "count": 4,
+        "share_of_valid": 0.25,
+        "pieces": [
+          "sonL_B_div_v21r2_03.json",
+          "sonL_B_div_v21r2_08.json",
+          "sonL_B_div_v21r2_10.json",
+          "sonL_B_div_v21r2_14.json"
+        ]
+      },
+      {
+        "family_id": 8,
+        "family": "身份心理战/隐藏角色社交推理",
+        "count": 2,
+        "share_of_valid": 0.125,
+        "pieces": [
+          "sonL_B_div_v21r2_17.json",
+          "sonL_B_div_v21r2_18.json"
+        ]
+      },
+      {
+        "family_id": 9,
+        "family": "表演猜词",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 10,
+        "family": "隐藏信息叫价诈唬",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 11,
+        "family": "随机权力指令",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 12,
+        "family": "反应竞速抢物/夺权",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 13,
+        "family": "命运轮盘/随机选中",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 14,
+        "family": "投掷押注二元/多元猜测",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 15,
+        "family": "计时节奏集体饮酒",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 16,
+        "family": "藏物传递猜测",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 17,
+        "family": "身体竞速轮饮接力",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 18,
+        "family": "投掷精度物理竞技",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 19,
+        "family": "节奏拍手令/肢体连击链",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 20,
+        "family": "纯物理追逐/接触游戏",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 21,
+        "family": "位阶清牌接龙/爬梯甩牌",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 22,
+        "family": "吃墩叫牌合约对局",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 23,
+        "family": "知识问答竞猜擂台",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 24,
+        "family": "默契问答比对",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 25,
+        "family": "口令陷阱反应",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 26,
+        "family": "背景禁语监听淘汰",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 27,
+        "family": "摸牌弃牌组合成型",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 28,
+        "family": "骰子竞速夺位棋",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 29,
+        "family": "情景谜题问答链",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 30,
+        "family": "轮值祝酒仪式/敬酒接龙",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 31,
+        "family": "才艺表演公投评选",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 32,
+        "family": "配对夺堆抢分",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 33,
+        "family": "二十问/猜身份排除游戏",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 34,
+        "family": "猜码反馈推理",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 35,
+        "family": "赛事竞猜彩池",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 36,
+        "family": "点名弹劾表决惩罚",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 37,
+        "family": "合作沟通拆弹",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 38,
+        "family": "集体去重提示",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 39,
+        "family": "光谱定位共情",
+        "count": 0,
+        "share_of_valid": 0.0,
+        "pieces": []
+      },
+      {
+        "family_id": 40,
+        "family": "押注同桌答案",
+        "count": 3,
+        "share_of_valid": 0.1875,
+        "pieces": [
+          "sonL_B_div_v21r2_06.json",
+          "sonL_B_div_v21r2_11.json",
+          "sonL_B_div_v21r2_20.json"
+        ]
+      },
+      {
+        "family_id": 41,
+        "family": "随时喊停胆小鬼",
+        "count": 5,
+        "share_of_valid": 0.3125,
+        "pieces": [
+          "sonL_B_div_v21r2_01.json",
+          "sonL_B_div_v21r2_02.json",
+          "sonL_B_div_v21r2_04.json",
+          "sonL_B_div_v21r2_09.json",
+          "sonL_B_div_v21r2_13_r1.json"
+        ]
+      }
+    ]
+  },
+  "probe_A_prime": {
+    "question": "props_required 有无‘推得’标注的空酒瓶",
+    "positive": 0,
+    "total": 2,
+    "rows": [
+      {
+        "file": "sonnet_A2_probe_01.json",
+        "structure": "PASS",
+        "props_required": [
+          "啤酒",
+          "哑铃"
+        ],
+        "inferred_empty_bottle": false,
+        "excluded_from_main_denominators": true
+      },
+      {
+        "file": "sonnet_A2_probe_02.json",
+        "structure": "REJECT",
+        "props_required": [
+          "啤酒",
+          "哑铃"
+        ],
+        "inferred_empty_bottle": false,
+        "excluded_from_main_denominators": true
+      }
+    ]
+  },
+  "compiler": {
+    "batch": "DM-skill-v2.1.1-v21r2",
+    "scope": "check v2.1.1 过闸且 judge v0.3 判过的全部非 probe 件",
+    "candidate_count": 1,
+    "candidate_coverage": "1/1",
+    "engine": {
+      "repository": "AiParty",
+      "head": "176e48813c43331de8dc298e4e89ab6008a4e161",
+      "node": "v24.14.0",
+      "npm": "11.9.0",
+      "tsx": "4.23.0"
+    },
+    "regression": {
+      "test/compiler/compile.test.ts": {
+        "test_files_passed": 1,
+        "test_files_total": 1,
+        "tests_passed": 16,
+        "tests_total": 16,
+        "result": "PASS"
+      },
+      "npm run typecheck": "PASS"
+    },
+    "candidates": [
+      {
+        "file": "haiku_A_v21r2_01_r1.json",
+        "check": "PASS",
+        "judge": "过",
+        "pipeline_ok": true,
+        "has_finale": true,
+        "flow_phases": 2,
+        "setup_assign": 2,
+        "warning_count": 1,
+        "three_green": true
+      }
+    ],
+    "first_three_green": "haiku_A_v21r2_01_r1.json"
+  },
+  "usage": {
+    "api": {
+      "initial": {
+        "calls": 8,
+        "success": 7,
+        "failed": 1,
+        "status": {
+          "success": 7,
+          "invalid_json: Expecting ',' delimiter: line 4 column 92 (char 151)": 1
+        },
+        "prompt_tokens": 57828,
+        "completion_tokens": 86898,
+        "reasoning_tokens_subset_of_completion": 75157,
+        "total_tokens_prompt_plus_completion": 144726,
+        "latency_seconds": 1106.538895,
+        "mean_latency_seconds": 138.317362,
+        "cost_usd": 0.03242736
+      },
+      "retry_r1": {
+        "calls": 8,
+        "success": 8,
+        "failed": 0,
+        "status": {
+          "success": 8
+        },
+        "prompt_tokens": 58577,
+        "completion_tokens": 70084,
+        "reasoning_tokens_subset_of_completion": 60375,
+        "total_tokens_prompt_plus_completion": 128661,
+        "latency_seconds": 871.821661,
+        "mean_latency_seconds": 108.977708,
+        "cost_usd": 0.0278243
+      },
+      "total": {
+        "calls": 16,
+        "success": 15,
+        "failed": 1,
+        "status": {
+          "success": 15,
+          "invalid_json: Expecting ',' delimiter: line 4 column 92 (char 151)": 1
+        },
+        "prompt_tokens": 116405,
+        "completion_tokens": 156982,
+        "reasoning_tokens_subset_of_completion": 135532,
+        "total_tokens_prompt_plus_completion": 273387,
+        "latency_seconds": 1978.360556,
+        "mean_latency_seconds": 123.647535,
+        "cost_usd": 0.06025166
+      },
+      "reasoning_not_double_counted": true
+    },
+    "web": {
+      "valid": 25,
+      "pending": 0,
+      "excluded": 4,
+      "valid_by_model": {
+        "haiku": 8,
+        "sonnet": 8,
+        "sonL": 9
+      },
+      "valid_by_effort": {
+        "网页通道·参数不可控": 16,
+        "Low": 9
+      },
+      "excluded_by_effort": {
+        "网页通道·参数不可控": 1,
+        "High": 3
+      },
+      "token_latency_cost": null,
+      "canonical_sha256": "90d7d323d8ec3fe53b1fa35688ce842a54a1cdf15ee7e82ec6d43a35e2b5dd13",
+      "segment_sha256": "068eacde0386d8ae68d4e5b71fb6689a66a82b9727698d7605074fd750c700ab",
+      "machine_validation": {
+        "checked_at_master": "9db3553c24701c13b22c7d0c3bcb2e0fa58c8cc9",
+        "valid_targets_present_in_master": "25/25",
+        "original_commits_change_only_target": "25/25",
+        "original_blobs_match_master": "25/25",
+        "selected_low_blobs_match_master": "9/9",
+        "result": "PASS"
+      }
+    }
+  },
+  "protocol_audit": {
+    "candidate_json": 79,
+    "warning_sidecars": 58,
+    "sidecar_mismatch": 0,
+    "invalid_candidate_reviews": 0,
+    "main_first_pass_structure_pass_and_reviewed": 24,
+    "retry_structure_pass_and_reviewed": 11,
+    "terminal_structure_pass_and_reviewed": 26,
+    "terminal_structure_reject_no_judgment": 18
+  },
+  "thresholds": {
+    "semantic": {
+      "sonnet_pass_at_1": {
+        "passed": 0,
+        "total": 8,
+        "rate": 0.0
+      },
+      "baseline_rate": 0.125,
+      "green": false
+    },
+    "teaching": {
+      "sonnet_rate": 0.875,
+      "explanation_release_rate": 0.9,
+      "green": false
+    },
+    "prop_health": {
+      "record_only": true,
+      "top4_baseline": 0.787
+    },
+    "switch": {
+      "sonnet_judge_rate": 0.0,
+      "required": 0.3,
+      "compiler_regression": "16/16",
+      "green": false
+    },
+    "first_three_green": {
+      "file": "haiku_A_v21r2_01_r1.json",
+      "green": true
+    }
+  },
+  "family_catalog": {
+    "count": 41,
+    "families": [
+      {
+        "id": 1,
+        "name": "数字接龙惩罚"
+      },
+      {
+        "id": 2,
+        "name": "词语/类别接龙"
+      },
+      {
+        "id": 3,
+        "name": "记忆链复述/传话失真"
+      },
+      {
+        "id": 4,
+        "name": "命运扑克轮饮"
+      },
+      {
+        "id": 5,
+        "name": "骰牌随机博彩"
+      },
+      {
+        "id": 6,
+        "name": "真心话/自曝陈述"
+      },
+      {
+        "id": 7,
+        "name": "大冒险/表演挑战"
+      },
+      {
+        "id": 8,
+        "name": "身份心理战/隐藏角色社交推理"
+      },
+      {
+        "id": 9,
+        "name": "表演猜词"
+      },
+      {
+        "id": 10,
+        "name": "隐藏信息叫价诈唬"
+      },
+      {
+        "id": 11,
+        "name": "随机权力指令"
+      },
+      {
+        "id": 12,
+        "name": "反应竞速抢物/夺权"
+      },
+      {
+        "id": 13,
+        "name": "命运轮盘/随机选中"
+      },
+      {
+        "id": 14,
+        "name": "投掷押注二元/多元猜测"
+      },
+      {
+        "id": 15,
+        "name": "计时节奏集体饮酒"
+      },
+      {
+        "id": 16,
+        "name": "藏物传递猜测"
+      },
+      {
+        "id": 17,
+        "name": "身体竞速轮饮接力"
+      },
+      {
+        "id": 18,
+        "name": "投掷精度物理竞技"
+      },
+      {
+        "id": 19,
+        "name": "节奏拍手令/肢体连击链"
+      },
+      {
+        "id": 20,
+        "name": "纯物理追逐/接触游戏"
+      },
+      {
+        "id": 21,
+        "name": "位阶清牌接龙/爬梯甩牌"
+      },
+      {
+        "id": 22,
+        "name": "吃墩叫牌合约对局"
+      },
+      {
+        "id": 23,
+        "name": "知识问答竞猜擂台"
+      },
+      {
+        "id": 24,
+        "name": "默契问答比对"
+      },
+      {
+        "id": 25,
+        "name": "口令陷阱反应"
+      },
+      {
+        "id": 26,
+        "name": "背景禁语监听淘汰"
+      },
+      {
+        "id": 27,
+        "name": "摸牌弃牌组合成型"
+      },
+      {
+        "id": 28,
+        "name": "骰子竞速夺位棋"
+      },
+      {
+        "id": 29,
+        "name": "情景谜题问答链"
+      },
+      {
+        "id": 30,
+        "name": "轮值祝酒仪式/敬酒接龙"
+      },
+      {
+        "id": 31,
+        "name": "才艺表演公投评选"
+      },
+      {
+        "id": 32,
+        "name": "配对夺堆抢分"
+      },
+      {
+        "id": 33,
+        "name": "二十问/猜身份排除游戏"
+      },
+      {
+        "id": 34,
+        "name": "猜码反馈推理"
+      },
+      {
+        "id": 35,
+        "name": "赛事竞猜彩池"
+      },
+      {
+        "id": 36,
+        "name": "点名弹劾表决惩罚"
+      },
+      {
+        "id": 37,
+        "name": "合作沟通拆弹"
+      },
+      {
+        "id": 38,
+        "name": "集体去重提示"
+      },
+      {
+        "id": 39,
+        "name": "光谱定位共情"
+      },
+      {
+        "id": 40,
+        "name": "押注同桌答案"
+      },
+      {
+        "id": 41,
+        "name": "随时喊停胆小鬼"
+      }
+    ]
+  },
+  "notes": {
+    "pass_at_2": "首发判过 + 允许重试后判过；结构拒件不判级",
+    "reasoning_tokens": "completion 子集，不重复加总",
+    "terminal_scope": "主批以 _r1 为终件；B×20 首个结构有效件，否则 _r2 耗尽"
+  }
+}
