@@ -1,0 +1,126 @@
+```json
+{
+  "game_title": "颗粒度对齐大会",
+  "subtitle": "为公司团建包间现制 · 5 人速局",
+  "premise": "全员化身互联网大厂汇报人，每轮抽一个离谱的短视频挑战任务，但汇报时只能用开会黑话！黑话堆得越多分越高，但说错一个词当场翻车。其他人化身吃瓜群众，疯狂下注你到底能不能成。全程高能，绝不开会！",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "每人一张MBTI职场人设(如'E人卷王'、'I人摸鱼'、'P人随缘'、'J人控场'、'N人脑洞')，终局按扮演程度加分。" },
+    { "prop": "盲盒", "to": "公共区", "visibility": "全场公开", "note": "装满短视频挑战任务，每轮由当前汇报人公开抽取。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "吃瓜下注用；揭晓时自动转全场公开(道具内置)。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录黑话奖池与吃瓜筹码。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 私发MBTI人设密语卡，宣读'对齐大会'背景与黑话词库",
+    "每轮: 回合推进 → 汇报人抽盲盒 → 黑话堆叠(续押喊停) → 吃瓜下注(同时提交) → 验收闭环(判定) → 结算",
+    "5轮后(每人1轮) → 终局: 揭晓MBTI人设，结算扮演加分 → 颁发'闭环大师'称号"
+  ],
+  "rules": [
+    {
+      "flavor_name": "轮流对齐",
+      "mechanic": "回合推进",
+      "plain_rule": "按座位顺序，每人轮流当一次汇报人，总共打5轮。",
+      "visibility": "全场公开",
+      "params": { "order": "round_robin" }
+    },
+    {
+      "flavor_name": "黑话堆叠",
+      "mechanic": "续押喊停",
+      "plain_rule": "汇报人必须用开会黑话(如'对齐'、'赋能'、'闭环')来解释自己抽到的挑战任务。每说一个黑话词，奖池+1分。你可以随时喊停并执行挑战来拿走奖池分数；如果说出了非黑话的日常词汇，则爆掉：奖池清零且受罚。最多连说5个黑话词。",
+      "visibility": "全场公开",
+      "params": {
+        "draw_from": "$gen.黑话词库",
+        "continue_prompt": "继续堆叠黑话？",
+        "bust_when": "使用了非黑话词汇",
+        "cap": 5,
+        "on_cap": "force_settle",
+        "bank_on_stop": true,
+        "scoring_ref": ["黑话堆叠成功", "黑话翻车"]
+      }
+    },
+    {
+      "flavor_name": "吃瓜下注",
+      "mechanic": "同时提交",
+      "plain_rule": "汇报人决定执行挑战后，其他所有人私下预测汇报人能否完成挑战。猜中者得1分，猜错不扣分。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "预测汇报人挑战结果",
+        "input_kind": "options",
+        "options": ["成功", "失败"],
+        "timeout_s": 10,
+        "reveal": "simultaneous",
+        "scoring_ref": ["吃瓜猜中"]
+      }
+    },
+    {
+      "flavor_name": "验收闭环",
+      "mechanic": "判定",
+      "plain_rule": "汇报人现场执行短视频挑战。执行完毕后，由全场其他玩家一键表决'算不算完成'，过半数通过即为成功。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "挑战是否完成？",
+        "verdict_options": ["完成", "未完成"],
+        "on": {
+          "完成": { "scoring_ref": "挑战完成" },
+          "未完成": { "scoring_ref": "挑战失败" }
+        }
+      }
+    },
+    {
+      "flavor_name": "卷王爆雷",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "黑话翻车或挑战失败时，汇报人必须做一个简单的健身动作(如5个深蹲或10秒平板支撑)，可随时申请换一个动作。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "loser",
+        "pool": "$gen.健身动作池",
+        "scoring_ref": "黑话翻车"
+      }
+    },
+    {
+      "flavor_name": "MBTI原形毕露",
+      "mechanic": "揭示",
+      "plain_rule": "游戏结束时，所有人翻开自己的MBTI人设密语卡。如果你在整局中的行为风格与你的密语卡人设吻合，由全场表决认可后可额外加分。",
+      "visibility": "全场公开",
+      "params": {
+        "reveal_of": "prop:密语卡",
+        "to": "all",
+        "once": true
+      }
+    },
+    {
+      "flavor_name": "人设加分",
+      "mechanic": "加减分",
+      "plain_rule": "终局时，若你的MBTI人设扮演被全场认可，你的总分+2。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "+2",
+        "scoring_ref": "人设吻合加分"
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "黑话堆叠成功", "who": "actor", "effect": "+N(奖池分数)" },
+      { "event": "黑话翻车", "who": "actor", "effect": "惩罚(轻)" },
+      { "event": "吃瓜猜中", "who": "actor", "effect": "+1" },
+      { "event": "挑战完成", "who": "actor", "effect": "+2" },
+      { "event": "挑战失败", "who": "actor", "effect": "惩罚(轻)" },
+      { "event": "人设吻合加分", "who": "actor", "effect": "+2" }
+    ],
+    "win": "终局时总分最高者胜",
+    "tiebreak": "平局/并列默认由系统随机裁决(风味名: 命运转正)"
+  },
+  "reveal_text": "大会散场，PPT关停。原来最能对齐颗粒度的那个人，私底下是个连深蹲都做不标准的I人摸鱼怪。闭环了，家人们！",
+  "reveal_signature": "融合自 老周 的「开会黑话」 × 琳琳 的「短视频挑战」 × 小雨 的「爱吃瓜」 × Tony 的「健身狂魔」 × 阿凯 的「MBTI」",
+  "flavor_glossary": [
+    { "term": "对齐/颗粒度/闭环/赋能", "means": "互联网大厂常见黑话，这里被反过来当成唯一的合法沟通词汇，说日常用语反而会爆雷。" },
+    { "term": "吃瓜", "means": "网络流行语，指看热闹、八卦。这里指旁观者下注预测别人挑战成败的环节。" },
+    { "term": "卷王/摸鱼", "means": "职场流行语，卷王指极度努力竞争的人，摸鱼指偷懒。对应MBTI人设卡的扮演目标。" }
+  ],
+  "safety_note": "黄暴档 20/100(极低): 职场团建语境，惩罚仅限轻度健身动作且带拒绝权，无身体接触或羞辱内容；未点名任何真人、无版权引用。"
+}
+```

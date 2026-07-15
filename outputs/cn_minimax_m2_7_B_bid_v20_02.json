@@ -1,0 +1,89 @@
+```json
+{
+  "game_title": "M系鉴定大会",
+  "subtitle": "贴标签 · 猜标签 · 反标签 | 公司团建包间版",
+  "premise": "每人抽一个「官方认证」的MBTI标签贴额头上，但每个人都知道那是假的。轮流转、任务做、嘴炮猜——谁才是真正的i人/e人？谁又在假装外向实则社恐？嘴炮最响的那个，往往翻车最快。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "身份牌", "to": "全体", "visibility": "额头", "note": "每人发一张「官方认证M系牌」贴额头上，内容随机抽取(E/I/S/N/T/F/J/P各取一个字母拼成四码)。这张是公开的假身份，大家都知道是假的。" },
+    { "prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "每轮随机下发一张「鉴定任务卡」，只有你自己看到要做什么任务。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "每轮放逐投票用；亮票时自动转全场公开。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "任务环节限时。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记分用。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 每人抽一张「官方认证M系牌」贴额头，系统广播全场都知道那是官方发的假标签",
+    "第一轮: 抽任务卡 → 限时任务 → 同时猜MBTI → 计分 → 放逐投票 → 惩罚 → 下一轮",
+    "共进行5轮(或任务卡抽完为止)",
+    "揭幕: 亮出真实内心(每人匿名提交真实MBTI自评)，总分最高者获「M系带师」称号"
+  ],
+  "rules": [
+    {
+      "flavor_name": "MBI鉴定任务",
+      "mechanic": "限时",
+      "plain_rule": "每轮开始，每人从任务池里抽一张密语卡，上面写着你要完成的「行为挑战」。任务内容围绕i/e人日常设计，限时30秒内展示完毕（口述/动作/表情都行），完成后点「完成」按钮。没在时间内点=任务失败。旁观者不需要猜对，纯粹看表演。",
+      "visibility": "自己看",
+      "params": { "seconds": 30, "visible_countdown": true, "on_timeout": { "effect": "scoring_ref", "scoring_ref": ["任务完成", "任务失败"] } }
+    },
+    {
+      "flavor_name": "i/e狂喜判定",
+      "mechanic": "判定",
+      "plain_rule": "任务完成后，系统自动判定：完成的是i人任务（内向专属挑战）还是e人任务（外向专属挑战）。i人完成i人任务+2分，全场e人各+1旁观分；i人完成e人任务无奖励；e人完成e人任务+2分，全场i人各+1旁观分；e人完成i人任务无奖励。（即：自己的任务自己做对有分，反类型做对无奖励，匹配类型的人可以吃瓜得分）",
+      "visibility": "全场公开",
+      "params": { "source": "expr", "expr": "任务类型匹配参与者类型且完成状态=成功", "on": { "过": { "scoring_ref": ["任务完成"] }, "不过": { "scoring_ref": ["任务失败"] } } }
+    },
+    {
+      "flavor_name": "MBTI猜猜看",
+      "mechanic": "同时提交",
+      "plain_rule": "任务环节结束后，进入「嘴炮鉴定」时间：每人匿名提交一次「对全场任意一人的真实MBTI猜测」，猜ta最可能是I还是E（只需要猜一维，不猜四码）。所有人提交后同时亮票。猜对的人+1分，被猜对的人+1分（说明你表演得很到位），猜错无惩罚。可以故意猜错来掩护自己。",
+      "visibility": "自己看",
+      "params": { "prompt": "选一个你觉得ta真实MBTI第一字母是I还是E的人，猜ta的真实类型", "input_kind": "options", "options": ["$派生:全场其他人名+I", "$派生:全场其他人名+E"], "timeout_s": 30, "reveal": "simultaneous", "scoring_ref": ["猜对", "被猜对"] }
+    },
+    {
+      "flavor_name": "拉人下水",
+      "mechanic": "点名目标",
+      "plain_rule": "每轮猜MBTI环节结束后，进入「放逐票」时间：每人匿名投票选出「本轮你觉得最可能暴露真实MBTI的那个人」。票数最高者被标记为「显眼包」接受一次惩罚(轻)，有跳过权可以拒绝接受、换一个人受罚。若平票则系统随机裁决。",
+      "visibility": "自己看",
+      "params": { "selector": "vote", "target_pool": "alive_others", "on_named": { "scoring_ref": ["显眼包惩罚"], "eliminate": false } }
+    },
+    {
+      "flavor_name": "显眼包惩罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "被票选为「显眼包」的人，从「社死三选一」惩罚池里抽一个执行：① 当场模仿一个同事的经典口头禅（不能点名真人）② 用三个emoji描述最近的短视频热点 ③ 对着窗外大喊一声「颗粒度对齐了！」——跳过需换另一个人执行同一惩罚。",
+      "visibility": "全场公开",
+      "params": { "who": "target", "pool": "$gen.penalty_内容池", "scoring_ref": "显眼包惩罚" }
+    },
+    {
+      "flavor_name": "公开处刑（可选）",
+      "mechanic": "声明质疑",
+      "plain_rule": "整局限用1次：你可以公开声明「我认为XXX的真实MBTI是I/E」。被质疑的人必须翻牌验证（展示真实内心自评单）。若质疑正确，被质疑者-1分；若质疑错误或冤枉，质疑者-1分。这是个风险赌注，用完即废。",
+      "visibility": "自己看",
+      "params": { "claim_prompt": "我赌XXX的真实MBTI第一字母是", "challengers": "alive_others", "challenge_window_s": 0, "verify_source": "judge", "verify_reveals": "identity", "identity_resolution": "terminal", "on_liar": { "scoring_ref": "质疑正确" }, "on_false_accuse": { "scoring_ref": "质疑错误" } }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "任务完成", "who": "actor", "effect": "+2" },
+      { "event": "任务失败", "who": "actor", "effect": "+0" },
+      { "event": "旁观匹配型得分", "who": "all_except_actor", "effect": "+1" },
+      { "event": "猜对", "who": "actor", "effect": "+1" },
+      { "event": "被猜对", "who": "target", "effect": "+1" },
+      { "event": "显眼包惩罚", "who": "target", "effect": "惩罚(轻)" },
+      { "event": "质疑正确", "who": "loser(被质疑者)", "effect": "-1" },
+      { "event": "质疑错误", "who": "actor(质疑者)", "effect": "-1" }
+    ],
+    "win": "终局总分最高者胜，荣获「M系带师」称号；平局由系统随机裁决(风味名: 投硬币决定谁更i人)",
+    "tiebreak": "系统随机裁决(风味名: 投硬币决定谁更i人)"
+  },
+  "reveal_text": "对齐了颗粒度，闭环了短视频，i人e人的标签贴了一整晚。最后揭开底牌——原来最e的那个，一直在假装很i。",
+  "reveal_signature": "融合自 阿凯 的「MBTI贴标签」 × 琳琳 的「短视频挑战」 × 老周 的「开会黑话」 × 小雨 的「吃瓜雷达」 × Tony 的「健身狂魔」",
+  "flavor_glossary": [
+    { "term": "MBI/M系", "means": "MBTI的简称，这里游戏化地把它当成「官方认证标签」，官方发的是假身份，目的是让全场猜真实内心。" },
+    { "term": "i人/e人", "means": "MBTI里内倾/外倾的标签，泛指内向者和外向者。这里指真实性格，不是额头的假标签。" },
+    { "term": "颗粒度对齐", "means": "开会黑话里的高频词，这里借来当惩罚项——需要当众喊出来制造笑点。" },
+    { "term": "显眼包", "means": "网络流行语，指某个在群体里表现最突出/最容易被注意到的人，这里票选出来接受社死惩罚。" }
+  ],
+  "safety_note": "黄暴档 20/100(低): 全程无身体接触/低俗内容；惩罚为模仿口头禅(不点名)、emoji描述热点、对窗外喊黑话，均为安全搞笑；所有指向个人的环节均含跳过/换人拒绝权；无饮酒/无版权引用；适合公司团建场合。"
+}
+```

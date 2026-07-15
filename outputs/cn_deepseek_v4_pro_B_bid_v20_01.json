@@ -1,0 +1,121 @@
+{
+  "game_title": "颗粒度挑战局",
+  "subtitle": "团建特供 · 5人速火",
+  "premise": "先来一局黑话传声筒，看看你们组对齐能力多歪；然后每人轮流当‘博主’，抽挑战卡即兴表演，其他人盲猜，颗粒度贼细的分数直冲闭环。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "传递链环节每人收到一句含黑话的句子" },
+    { "prop": "密语卡", "to": "轮流", "visibility": "自己看", "note": "博主抽出挑战内容" },
+    { "prop": "命运转盘", "to": "公共区", "visibility": "全场公开", "note": "决定第一轮博主" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "表演限时1分钟" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "猜测挑战用；揭晓自动公开" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录总分" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局：转盘决定谁是首轮博主",
+    "阶段1·黑话传声筒：每人阅读自己的密语卡（一句话含黑话），按座位顺序从左到右口头传递，末位大声说出听到的版本，最后对照原句公开，爆笑不计分（暖场）",
+    "阶段2·短视频挑战赛：从首轮博主开始，博主抽一张挑战密语卡，打开沙漏，1分钟内表演；期间其他人用匿名投票器提交猜测“挑战是啥”；时间到后停止，系统判定猜对的人，博主根据猜对人数得分",
+    "循环：按座位顺时针轮换博主，每人当两次博主后结束",
+    "终局：总分最高者胜"
+  ],
+  "rules": [
+    {
+      "flavor_name": "对齐传话",
+      "mechanic": "传递链",
+      "plain_rule": "每人收到一句话秘密消息，按座位顺序依次口头传给下一个人，不能重复、只能听一遍；最后一个人大声说出来，然后系统展示最初的消息，对比首尾，乐就完了。",
+      "visibility": "自己看",
+      "params": {
+        "content_from": "$gen.黑话句子池",
+        "order": "seat",
+        "each_sees": "prev_only",
+        "replay": "first_vs_last"
+      }
+    },
+    {
+      "flavor_name": "拍你一条",
+      "mechanic": "回合推进",
+      "plain_rule": "轮到的人成为本轮博主，负责表演抽到的挑战。",
+      "visibility": "全场公开",
+      "params": {
+        "order": "round_robin"
+      }
+    },
+    {
+      "flavor_name": "火到我了",
+      "mechanic": "限时",
+      "plain_rule": "博主表演时间只有60秒，沙漏走完必须停下。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 60,
+        "visible_countdown": true,
+        "on_timeout": {
+          "effect": "goto",
+          "goto": "匿名投票揭晓"
+        }
+      }
+    },
+    {
+      "flavor_name": "我猜我猜我猜猜猜",
+      "mechanic": "同时提交",
+      "plain_rule": "所有非博主的玩家，悄悄在投票器上选一个你认为博主抽到的挑战；时间到或所有人提交后，一起亮结果。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "猜博主抽到的挑战是？",
+        "input_kind": "options",
+        "options": ["哑铃弯举", "波比跳", "平板支撑", "曳步舞", "对口型唱歌", "深蹲挑战"],
+        "timeout_s": 30,
+        "reveal": "simultaneous",
+        "scoring_ref": []
+      }
+    },
+    {
+      "flavor_name": "颗粒度判定",
+      "mechanic": "判定",
+      "plain_rule": "系统自动对比每个玩家的投票与博主抽到的真实挑战，猜中的+1分。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "expr",
+        "question": "玩家的选项是否等于挑战答案",
+        "expr": "submission == challenge_answer",
+        "on": {
+          "过": { "scoring_ref": ["猜中挑战"] },
+          "不过": {}
+        }
+      }
+    },
+    {
+      "flavor_name": "流量变现",
+      "mechanic": "判定",
+      "plain_rule": "如果本轮超过一半的玩家猜中挑战（3人或以上），博主+2分；否则博主-1分。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "expr",
+        "question": "本轮猜中玩家数≥3",
+        "expr": "count_correct >= 3",
+        "on": {
+          "过": { "scoring_ref": ["博主内容爆火"] },
+          "不过": { "scoring_ref": ["博主内容翻车"] }
+        }
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "猜中挑战", "who": "猜对者", "effect": "+1" },
+      { "event": "博主内容爆火", "who": "当轮博主", "effect": "+2" },
+      { "event": "博主内容翻车", "who": "当轮博主", "effect": "-1" }
+    ],
+    "win": "终局时总分最高的玩家获胜",
+    "tiebreak": "如果有并列最高分，由系统随机裁决，称为‘对齐一下兜底’"
+  },
+  "reveal_text": "经过几轮挑战，你们发现——会议黑话传到最后比挑战本身还有流量，而老周的波比跳永远颗粒度不足。团建的真正闭环，是笑到哑铃都举不起来。",
+  "reveal_signature": "融合自 老周 的「开会黑话」× 琳琳 的「短视频挑战」× 阿凯 的「i人e人」（术语穿皮）",
+  "flavor_glossary": [
+    { "term": "对齐", "means": "开会黑话，指统一意见或标准；游戏里传话环节暗讽越对齐越歪" },
+    { "term": "颗粒度", "means": "指细节程度，这里用于评分讲究精细——猜得准不准" },
+    { "term": "闭环", "means": "完整流程，这里指游戏从传黑话到挑战赛形成一个搞笑闭环" },
+    { "term": "i人/e人", "means": "MBTI内外向分类，没有用做机制但预告揭幕文案" }
+  ],
+  "safety_note": "黄暴档 20/100，无任何低俗内容；惩罚仅涉及扣分，无强迫任务；涉及健身动作请根据个人能力量力而行，系统提供跳过选项。"
+}

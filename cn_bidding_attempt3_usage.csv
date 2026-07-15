@@ -1,0 +1,13 @@
+﻿"filename","provider","requested_model","response_model","thinking_mode","prompt_token","completion_token","reasoning_token","cached_prompt_token","latency_seconds","cost_currency","cost_amount","input_price_per_m","output_price_per_m","cache_hit_price_per_m","status"
+"cn_minimax_m2_7_B_bid_v20_01.json","MiniMax","MiniMax-M2.7","MiniMax-M2.7","required","8256","4598","2381","unavailable","138.655448","CNY","0.0559608","2.1","8.4","0.42","received"
+"cn_minimax_m2_7_B_bid_v20_02.json","MiniMax","MiniMax-M2.7","MiniMax-M2.7","required","8256","3294","1135","8059","91.545566","CNY","0.03146808","2.1","8.4","0.42","received"
+"cn_minimax_m2_7_B_bid_v20_03.json","MiniMax","MiniMax-M2.7","MiniMax-M2.7","required","8256","4732","1758","8059","126.015479","CNY","0.04354728","2.1","8.4","0.42","received"
+cn_kimi_k2_6_B_bid_v20_01.json,Kimi,kimi-k2.6,unavailable,enabled,unavailable,unavailable,unavailable,unavailable,22.347841,CNY,unavailable,6.5,27.0,1.1,HTTP 400
+cn_kimi_k2_6_B_bid_v20_02.json,Kimi,kimi-k2.6,unavailable,enabled,unavailable,unavailable,unavailable,unavailable,21.841788,CNY,unavailable,6.5,27.0,1.1,HTTP 400
+cn_kimi_k2_6_B_bid_v20_03.json,Kimi,kimi-k2.6,unavailable,enabled,unavailable,unavailable,unavailable,unavailable,21.396088,CNY,unavailable,6.5,27.0,1.1,HTTP 400
+cn_glm_5_1_B_bid_v20_01.json,智谱,glm-5.1,unavailable,enabled,unavailable,unavailable,unavailable,unavailable,1.736295,CNY,unavailable,6.0,24.0,1.3,HTTP 401
+cn_glm_5_1_B_bid_v20_02.json,智谱,glm-5.1,unavailable,enabled,unavailable,unavailable,unavailable,unavailable,1.734133,CNY,unavailable,6.0,24.0,1.3,HTTP 401
+cn_glm_5_1_B_bid_v20_03.json,智谱,glm-5.1,unavailable,enabled,unavailable,unavailable,unavailable,unavailable,1.786884,CNY,unavailable,6.0,24.0,1.3,HTTP 401
+cn_deepseek_v4_pro_B_bid_v20_01.json,DeepSeek,deepseek-v4-pro,unavailable,enabled/high,unavailable,unavailable,unavailable,unavailable,1.351150,USD,unavailable,0.435,0.87,0.003625,HTTP 401
+cn_deepseek_v4_pro_B_bid_v20_02.json,DeepSeek,deepseek-v4-pro,unavailable,enabled/high,unavailable,unavailable,unavailable,unavailable,1.321654,USD,unavailable,0.435,0.87,0.003625,HTTP 401
+cn_deepseek_v4_pro_B_bid_v20_03.json,DeepSeek,deepseek-v4-pro,unavailable,enabled/high,unavailable,unavailable,unavailable,unavailable,1.390304,USD,unavailable,0.435,0.87,0.003625,HTTP 401

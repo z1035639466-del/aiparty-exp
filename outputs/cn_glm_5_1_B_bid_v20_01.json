@@ -1,0 +1,123 @@
+{
+  "game_title": "对齐！颗粒度！",
+  "subtitle": "公司团建包间 · 5人速局",
+  "premise": "全员轮流抽取黑话挑战盲盒，越抽越难，分数翻倍。你可以见好就收保住底分，也可以贪心续押——但爆牌的代价，是当众接受社畜拉伸！节奏极快，笑果拉满。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "盲盒", "to": "公共区", "visibility": "全场公开", "note": "内含一叠'黑话挑战卡'与少量'雷'，每次翻开一张。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "每次挑战限时 15 秒。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每人累积分数。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 盲盒洗牌，全员确认记分板归零。",
+    "轮流: 当前玩家翻开盲盒顶卡 → 宣读挑战 → 15秒内完成(沙漏) → 全员表决是否通过。",
+    "抉择: 通过后选择'喊停'(记当前分)或'续押'(清零当前分，再翻一张，分值翻倍)。",
+    "爆牌: 挑战未通过或超时 → 当前累积清零，接受一次轻惩罚，轮到下一位。",
+    "终局: 盲盒抽空或打满 3 轮 → 揭幕。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "黑话加码",
+      "mechanic": "续押喊停",
+      "plain_rule": "翻开盲盒并完成挑战后，你可以选择见好就收拿下分数，或者放弃当前分数再翻一张，下一张的分值翻倍；最多连抽 5 张，到顶必须结算。一旦挑战失败，本轮累积清零并受罚。",
+      "visibility": "全场公开",
+      "params": {
+        "draw_from": "$gen.黑话挑战池",
+        "continue_prompt": "继续对齐还是就此闭环？",
+        "bust_when": "挑战不通过",
+        "cap": 5,
+        "on_cap": "force_settle",
+        "bank_on_stop": true,
+        "scoring_ref": ["喊停保底", "续押成功", "爆牌"]
+      }
+    },
+    {
+      "flavor_name": "吃瓜表决",
+      "mechanic": "判定",
+      "plain_rule": "挑战是否通过，由其他所有人一键表决，多数算过；平局时由系统随机裁决。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "这波对齐了吗？",
+        "verdict_options": ["对齐了", "没对齐"],
+        "on": {
+          "对齐了": { "scoring_ref": "续押成功" },
+          "没对齐": { "scoring_ref": "爆牌" }
+        }
+      }
+    },
+    {
+      "flavor_name": "i人e人限制器",
+      "mechanic": "受限沟通",
+      "plain_rule": "若抽到带有'受限'标记的挑战卡，你在描述或表演时，嘴里只能说出 MBTI 的字母（如 I、E、N、S），不能说其他任何字词。",
+      "visibility": "全场公开",
+      "params": {
+        "channel": "one_word",
+        "enforce": "channel_only"
+      }
+    },
+    {
+      "flavor_name": "吃瓜雷达",
+      "mechanic": "揭示",
+      "plain_rule": "轮到你抽卡前，你可以花 1 分偷看盲盒最顶上的那张卡，只有你看得到；看完再决定这轮要不要抽。",
+      "visibility": "自己看",
+      "params": {
+        "reveal_of": "prop:盲盒",
+        "to": "actor",
+        "once": true
+      }
+    },
+    {
+      "flavor_name": "八卦代价",
+      "mechanic": "加减分",
+      "plain_rule": "使用吃瓜雷达偷看，扣 1 分。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "delta": "-1",
+        "scoring_ref": "吃瓜消费"
+      }
+    },
+    {
+      "flavor_name": "短视频节奏",
+      "mechanic": "限时",
+      "plain_rule": "每次挑战只有 15 秒，沙漏一漏完立刻停嘴，超时算爆牌。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 15,
+        "visible_countdown": true,
+        "on_timeout": { "effect": "scoring", "scoring_ref": "爆牌" }
+      }
+    },
+    {
+      "flavor_name": "社畜拉伸",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "爆牌的人做一个轻度惩罚（如 5 个深蹲或模仿一个短视频热门动作），可申请换一个。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "actor",
+        "pool": "$gen.惩罚池",
+        "scoring_ref": "爆牌"
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "喊停保底", "who": "actor", "effect": "+2" },
+      { "event": "续押成功", "who": "actor", "effect": "+2" },
+      { "event": "爆牌", "who": "actor", "effect": "惩罚(轻)" },
+      { "event": "吃瓜消费", "who": "actor", "effect": "-1" }
+    ],
+    "win": "终局时总分最高者胜",
+    "tiebreak": "系统随机裁决(风味名: 抛硬币定P级)"
+  },
+  "reveal_text": "黑话对齐了，颗粒度拉满了，才发现最 i 的人一直在偷偷吃 e 人的瓜。全场闭环，下班！",
+  "reveal_signature": "融合自 老周 的「开会黑话」 × 阿凯 的「MBTI」 × 小雨 的「爱吃瓜」 × 琳琳 的「短视频」 × Tony 的「健身」",
+  "flavor_glossary": [
+    { "term": "对齐/颗粒度/闭环", "means": "互联网公司常见的开会黑话，这里被当成挑战的核心词汇库。" },
+    { "term": "i人e人", "means": "MBTI性格测试中的内向(I)与外向(E)类型，这里用作受限沟通时的唯一合法词汇。" },
+    { "term": "社畜拉伸", "means": "结合了Tony的健身爱好与职场自嘲，指代爆牌后的轻度体力惩罚。" }
+  ],
+  "safety_note": "黄暴档 20/100(极低): 职场语境，惩罚仅为轻度动作(可跳过/替换)，无贴身接触与羞辱内容；未点名任何真人、无版权引用。"
+}

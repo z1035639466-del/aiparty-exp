@@ -1,0 +1,136 @@
+{
+  "canonical_skill": "docs/specs/DM-skill-v2.0.md",
+  "checker": {
+    "path": "check.py",
+    "implementation_version": "v2.1",
+    "canonical_source": "docs/specs/DM-skill-v2.0.md"
+  },
+  "input": "inputs/input_B.json",
+  "models": {
+    "MiniMax M2.7": [
+      {
+        "file": "outputs/cn_minimax_m2_7_B_bid_v20_01.json",
+        "pass": false,
+        "errors": ["JSON 不可解析: Expecting value: line 1 column 1 (char 0)"],
+        "warnings": []
+      },
+      {
+        "file": "outputs/cn_minimax_m2_7_B_bid_v20_02.json",
+        "pass": false,
+        "errors": ["JSON 不可解析: Expecting value: line 1 column 1 (char 0)"],
+        "warnings": []
+      },
+      {
+        "file": "outputs/cn_minimax_m2_7_B_bid_v20_03.json",
+        "pass": false,
+        "errors": ["JSON 不可解析: Expecting value: line 1 column 1 (char 0)"],
+        "warnings": []
+      }
+    ],
+    "Kimi K2.6": [
+      {
+        "file": "outputs/cn_kimi_k2_6_B_bid_v20_01.json",
+        "pass": true,
+        "errors": [],
+        "warnings": ["dead_prop:命运转盘", "dead_prop:密语卡"]
+      },
+      {
+        "file": "outputs/cn_kimi_k2_6_B_bid_v20_02.json",
+        "pass": false,
+        "errors": ["JSON 不可解析: Expecting value: line 1 column 1 (char 0)"],
+        "warnings": [],
+        "api_status": "network_error: TimeoutError"
+      },
+      {
+        "file": "outputs/cn_kimi_k2_6_B_bid_v20_03.json",
+        "pass": false,
+        "errors": [
+          "rules[1].params.on_named 的 scoring_ref 缺失或为空",
+          "rules[9] 惩罚档位不一致：scoring_ref '挑战失败' 的 effect '-1' ≠ 机制档位 惩罚(轻)"
+        ],
+        "warnings": ["dead_prop:命运转盘", "dead_prop:盲盒"]
+      }
+    ],
+    "GLM-5.1": [
+      {
+        "file": "outputs/cn_glm_5_1_B_bid_v20_01.json",
+        "pass": false,
+        "errors": [
+          "rules[2].params.on.过 缺失（需 on.过）",
+          "rules[2].params.on.不过 缺失（需 on.不过）"
+        ],
+        "warnings": []
+      },
+      {
+        "file": "outputs/cn_glm_5_1_B_bid_v20_02.json",
+        "pass": false,
+        "errors": ["JSON 不可解析: Expecting value: line 1 column 1 (char 0)"],
+        "warnings": []
+      },
+      {
+        "file": "outputs/cn_glm_5_1_B_bid_v20_03.json",
+        "pass": true,
+        "errors": [],
+        "warnings": ["prose_param_mismatch:rules[2].timeout_s=15", "dead_prop:密语卡"]
+      }
+    ],
+    "Qwen3.7 Plus": [
+      {
+        "file": "outputs/cn_qwen3_7_plus_B_bid_v20_01.json",
+        "pass": false,
+        "errors": ["JSON 不可解析: Expecting value: line 1 column 1 (char 0)"],
+        "warnings": [],
+        "api_status": "network_error: RemoteDisconnected"
+      },
+      {
+        "file": "outputs/cn_qwen3_7_plus_B_bid_v20_02.json",
+        "pass": false,
+        "errors": ["JSON 不可解析: Expecting value: line 1 column 1 (char 0)"],
+        "warnings": [],
+        "api_status": "network_error: TimeoutError"
+      },
+      {
+        "file": "outputs/cn_qwen3_7_plus_B_bid_v20_03.json",
+        "pass": false,
+        "errors": ["JSON 不可解析: Expecting value: line 1 column 1 (char 0)"],
+        "warnings": [],
+        "api_status": "network_error: TimeoutError"
+      }
+    ],
+    "DeepSeek V4 Pro": [
+      {
+        "file": "outputs/cn_deepseek_v4_pro_B_bid_v20_01.json",
+        "pass": false,
+        "errors": [
+          "rules[4].params.scoring_ref 缺失或为空（同时提交 必填顶层 scoring_ref）",
+          "rules[5].params.on.不过 的 scoring_ref 缺失或为空",
+          "rules[5].params.expr 未引用任何 state 键（须含 state:<键>，散文自由文本拒）（source=expr 须为可解析表达式且引用 state 键）",
+          "rules[6].params.expr 未引用任何 state 键（须含 state:<键>，散文自由文本拒）（source=expr 须为可解析表达式且引用 state 键）"
+        ],
+        "warnings": ["dead_prop:命运转盘", "dead_prop:密语卡"],
+        "api_status": "received"
+      },
+      {
+        "file": "outputs/cn_deepseek_v4_pro_B_bid_v20_02.json",
+        "pass": false,
+        "errors": [
+          "props_dealt[3].prop 不在道具白名单: '同时提交器'",
+          "rules[2].params.on.过 缺失（需 on.过）",
+          "rules[2].params.on.不过 缺失（需 on.不过）"
+        ],
+        "warnings": ["prose_param_mismatch:rules[5].timeout_s=20", "dead_prop:密语卡", "dead_prop:身份牌"],
+        "api_status": "received"
+      },
+      {
+        "file": "outputs/cn_deepseek_v4_pro_B_bid_v20_03.json",
+        "pass": false,
+        "errors": [
+          "rules[2].params.on.过 缺失（需 on.过）",
+          "rules[2].params.on.不过 缺失（需 on.不过）"
+        ],
+        "warnings": ["dead_prop:命运转盘", "dead_prop:密语卡"],
+        "api_status": "received"
+      }
+    ]
+  }
+}
