@@ -1,0 +1,112 @@
+{
+  "game_title": "黑话生存直播间",
+  "subtitle": "转盘定轨道，额头贴标签，八卦悄悄传",
+  "premise": "命运转盘每轮甩出一条赛道——黑话诱导、挑战直拍、标签自猜——全员同步下场，背地里还有一条八卦纸条正在饭桌底下悄悄传递，终局揭晓谁最会编、谁被传成了另一个人。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop":"身份牌","to":"全体","visibility":"额头","note":"开局每人领一张 MBTI 标签牌贴额头，自己看不到，别人全程看得到；整局不换，作为标签自猜环节的谜底"},
+    {"prop":"命运转盘","to":"全场","visibility":"全场公开","note":"三扇区：黑话诱导 / 挑战直拍 / 标签自猜，转出赛道并转出当值人"},
+    {"prop":"密语卡","to":"当值人","visibility":"自己看","note":"黑话赛道当值人私下领一张卡，上面写本轮要自然说出的黑话词"},
+    {"prop":"抽签筒","to":"全场","visibility":"自己看/公开","note":"挑战直拍赛道用来抽当轮挑战名"},
+    {"prop":"匿名投票器","to":"全场","visibility":"自己看","note":"用于八卦终局的最失真投票"},
+    {"prop":"沙漏","to":"全场","visibility":"全场公开","note":"每轮限时用"},
+    {"prop":"记分板","to":"全场","visibility":"全场公开","note":"实时加减分"},
+    {"prop":"公共看板","to":"全场","visibility":"全场公开","note":"显示本轮赛道与当值人"}
+  ],
+  "props_required": [],
+  "flow": [
+    "阶段0 开局：每人领 MBTI 身份牌贴额头；公共看板亮出玩法说明；转盘配置三扇区。",
+    "阶段1(循环5轮，每轮限时60秒)：转命运转盘 → 定当值人与赛道 → 按赛道执行对应规则 → 记分板即时结算 → 同时抽一张八卦纸条按座位往下传一位（每人只看得到上一棒写的内容）。",
+    "阶段2 八卦终局：五轮跑完，八卦纸条正好传完一圈，公开对比首尾内容，全场用匿名投票器投\"最失真奖\"。",
+    "阶段3 身份揭晓：全员摘下额头牌，公开核对整局猜没猜中过自己的标签。",
+    "阶段4 总结算：记分板出总分，最高分获胜；垫底者领一个健身氛围的轻量惩罚（可跳过换成鼓掌陪跑）。"
+  ],
+  "rules": [
+    {
+      "flavor_name":"黑话植入",
+      "mechanic":"声明质疑",
+      "plain_rule":"密语卡上写了一个黑话词，当值人要在本轮聊天里自然说出这个词。时间到，当值人自己声明\"我说了/没说\"，别人可以当场质疑；质疑后翻密语卡核对真假，说谎的人受罚，冤枉别人的人也受罚。",
+      "visibility":"自己看",
+      "params": {"claim_prompt":"我这轮已经把密语卡上的黑话词自然说出来了吗？","challengers":"others","challenge_window_s":20,"verify_source":"prop_reveal:密语卡","verify_reveals":"prop_state","on_liar":{"scoring_ref":["黑话造假受罚","识破黑话加分"]},"on_false_accuse":{"scoring_ref":["黑话冤枉受罚","黑话被冤枉补偿"]}}
+    },
+    {
+      "flavor_name":"直拍挑战",
+      "mechanic":"判定",
+      "plain_rule":"抽签筒抽出一个挑战名，全场看着当值人在限时内完成，时间到大家一键表决\"算不算过\"，过了加分，没过扣分。",
+      "visibility":"全场公开",
+      "params": {"source":"consensus","question":"这轮挑战算完成了吗？","verdict_options":["过","不过"],"on":{"过":{"scoring_ref":"挑战成功"},"不过":{"scoring_ref":"挑战失败"}}}
+    },
+    {
+      "flavor_name":"挑战倒计时",
+      "mechanic":"限时",
+      "plain_rule":"沙漏开始倒计时60秒，当值人必须在这段时间内完成挑战，超时直接判失败扣分。",
+      "visibility":"全场公开",
+      "params": {"seconds":60,"visible_countdown":true,"on_timeout":{"effect":"scoring","scoring_ref":"挑战超时扣分"}}
+    },
+    {
+      "flavor_name":"猜猜我是谁",
+      "mechanic":"受限沟通",
+      "plain_rule":"标签自猜赛道，除当值人外的所有人只能各说一个词来提示当值人额头上贴的是什么标签，不许说长句子。",
+      "visibility":"全场公开",
+      "params": {"channel":"one_word","enforce":"channel_only"}
+    },
+    {
+      "flavor_name":"标签自证",
+      "mechanic":"判定",
+      "plain_rule":"提示说完，当值人喊出自己觉得额头上贴的是什么标签，全场一键表决对不对，猜中加分，猜错不扣分。",
+      "visibility":"全场公开",
+      "params": {"source":"consensus","question":"当值人猜对自己的标签了吗？","verdict_options":["过","不过"],"on":{"过":{"scoring_ref":"标签猜中加分"},"不过":{"scoring_ref":[]}}}
+    },
+    {
+      "flavor_name":"命运抽人",
+      "mechanic":"点名目标",
+      "plain_rule":"每轮开始先转命运转盘，转出这一轮的赛道和当值人，当值人就是这轮要下场的人。",
+      "visibility":"全场公开",
+      "params": {"selector":"random","target_pool":"alive_others","on_named":{"scoring_ref":[]}}
+    },
+    {
+      "flavor_name":"饭桌传闻",
+      "mechanic":"传递链",
+      "plain_rule":"每轮结束都会传一张八卦纸条，按座位顺序一个接一个往下传，每人只能看到上一个人写的内容，然后自己接着编一句再传给下一位；跑完一圈后当众公开第一句和最后一句对比。",
+      "visibility":"自己看",
+      "params": {"content_from":"$gen.八卦种子池","order":"seat","each_sees":"prev_only","replay":"first_vs_last"}
+    },
+    {
+      "flavor_name":"最失真奖",
+      "mechanic":"同时提交",
+      "plain_rule":"八卦纸条首尾公开后，全场同时私密投票选\"这轮传得最离谱的一棒是谁传丢的\"，一起揭晓，票数最高的那位额外获得一个搞笑称号加分。",
+      "visibility":"自己看",
+      "params": {"prompt":"这轮八卦谁传得最离谱？","input_kind":"options","options":"$派生:本轮传递链参与者","timeout_s":20,"reveal":"simultaneous","scoring_ref":["最失真奖加分"]}
+    },
+    {
+      "flavor_name":"标签终局摊牌",
+      "mechanic":"揭示",
+      "plain_rule":"游戏结束时所有人摘下额头牌，公开自己真正的标签，方便大家核对整局猜得准不准。",
+      "visibility":"额头",
+      "params": {"reveal_of":"prop:身份牌","to":"all","once":true}
+    },
+    {
+      "flavor_name":"垫底健身秀",
+      "mechanic":"惩罚(轻)",
+      "plain_rule":"总分垫底的人要即兴做一个健身动作示范给大家看；不想做也可以选择替代项——给冠军鼓掌喝彩三十秒，没有羞辱性代价。",
+      "visibility":"全场公开",
+      "params": {"who":"loser","pool":"$gen.penalty_健身轻量池","scoring_ref":"垫底惩罚"}
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      {"event":"黑话造假受罚","effect":"delta","delta":"-2"},
+      {"event":"识破黑话加分","effect":"delta","delta":"+2"},
+      {"event":"黑话冤枉受罚","effect":"delta","delta":"-1"},
+      {"event":"黑话被冤枉补偿","effect":"delta","delta":"+1"},
+      {"event":"挑战成功","effect":"delta","delta":"+2"},
+      {"event":"挑战失败","effect":"delta","delta":"-1"},
+      {"event":"挑战超时扣分","effect":"delta","delta":"-1"},
+      {"event":"标签猜中加分","effect":"delta","delta":"+2"},
+      {"event":"最失真奖加分","effect":"delta","delta":"+1"},
+      {"event":"垫底惩罚","effect":"penalty_tier","tier":"轻"}
+    ],
+    "win": "五轮结束后记分板总分最高者获胜",
+    "tiebreak": "平局与并列默认由系统随机裁决（可包一层\"命运一掷\"的转盘皮）"
+  }
+}
