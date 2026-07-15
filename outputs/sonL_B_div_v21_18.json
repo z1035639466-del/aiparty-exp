@@ -1,0 +1,143 @@
+{
+  "game_title": "闭环健身房 · 团建包间限定",
+  "subtitle": "为阿凯/琳琳/老周/小雨/Tony 现制 · 5 人速局",
+  "premise": "每轮抽一个黑话词当唯一可用词，发起人靠这一个词比划出今天的短视频挑战，全场表决过不过；过不了关就搏一把健身续命，或见好就收。中途谁被抓包在i人e人上撒谎，密语卡当场翻底。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "开局每人写下自己认的MBTI类型(更像i人还是e人)，只有自己看得到；后面声明质疑翻牌验证真假时才会被打开。" },
+    { "prop": "骰盅", "to": "当轮发起人", "visibility": "自己看", "note": "健身续命阶段用来开盅判定这次搏一把有没有拉伤。" },
+    { "prop": "抽签筒", "to": "公共区", "visibility": "全场公开", "note": "每轮开局抽一根签，决定本轮唯一可用的黑话词(对齐/颗粒度/闭环等)。" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "闭环对齐的共识表决、瓜料竞猜的同时提交都用它；揭晓时自动转公开(道具内置)。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "挑战动作限时30秒。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每轮加减分，终局比总分。" },
+    { "prop": "公共看板", "to": "公共区", "visibility": "全场公开", "note": "显示当前轮的黑话词和发起人是谁。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 每人领一张密语卡写下自己认的MBTI类型(i人/e人)，自己收好；宣读黑话词表与挑战规则。",
+    "每轮(共4轮，按现实座位顺序轮流当发起人): 抽签筒抽一个黑话词 → 发起人只用这个词描述今日短视频挑战 → 30秒内当众完成动作 → 全场表决过不过关。",
+    "没过关的发起人: 可选'再搏一把'或'见好就收'；搏一把就开骰盅，拉伤就清零本轮分、最多搏4次后系统强制结算。",
+    "每轮表决前: 其余人同时私密提交'这轮发起人会不会搏一把'的预测，同时揭晓算分。",
+    "任意时刻: 发起人可公开声称自己此刻更像i人还是e人(可以撒谎)，任何人可质疑，一旦质疑就翻密语卡验真假。",
+    "每轮末: 传一条瓜(八卦内容)按座位顺序悄悄传递，最后一人念出来，跟原句对比看走样多少，纯图一乐。",
+    "4轮跑完: 揭幕，记分板总分最高者胜；平局或并列一律由系统随机裁决(风味名：抽签筒补签)。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "颗粒度点题",
+      "mechanic": "受限沟通",
+      "plain_rule": "本轮发起人描述这轮短视频挑战是什么时，只能反复说抽到的那一个黑话词，别的话不准说，其余人靠意会猜挑战内容。",
+      "visibility": "全场公开",
+      "params": { "channel": "one_word", "enforce": "channel_only" }
+    },
+    {
+      "flavor_name": "沙漏倒计时",
+      "mechanic": "限时",
+      "plain_rule": "发起人展示挑战动作只有30秒，沙漏一响必须停手，直接进入表决。",
+      "visibility": "全场公开",
+      "params": { "seconds": 30, "visible_countdown": true, "on_timeout": { "effect": "goto", "goto": "闭环对齐表决" } }
+    },
+    {
+      "flavor_name": "闭环对齐表决",
+      "mechanic": "判定",
+      "plain_rule": "发起人做完动作后，全场一键表决'这个挑战算过关吗'，多数意见说了算。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "这个挑战算过关吗？",
+        "verdict_options": ["过", "不过"],
+        "on": { "过": { "scoring_ref": "挑战成功" }, "不过": { "scoring_ref": "挑战失败" } }
+      }
+    },
+    {
+      "flavor_name": "闭环失败自罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "挑战没过关的人，当场喊一句健身狂魔式加油口号自罚；不想喊也可以跳过，换成说一句黑话代替，不算丢脸。",
+      "visibility": "全场公开",
+      "params": { "who": "actor", "pool": "$gen.penalty_内容池", "scoring_ref": "挑战失败" }
+    },
+    {
+      "flavor_name": "i人e人自报",
+      "mechanic": "声明质疑",
+      "plain_rule": "发起人可以当众声称自己这轮更像'i人'还是'e人'(允许撒谎)；任何人都能质疑，一旦被质疑就翻开发起人自己写的密语卡对质，说谎的人受罚，瞎冤枉别人的人也受罚。",
+      "visibility": "自己看",
+      "params": {
+        "claim_prompt": "公开声称你这轮更像i人还是e人",
+        "challengers": "others",
+        "challenge_window_s": 20,
+        "verify_source": "prop_reveal:密语卡",
+        "verify_reveals": "prop_state",
+        "on_liar": { "scoring_ref": ["撒谎受罚", "揭穿加分"] },
+        "on_false_accuse": { "scoring_ref": ["冤枉受罚", "被冤枉补偿"] }
+      }
+    },
+    {
+      "flavor_name": "健身续命",
+      "mechanic": "续押喊停",
+      "plain_rule": "没过关的人可以选'再加一组健身动作搏一把'或'见好就收保住已得的分'；每搏一把就开一次骰盅，开出'拉伤'就爆掉、之前攒的分清零；最多搏4次，第4次开完系统强制结算。",
+      "visibility": "自己看",
+      "params": {
+        "draw_from": "prop:骰盅",
+        "continue_prompt": "再搏一把还是见好就收？",
+        "bust_when": "开出拉伤",
+        "cap": 4,
+        "on_cap": "force_settle",
+        "bank_on_stop": true,
+        "scoring_ref": ["落袋为安", "拉伤清零"]
+      }
+    },
+    {
+      "flavor_name": "瓜料竞猜",
+      "mechanic": "同时提交",
+      "plain_rule": "表决前，其余人各自私密提交'这轮发起人会搏一把还是见好就收'的预测，一起揭晓，猜中的人加分，猜错的人扣分。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "这轮发起人会选择搏一把还是见好就收？",
+        "input_kind": "options",
+        "options": ["搏一把", "见好就收"],
+        "timeout_s": 15,
+        "reveal": "simultaneous",
+        "scoring_ref": ["预测命中加分", "预测落空扣分"]
+      }
+    },
+    {
+      "flavor_name": "瓜田快报",
+      "mechanic": "传递链",
+      "plain_rule": "一条瓜(八卦内容)从发起人开始，按现实座位顺序悄悄往下传，每人只能看到上一个人传来的内容，传到最后一人当众念出来，跟原句对比看走样了多少，纯图一乐，不计分。",
+      "visibility": "自己看",
+      "params": { "content_from": "$gen.瓜料池", "order": "seat", "each_sees": "prev_only", "replay": "first_vs_last" }
+    },
+    {
+      "flavor_name": "轮值发起人",
+      "mechanic": "回合推进",
+      "plain_rule": "按大家现实坐的位置顺序轮流当发起人，跑满4轮(不重排座位)。",
+      "visibility": "全场公开",
+      "params": { "order": "round_robin" }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "挑战成功", "who": "actor", "effect": "+1" },
+      { "event": "挑战失败", "who": "actor", "effect": "惩罚(轻)" },
+      { "event": "撒谎受罚", "who": "actor", "effect": "惩罚(轻)" },
+      { "event": "揭穿加分", "who": "challenger", "effect": "+2" },
+      { "event": "冤枉受罚", "who": "challenger", "effect": "惩罚(轻)" },
+      { "event": "被冤枉补偿", "who": "actor", "effect": "+1" },
+      { "event": "落袋为安", "who": "actor", "effect": "+2" },
+      { "event": "拉伤清零", "who": "actor", "effect": "清零本次续押累积分" },
+      { "event": "预测命中加分", "who": "predictor", "effect": "+1" },
+      { "event": "预测落空扣分", "who": "predictor", "effect": "-1" }
+    ],
+    "win": "4轮跑完后，记分板总分最高者胜",
+    "tiebreak": "系统随机裁决(风味名：抽签筒补签)"
+  },
+  "reveal_text": "四轮下来才发现，嘴上最会说'对齐颗粒度闭环'的那个人，健身搏起命来反倒最怂；反倒是平时不吭声的那位，瓜传到最后一句都没走样，堪称组里最稳定的接口。",
+  "reveal_signature": "融合自 老周 的「对齐/颗粒度/闭环」黑话 × 阿凯 的「MBTI贴标签」 × 琳琳 的「短视频挑战」 × 小雨 的「爱吃瓜」 × Tony 的「健身狂魔」",
+  "flavor_glossary": [
+    { "term": "对齐/颗粒度/闭环", "means": "开会常用黑话，这里被当成本局唯一合法的'暗号词'，用来描述挑战内容。" },
+    { "term": "i人/e人", "means": "MBTI里内向/外向的简称，这里用来做一局'敢不敢公开自称+被拆穿'的小游戏。" },
+    { "term": "瓜", "means": "八卦的意思，这里指传递链游戏里传的那条小道消息。" },
+    { "term": "拉伤", "means": "健身梗，这里指续押喊停搏一把时开出的'爆掉'结果。" }
+  ],
+  "safety_note": "黄暴档 20/100(低)：所有惩罚只到'喊口号/说黑话'，不涉身体接触、不涉真实隐私爆料；因是团建包间场合，未设任何点名式贴身惩罚，且每条个人向惩罚都带跳过/换一个的拒绝权；未点名任何真实第三人、无版权引用。"
+}
