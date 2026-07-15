@@ -1,0 +1,117 @@
+{
+  "game_title": "颗粒度对齐夜·团建包间发疯局",
+  "subtitle": "黑话闭环、瓜田连麦、i人e人默契一把梭",
+  "premise": "今晚这间团建包间被五个人的口头禅承包了——黑话得逼着说出口,瓜得靠传情报才不失真,i人e人的默契靠手速定输赢。五轮抽签走完,谁分最高谁把这局玩明白了。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop":"抽签筒","to":"全体","visibility":"自己看","note":"每轮开局抓阄决定当轮「传令人」,不放回抽取,五人局抽满五轮即走完全部环节"},
+    {"prop":"密语卡","to":"当轮传令人","visibility":"自己看","note":"私发本轮要逼队友说出口的黑话词(如「对齐」「颗粒度」「闭环」),仅传令人可见"},
+    {"prop":"沙漏","to":"全体","visibility":"全场公开","note":"密令环节与挑战环节共用的倒计时,开始即所有人可见剩余时间"},
+    {"prop":"命运转盘","to":"全体","visibility":"全场公开","note":"扇区放短视频神曲挑战/健身接力挑战两类,转到哪个就发起哪个,已选扇区本轮不再重复"},
+    {"prop":"匿名投票器","to":"全体","visibility":"自己看","note":"用于MBTI默契题的私密同时提交,以及挑战墙/密令是否过关的全场表决,提交阶段自己看、揭晓操作自动转公开"},
+    {"prop":"记分板","to":"全体","visibility":"全场公开","note":"全程展示个人分,加减分与惩罚触发实时刷新"}
+  ],
+  "props_required": [],
+  "flow": [
+    "阶段1 开局说明: 讲清黑话密令怎么玩、非饮酒惩罚池随时可跳过换一个,抽签筒亮出五人姓名签",
+    "阶段2 黑话密令轮(重复五次,每人各当一次传令人): 抽签定传令人 → 传令人受限沟通逼队友说出黑话词 → 沙漏限时倒计时 → 全场共识判定这轮算不算对齐 → 超时或没对齐者领轻惩罚",
+    "阶段3 瓜田速报: 主持人起一句瓜料,按现实座位顺序传递链逐人小声复述,传到最后一人当众说出,全场对比首尾版本笑一轮",
+    "阶段4 MBTI默契墙: 每轮抛一个团建场景,全员用匿名投票器私密同时提交「i人会怎么做/e人会怎么做」,揭晓后命中多数选项的人加分",
+    "阶段5 命运转盘挑战墙: 转盘转出短视频挑战或健身接力,完成后全场表决过关与否;没过关的人可在健身续命局里选择加练一组换机会或直接喊停领轻惩罚",
+    "阶段6 终局结算: 五轮密令跑完即终局,记分板揭晓最终排名,分数并列按全局约定由命运转盘随机裁决"
+  ],
+  "rules": [
+    {
+      "flavor_name":"颗粒度密令",
+      "mechanic":"受限沟通",
+      "plain_rule":"抽到「传令人」的人拿到一张写着黑话词的密语卡,限定时间内只能用一个近义词提示别人,让对方把黑话词(比如「对齐」「颗粒度」「闭环」)亲口说出来,不能直接说这个词本身,也不能用动作比划。",
+      "visibility":"自己看",
+      "params": {"channel":"one_word","enforce":"channel_only"}
+    },
+    {
+      "flavor_name":"对齐倒计时",
+      "mechanic":"限时",
+      "plain_rule":"沙漏一开始计时,传令人要在时间内完成提示,时间一到不管有没有说出来都直接进入判定环节。",
+      "visibility":"全场公开",
+      "params": {"seconds":30,"visible_countdown":true,"on_timeout":{"effect":"scoring","scoring_ref":"密令超时"}}
+    },
+    {
+      "flavor_name":"闭环判定",
+      "mechanic":"判定",
+      "plain_rule":"时间到或队友喊出词后,全场一起举手表决「这轮算不算对齐成功」,过半数认可就算过关,传令人和搭档一起加分;没过关就都进惩罚池。",
+      "visibility":"全场公开",
+      "params": {"source":"consensus","question":"这轮黑话密令,队友在时限内说出词了吗?","verdict_options":["对齐成功","没对齐"],"on":{"对齐成功":{"scoring_ref":"密令达成"},"没对齐":{"scoring_ref":"密令超时"}}}
+    },
+    {
+      "flavor_name":"没对齐轻罚",
+      "mechanic":"惩罚(轻)",
+      "plain_rule":"没对齐的两人从非饮酒惩罚池里抽一个轻惩罚(比如用黑话即兴说一句rap、原地摆一个夸张pose),不想抽这个可以一键换一个,拒绝不扣额外分也不用道歉。",
+      "visibility":"全场公开",
+      "params": {"who":"loser","pool":"$gen.penalty_黑话轻惩罚池","scoring_ref":"密令超时"}
+    },
+    {
+      "flavor_name":"瓜田速报",
+      "mechanic":"传递链",
+      "plain_rule":"主持人给第一位玩家念一句瓜料开头,这位玩家小声复述给下一位,下一位再往下传,每人只能听到上一位说的版本,传到最后一位要大声说出来,全场再回放对比第一版和最后一版差多远。",
+      "visibility":"自己看",
+      "params": {"content_from":"$gen.瓜料池","order":"seat","each_sees":"prev_only","replay":"first_vs_last"}
+    },
+    {
+      "flavor_name":"i人e人默契墙",
+      "mechanic":"同时提交",
+      "plain_rule":"主持人念一个团建场景(比如「轮到你敬酒发言」),所有人不许商量,私下用投票器同时选「i人会怎么做」或「e人会怎么做」的选项,一起揭晓,选中多数人那边的加分。",
+      "visibility":"自己看",
+      "params": {"prompt":"这个场景,i人会怎么选,e人又会怎么选?","input_kind":"options","options":"$派生:本轮MBTI场景选项","timeout_s":20,"reveal":"simultaneous","scoring_ref":["默契命中加分"]}
+    },
+    {
+      "flavor_name":"变装挑战墙",
+      "mechanic":"判定",
+      "plain_rule":"命运转盘转出一个挑战(短视频神曲模仿或健身接力二选一),挑战者当场完成,完成后全场一键表决「这段算不算过关」,过关就加分,不过关就进健身续命局。",
+      "visibility":"全场公开",
+      "params": {"source":"consensus","question":"这段挑战,全场公认过关了吗?","verdict_options":["过","不过"],"on":{"过":{"scoring_ref":"挑战成功"},"不过":{"scoring_ref":"挑战失败"}}}
+    },
+    {
+      "flavor_name":"挑战没过轻罚",
+      "mechanic":"惩罚(轻)",
+      "plain_rule":"挑战没过关又不想续命的人,直接从非饮酒惩罚池抽一个轻惩罚,同样可以一键换一个,拒绝没有代价。",
+      "visibility":"全场公开",
+      "params": {"who":"loser","pool":"$gen.penalty_挑战轻惩罚池","scoring_ref":"挑战失败"}
+    },
+    {
+      "flavor_name":"健身续命局",
+      "mechanic":"续押喊停",
+      "plain_rule":"挑战没过关的人可以选「续押」——现场再加一组健身动作(比如10个开合跳)换一次翻盘机会,也可以选「喊停」直接领轻惩罚;续押时抽到「抽筋牌」就直接爆掉扣分,最多续押三次,到第三次强制结算。",
+      "visibility":"全场公开",
+      "params": {"draw_from":"$gen.健身续命池","continue_prompt":"要不要再加一组换机会?","bust_when":"抽中抽筋牌","cap":3,"on_cap":"force_settle","bank_on_stop":true,"scoring_ref":["续命成功","续命爆掉"]}
+    },
+    {
+      "flavor_name":"瓜料原句揭晓",
+      "mechanic":"揭示",
+      "plain_rule":"传递链走完之后,主持人把最初那句瓜料原文亮出来,让全场看看到底传丢了哪几个字。",
+      "visibility":"全场公开",
+      "params": {"reveal_of":"prop:密语卡","to":"actor","once":true}
+    },
+    {
+      "flavor_name":"传令人接力",
+      "mechanic":"回合推进",
+      "plain_rule":"每完成一轮黑话密令,就按现实座位顺序轮到下一位没当过传令人的人抽签,五个人各当一次传令人后本局自动进入终局结算。",
+      "visibility":"全场公开",
+      "params": {"order":"round_robin"}
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      {"event":"密令达成","effect":"score_delta","delta":"+1","desc":"传令人与队友在时限内成功对齐黑话词"},
+      {"event":"密令超时","effect":"penalty_light","desc":"密令未在时限内完成或表决未通过"},
+      {"event":"默契命中加分","effect":"score_delta","delta":"+2","desc":"MBTI默契墙提交结果命中多数选项"},
+      {"event":"挑战成功","effect":"score_delta","delta":"+2","desc":"变装挑战墙经全场表决过关"},
+      {"event":"挑战失败","effect":"penalty_light","desc":"变装挑战墙未通过全场表决"},
+      {"event":"续命成功","effect":"score_delta","delta":"+2","desc":"健身续命局续押后未爆掉,翻盘成功"},
+      {"event":"续命爆掉","effect":"score_delta","delta":"-2","desc":"健身续命局续押抽中抽筋牌"}
+    ],
+    "win": {"basis":"五轮走完后个人总分最高者获胜","scope":"individual"},
+    "tiebreak": "平局与并列默认由系统随机裁决(命运转盘皮:命运一掷决出唯一赢家)"
+  },
+  "reveal_text": "颗粒度算是对齐了,瓜也传丢了大半个版本,i人e人的默契墙比想象中准——这届团建,包间被玩明白了。",
+  "reveal_signature": ["老周", "小雨", "阿凯", "琳琳", "Tony"]
+}
