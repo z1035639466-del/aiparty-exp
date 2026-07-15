@@ -1,0 +1,164 @@
+{
+  "game_title": "对齐一下，颗粒度局",
+  "subtitle": "团建包间黑话生存夜",
+  "premise": "黑话警戒线全程常驻，MBTI猜心、颗粒度加注、魔性挑战盲盒轮着上，最后一轮瓜料传声筒验成色，看谁能笑着扛到记分板顶端。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "开局每人一张，写好本局要悄悄完成的小任务；不想做可当场换一张温和替代，无额外代价" },
+    { "prop": "盲盒", "to": "公共", "visibility": "全场公开", "note": "轮到者从中摸一个魔性挑战，摸出即公开表演" },
+    { "prop": "命运转盘", "to": "公共", "visibility": "全场公开", "note": "只用来转出惩罚内容池(职场向/健身向)，不决定谁受罚" },
+    { "prop": "匿名投票器", "to": "全体", "visibility": "自己看", "note": "各类需要全场表决/指认的环节都走它，提交私密、揭晓自动转公开" },
+    { "prop": "沙漏", "to": "公共", "visibility": "全场公开", "note": "魔性挑战表演限时用" },
+    { "prop": "记分板", "to": "公共", "visibility": "全场公开", "note": "全程累计分数，终局排名依据" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局：每人领一张密语卡（悄悄写好本轮小任务），主持人宣布'黑话警戒线'常驻规则——全场只能用工作黑话描述进度，生效直到终局。",
+    "轮次循环(共5轮，每人轮到自己算1轮)：轮到者先带全场做一次'i人此刻在想什么'同时提交竞猜，然后自选'颗粒度加注'续押，或从'魔性挑战盲盒'摸一个挑战并在沙漏计时内表演。",
+    "常驻监督：任何时候有人没绷住说了大白话，随时可被举报，触发'举报开庭'共识判定。",
+    "5轮结束后进入'瓜料传声筒'：按座位顺序悄悄传一句瓜料，最后一棒大声说出来，跟原文对比走样程度。",
+    "全场用匿名投票器'认领声音勋章'，选出这轮传得最像原文的人。",
+    "密语卡任务在此刻做最后一次自报'完成/没完成'，其他人可质疑对质。",
+    "记分板结算：分数最高者获胜；若并列，系统随机裁决。",
+    "惩罚提醒：任何惩罚内容都可以换一个更温和的选项，拒绝不额外受罚；健身向惩罚强度自选，不勉强。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "i人此刻在想什么",
+      "mechanic": "同时提交",
+      "plain_rule": "主持人报一个本轮场景（比如'轮到你发言了'），所有人同时悄悄选一个人，猜谁此刻最想装死躲起来。选完一起揭晓，选中和大多数人一致的人加分，选歪的人没有代价。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "这轮谁最想当'i人'躲起来？",
+        "input_kind": "options",
+        "options": "$派生:本轮全体玩家",
+        "timeout_s": 20,
+        "reveal": "simultaneous",
+        "scoring_ref": ["默契连线加分"]
+      }
+    },
+    {
+      "flavor_name": "黑话警戒线",
+      "mechanic": "受限沟通",
+      "plain_rule": "整场进行期间，描述'进度/协作/汇报'类话题时禁止说大白话，只能用工作黑话代替（比如说'我们对齐一下'而不是'我们商量一下'）。这条规则从开局生效到终局，随时可被举报触发判定。",
+      "visibility": "全场公开",
+      "params": {
+        "channel": "one_word",
+        "enforce": "channel_only"
+      }
+    },
+    {
+      "flavor_name": "举报开庭",
+      "mechanic": "判定",
+      "plain_rule": "任何人举报'某某刚才说了大白话'，全场一键表决这次举报算不算数。算数就对被举报人执行惩罚(轻)，不算数就对举报人执行惩罚(轻)。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "这次举报成立吗？",
+        "verdict_options": ["成立", "不成立"],
+        "on": {
+          "成立": { "scoring_ref": "举报成立" },
+          "不成立": { "scoring_ref": "举报不成立" }
+        }
+      }
+    },
+    {
+      "flavor_name": "颗粒度加注",
+      "mechanic": "续押喊停",
+      "plain_rule": "轮到你时，你可以选择'再拆细一次颗粒度'（继续加注，奖励池+1）或'先这样吧'（喊停，锁住已得分）。抽到'过度对齐'就直接爆掉，清零这一轮所有累积。",
+      "visibility": "全场公开",
+      "params": {
+        "draw_from": "$gen.颗粒度事件池",
+        "continue_prompt": "继续拆细颗粒度，还是先这样吧？",
+        "bust_when": "抽中过度对齐",
+        "cap": 8,
+        "on_cap": "force_settle",
+        "bank_on_stop": true,
+        "scoring_ref": ["落袋为安", "爆掉清零"]
+      }
+    },
+    {
+      "flavor_name": "秘密任务：贴地气",
+      "mechanic": "声明质疑",
+      "plain_rule": "每人开局收到一张密语卡，上面写着本局要悄悄完成的小任务（比如'让别人主动夸你一句'）。轮末你自己申报'完成了/没完成'，其他人可以质疑，质疑后翻开密语卡对质：说谎被抓要受罚，冤枉别人也要受罚。不想做这项任务可以当场换一张更温和的。",
+      "visibility": "自己看",
+      "params": {
+        "claim_prompt": "你完成密语卡任务了吗？",
+        "challengers": "others",
+        "challenge_window_s": 30,
+        "verify_source": "prop_reveal:密语卡",
+        "verify_reveals": "prop_state",
+        "on_liar": { "scoring_ref": ["撒谎受罚", "揭穿加分"] },
+        "on_false_accuse": { "scoring_ref": ["冤枉受罚", "被冤枉补偿"] }
+      }
+    },
+    {
+      "flavor_name": "瓜料传声筒",
+      "mechanic": "传递链",
+      "plain_rule": "主持人给第一个人一句'瓜'文本，按座位顺序小声传给下一位，每人只能听到上一位说的，传到最后一位大声说出来，跟原文对比看走样了多少。",
+      "visibility": "自己看",
+      "params": {
+        "content_from": "$gen.瓜料池",
+        "order": "seat",
+        "each_sees": "prev_only",
+        "replay": "first_vs_last"
+      }
+    },
+    {
+      "flavor_name": "认领声音勋章",
+      "mechanic": "点名目标",
+      "plain_rule": "传声筒结束后，全场用匿名投票器投票选出这轮传得最像原文的人，被选中的人加分。",
+      "visibility": "自己看",
+      "params": {
+        "selector": "vote",
+        "target_pool": "alive_others",
+        "on_named": { "scoring_ref": ["还原大师加分"], "eliminate": false }
+      }
+    },
+    {
+      "flavor_name": "魔性挑战盲盒",
+      "mechanic": "判定",
+      "plain_rule": "轮到你时，从盲盒里摸一个挑战（比如模仿一个魔性动作或喊一句流行梗），当场表演，全场一键表决'过不过'，过了加分，不过按惩罚(轻)执行。",
+      "visibility": "全场公开",
+      "params": {
+        "source": "consensus",
+        "question": "这个挑战他过关了吗？",
+        "verdict_options": ["过", "不过"],
+        "on": {
+          "过": { "scoring_ref": "挑战成功" },
+          "不过": { "scoring_ref": "挑战失败" }
+        }
+      }
+    },
+    {
+      "flavor_name": "魔性挑战倒计时",
+      "mechanic": "限时",
+      "plain_rule": "摸到挑战后，沙漏给你30秒完成表演，时间到还没做完，直接按'不过'判定。",
+      "visibility": "全场公开",
+      "params": {
+        "seconds": 30,
+        "visible_countdown": true,
+        "on_timeout": { "effect": "scoring", "scoring_ref": "挑战失败" }
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "默契连线加分", "effect": "delta", "params": { "who": "matched_players", "delta": "+1" } },
+      { "event": "举报成立", "effect": "惩罚(轻)", "params": { "who": "accused", "pool": "$gen.penalty_黑话内容池" } },
+      { "event": "举报不成立", "effect": "惩罚(轻)", "params": { "who": "reporter", "pool": "$gen.penalty_黑话内容池" } },
+      { "event": "落袋为安", "effect": "delta", "params": { "who": "actor", "delta": "+bank" } },
+      { "event": "爆掉清零", "effect": "delta", "params": { "who": "actor", "delta": "reset_to_0" } },
+      { "event": "撒谎受罚", "effect": "惩罚(中)", "params": { "who": "claimant", "pool": "$gen.penalty_职场内容池" } },
+      { "event": "揭穿加分", "effect": "delta", "params": { "who": "challenger", "delta": "+2" } },
+      { "event": "冤枉受罚", "effect": "惩罚(轻)", "params": { "who": "challenger", "pool": "$gen.penalty_职场内容池" } },
+      { "event": "被冤枉补偿", "effect": "delta", "params": { "who": "claimant", "delta": "+1" } },
+      { "event": "还原大师加分", "effect": "delta", "params": { "who": "named", "delta": "+2" } },
+      { "event": "挑战成功", "effect": "delta", "params": { "who": "performer", "delta": "+2" } },
+      { "event": "挑战失败", "effect": "惩罚(轻)", "params": { "who": "performer", "pool": "$gen.penalty_健身内容池" } }
+    ],
+    "win": "记分板总分最高者获胜",
+    "tiebreak": "并列由系统随机裁决"
+  },
+  "reveal_signature": ["阿凯：MBTI i人e人猜心", "老周：黑话警戒线与颗粒度加注", "小雨：瓜料传声筒", "琳琳：魔性挑战盲盒", "Tony：健身向惩罚内容池"]
+}
