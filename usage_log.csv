@@ -159,3 +159,11 @@ dsT_A_v21r1_01.json,deepseek-v4-flash,true,high,6568,9828,8828,128.199798,0.0036
 dsT_D_v21r1_01.json,deepseek-v4-flash,true,high,6604,10324,8441,137.351873,0.003815280,success
 dsT_A_v21r1_02.json,deepseek-v4-flash,true,high,6568,10934,10012,141.689002,0.003981040,success
 dsT_B_v21r1_01.json,deepseek-v4-flash,true,high,6642,12561,11176,150.288657,0.004446960,success
+dsT_A_v21r2_01.json,deepseek-v4-flash,true,high,7187,10652,9197,133.860375,0.003988740,success
+dsT_A_v21r2_02.json,deepseek-v4-flash,true,high,7187,14205,12437,175.711851,0.004983580,success
+dsT_B_v21r2_01.json,deepseek-v4-flash,true,high,7261,10954,9256,115.298840,0.004083660,success
+dsT_B_v21r2_02.json,deepseek-v4-flash,true,high,7261,10557,9469,138.557896,0.003972500,success
+dsT_C_v21r2_01.json,deepseek-v4-flash,true,high,7243,12160,10330,169.146047,0.004418820,"invalid_json: Expecting ',' delimiter: line 4 column 92 (char 151)"
+dsT_C_v21r2_02.json,deepseek-v4-flash,true,high,7243,9932,8797,129.371002,0.003794980,success
+dsT_D_v21r2_01.json,deepseek-v4-flash,true,high,7223,6925,5279,96.237126,0.002950220,success
+dsT_D_v21r2_02.json,deepseek-v4-flash,true,high,7223,11513,10392,148.355758,0.004234860,success

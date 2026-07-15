@@ -1,0 +1,133 @@
+{
+  "game_title": "对齐一下？——团建MBTI黑话局",
+  "subtitle": "颗粒度闭环大会",
+  "premise": "每轮抽黑话议题，指定一人表演挑战，其他人猜他i人还是e人；随机事件搅局。最后看谁最懂对齐。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop":"身份牌","to":"全体","visibility":"自己看","note":"随机分配i人或e人"},
+    {"prop":"抽签筒","to":"全局","visibility":"全场公开","note":"放入9张签：对齐、颗粒度、闭环各3张"},
+    {"prop":"骰子","to":"全局","visibility":"全场公开","note":"1-5对应玩家顺序"},
+    {"prop":"盲盒","to":"全局","visibility":"全场公开","note":"内含多种随机事件"},
+    {"prop":"公共看板","to":"全局","visibility":"全场公开","note":"显示当前黑话词和回合"},
+    {"prop":"记分板","to":"全局","visibility":"全场公开","note":"记录分数"}
+  ],
+  "props_required": [],
+  "flow": [
+    "阶段1 开局：每人发一张身份牌（i人/e人，自己看）。将黑话词签放入抽签筒。所有玩家初始0分。",
+    "阶段2 轮次（共5轮，确保每人至少当一次汇报人）：",
+    "  步骤2a 从抽签筒抽一张黑话词，显示在公共看板。",
+    "  步骤2b 掷骰子，选出一个未当过汇报人的玩家（若已当过则重掷）。",
+    "  步骤2c 给汇报人发一张密语卡（挑战任务，从预设池随机，可跳过）。",
+    "  步骤2d 汇报人执行挑战（使用沙漏限时60秒，到点强制结束）。",
+    "  步骤2e 其他玩家通过匿名投票器评判挑战是否过关（判定规则）。",
+    "  步骤2f 其他玩家通过匿名投票器猜测汇报人的MBTI（同时提交规则）。",
+    "  步骤2g 根据评判和猜测结果加减分。",
+    "  步骤2h 触发一次盲盒事件（从盲盒池随机抽取并执行）。",
+    "阶段3 终局：系统揭示所有玩家的身份牌（成为公开）。",
+    "阶段4 结算：总分最高者获胜，平局系统随机裁决。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "这场表演够不够「对齐」？",
+      "mechanic": "判定",
+      "plain_rule": "除了汇报人，其他玩家通过手机匿名投票，选择「过」或「不过」。超过半数选「过」即为过关，否则失败。过关汇报人+2分，失败-1分。",
+      "visibility": "自己看",
+      "params": {
+        "source": "consensus",
+        "question": "汇报人的挑战是否过关？",
+        "verdict_options": ["过", "不过"],
+        "on": {
+          "过": { "scoring_ref": ["挑战通过"] },
+          "不过": { "scoring_ref": ["挑战失败"] }
+        }
+      }
+    },
+    {
+      "flavor_name": "他是i人还是e人？",
+      "mechanic": "同时提交",
+      "plain_rule": "除了汇报人，其他玩家各自在手机上秘密选择「i人」或「e人」，同时揭晓。猜对者+1分，猜错不扣分。",
+      "visibility": "自己看",
+      "params": {
+        "prompt": "猜猜当前汇报人的MBTI类型",
+        "input_kind": "options",
+        "options": ["i人", "e人"],
+        "timeout_s": 15,
+        "reveal": "simultaneous",
+        "scoring_ref": ["猜对MBTI", "猜错MBTI"]
+      }
+    },
+    {
+      "flavor_name": "升职加薪",
+      "mechanic": "加减分",
+      "plain_rule": "当前分数最低的玩家直接+3分。若多人并列最低，由系统随机选一位。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "lowest",
+        "delta": "+3",
+        "scoring_ref": ["升职加薪"]
+      }
+    },
+    {
+      "flavor_name": "降薪警告",
+      "mechanic": "加减分",
+      "plain_rule": "当前分数最高的玩家直接-2分。若多人并列最高，由系统随机选一位。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "highest",
+        "delta": "-2",
+        "scoring_ref": ["降薪警告"]
+      }
+    },
+    {
+      "flavor_name": "Tony叫你一起练",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "被指定的玩家需要做5个深蹲，或选择喝一口水作为替代。如果不想做，可以喊「跳过」换为其他温和替代（如分享一个冷笑话）。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "lowest",
+        "pool": "做5个深蹲或喝一口水（可跳过，换讲冷笑话）",
+        "scoring_ref": ["健身惩罚"]
+      }
+    },
+    {
+      "flavor_name": "小雨的八卦雷达",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "被指定的玩家需要分享一个最近听到的八卦（可以是任何无害的趣事）。如果不想说，可以喊「跳过」换为其他温和替代（如模仿一个动物叫声）。",
+      "visibility": "全场公开",
+      "params": {
+        "who": "highest",
+        "pool": "分享一个八卦（可跳过，换模仿动物叫声）",
+        "scoring_ref": ["八卦任务"]
+      }
+    },
+    {
+      "flavor_name": "终局揭面",
+      "mechanic": "揭示",
+      "plain_rule": "系统将所有玩家的身份牌（i人/e人）公开显示在公共看板上，所有人可见。",
+      "visibility": "全场公开",
+      "params": {
+        "reveal_of": "prop:身份牌",
+        "to": "global",
+        "once": true,
+        "identity_resolution": "terminal"
+      }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "挑战通过", "effect": "+2", "target": "汇报人" },
+      { "event": "挑战失败", "effect": "-1", "target": "汇报人" },
+      { "event": "猜对MBTI", "effect": "+1", "target": "猜对人" },
+      { "event": "猜错MBTI", "effect": "0", "target": "猜错人" },
+      { "event": "升职加薪", "effect": "+3", "target": "最低分" },
+      { "event": "降薪警告", "effect": "-2", "target": "最高分" },
+      { "event": "健身惩罚", "effect": "0（无分，可跳过）", "target": "指定人" },
+      { "event": "八卦任务", "effect": "0（无分，可跳过）", "target": "指定人" }
+    ],
+    "win": {
+      "condition": "最终总分最高",
+      "effect": "获胜"
+    },
+    "tiebreak": "平局由系统随机裁决"
+  }
+}
