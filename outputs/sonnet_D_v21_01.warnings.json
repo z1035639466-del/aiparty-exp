@@ -1,0 +1,7 @@
+{
+  "file": "sonnet_D_v21_01.json",
+  "spec_version": "v2.1",
+  "warnings": [
+    "dead_prop:抽签筒"
+  ]
+}

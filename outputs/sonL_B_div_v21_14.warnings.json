@@ -1,0 +1,9 @@
+{
+  "file": "sonL_B_div_v21_14.json",
+  "spec_version": "v2.1",
+  "warnings": [
+    "prose_param_mismatch:rules[4].challenge_window_s=30",
+    "dead_prop:抽签筒",
+    "dead_prop:骰盅"
+  ]
+}

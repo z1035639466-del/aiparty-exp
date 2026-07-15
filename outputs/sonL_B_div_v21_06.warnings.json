@@ -1,0 +1,9 @@
+{
+  "file": "sonL_B_div_v21_06.json",
+  "spec_version": "v2.1",
+  "warnings": [
+    "dead_prop:命运转盘",
+    "dead_prop:密语卡",
+    "dead_prop:抽签筒"
+  ]
+}
