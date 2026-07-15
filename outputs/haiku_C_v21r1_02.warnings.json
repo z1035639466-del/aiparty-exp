@@ -1,0 +1,11 @@
+{
+  "file": "haiku_C_v21r1_02.json",
+  "spec_version": "v2.1",
+  "warnings": [
+    "prose_param_mismatch:rules[2].seconds=180",
+    "prose_param_mismatch:rules[3].timeout_s=30",
+    "dead_prop:密语卡",
+    "dead_ledger:讲述者得分",
+    "dead_ledger:集体健忘症"
+  ]
+}

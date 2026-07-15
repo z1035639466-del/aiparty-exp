@@ -1,0 +1,8 @@
+{
+  "file": "haiku_B_v21r1_01.json",
+  "spec_version": "v2.1",
+  "warnings": [
+    "dead_prop:命运转盘",
+    "dead_ledger:黑话违规扣分"
+  ]
+}

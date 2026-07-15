@@ -1,0 +1,9 @@
+{
+  "file": "sonnet_A_v21r1_01.json",
+  "spec_version": "v2.1",
+  "warnings": [
+    "dead_prop:定时炸弹",
+    "dead_prop:密语卡",
+    "dead_prop:盲盒"
+  ]
+}

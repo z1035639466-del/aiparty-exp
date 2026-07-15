@@ -1,0 +1,11 @@
+{
+  "file": "sonL_B_div_v21r1_08.json",
+  "spec_version": "v2.1",
+  "warnings": [
+    "prose_param_mismatch:rules[7].seconds=75",
+    "dead_prop:命运转盘",
+    "dead_prop:定时炸弹",
+    "dead_prop:密语卡",
+    "dead_prop:抽签筒"
+  ]
+}
