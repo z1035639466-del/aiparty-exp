@@ -1,0 +1,10 @@
+{
+  "file": "sonL_B_div_v21r2_15_r2.json",
+  "spec_version": "v2.1.1",
+  "warnings": [
+    "prose_param_mismatch:rules[2].timeout_s=15",
+    "prose_param_mismatch:rules[7].timeout_s=20",
+    "dead_prop:密语卡",
+    "dead_prop:抽签筒"
+  ]
+}
