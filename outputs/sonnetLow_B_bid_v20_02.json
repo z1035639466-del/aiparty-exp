@@ -1,0 +1,115 @@
+{
+  "game_title": "烫手瓜传声筒 · 团建包间限定",
+  "subtitle": "为公司团建包间现制 · 5 人个人赛",
+  "premise": "黑话短句沿座位一路传到走样，烫手瓜在限时倒计时里被甩来甩去，MBTI 偷看猜准加分，Tony 随时可能点名拉你一起练——各自独立计分，没人出局，看谁分最高。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    { "prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "黑话传声筒每轮私发给'第一棒'一句原话，其余人只在传到自己时才看得到上一棒写的内容。" },
+    { "prop": "沙漏", "to": "公共区", "visibility": "全场公开", "note": "烫手瓜倒计时、拉练挑战限时都用它。" },
+    { "prop": "记分板", "to": "公共区", "visibility": "全场公开", "note": "记录每次加减分与惩罚，终局按总分排名。" },
+    { "prop": "身份牌", "to": "全体", "visibility": "自己看", "note": "每人一张自评 MBTI 牌(写自己觉得的 E/I)，只有自己看得到，用于 MBTI 偷看环节的谜底。" }
+  ],
+  "props_required": [],
+  "flow": [
+    "开局: 发身份牌(自评 MBTI，自己看)、摆好沙漏/记分板，宣布烫手瓜从阿凯开始",
+    "共 3 轮，每轮先跑一次黑话传声筒: 老周出一句黑话短句私发给第一棒 → 沿座位顺序私密逐人传递，每人只看得到上一棒写的内容 → 传到最后一棒公开念出来，和原句比对",
+    "同一轮内，烫手瓜倒计时同步进行: 沙漏 90 秒，持瓜者说一句符合黑话规则的话就能把瓜甩给下家(可跳过/让别人先甩)，时间到瓜在谁手里谁受罚",
+    "每轮穿插一次 MBTI 偷看: 任意一人可整局限一次，偷看某人的自评 MBTI 牌，然后当场公开猜'像 E 还是 I'，全场表决猜没猜对",
+    "每轮结束前，Tony 可以点名拉一个人(可换人一次)一起做一个健身挑战动作，限时 30 秒，全场表决是否完成",
+    "3 轮跑完，记分板结算：总分最高者胜；分数并列时，默认由系统随机裁决(风味名: 沙漏定生死)"
+  ],
+  "rules": [
+    {
+      "flavor_name": "黑话传声筒",
+      "mechanic": "传递链",
+      "plain_rule": "老周想的一句开会黑话，私发给第一个人，然后一个接一个悄悄往下传，每个人只能看到上一个人写的内容，不能看原句。传到最后一个人，大声念出他收到的版本。",
+      "visibility": "自己看",
+      "params": { "content_from": "$gen.黑话短句池", "order": "seat", "each_sees": "prev_only", "replay": "first_vs_last" }
+    },
+    {
+      "flavor_name": "传声鉴定",
+      "mechanic": "判定",
+      "plain_rule": "全场一起表决：最后念出来的版本，和最初那句黑话意思对不对得上？对得上算传声成功，走样了算传声失真。",
+      "visibility": "全场公开",
+      "params": { "source": "consensus", "question": "传到最后一棒的版本，和最初那句黑话意思是否基本一致？", "verdict_options": ["对得上", "走样了"], "on": { "过": { "scoring_ref": ["传声成功"] }, "不过": { "scoring_ref": ["传声失真"] } } }
+    },
+    {
+      "flavor_name": "烫手瓜甩锅",
+      "mechanic": "转移",
+      "plain_rule": "瓜从阿凯开始。持瓜的人只要说出一句符合本轮黑话规则的话，就能把瓜甩给指定的下一个人；不想甩也可以选择先不甩(拒绝权)。倒计时结束前瓜可以一直传来传去。",
+      "visibility": "全场公开",
+      "params": { "what": "token", "from": "actor", "to": "chosen", "scoring_ref": ["瓜落谁手"] }
+    },
+    {
+      "flavor_name": "瓜滚倒计时",
+      "mechanic": "限时",
+      "plain_rule": "沙漏倒 90 秒，时间到瓜停在谁手里，谁就要接受一次判定。",
+      "visibility": "全场公开",
+      "params": { "seconds": 90, "visible_countdown": true, "on_timeout": { "effect": "scoring", "scoring_ref": ["瓜落谁手"] } }
+    },
+    {
+      "flavor_name": "MBTI 偷窥",
+      "mechanic": "揭示",
+      "plain_rule": "整局每人限用一次：可以偷看任意一个人的自评 MBTI 牌，只有你自己看得到结果。",
+      "visibility": "自己看",
+      "params": { "reveal_of": "prop:身份牌", "to": "actor", "once": true }
+    },
+    {
+      "flavor_name": "猜准加分",
+      "mechanic": "判定",
+      "plain_rule": "偷看完之后，当场公开猜一句'我觉得他更像 E 还是 I'，全场表决猜没猜对。",
+      "visibility": "全场公开",
+      "params": { "source": "consensus", "question": "刚才公开猜测的 E/I 倾向，是否和被偷看那人的自评 MBTI 牌一致？", "verdict_options": ["猜对", "猜错"], "on": { "过": { "scoring_ref": ["MBTI猜对"] }, "不过": { "scoring_ref": ["MBTI猜错"] } } }
+    },
+    {
+      "flavor_name": "拉练点名",
+      "mechanic": "点名目标",
+      "plain_rule": "Tony 每轮可以点名一个人一起做健身挑战动作；被点名的人可以选择换成别人(拒绝权只能用一次)。",
+      "visibility": "全场公开",
+      "params": { "selector": "actor", "target_pool": "others", "on_named": { "scoring_ref": ["拉练完成", "拉练放弃"], "eliminate": false } }
+    },
+    {
+      "flavor_name": "拉练达标",
+      "mechanic": "判定",
+      "plain_rule": "沙漏倒 30 秒，时间内全场一起表决被点名的人是否完成了这个健身挑战动作。",
+      "visibility": "全场公开",
+      "params": { "source": "consensus", "question": "被点名者是否在限时内完成了健身挑战动作？", "verdict_options": ["完成", "放弃"], "on": { "过": { "scoring_ref": ["拉练完成"] }, "不过": { "scoring_ref": ["拉练放弃"] } } }
+    },
+    {
+      "flavor_name": "走样惩罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "传声失真、或倒计时结束时瓜还在手里的人，从惩罚池抽一个轻度惩罚(可跳过/换一个)。",
+      "visibility": "全场公开",
+      "params": { "who": "target", "pool": "$gen.penalty_内容池", "scoring_ref": ["传声失真", "瓜落谁手"] }
+    },
+    {
+      "flavor_name": "躺平惩罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "被点名做健身挑战但表决为'放弃'的人，领一次轻度惩罚(可跳过/换一个)。",
+      "visibility": "全场公开",
+      "params": { "who": "target", "pool": "$gen.penalty_内容池", "scoring_ref": "拉练放弃" }
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      { "event": "传声成功", "who": "参与传递链的全员", "effect": "+2" },
+      { "event": "传声失真", "who": "参与传递链的全员", "effect": "惩罚(轻)" },
+      { "event": "瓜落谁手", "who": "倒计时结束时的持瓜人", "effect": "惩罚(轻)" },
+      { "event": "MBTI猜对", "who": "actor(猜测者)", "effect": "+1" },
+      { "event": "MBTI猜错", "who": "actor(猜测者)", "effect": "-1" },
+      { "event": "拉练完成", "who": "被点名者", "effect": "+2" },
+      { "event": "拉练放弃", "who": "被点名者", "effect": "惩罚(轻)" }
+    ],
+    "win": "终局时总分最高者胜",
+    "tiebreak": "系统随机裁决(风味名: 沙漏定生死)"
+  },
+  "reveal_text": "三轮下来，'颗粒度'传到最后一棒变成了什么谁也说不清，瓜倒是稳稳停在了最不会甩锅的那个人手里——健身房今晚多了个被 Tony 拉去凑数的难兄难弟。",
+  "reveal_signature": "融合自 老周 的「开会黑话」× 小雨 的「爱吃瓜」× 阿凯 的「MBTI 贴标签」× Tony 的「健身拉练」",
+  "flavor_glossary": [
+    { "term": "传声筒", "means": "传话游戏的俗称，这里用开会黑话当传递内容，比对首尾走样程度。" },
+    { "term": "烫手瓜", "means": "'吃瓜'延伸出的说法，这里指一个大家都想尽快甩出去的道具。" },
+    { "term": "i人e人", "means": "MBTI 人格测试里的内向(I)/外向(E)标签，这里用来玩'偷看+猜测'。" },
+    { "term": "拉练", "means": "健身圈常说的'拉着一起练'，这里指被点名后必须完成的健身挑战动作。" }
+  ],
+  "safety_note": "黄暴档 20/100(低): 惩罚只到口头认罚/夸张表态级别，不涉肢体接触、羞辱或饮酒逼迫；所有指向个人的任务与惩罚均带'跳过/换一个'的拒绝权；已避开高羞耻惩罚(职场场合)；未编造任何真人具体言论，全部梗均来自玩家自述素材。"
+}
