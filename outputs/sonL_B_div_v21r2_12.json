@@ -1,0 +1,110 @@
+{
+  "game_title": "全员闭环认养夜",
+  "subtitle": "团建包间限定·i人e人×黑话×瓜料×健身五连炸(5人局)",
+  "premise": "今晚每个人轮流被「闭环」一次——先被全场猜i人e人，再被拉去做一个全网挑战，最后自己写的瓜料被当众拷问认不认；中间还插一次黑话传声筒考团队默契，分数最高的那位，才是真扛得住团建的人。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop":"密语卡","to":"全体","visibility":"自己看","note":"开局每人写一张「自证卡」(自己的一件真实小事)，系统悄悄收好，瓜料对质环节要用"},
+    {"prop":"匿名投票器","to":"全体","visibility":"自己看","note":"人设速测环节私密提交猜测，倒计时到自动同时公开揭晓"},
+    {"prop":"沙漏","to":"全体","visibility":"全场公开","note":"全网挑战倒计时、瓜料质疑窗口倒计时都用它"},
+    {"prop":"记分板","to":"全体","visibility":"全场公开","note":"实时显示每人当前得分，终局据此排名"},
+    {"prop":"公共看板","to":"全体","visibility":"全场公开","note":"显示当前主角、当前轮数、黑话传声筒的进行状态"}
+  ],
+  "props_required": [],
+  "flow": [
+    "阶段1: 开局——全员各自往密语卡里悄悄写一件关于自己的真事(自证卡)，系统收好不公开；主持人过一遍规则。",
+    "阶段2: 主循环共5轮，按现实坐序顺时针轮流指定本轮主角(回合推进)。",
+    "阶段3: 每轮主角三连——①人设速测(同时提交猜i人/e人) ②全网挑战(限时30秒完成动作+全场认证判定过/不过；不过则温和惩罚(轻)，过了可续押喊停加练冲分) ③瓜料心跳对质(主角就自己的自证卡内容做声明，全场可质疑，系统翻卡验真假)。",
+    "阶段4: 第3轮主角三连结束后，插入一次全场彩蛋：黑话传声筒(传递链传句子，传到底后全场判定「神还原」还是「面目全非」)。",
+    "阶段5: 5轮主角全部轮完后，终局——记分板结算总分，宣布「全场闭环之星」；如有并列，由系统随机裁决(全局约定)。"
+  ],
+  "rules": [
+    {
+      "flavor_name": "打工人闭环轮值",
+      "mechanic": "回合推进",
+      "plain_rule": "全场按现实坐着的顺序，顺时针轮流指定「本轮主角」，一共轮5轮(每人一次)，不用系统重新排座位。",
+      "visibility": "全场公开",
+      "params": {"order":"round_robin"}
+    },
+    {
+      "flavor_name": "人设速测：i人e人生死投",
+      "mechanic": "同时提交",
+      "plain_rule": "本轮主角站到场中间，其他人不许商量，每人在自己屏幕上偷偷选「我觉得TA更像哪一型」，倒计时一到所有人同时亮出答案；猜中的人各加1分，猜错不扣分。",
+      "visibility": "自己看",
+      "params": {"prompt":"这轮主角更像哪一型？","input_kind":"options","options":["i人","e人"],"timeout_s":20,"reveal":"simultaneous","scoring_ref":["猜中人设"]}
+    },
+    {
+      "flavor_name": "全网挑战限时上分",
+      "mechanic": "限时",
+      "plain_rule": "主角有30秒时间当场完成系统抽到的挑战动作(比如深蹲、平板支撑、模仿一个健身动作)；如果主角觉得这个动作不适合自己身体状况或就是不想做，可以直接换一个更轻松的动作，不算失败、不扣分。时间到自动进入「全场认证」判定。",
+      "visibility": "全场公开",
+      "params": {"seconds":30,"visible_countdown":true,"on_timeout":{"effect":"goto","goto":"全场认证判定"}}
+    },
+    {
+      "flavor_name": "全场认证：这挑战算不算过",
+      "mechanic": "判定",
+      "plain_rule": "时间到后，全场一起举手表决主角这个动作做到位没有；多数说「过」就算过，说「不过」就算不过，投票即最终结果。",
+      "visibility": "全场公开",
+      "params": {"source":"consensus","question":"主角这轮的挑战动作，全场公认做到位了吗？","verdict_options":["过","不过"],"on":{"过":{"scoring_ref":["挑战达标"]},"不过":{"scoring_ref":["挑战翻车"]}}}
+    },
+    {
+      "flavor_name": "闭环回炉·温和版",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "挑战没做到位的主角，从「温和惩罚池」里抽一个轻惩罚(比如现场freestyle一句黑话小课堂、原地转圈报自己的花名)；主角可以直接选跳过换一个，绝不允许羞辱性内容，也不强迫喝酒。",
+      "visibility": "全场公开",
+      "params": {"who":"loser","pool":"$gen.penalty_闭环内容池","scoring_ref":["挑战翻车"]}
+    },
+    {
+      "flavor_name": "要不要加练·团建梭哈",
+      "mechanic": "续押喊停",
+      "plain_rule": "挑战做到位的主角可以选「继续加练拿更高分」或「见好就收」：每加练一次奖励翻倍(2→4→6→8封顶)，一旦某次加练全场认证判「不过」，这轮加练奖励清零(挑战本身拿到的基础分不受影响)；喊停可以随时喊，奖励立刻进账。",
+      "visibility": "全场公开",
+      "params": {"draw_from":"$gen.加练动作池","continue_prompt":"要继续加练冲分，还是见好就收？","bust_when":"加练动作全场认证判「不过」","cap":8,"on_cap":"force_settle","bank_on_stop":true,"scoring_ref":["加练落袋","加练清零"]}
+    },
+    {
+      "flavor_name": "瓜料心跳对质",
+      "mechanic": "声明质疑",
+      "plain_rule": "主持人念出主角开局悄悄写的那张自证卡内容，主角当场选择「认领并讲清楚」或者「嘴硬说这不是我的」，其他人可以当场质疑TA是不是在装；一旦被质疑，系统直接翻开那张卡核对真假。主角若不想在众人面前多聊这张卡，随时可以喊「跳过」，此轮改判中性完成，不算认领也不算嘴硬，不受任何处罚。",
+      "visibility": "自己看",
+      "params": {"claim_prompt":"这张自证卡是不是你写的、内容属实吗？","challengers":"others","challenge_window_s":20,"verify_source":"prop_reveal:密语卡","verify_reveals":"prop_state","on_liar":{"scoring_ref":["嘴硬被抓"]},"on_false_accuse":{"scoring_ref":["瞎质疑受罚","被冤枉补偿"]}}
+    },
+    {
+      "flavor_name": "黑话传声筒",
+      "mechanic": "传递链",
+      "plain_rule": "系统给第一个人一句藏着「对齐/颗粒度/闭环」这类职场黑话的整活句子，每人只能悄悄传给下一位、不能让别人看到，传到最后一位当众说出TA收到的版本，全场对比首尾差多远。",
+      "visibility": "自己看",
+      "params": {"content_from":"$gen.黑话原句池","order":"seat","each_sees":"prev_only","replay":"first_vs_last"}
+    },
+    {
+      "flavor_name": "传声筒验收：神还原还是面目全非",
+      "mechanic": "判定",
+      "plain_rule": "全场一起表决：最后一位说出的版本，和最开始那句比，是不是还留着原意？算「神还原」还是「面目全非」，投票定。",
+      "visibility": "全场公开",
+      "params": {"source":"consensus","question":"传声筒最后的版本，还留着原句的意思吗？","verdict_options":["过","不过"],"on":{"过":{"scoring_ref":["神还原"]},"不过":{"scoring_ref":["面目全非"]}}}
+    }
+  ],
+  "reveal_text": "今晚这局「全场闭环」到此打卡——i人e人也好，黑话满天飞也好，健身狂魔拉了几个人陪练，八卦雷达也抓了几个嘴硬现行，都记在这块记分板上了。全场闭环之星，颁给分数最高的那位，掌声送上。",
+  "reveal_signature": [
+    "阿凯的MBTI贴标签 → 人设速测(同时提交)",
+    "老周的职场黑话(对齐/颗粒度/闭环) → 黑话传声筒(传递链+判定)",
+    "小雨的爱吃瓜 → 瓜料心跳对质(声明质疑)",
+    "Tony的健身狂魔+琳琳的短视频挑战 → 全网挑战(限时+判定+续押喊停)"
+  ],
+  "safety_note": "本局黄暴档低，所有惩罚均为温和向且可一键跳过换一个，不含羞辱性内容；健身类挑战量力而行，可随时换成更轻松的动作；不含劝酒环节；瓜料对质环节内容完全由玩家自愿现场决定，可随时喊跳过，不涉及真实隐私爆料。",
+  "settlement": {
+    "scoring": [
+      {"event":"猜中人设","effect":"+1","target":"correct_guessers"},
+      {"event":"挑战达标","effect":"+1","target":"actor"},
+      {"event":"挑战翻车","effect":"触发惩罚(轻)","target":"actor"},
+      {"event":"加练落袋","effect":"+2~+8(按加练次数结算，见好就收即刻进账)","target":"actor"},
+      {"event":"加练清零","effect":"+0(本轮加练奖励清零，不倒扣挑战基础分)","target":"actor"},
+      {"event":"嘴硬被抓","effect":"-2","target":"actor"},
+      {"event":"瞎质疑受罚","effect":"-1","target":"challenger"},
+      {"event":"被冤枉补偿","effect":"+1","target":"actor"},
+      {"event":"神还原","effect":"+2","target":"table_all"},
+      {"event":"面目全非","effect":"+0(纯记录，不改变分数)","target":"table_all"}
+    ],
+    "win": {"basis":"individual_score_total","description":"5轮主角轮完后，记分板个人总分最高者获胜，称号「全场闭环之星」"},
+    "tiebreak": "并列由系统随机裁决(全局约定，可包一层「命运一掷」的皮)"
+  }
+}
