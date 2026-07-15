@@ -1,0 +1,84 @@
+{
+  "game_title": "职场黑话热搜王",
+  "subtitle": "对齐、颗粒度、闭环，全靠这三个词猜",
+  "premise": "团建包间限定：轮流用组里的开会黑话describe本轮热搜挑战词，其余人同时提交竞猜；再靠健身挑战和热度续押冲榜，看谁先当上今晚的职场热搜之王。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop": "密语卡", "to": "全体", "visibility": "自己看", "note": "健身挑战任务卡，内容围绕健身动作，附带非运动替代选项"},
+    {"prop": "沙漏", "to": "全场", "visibility": "全场公开", "note": "每轮60秒倒计时器"},
+    {"prop": "匿名投票器", "to": "全场", "visibility": "自己看", "note": "揭晓时自动转公开；用于挑战关键词竞猜的同时私密提交"},
+    {"prop": "记分板", "to": "全场", "visibility": "全场公开", "note": "累计涨粉分与挑战得分"},
+    {"prop": "公共看板", "to": "全场", "visibility": "全场公开", "note": "显示当轮挑战关键词、黑话通道词与热度事件池"}
+  ],
+  "props_required": [],
+  "flow": [
+    "阶段1: 公共看板宣布赛制，回合推进(round_robin)定下描述者出场顺序",
+    "阶段2: 循环5轮——每轮：公共看板亮出本轮挑战关键词→受限沟通(描述者只能说'对齐/颗粒度/闭环')→沙漏限时60秒→其余人同时提交猜测→揭晓计分，超时则描述者扣分",
+    "阶段3: 全员领取密语卡里的健身挑战任务，自愿进行后由全场判定(共识)是否过关；不愿运动可跳过换成非运动替代任务，不算失败",
+    "阶段4: 热度续押喊停——轮流抽热度事件牌，选择继续冲热度或见好就收，抽满8张强制结算",
+    "阶段5: 记分板结算，平局由系统随机裁决，宣布职场热搜之王"
+  ],
+  "rules": [
+    {
+      "flavor_name": "黑话通关令",
+      "mechanic": "受限沟通",
+      "plain_rule": "轮到的描述者本轮只能说'对齐'、'颗粒度'、'闭环'这三个词来提示公共看板上的挑战关键词，不能说其他任何词或做提示性动作，队友靠这三词猜答案。",
+      "visibility": "全场公开",
+      "params": {"channel": "office_jargon_three_word", "enforce": "channel_only"}
+    },
+    {
+      "flavor_name": "挑战直播间竞猜",
+      "mechanic": "同时提交",
+      "plain_rule": "描述结束或计时到点后，其余四人各自私密提交自己认为的挑战关键词答案，同时公开揭晓，猜中的人加分。",
+      "visibility": "自己看",
+      "params": {"prompt": "这轮的挑战关键词是什么？", "input_kind": "free_text", "timeout_s": 60, "reveal": "simultaneous", "scoring_ref": ["猜中加分"]}
+    },
+    {
+      "flavor_name": "沙漏警报",
+      "mechanic": "限时",
+      "plain_rule": "每轮描述与竞猜共给60秒倒计时，全场可见，时间到自动进入揭晓环节；描述者60秒内一个有效黑话提示都没说出，本轮描述者超时扣分。",
+      "visibility": "全场公开",
+      "params": {"seconds": 60, "visible_countdown": true, "on_timeout": {"effect": "scoring", "scoring_ref": "超时扣分"}}
+    },
+    {
+      "flavor_name": "健身挑战认证",
+      "mechanic": "判定",
+      "plain_rule": "密语卡里领到健身挑战任务的人，完成后请全场目视确认，由全场一键表决'这个挑战算过关吗'，过关加分，不过关不扣分；任务本人有权跳过换成一个不运动的替代任务（如背诵一句黑话三遍），不算失败也不受罚。",
+      "visibility": "全场公开",
+      "params": {"source": "consensus", "question": "这个挑战算过关吗？", "verdict_options": ["过", "不过"], "on": {"过": {"scoring_ref": "挑战成功"}, "不过": {"scoring_ref": []}}}
+    },
+    {
+      "flavor_name": "热度续押",
+      "mechanic": "续押喊停",
+      "plain_rule": "全员轮流抽一张热度事件牌，可以选择'继续冲热度'或'见好就收保住已得涨粉分'；如果继续时抽到掉粉牌，本轮累积的涨粉分清零；抽满8张还没停，直接强制结算保住当前涨粉分。",
+      "visibility": "全场公开",
+      "params": {"draw_from": "$gen.热度事件池", "continue_prompt": "继续冲热度还是见好就收？", "bust_when": "抽中掉粉牌", "cap": 8, "on_cap": "force_settle", "bank_on_stop": true, "scoring_ref": ["涨粉入账", "爆掉清零"]}
+    },
+    {
+      "flavor_name": "发言顺位",
+      "mechanic": "回合推进",
+      "plain_rule": "黑话描述者按现实座位顺序依次轮换，每人恰好当一次描述者，不打乱、不虚拟排序。",
+      "visibility": "全场公开",
+      "params": {"order": "round_robin"}
+    },
+    {
+      "flavor_name": "黑话绕口令惩罚",
+      "mechanic": "惩罚(轻)",
+      "plain_rule": "超时扣分累计满两次的描述者，要连续念三遍指定的职场黑话绕口令（如'对齐颗粒度、颗粒度对齐、闭环颗粒度对齐闭环'），念错重来；本人可以选择跳过，跳过则只记一次超时标记，不做任何羞辱性惩罚。",
+      "visibility": "全场公开",
+      "params": {"who": "loser", "pool": "$gen.penalty_黑话绕口令池", "scoring_ref": "闯关失败"}
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      {"event": "猜中加分", "effect": "delta", "who": "guesser", "value": "+2"},
+      {"event": "超时扣分", "effect": "delta", "who": "describer", "value": "-1"},
+      {"event": "挑战成功", "effect": "delta", "who": "actor", "value": "+2"},
+      {"event": "涨粉入账", "effect": "delta", "who": "actor", "value": "+3"},
+      {"event": "爆掉清零", "effect": "reset", "who": "actor", "value": "0"},
+      {"event": "闯关失败", "effect": "penalty_light", "who": "loser", "value": "pool:黑话绕口令"}
+    ],
+    "win": "游戏结束时记分板总分最高者获胜，称号'职场热搜之王'",
+    "tiebreak": "平局与并列由系统随机裁决（命运一掷）"
+  }
+}
