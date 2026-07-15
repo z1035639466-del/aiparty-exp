@@ -1,0 +1,83 @@
+{
+  "game_title": "颗粒度快闪局",
+  "subtitle": "职场包间限定：一晚上把 i/e 人设、黑话、热梗、吃瓜、健身狂全部拉出来遛一遍",
+  "premise": "五个回合，每回合一个情境砸下来，大家各自私密应对，揭晓就见分晓；没有谁被锁定出局，全程靠反应速度和默契攒分，垫底的人最后领一份健身向的温柔惩罚。",
+  "players": ["阿凯", "琳琳", "老周", "小雨", "Tony"],
+  "props_dealt": [
+    {"prop":"匿名投票器","to":"全体","visibility":"自己看","note":"每回合的私密提交/竞猜都走它，揭晓时自动转公开"},
+    {"prop":"密语卡","to":"全体","visibility":"自己看","note":"回合二每人各发一张，卡上是各自的黑话诱导任务"},
+    {"prop":"盲盒","to":"全体","visibility":"自己看开","note":"回合三追热点挑战池，抽到什么做什么"},
+    {"prop":"记分板","to":"全体","visibility":"全场公开","note":"实时显示各人总分"},
+    {"prop":"公共看板","to":"全体","visibility":"全场公开","note":"显示当前回合与规则提示"}
+  ],
+  "props_required": [],
+  "flow": [
+    "阶段0 开局: 公共看板显示五回合流程与记分板归零，简述规则(可跳过/换一个的温和替代随时可用)",
+    "阶段1 i人e人快照: 系统抛出职场情境，全员用匿名投票器私密提交猜测，揭晓统计默契命中",
+    "阶段2 颗粒度飞镖: 每人领一张密语卡黑话诱导任务，限时内自行找机会完成，回合末各自声明是否完成，接受质疑",
+    "阶段3 追热点续押: 从盲盒抽挑战牌，每次抽完可选继续加码或见好就收，抽中翻车牌则本轮清零",
+    "阶段4 茶水间传声筒: 一句瓜料按座位顺序私密逐人传递，终局对比首尾并共识判定是否传准",
+    "阶段5 总结算: 记分板汇总总分，最高分获胜，垫底者领健身向轻惩罚(可跳过换成温和替代)，若并列由系统随机裁决"
+  ],
+  "rules": [
+    {
+      "flavor_name":"i人e人闪测",
+      "mechanic":"同时提交",
+      "plain_rule":"系统说一个开会场景，比如'领导突然点名发言'，你私密选一个你觉得全场最先会这么反应的人，选完大家一起揭晓，猜中算你默契在线",
+      "visibility":"自己看",
+      "params": {"prompt":"这个场景里，你觉得谁会第一个反应？","input_kind":"options","options":"$派生:本轮在场玩家","timeout_s":20,"reveal":"simultaneous","scoring_ref":["默契命中","默契落空"]}
+    },
+    {
+      "flavor_name":"颗粒度飞镖",
+      "mechanic":"声明质疑",
+      "plain_rule":"你手上的密语卡写了一个词，比如'颗粒度'，回合内想办法把它自然地说出来，还要让另一个人跟着念一遍；回合末公开声明你做到没做到，别人可以质疑，质疑就要对质",
+      "visibility":"自己看",
+      "params": {"claim_prompt":"你完成了这轮的黑话诱导任务吗？","challengers":"others","challenge_window_s":20,"verify_source":"prop_reveal:密语卡","verify_reveals":"prop_state","on_liar":{"scoring_ref":["装死翻车","抓包加分"]},"on_false_accuse":{"scoring_ref":["冤枉扣分","被冤枉补偿"]}}
+    },
+    {
+      "flavor_name":"追热点续押",
+      "mechanic":"续押喊停",
+      "plain_rule":"从盲盒里抽一张挑战牌照做，做完可以选'继续追下一个热点'或'见好就收保住已得分'，一旦抽到翻车牌，这轮攒的分全部清零",
+      "visibility":"全场公开",
+      "params": {"draw_from":"prop:盲盒","continue_prompt":"继续追热点还是见好就收？","bust_when":"抽中翻车牌","cap":5,"on_cap":"force_settle","bank_on_stop":true,"scoring_ref":["追梗成功","翻车清零"]}
+    },
+    {
+      "flavor_name":"茶水间传声筒",
+      "mechanic":"传递链",
+      "plain_rule":"系统给第一个人一句悄悄话，按座位顺序一个个私密传下去，每人只看得到上一棒传给你的内容，传到最后一棒，系统会把最初的话和最后收到的话一起亮出来给大家看",
+      "visibility":"自己看",
+      "params": {"content_from":"$gen.瓜料池","order":"seat","each_sees":"prev_only","replay":"first_vs_last"}
+    },
+    {
+      "flavor_name":"瓜验尸",
+      "mechanic":"判定",
+      "plain_rule":"传声筒结束后，大家一起看首尾对比，公开表决'最后传出来的和最初的瓜，意思还对得上吗'，对得上就算传得准",
+      "visibility":"全场公开",
+      "params": {"source":"consensus","question":"最后一棒传出的内容，和最初的瓜对得上大概意思吗？","verdict_options":["对得上","走样了"],"on":{"对得上":{"scoring_ref":"传得准"},"走样了":{"scoring_ref":"失真扣分"}}}
+    },
+    {
+      "flavor_name":"打卡挑战刑罚",
+      "mechanic":"惩罚(轻)",
+      "plain_rule":"总分垫底的人从健身惩罚池里抽一个动作当场做完(比如十个开合跳)，不想做可以直接换成温和替代项(比如喝一口水)，没人会因此被笑话",
+      "visibility":"全场公开",
+      "params": {"who":"loser","pool":"$gen.penalty_健身池","scoring_ref":"总分垫底"}
+    }
+  ],
+  "settlement": {
+    "scoring": [
+      {"event":"默契命中","effect":"+1","who":"guesser"},
+      {"event":"默契落空","effect":"+0","who":"guesser"},
+      {"event":"装死翻车","effect":"-2","who":"actor"},
+      {"event":"抓包加分","effect":"+2","who":"challenger"},
+      {"event":"冤枉扣分","effect":"-1","who":"challenger"},
+      {"event":"被冤枉补偿","effect":"+1","who":"actor"},
+      {"event":"追梗成功","effect":"+1","who":"actor"},
+      {"event":"翻车清零","effect":"reset_round_bank","who":"actor"},
+      {"event":"传得准","effect":"+2","who":"chain_all"},
+      {"event":"失真扣分","effect":"-1","who":"last_receiver"},
+      {"event":"总分垫底","effect":"penalty_trigger","who":"loser"}
+    ],
+    "win": {"basis":"total_score","order":"desc"},
+    "tiebreak":"平局/并列默认由系统随机裁决"
+  }
+}
