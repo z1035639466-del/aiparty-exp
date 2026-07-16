@@ -1,0 +1,1259 @@
+{
+  "generated_at": "2026-07-16",
+  "title": "Global youth party-slang river mouths: East and Southeast Asia",
+  "scope": [
+    "Japan",
+    "South Korea",
+    "Vietnam",
+    "Thailand",
+    "Indonesia",
+    "Philippines"
+  ],
+  "criterion": "A useful river mouth must produce a dense exact-search stream of executable games, rules, host tips, question cards, apps, collections, or repeat creators. Semantic similarity to Chinese 局头 alone is insufficient.",
+  "density_scale": {
+    "very_high": "Exact query repeatedly surfaces multiple independent collections, rules, apps or creator-style posts.",
+    "high": "Strong multi-source stream of executable content.",
+    "medium": "Real and repeatable content exists, but density is smaller or mixed.",
+    "low": "Mostly definitions, cultural explanation, people or unrelated content.",
+    "noisy": "Target content exists but is overwhelmed by another intent or unsafe SEO pollution."
+  },
+  "status_scale": {
+    "verified": "The exact term or combination is already a usable content-collection river mouth.",
+    "candidate": "Native term is real but requires signed-in platform validation or stronger qualifiers.",
+    "dead_end": "Meaning is relevant but exact search does not lead to the target content river.",
+    "risk": "Youth term or query exists but has strong semantic, reputational, adult or gambling contamination."
+  },
+  "top_line": {
+    "true_role_like_bridges": [
+      {
+        "term": "tanggero / tanggera",
+        "market": "Philippines",
+        "assessment": "Closest functional role across the six markets, but only medium public search yield."
+      },
+      {
+        "term": "chủ xị",
+        "market": "Vietnam",
+        "assessment": "Strong shared-cup and round-control role in Southern drinking culture, but low tutorial density."
+      }
+    ],
+    "best_content_river_mouths": [
+      "飲み会ゲーム",
+      "幹事必見 飲み会ゲーム",
+      "술게임",
+      "술자리 게임",
+      "trò chơi bàn nhậu",
+      "เกมวงเหล้า",
+      "tebak-tebakan receh tongkrongan",
+      "kartu pertanyaan tongkrongan",
+      "inuman games"
+    ]
+  },
+  "items": [
+    {
+      "id": "JP-01",
+      "country": "Japan",
+      "locale": "ja-JP",
+      "term": "飲み会ゲーム",
+      "layer": "occasion_carrier",
+      "status": "verified",
+      "search_yield": "high",
+      "role_likeness": "none",
+      "functional_gloss": "Drinking-party games; the strongest Japanese executable-content entry.",
+      "exact_queries": [
+        "飲み会ゲーム",
+        "飲み会ゲーム 盛り上がる",
+        "飲み会ゲーム 大人数",
+        "飲み会ゲーム 道具なし",
+        "飲み会ゲーム アプリ",
+        "飲み会ゲーム 大学生"
+      ],
+      "evidence": [
+        {
+          "url": "https://nomi-party.com/",
+          "type": "native_portal",
+          "note": "Portal built around more than ten drinking games."
+        },
+        {
+          "url": "https://www.spacemarket.com/magazine/know-how/party/drinking-party-game/",
+          "type": "local_media",
+          "note": "2026 collection of 24 games plus organizer preparation."
+        },
+        {
+          "url": "https://play.google.com/store/apps/details?id=com.kanpai.game",
+          "type": "app_store",
+          "note": "Eight-game Japanese drinking-party app with 5K+ downloads."
+        }
+      ],
+      "next_hops": [
+        "宅飲みゲーム",
+        "宴会ゲーム",
+        "罰ゲーム",
+        "質問ゲーム",
+        "カードゲーム"
+      ],
+      "caution": "Alcohol context; retain a parallel non-alcohol party-game branch for minors."
+    },
+    {
+      "id": "JP-02",
+      "country": "Japan",
+      "locale": "ja-JP",
+      "term": "幹事必見 + 飲み会ゲーム",
+      "layer": "role_content_wrapper",
+      "status": "verified",
+      "search_yield": "high",
+      "role_likeness": "medium",
+      "functional_gloss": "Organizer-must-see title wrapper; the closest Japanese packaging to 局头手册.",
+      "exact_queries": [
+        "幹事必見 飲み会ゲーム",
+        "幹事必見 宴会ゲーム",
+        "幹事 ゲーム 進行",
+        "幹事 コツ 盛り上げ"
+      ],
+      "evidence": [
+        {
+          "url": "https://nomi-game.work/",
+          "type": "native_portal",
+          "note": "Uses 幹事さん必見 and collects user-shared drinking games."
+        },
+        {
+          "url": "https://note.com/akih/n/nd3cb52119e23",
+          "type": "creator_post",
+          "note": "2026 organizer-must-see game content."
+        },
+        {
+          "url": "https://woman.mynavi.jp/article/240905-6/",
+          "type": "local_media",
+          "note": "Eighteen banquet games framed for organizers."
+        }
+      ],
+      "next_hops": [
+        "幹事必見",
+        "幹事 進行",
+        "宴会ゲーム",
+        "司会 台本"
+      ],
+      "caution": "幹事 alone is broad and formal; keep the game or party qualifier."
+    },
+    {
+      "id": "JP-03",
+      "country": "Japan",
+      "locale": "ja-JP",
+      "term": "合コンゲーム",
+      "layer": "occasion_carrier",
+      "status": "verified",
+      "search_yield": "medium",
+      "role_likeness": "none",
+      "functional_gloss": "Mixer and dating-party games, often focused on icebreaking and flirtation.",
+      "exact_queries": [
+        "合コンゲーム",
+        "合コンゲーム 盛り上がる",
+        "合コン 質問ゲーム"
+      ],
+      "evidence": [
+        {
+          "url": "https://arine.jp/articles/55881",
+          "type": "local_media",
+          "note": "Collection of fifteen mixer games."
+        },
+        {
+          "url": "https://megdai.jp/markebatake/marketing/5585/",
+          "type": "local_media",
+          "note": "2025 mixer-game collection."
+        }
+      ],
+      "next_hops": [
+        "合コン 質問",
+        "合コン カード",
+        "宅飲みゲーム"
+      ],
+      "caution": "Dating and adult assumptions can narrow or sexualize results."
+    },
+    {
+      "id": "JP-04",
+      "country": "Japan",
+      "locale": "ja-JP",
+      "term": "幹事",
+      "layer": "role",
+      "status": "candidate",
+      "search_yield": "low",
+      "role_likeness": "medium",
+      "functional_gloss": "Standard organizer role for drinking parties and banquets.",
+      "exact_queries": [
+        "幹事 飲み会",
+        "幹事 ゲーム",
+        "幹事 コツ"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.jp-guide.net/businessmanner/event/kanji_nomikai.html",
+          "type": "reference",
+          "note": "Documents the standard organizer role and duties."
+        }
+      ],
+      "next_hops": [
+        "幹事必見 飲み会ゲーム",
+        "幹事 進行 台本"
+      ],
+      "caution": "Single-term results skew toward booking, budgets, etiquette and corporate events."
+    },
+    {
+      "id": "JP-05",
+      "country": "Japan",
+      "locale": "ja-JP",
+      "term": "盛り上げ役 / 宴会部長",
+      "layer": "role",
+      "status": "dead_end",
+      "search_yield": "low",
+      "role_likeness": "medium",
+      "functional_gloss": "The person who livens up a room; semantically relevant but not a content river.",
+      "exact_queries": [
+        "盛り上げ役 飲み会",
+        "宴会部長 ゲーム"
+      ],
+      "evidence": [
+        {
+          "url": "https://gakumado.mynavi.jp/freshers/articles/11507",
+          "type": "local_media",
+          "note": "宴会部長 appears as an older corporate-banquet role."
+        }
+      ],
+      "next_hops": [],
+      "caution": "Results describe personality or old corporate culture rather than tutorials."
+    },
+    {
+      "id": "JP-06",
+      "country": "Japan",
+      "locale": "ja-JP",
+      "term": "パリピ / 陽キャ",
+      "layer": "youth_identity",
+      "status": "risk",
+      "search_yield": "noisy",
+      "role_likeness": "low",
+      "functional_gloss": "Party-person and extrovert labels.",
+      "exact_queries": [
+        "パリピ 飲み会",
+        "陽キャ ゲーム"
+      ],
+      "evidence": [
+        {
+          "url": "https://domani.shogakukan.co.jp/925055",
+          "type": "reference",
+          "note": "Explains パリピ usage."
+        },
+        {
+          "url": "https://woman.mynavi.jp/article/210628-33/",
+          "type": "reference",
+          "note": "Explains 陽キャ usage."
+        }
+      ],
+      "next_hops": [],
+      "caution": "Personality, fashion and celebrity content overwhelms game instructions."
+    },
+    {
+      "id": "KR-01",
+      "country": "South Korea",
+      "locale": "ko-KR",
+      "term": "술게임",
+      "layer": "occasion_carrier",
+      "status": "verified",
+      "search_yield": "high",
+      "role_likeness": "none",
+      "functional_gloss": "Drinking game; strongest Korean content river.",
+      "exact_queries": [
+        "술게임",
+        "술게임 추천",
+        "술게임 모음",
+        "술게임 룰",
+        "대학생 술게임",
+        "MT 술게임"
+      ],
+      "evidence": [
+        {
+          "url": "https://play.google.com/store/apps/details?id=com.enoo.sulpan",
+          "type": "app_store",
+          "note": "술판 offers eighty games, detailed rules and text-to-speech."
+        },
+        {
+          "url": "https://zekesnote.tistory.com/1506",
+          "type": "local_blog",
+          "note": "Drinking-game apps and rules list."
+        },
+        {
+          "url": "https://kin.naver.com/tag/tagDetail.nhn?tag=%EC%88%A0%EA%B2%8C%EC%9E%84%EC%9E%98%EB%AA%B0%EB%9D%BC%EC%9A%94",
+          "type": "native_community",
+          "note": "Naver question/tag stream around not knowing drinking games."
+        }
+      ],
+      "next_hops": [
+        "술게임 벌칙",
+        "술게임 질문",
+        "진실게임",
+        "밸런스게임",
+        "MT 게임",
+        "술게임 앱"
+      ],
+      "caution": "Alcohol context; distinguish university-age content from minors."
+    },
+    {
+      "id": "KR-02",
+      "country": "South Korea",
+      "locale": "ko-KR",
+      "term": "술자리 게임",
+      "layer": "occasion_carrier",
+      "status": "verified",
+      "search_yield": "high",
+      "role_likeness": "none",
+      "functional_gloss": "Games played at a drinking table or drinking gathering.",
+      "exact_queries": [
+        "술자리 게임",
+        "술자리 게임 추천",
+        "술자리 게임 룰",
+        "새내기 술자리 게임"
+      ],
+      "evidence": [
+        {
+          "url": "https://apps.apple.com/kr/app/%EB%82%98%EB%8A%94-%EC%95%84%EC%A7%81-%EC%A7%84%EC%8B%A4%EA%B2%8C%EC%9E%84-%ED%8C%8C%ED%8B%B0/id1473100410",
+          "type": "app_store",
+          "note": "Korean truth-game and party application."
+        },
+        {
+          "url": "https://contents.premium.naver.com/cleek/economiclaboratory/contents/260503132036563rg",
+          "type": "native_media",
+          "note": "2026 application coverage."
+        }
+      ],
+      "next_hops": [
+        "새내기 술자리",
+        "술자리 벌칙",
+        "술자리 질문"
+      ],
+      "caution": "May overlap with general etiquette and drinking advice."
+    },
+    {
+      "id": "KR-03",
+      "country": "South Korea",
+      "locale": "ko-KR",
+      "term": "술겜",
+      "layer": "youth_abbreviation",
+      "status": "candidate",
+      "search_yield": "medium",
+      "role_likeness": "none",
+      "functional_gloss": "Youth abbreviation of 술게임.",
+      "exact_queries": [
+        "술겜",
+        "술겜 추천",
+        "술겜 룰",
+        "술겜 대학생"
+      ],
+      "evidence": [
+        {
+          "url": "https://orbi.kr/00077701449",
+          "type": "youth_community",
+          "note": "Natural 2026 youth usage of the abbreviation."
+        }
+      ],
+      "next_hops": [
+        "술게임",
+        "술겜 벌칙",
+        "술겜 앱"
+      ],
+      "caution": "Public-web tutorial density is lower than the full form; validate on short-video platforms."
+    },
+    {
+      "id": "KR-04",
+      "country": "South Korea",
+      "locale": "ko-KR",
+      "term": "인싸 술게임 / 인싸게임",
+      "layer": "youth_wrapper",
+      "status": "candidate",
+      "search_yield": "medium",
+      "role_likeness": "low",
+      "functional_gloss": "Social-insider framing applied to drinking or party games.",
+      "exact_queries": [
+        "인싸 술게임",
+        "인싸게임",
+        "인싸되는 술자리"
+      ],
+      "evidence": [
+        {
+          "url": "https://manytip.tistory.com/60/",
+          "type": "local_blog",
+          "note": "Uses the becoming-an-insider drinking-table wrapper."
+        },
+        {
+          "url": "https://enews.imbc.com/Tpl/View/263372",
+          "type": "local_media",
+          "note": "Native media usage of 인싸게임."
+        }
+      ],
+      "next_hops": [
+        "핵인싸 게임",
+        "인싸 술자리",
+        "술게임 추천"
+      ],
+      "caution": "The wrapper is noisy and often leads to TV, celebrities, fashion or products."
+    },
+    {
+      "id": "KR-05",
+      "country": "South Korea",
+      "locale": "ko-KR",
+      "term": "분위기 메이커",
+      "layer": "role",
+      "status": "dead_end",
+      "search_yield": "low",
+      "role_likeness": "medium",
+      "functional_gloss": "Mood maker or life of the party.",
+      "exact_queries": [
+        "분위기 메이커 술자리",
+        "분위기 메이커 게임"
+      ],
+      "evidence": [
+        {
+          "url": "https://static.ebs.co.kr/images/public/lectures/2023/11/1/9/60228612/f37840cf-4a38-445f-add4-bf7a0a9975cc.pdf",
+          "type": "education_reference",
+          "note": "Documents 분위기 메이커 as a life-of-the-party expression."
+        }
+      ],
+      "next_hops": [],
+      "caution": "Search results describe a personality or English phrase rather than game systems."
+    },
+    {
+      "id": "KR-06",
+      "country": "South Korea",
+      "locale": "ko-KR",
+      "term": "인싸 / 핵인싸",
+      "layer": "youth_identity",
+      "status": "risk",
+      "search_yield": "noisy",
+      "role_likeness": "low",
+      "functional_gloss": "Social insider or extremely connected popular person.",
+      "exact_queries": [
+        "인싸 술자리",
+        "핵인싸 게임"
+      ],
+      "evidence": [
+        {
+          "url": "https://enews.imbc.com/News/RetrieveNewsInfo/264305",
+          "type": "local_media",
+          "note": "Native use of 핵인싸."
+        }
+      ],
+      "next_hops": [
+        "인싸 술게임"
+      ],
+      "caution": "Single-term search is dominated by identity, entertainment and consumer content."
+    },
+    {
+      "id": "VN-01",
+      "country": "Vietnam",
+      "locale": "vi-VN",
+      "term": "trò chơi bàn nhậu",
+      "layer": "occasion_carrier",
+      "status": "verified",
+      "search_yield": "high",
+      "role_likeness": "none",
+      "functional_gloss": "Games for the drinking table.",
+      "exact_queries": [
+        "trò chơi bàn nhậu",
+        "trò chơi trên bàn nhậu",
+        "trò chơi bàn nhậu vui",
+        "luật chơi bàn nhậu"
+      ],
+      "evidence": [
+        {
+          "url": "https://quay.com.vn/top-27-tro-choi-vui-tren-ban-nhau-don-gian-ma-cuc-cuon-n467",
+          "type": "local_media",
+          "note": "2026 collection of more than twenty-seven drinking-table games."
+        },
+        {
+          "url": "https://www.lmd.vn/bai-viet/top-10-tro-choi-su-dung-bia-ruou-cho-buoi-tiec--ban-nhau-soi-dong",
+          "type": "local_media",
+          "note": "Ten alcohol-based party and table games."
+        },
+        {
+          "url": "https://ideashop.vn/tong-hop-cac-tro-choi-uong-bia-tang-doanh-so-cho-quan-bar-beer-club-n89783.html",
+          "type": "local_business_media",
+          "note": "Game collection framed as atmosphere and sales tools for bars."
+        }
+      ],
+      "next_hops": [
+        "trò chơi phạt rượu",
+        "câu hỏi bàn nhậu",
+        "bài uống rượu",
+        "xúc xắc uống bia"
+      ],
+      "caution": "Alcohol context and some commercial bar targeting."
+    },
+    {
+      "id": "VN-02",
+      "country": "Vietnam",
+      "locale": "vi-VN",
+      "term": "trò chơi uống rượu / trò chơi uống bia",
+      "layer": "occasion_carrier",
+      "status": "verified",
+      "search_yield": "high",
+      "role_likeness": "none",
+      "functional_gloss": "Drinking games using liquor or beer.",
+      "exact_queries": [
+        "trò chơi uống rượu",
+        "trò chơi uống bia",
+        "app trò chơi uống rượu",
+        "game uống bia"
+      ],
+      "evidence": [
+        {
+          "url": "https://dienthoaivui.com.vn/app-tro-choi-uong-ruou-bia-tren-dien-thoai/",
+          "type": "local_media",
+          "note": "Collection of mobile drinking-game applications."
+        },
+        {
+          "url": "https://www.appbrain.com/app/n%C3%B3i-hay-l%C3%A0m/com.bkglobal.noi_hay_lam",
+          "type": "app_directory",
+          "note": "Vietnamese truth-or-dare style drinking-game app with a 2026 listing."
+        }
+      ],
+      "next_hops": [
+        "truth or dare tiếng Việt",
+        "game nhậu",
+        "trò chơi uống bia app"
+      ],
+      "caution": "Age-gate alcohol material and separate youth-safe variants."
+    },
+    {
+      "id": "VN-03",
+      "country": "Vietnam",
+      "locale": "vi-VN",
+      "term": "game nhậu",
+      "layer": "occasion_carrier",
+      "status": "candidate",
+      "search_yield": "medium",
+      "role_likeness": "none",
+      "functional_gloss": "Colloquial drinking-session game query.",
+      "exact_queries": [
+        "game nhậu",
+        "game nhậu vui",
+        "game nhậu trên điện thoại"
+      ],
+      "evidence": [
+        {
+          "url": "https://dienthoaivui.com.vn/app-tro-choi-uong-ruou-bia-tren-dien-thoai/",
+          "type": "local_media",
+          "note": "Shows a real mobile-app river adjacent to the colloquial query."
+        }
+      ],
+      "next_hops": [
+        "trò chơi bàn nhậu",
+        "game uống bia"
+      ],
+      "caution": "Mixed Vietnamese-English wording may be more platform-specific than web-search specific."
+    },
+    {
+      "id": "VN-04",
+      "country": "Vietnam",
+      "locale": "vi-VN",
+      "term": "chủ xị",
+      "layer": "role",
+      "status": "candidate",
+      "search_yield": "low",
+      "role_likeness": "high",
+      "functional_gloss": "Southern or Mekong drinking-circle controller who manages a shared cup, rounds, permissions and penalties.",
+      "exact_queries": [
+        "chủ xị bàn nhậu",
+        "kinh nghiệm làm chủ xị",
+        "luật nhậu chủ xị",
+        "trò chơi của chủ xị",
+        "chủ xị miền Tây"
+      ],
+      "evidence": [
+        {
+          "url": "https://baocantho.com.vn/ban-them-ve-van-hoa-ruou-o-nam-bo-a21213.html",
+          "type": "local_cultural_media",
+          "note": "Documents chủ xị in Southern drinking culture."
+        },
+        {
+          "url": "https://ruouchuoihot.vn/tinh-bau-ban/ve-mien-tay-uong-gu-2_101.html",
+          "type": "local_cultural_article",
+          "note": "Describes selection criteria, permission to skip rounds and penalties."
+        }
+      ],
+      "next_hops": [
+        "chủ xị miền Tây",
+        "chủ xị luật nhậu",
+        "chủ xị TikTok"
+      ],
+      "caution": "Strong role match but public exact search is dominated by culture and etymology, not manuals."
+    },
+    {
+      "id": "VN-05",
+      "country": "Vietnam",
+      "locale": "vi-VN",
+      "term": "quản trò",
+      "layer": "role",
+      "status": "candidate",
+      "search_yield": "medium",
+      "role_likeness": "high",
+      "functional_gloss": "Game facilitator who explains rules and keeps order.",
+      "exact_queries": [
+        "quản trò bàn nhậu",
+        "quản trò tiệc",
+        "quản trò sinh viên",
+        "trò chơi quản trò"
+      ],
+      "evidence": [
+        {
+          "url": "https://ioe.vn/chi-tiet/tap-chi-tieng-anh/11-tro-choi-bo-tro-hoc-tieng-anh-phan-1-5-2145",
+          "type": "education_reference",
+          "note": "Defines the rule-explaining and order-keeping facilitator function."
+        }
+      ],
+      "next_hops": [
+        "quản trò nhậu",
+        "quản trò tiệc sinh viên"
+      ],
+      "caution": "Large wrong-context river: schools, camps, children, training and team building."
+    },
+    {
+      "id": "VN-06",
+      "country": "Vietnam",
+      "locale": "vi-VN",
+      "term": "cây hài / chúa hề / thánh tấu hài / vựa muối",
+      "layer": "youth_identity",
+      "status": "dead_end",
+      "search_yield": "noisy",
+      "role_likeness": "low",
+      "functional_gloss": "Comic person, clown or meme-heavy funny friend.",
+      "exact_queries": [
+        "cây hài bàn nhậu",
+        "chúa hề nhóm bạn"
+      ],
+      "evidence": [
+        {
+          "url": "https://fptshop.com.vn/tin-tuc/for-gamers/trmua-hme-la-gi-209200",
+          "type": "local_slang_media",
+          "note": "2026 explanation of contemporary comedy-person slang."
+        }
+      ],
+      "next_hops": [],
+      "caution": "Character labels do not yield rule, card or hosting-guide streams."
+    },
+    {
+      "id": "TH-01",
+      "country": "Thailand",
+      "locale": "th-TH",
+      "term": "เกมวงเหล้า",
+      "layer": "occasion_carrier",
+      "status": "verified",
+      "search_yield": "very_high",
+      "role_likeness": "none",
+      "functional_gloss": "Games for a drinking circle.",
+      "exact_queries": [
+        "เกมวงเหล้า",
+        "เกมวงเหล้า สนุกๆ",
+        "เกมวงเหล้า ไม่ใช้อุปกรณ์",
+        "เกมวงเหล้า คำถาม",
+        "เกมวงเหล้า มหาลัย",
+        "เกมวงเหล้า แอป"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.traveloka.com/th-th/explore/activities/best-drinking-game-apps-party/1001216",
+          "type": "local_media",
+          "note": "Drinking-game apps and party play."
+        },
+        {
+          "url": "https://salehere.co.th/articles/drinking-games-for-party",
+          "type": "local_media",
+          "note": "Native party drinking-game collection."
+        },
+        {
+          "url": "https://www.lemon8-app.com/%40nightlife.run/7476034298936820241?region=th",
+          "type": "social_platform",
+          "note": "Five-game social post with playable rules."
+        }
+      ],
+      "next_hops": [
+        "เกมปาร์ตี้",
+        "เกมไพ่",
+        "เกมคำถาม",
+        "เกมลงโทษ",
+        "คำถามวงเหล้า"
+      ],
+      "caution": "Alcohol and punishment content require youth-safety segmentation."
+    },
+    {
+      "id": "TH-02",
+      "country": "Thailand",
+      "locale": "th-TH",
+      "term": "รวมเกมวงเหล้า",
+      "layer": "collection_wrapper",
+      "status": "verified",
+      "search_yield": "high",
+      "role_likeness": "none",
+      "functional_gloss": "Collection of drinking-circle games.",
+      "exact_queries": [
+        "รวมเกมวงเหล้า",
+        "รวมเกมวงเหล้า สนุกๆ",
+        "รวมเกมวงเหล้า TikTok"
+      ],
+      "evidence": [
+        {
+          "url": "https://salehere.co.th/articles/drinking-games-for-party",
+          "type": "local_media",
+          "note": "Collection-format evidence."
+        },
+        {
+          "url": "https://toz-app.com/th/blog/drinking-games/top-10-drinking-games-for-parties",
+          "type": "localized_game_site",
+          "note": "Thai top-ten collection and rules."
+        }
+      ],
+      "next_hops": [
+        "กติกาเกมวงเหล้า",
+        "เกมวงเหล้า คำถาม"
+      ],
+      "caution": "Collection pages may include translated or SEO-generated material; count independent native creators separately."
+    },
+    {
+      "id": "TH-03",
+      "country": "Thailand",
+      "locale": "th-TH",
+      "term": "กติกาเกมวงเหล้า",
+      "layer": "rules_wrapper",
+      "status": "verified",
+      "search_yield": "high",
+      "role_likeness": "none",
+      "functional_gloss": "Rules for drinking-circle games.",
+      "exact_queries": [
+        "กติกาเกมวงเหล้า",
+        "กติกาเกมวงเหล้า ไพ่",
+        "กติกาเกมวงเหล้า คำถาม"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.lemon8-app.com/%40nightlife.run/7476034298936820241?region=th",
+          "type": "social_platform",
+          "note": "Rule-bearing examples on a social platform."
+        },
+        {
+          "url": "https://toz-app.com/th/blog/drinking-games/top-10-drinking-games-for-parties",
+          "type": "localized_game_site",
+          "note": "Playable Thai rules."
+        }
+      ],
+      "next_hops": [
+        "เกมวงเหล้า ไพ่",
+        "เกมวงเหล้า ลงโทษ"
+      ],
+      "caution": "Same alcohol and punishment safety issue as the base query."
+    },
+    {
+      "id": "TH-04",
+      "country": "Thailand",
+      "locale": "th-TH",
+      "term": "แม่งาน / โต้โผ",
+      "layer": "role",
+      "status": "candidate",
+      "search_yield": "low",
+      "role_likeness": "medium",
+      "functional_gloss": "Lead organizer or principal promoter.",
+      "exact_queries": [
+        "แม่งาน เกมวงเหล้า",
+        "โต้โผ ปาร์ตี้",
+        "แม่งาน ปาร์ตี้"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.sanook.com/dictionary/dict/dict-th-th-royal-institute/search/%E0%B9%81%E0%B8%A1%E0%B9%88%E0%B8%87%E0%B8%B2%E0%B8%99/",
+          "type": "dictionary",
+          "note": "Reference for แม่งาน."
+        },
+        {
+          "url": "https://dict.longdo.com/search/%E0%B9%82%E0%B8%95%E0%B9%89%E0%B9%82%E0%B8%9C",
+          "type": "dictionary",
+          "note": "Reference for โต้โผ."
+        }
+      ],
+      "next_hops": [
+        "แม่งาน เกมวงเหล้า",
+        "แม่งาน เกมปาร์ตี้"
+      ],
+      "caution": "Single-term search goes to broad events and formal projects, not youth game manuals."
+    },
+    {
+      "id": "TH-05",
+      "country": "Thailand",
+      "locale": "th-TH",
+      "term": "ตัวตึง",
+      "layer": "youth_identity",
+      "status": "risk",
+      "search_yield": "noisy",
+      "role_likeness": "low",
+      "functional_gloss": "Standout, toughest or most prominent person in a scene.",
+      "exact_queries": [
+        "ตัวตึง วงเหล้า",
+        "ตัวตึง ปาร์ตี้"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.thairath.co.th/lifestyle/life/2530578",
+          "type": "local_slang_media",
+          "note": "Explains the contemporary youth slang."
+        },
+        {
+          "url": "https://www.slangzone.net/th/word/%E0%B8%95%E0%B8%B1%E0%B8%A7%E0%B8%95%E0%B8%B6%E0%B8%87",
+          "type": "slang_reference",
+          "note": "Current usage record."
+        }
+      ],
+      "next_hops": [],
+      "caution": "Broad fame, conflict and persona river; not a rules or host-manual entry."
+    },
+    {
+      "id": "TH-06",
+      "country": "Thailand",
+      "locale": "th-TH",
+      "term": "คนเปิดกฎ",
+      "layer": "one_off_role_phrase",
+      "status": "dead_end",
+      "search_yield": "low",
+      "role_likeness": "medium",
+      "functional_gloss": "The person who opens or introduces a rule.",
+      "exact_queries": [
+        "คนเปิดกฎ เกมวงเหล้า"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.lemon8-app.com/%40nightlife.run/7476034298936820241?region=th",
+          "type": "social_platform",
+          "note": "One observed phrase in a game post."
+        }
+      ],
+      "next_hops": [],
+      "caution": "No cross-creator lexical recurrence found; treat as descriptive wording, not slang."
+    },
+    {
+      "id": "ID-01",
+      "country": "Indonesia",
+      "locale": "id-ID",
+      "term": "tebak-tebakan receh tongkrongan",
+      "layer": "activity_occasion",
+      "status": "verified",
+      "search_yield": "high",
+      "role_likeness": "none",
+      "functional_gloss": "Silly or lowbrow riddles for a friend hangout.",
+      "exact_queries": [
+        "tebak-tebakan receh tongkrongan",
+        "tebak tebakan lucu tongkrongan",
+        "pertanyaan receh buat tongkrongan",
+        "ice breaking tongkrongan"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.bola.com/ragam/read/5460633/40-tebak-tebakan-receh-tapi-lucu-bikin-tongkrongan-berwarna",
+          "type": "local_media",
+          "note": "Forty riddles framed as making a hangout livelier."
+        },
+        {
+          "url": "https://mediaindonesia.com/humaniora/742674/150-tebak-tebakan-lucu-receh-tapi-bikin-ngakak-lengkap-dengan-jawabannya",
+          "type": "local_media",
+          "note": "One hundred fifty riddles and answers."
+        },
+        {
+          "url": "https://kumparan.com/pengetahuan-umum/50-tebak-tebakan-receh-yang-bikin-suasana-lebih-hidup-25NH43XAgGf",
+          "type": "local_media",
+          "note": "Fifty riddles explicitly framed as enlivening the atmosphere."
+        }
+      ],
+      "next_hops": [
+        "pertanyaan receh",
+        "tebak-tebakan lucu",
+        "games tanpa alat",
+        "ice breaking tongkrongan"
+      ],
+      "caution": "High-volume listicles can duplicate items; de-duplicate prompts and creators."
+    },
+    {
+      "id": "ID-02",
+      "country": "Indonesia",
+      "locale": "id-ID",
+      "term": "kartu pertanyaan tongkrongan",
+      "layer": "carrier_occasion",
+      "status": "verified",
+      "search_yield": "medium",
+      "role_likeness": "none",
+      "functional_gloss": "Question-card decks for friend hangouts.",
+      "exact_queries": [
+        "kartu pertanyaan tongkrongan",
+        "kartu obrolan tongkrongan",
+        "kartu pertanyaan teman",
+        "truth or dare tongkrongan"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.yappin.co/",
+          "type": "local_product",
+          "note": "Indonesian question-card and social-play products."
+        },
+        {
+          "url": "https://shopee.co.id/TalknChill-Kartu-Permainan-Edisi-Tongkrongan-Khusus-Cowok-Game-Kartu-Pertanyaan-Seperti-Truth-or-Dare-Games-Card-Mainan-Kartu-i.56718143.18524845773",
+          "type": "marketplace",
+          "note": "TalknChill hangout question-card product."
+        },
+        {
+          "url": "https://toz-app.com/id/blog/party-games/147-friends-21-questions",
+          "type": "localized_game_site",
+          "note": "2026 Indonesian friend-group 21 Questions content."
+        }
+      ],
+      "next_hops": [
+        "kartu obrolan",
+        "pertanyaan deep talk",
+        "truth or dare teman"
+      ],
+      "caution": "Some results are product listings rather than organic creator series."
+    },
+    {
+      "id": "ID-03",
+      "country": "Indonesia",
+      "locale": "id-ID",
+      "term": "game tongkrongan",
+      "layer": "occasion_carrier",
+      "status": "candidate",
+      "search_yield": "noisy",
+      "role_likeness": "none",
+      "functional_gloss": "Games for the hangout circle.",
+      "exact_queries": [
+        "game tongkrongan tanpa alat",
+        "game tongkrongan tanpa HP",
+        "game tongkrongan kartu",
+        "game tongkrongan kampus"
+      ],
+      "evidence": [
+        {
+          "url": "https://rri.co.id/padang/hobi/2519800/uno-jadi-game-tongkrongan-yang-bikin-nagih",
+          "type": "local_media",
+          "note": "2026 article on UNO as an addictive hangout game."
+        },
+        {
+          "url": "https://tugumalang.id/8-permainan-asik-saat-nongkrong-bareng-sahabat/",
+          "type": "local_media",
+          "note": "Eight games for hanging out with friends."
+        },
+        {
+          "url": "https://play.google.com/store/apps/details?id=com.vanilla.nhiemultiplayer",
+          "type": "app_store",
+          "note": "Friend-group multiplayer application."
+        }
+      ],
+      "next_hops": [
+        "games seru buat nongkrong",
+        "game tanpa alat",
+        "kartu tongkrongan"
+      ],
+      "caution": "Large collision with video games and gambling SEO; always add carrier and non-gambling qualifiers."
+    },
+    {
+      "id": "ID-04",
+      "country": "Indonesia",
+      "locale": "id-ID",
+      "term": "tongkrongan / nongki",
+      "layer": "youth_occasion",
+      "status": "candidate",
+      "search_yield": "noisy",
+      "role_likeness": "none",
+      "functional_gloss": "Hangout place, social circle or casual hanging out.",
+      "exact_queries": [
+        "tongkrongan games",
+        "nongki games",
+        "anak tongkrongan permainan"
+      ],
+      "evidence": [
+        {
+          "url": "https://rri.co.id/padang/hobi/2519800/uno-jadi-game-tongkrongan-yang-bikin-nagih",
+          "type": "local_media",
+          "note": "Shows a real hangout-game usage."
+        }
+      ],
+      "next_hops": [
+        "tebak-tebakan receh tongkrongan",
+        "kartu pertanyaan tongkrongan"
+      ],
+      "caution": "The base scene term is too broad to collect executable games without a carrier."
+    },
+    {
+      "id": "ID-05",
+      "country": "Indonesia",
+      "locale": "id-ID",
+      "term": "badut tongkrongan",
+      "layer": "role_identity",
+      "status": "dead_end",
+      "search_yield": "medium",
+      "role_likeness": "low",
+      "functional_gloss": "The clown or comedic person in a hangout group.",
+      "exact_queries": [
+        "badut tongkrongan",
+        "si badut tongkrongan"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.idntimes.com/men/attitude/7-tipe-anak-tongkrongan-yang-selalu-ada-kamu-yang-mana-01-fqxf8-3wzrt9",
+          "type": "local_media",
+          "note": "Si Badut appears as a recognizable friend-group type."
+        }
+      ],
+      "next_hops": [],
+      "caution": "Produces memes and group-character lists rather than game rules or hosting manuals."
+    },
+    {
+      "id": "ID-06",
+      "country": "Indonesia",
+      "locale": "id-ID",
+      "term": "gacor / slot + tongkrongan",
+      "layer": "seo_pollution",
+      "status": "risk",
+      "search_yield": "noisy",
+      "role_likeness": "none",
+      "functional_gloss": "Gambling and slot-machine contamination around hangout-game queries.",
+      "exact_queries": [
+        "game tongkrongan"
+      ],
+      "evidence": [],
+      "next_hops": [
+        "game tongkrongan tanpa alat",
+        "kartu pertanyaan tongkrongan"
+      ],
+      "caution": "Exclude slot, gacor, judi, casino and betting domains from youth-party collection."
+    },
+    {
+      "id": "PH-01",
+      "country": "Philippines",
+      "locale": "fil-PH",
+      "term": "inuman games",
+      "layer": "occasion_carrier",
+      "status": "verified",
+      "search_yield": "high",
+      "role_likeness": "none",
+      "functional_gloss": "Games for a Filipino drinking session.",
+      "exact_queries": [
+        "inuman games",
+        "Pinoy inuman games",
+        "inuman games rules",
+        "inuman games barkada",
+        "inuman questions",
+        "inuman card game"
+      ],
+      "evidence": [
+        {
+          "url": "https://play.google.com/store/apps/details?id=com.wiredkoalastudios.gameofshots2.partytime",
+          "type": "app_store",
+          "note": "Game of Shots has 100K+ downloads and 8.5K reviews."
+        },
+        {
+          "url": "https://toz-app.com/fil/blog/drinking-games/truth-or-drink",
+          "type": "localized_game_site",
+          "note": "2026 Filipino-language Truth or Drink with 150 questions and rules."
+        },
+        {
+          "url": "https://toz-app.com/fil/games/red-or-black",
+          "type": "localized_game_site",
+          "note": "Playable Filipino-language Red or Black rules."
+        }
+      ],
+      "next_hops": [
+        "tagayan games",
+        "barkada games",
+        "inuman questions",
+        "pakulo sa inuman",
+        "pa-games barkada"
+      ],
+      "caution": "Alcohol context; isolate non-alcohol barkada games for minors."
+    },
+    {
+      "id": "PH-02",
+      "country": "Philippines",
+      "locale": "fil-PH",
+      "term": "tanggero / tanggera / tig-tagay",
+      "layer": "role",
+      "status": "candidate",
+      "search_yield": "medium",
+      "role_likeness": "high",
+      "functional_gloss": "Person who pours, controls the shared glass and paces a tagay drinking circle.",
+      "exact_queries": [
+        "tanggero tips",
+        "tanggero rules",
+        "tanggero guide",
+        "tanggero barkada",
+        "tanggero inuman games",
+        "tig-tagay tips"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.tagaloglang.com/tanggero/",
+          "type": "language_reference",
+          "note": "Native lexical definition."
+        },
+        {
+          "url": "https://philssj.org/index.php/main/article/download/494/264/",
+          "type": "academic",
+          "note": "2026 article documents gunner, tanggero and tig-tagay in tagay ritual."
+        },
+        {
+          "url": "https://ramir096.wordpress.com/2012/07/20/inuman-101/",
+          "type": "local_blog",
+          "note": "Dedicated Tanggero Tips section."
+        },
+        {
+          "url": "https://alawsawagam.blogspot.com/2014/02/ibat-ibang-uriklase-ng-mnginginom.html",
+          "type": "local_blog",
+          "note": "Calls the tanggero the playmaker."
+        }
+      ],
+      "next_hops": [
+        "tanggero TikTok",
+        "tanggero humor",
+        "tagayan games",
+        "inuman 101"
+      ],
+      "caution": "Closest role match, but public search still lacks a dense stream of manuals, cards and repeat creators."
+    },
+    {
+      "id": "PH-03",
+      "country": "Philippines",
+      "locale": "fil-PH",
+      "term": "tanggero tips / inuman 101",
+      "layer": "role_content_wrapper",
+      "status": "candidate",
+      "search_yield": "medium",
+      "role_likeness": "high",
+      "functional_gloss": "Tips and beginner-guide wrapper for the tagay pourer or drinking session.",
+      "exact_queries": [
+        "tanggero tips",
+        "inuman 101",
+        "tanggero guide",
+        "tanggero do and dont"
+      ],
+      "evidence": [
+        {
+          "url": "https://ramir096.wordpress.com/2012/07/20/inuman-101/",
+          "type": "local_blog",
+          "note": "Concrete role-guide example."
+        },
+        {
+          "url": "https://flyingketchup.ph/inuman-chronicles-the-essence-of-pinoy-drinking-culture/",
+          "type": "local_cultural_media",
+          "note": "Broader inuman culture and role context."
+        }
+      ],
+      "next_hops": [
+        "inuman games",
+        "tagayan rules",
+        "tanggero TikTok"
+      ],
+      "caution": "Evidence exists but is not yet a dense contemporary creator river."
+    },
+    {
+      "id": "PH-04",
+      "country": "Philippines",
+      "locale": "fil-PH",
+      "term": "tagayan / inuman",
+      "layer": "occasion",
+      "status": "candidate",
+      "search_yield": "noisy",
+      "role_likeness": "none",
+      "functional_gloss": "Shared-round drinking and drinking-session scene terms.",
+      "exact_queries": [
+        "tagayan games",
+        "inuman barkada",
+        "tagayan rules"
+      ],
+      "evidence": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Drinking_culture_of_the_Philippines",
+          "type": "reference",
+          "note": "Overview of Filipino drinking and tagay culture."
+        }
+      ],
+      "next_hops": [
+        "inuman games",
+        "tanggero tips"
+      ],
+      "caution": "Single scene terms include health, culture, memes and nightlife; add games, rules or questions."
+    },
+    {
+      "id": "PH-05",
+      "country": "Philippines",
+      "locale": "fil-PH",
+      "term": "pa-games / kwelang pakulo",
+      "layer": "activity_wrapper",
+      "status": "candidate",
+      "search_yield": "medium",
+      "role_likeness": "none",
+      "functional_gloss": "Funny games, gimmicks or entertaining activities.",
+      "exact_queries": [
+        "pa-games sa inuman",
+        "kwelang pakulo barkada",
+        "pa-games barkada",
+        "pakulo sa inuman"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.reddit.com/r/CasualPH/comments/15fsjkf",
+          "type": "native_community",
+          "note": "Natural request for kwelang pakulo and pa-games."
+        }
+      ],
+      "next_hops": [
+        "inuman games",
+        "barkada games",
+        "pakulo sa inuman"
+      ],
+      "caution": "Without scene qualifiers, results mix workplace events, children, TV and general parties."
+    },
+    {
+      "id": "PH-06",
+      "country": "Philippines",
+      "locale": "fil-PH",
+      "term": "kaladkarin / bida-bida / pabida",
+      "layer": "youth_identity",
+      "status": "risk",
+      "search_yield": "noisy",
+      "role_likeness": "low",
+      "functional_gloss": "Easy-to-invite friend; attention-seeking or scene-stealing person.",
+      "exact_queries": [
+        "kaladkarin barkada",
+        "bida-bida inuman",
+        "pabida party"
+      ],
+      "evidence": [
+        {
+          "url": "https://en.wiktionary.org/wiki/kaladkarin",
+          "type": "language_reference",
+          "note": "Documents current slang and older derogatory senses."
+        },
+        {
+          "url": "https://en.wiktionary.org/wiki/bida-bida",
+          "type": "language_reference",
+          "note": "Documents the attention-seeking sense."
+        }
+      ],
+      "next_hops": [],
+      "caution": "Identity and reputational labels, including derogatory or gendered senses; not game-manual entries."
+    }
+  ],
+  "recommended_validation": {
+    "platforms": [
+      "TikTok",
+      "Instagram Reels",
+      "YouTube Shorts",
+      "local community and short-video platforms"
+    ],
+    "protocol": [
+      "Run the exact query and label the first 20 to 50 results.",
+      "Measure the share containing playable rules, prompts, cards or host techniques.",
+      "Count independent creators, not duplicate SEO pages.",
+      "Look for at least three installments from one creator or a repeated series format.",
+      "Extract new role terms from native captions and comments.",
+      "Downgrade role terms that return only definitions, personalities or cultural explanation."
+    ]
+  }
+}

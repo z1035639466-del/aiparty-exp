@@ -1,5 +1,18 @@
 # UGC 河流采集阶段汇总（2026-07-16）
 
+## 全球青年黑话河口扩展
+
+在原有多语玩法采集之上，又按“精确搜索后是否持续长出玩法、主持技巧、规则、卡牌、脚本、App 或系列创作者”完成全球词河扩展：东亚/东南亚 36 条、欧洲/拉美 46 条、英语圈/印度/尼日利亚/南非 21 条，共 103 个词簇（50 verified、34 candidate、12 dead/negative、7 risk-only），并另做 18 条 YouTube 原样回搜与平台冲突审计。
+
+本阶段最重要的校正是：**词义像“局头”不等于能当采集入口。** 当前搜索行为最接近的单角色词是越南语 `quản trò`；韩国 `술게임 장인` 是值得继续判活的青年角色候选；日本 `幹事必見 + 飲み会ゲーム` 与印度 `freshers party anchoring script` 更像“局头手册”的内容壳。大多数市场的主矿脉则是本地场景黑话与内容载体组合，如 `la previa → juegos para la previa`、`esquenta → Esquenta, O Jogo`、`pre-drinks → games`、`tongkrongan → permainan/tebak-tebakan`。
+
+- [全球“局头型”玩法河口总表](./global_party_game_river_mouths_2026-07-16.md)
+- [机器可读总表](./global_party_game_river_mouths_master_2026-07-16.json)
+- [YouTube 原样回搜与平台冲突审计](./global_river_mouth_youtube_recheck_2026-07-16.json)
+- [东亚/东南亚 36 条词簇](./global_slang_east_asia_2026-07-16.md)
+- [欧洲/拉美 46 条词簇](./global_slang_europe_latam_2026-07-16.md)
+- [英语圈/印度/尼日利亚/南非 21 条词簇](./global_slang_anglo_south_africa_2026-07-16.md)
+
 ## 本轮交付
 
 | 层 | 结果 |

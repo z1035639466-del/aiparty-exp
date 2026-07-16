@@ -1,0 +1,322 @@
+{
+  "schema_version": "ugc-river-mouth-recheck-v1",
+  "captured_on": "2026-07-16",
+  "platform": "YouTube",
+  "access_context": "logged-in in-app browser; read-only",
+  "purpose": "Test whether an exact native query opens a dense river of party-game tutorials, host skills, cards, scripts, or repeatable series. Semantic resemblance to 局头 is not sufficient.",
+  "counting_note": "Counts describe only the first visible result set in this session. They are discovery snapshots, not platform-wide statistics. Ads were excluded.",
+  "query_runs": [
+    {
+      "locale": "vi-VN",
+      "query": "quản trò",
+      "search_url": "https://www.youtube.com/results?search_query=qu%E1%BA%A3n+tr%C3%B2",
+      "visible_results": 12,
+      "role_related": 12,
+      "party_or_group_game_tutorials": 7,
+      "status": "verified_role_river_mouth",
+      "assessment": "The strongest single role term in this recheck. Exact search surfaced facilitator skills, how-to-become-good lessons, game-organization tutorials, a 14-video activity-game playlist, contests, and a dedicated Người Quản Trò channel. It is broader than youth nightlife, but it genuinely opens a game-facilitation content river.",
+      "representative_results": [
+        {
+          "title": "Kỹ Năng Sinh Hoạt Quản Trò II Trò Chơi Sinh Hoạt Tổng Hợp",
+          "url": "https://www.youtube.com/watch?v=nE7XEM-WqHs"
+        },
+        {
+          "title": "Bài 1 - Tại sao mọi người nên có kĩ năng quản trò",
+          "url": "https://www.youtube.com/watch?v=kmegSKhPxlY"
+        },
+        {
+          "title": "Nghệ Thuật Quản Trò & Bí Quyết Tổ Chức Trò Chơi Hấp Dẫn",
+          "url": "https://www.youtube.com/watch?v=4dR9FTazmfI"
+        },
+        {
+          "title": "Kỹ Năng Quản Trò [10]",
+          "url": "https://www.youtube.com/watch?v=wFOemFQNlz8"
+        }
+      ],
+      "next_hops": [
+        "người quản trò",
+        "kỹ năng quản trò",
+        "nghệ thuật quản trò",
+        "trò chơi sinh hoạt",
+        "hoạt náo"
+      ],
+      "caution": "Not exclusively Gen Z and not exclusively parties; institutional youth groups, camps, buses, Werewolf and stage facilitation are mixed in."
+    },
+    {
+      "locale": "vi-VN",
+      "query": "chủ xị",
+      "search_url": "https://www.youtube.com/results?search_query=ch%E1%BB%A7+x%E1%BB%8B",
+      "visible_results": 5,
+      "party_game_relevant": 1,
+      "status": "real_slang_weak_game_yield",
+      "assessment": "This is the more colloquial drinking-session host/controller label, but exact search mostly returned a family meal host, television-host metaphors and entertainment titles. Only one visible result directly connected the label to opening a music game and drink rounds.",
+      "representative_result": {
+        "title": "'Chủ xị' Giang Ca mở game âm nhạc khiến DatKaa, Phát Hồ liên tục nâng ly",
+        "url": "https://www.youtube.com/watch?v=Sbk8nfMC6gg"
+      },
+      "decision": "Keep as a cultural-role term, but use quản trò—not chủ xị—as the current game-content river mouth."
+    },
+    {
+      "locale": "ko-KR",
+      "query": "술게임 강의",
+      "search_url": "https://www.youtube.com/results?search_query=%EC%88%A0%EA%B2%8C%EC%9E%84+%EA%B0%95%EC%9D%98",
+      "visible_results": 7,
+      "party_game_relevant": 7,
+      "status": "verified_carrier_river_mouth",
+      "assessment": "Dense course/lesson carrier: a freshman seven-minute special lecture, numbered lessons, and a recurring 10-second game series.",
+      "representative_results": [
+        {
+          "title": "새내기를 위한 7분 술게임 특강 (새터 가기 전 필수시청)",
+          "url": "https://www.youtube.com/watch?v=OXkGVMEsCAs"
+        },
+        {
+          "title": "술게임 강의 01강 공동묘지&바니바니",
+          "url": "https://www.youtube.com/watch?v=bundgr_MY5U"
+        },
+        {
+          "title": "[10초 술게임] 홍삼게임",
+          "url": "https://www.youtube.com/watch?v=JY-lVzl88O4"
+        }
+      ],
+      "next_hops": [
+        "술게임 특강",
+        "술게임 01강",
+        "10초 술게임",
+        "새내기 술게임",
+        "MT 술게임"
+      ],
+      "cross_reference": "youtube_korea_live_2026-07-16.json records a separate 술게임 게임 설명 run with 10/10 relevant results."
+    },
+    {
+      "locale": "ko-KR",
+      "query": "술게임 장인",
+      "search_url": "https://www.youtube.com/results?search_query=%EC%88%A0%EA%B2%8C%EC%9E%84+%EC%9E%A5%EC%9D%B8",
+      "visible_results": 7,
+      "party_game_relevant": 7,
+      "exact_role_phrase_in_visible_titles": 1,
+      "status": "candidate_role_label_strong_yield",
+      "assessment": "Searching the master/expert framing opens a game river, including an explicit 'become a 술게임 장인' series, uncommon routines, and the 10-second tutorial cluster. The phrase has good yield but is not yet proven as a stable multi-author self-label.",
+      "representative_results": [
+        {
+          "title": "술게임 장인 되는 #술게임 | 민또술 시리즈",
+          "url": "https://www.youtube.com/watch?v=sjM44NwDs2U"
+        },
+        {
+          "title": "술 게임 클라스가 다르다!! 흔하지 않은 역대급 술 자리 술 게임!",
+          "url": "https://www.youtube.com/watch?v=PPl_5GMYQqI"
+        }
+      ],
+      "next_hops": [
+        "민또술 시리즈",
+        "흔하지 않은 술게임",
+        "술자리 내기 루틴",
+        "10초 술게임"
+      ],
+      "caution": "Keep as candidate until another platform or multiple creators use the exact role phrase. Adult/alcohol labeling is explicit."
+    },
+    {
+      "locale": "ja-JP",
+      "query": "飲み会 幹事 ゲーム",
+      "search_url": "https://www.youtube.com/results?search_query=%E9%A3%B2%E3%81%BF%E4%BC%9A+%E5%B9%B9%E4%BA%8B+%E3%82%B2%E3%83%BC%E3%83%A0",
+      "visible_results": 5,
+      "party_game_relevant": 5,
+      "status": "verified_qualified_role_river_mouth",
+      "assessment": "The role word 幹事 becomes productive when qualified by drinking-party and game anchors. Results included ten-game lists, progress/hosting technique and beginner-safe year-end party games.",
+      "representative_results": [
+        {
+          "title": "【幹事必見】飲み会で必ず盛り上がるゲーム10選！！",
+          "url": "https://www.youtube.com/watch?v=PYoJz1C05zE"
+        },
+        {
+          "title": "【幹事必見】絶賛される懇親会＆忘年会進行術！",
+          "url": "https://www.youtube.com/watch?v=Ol7uXaTMsS4"
+        }
+      ],
+      "next_hops": [
+        "幹事必見",
+        "飲み会 盛り上がるゲーム",
+        "忘年会ゲーム",
+        "懇親会 進行術"
+      ],
+      "caution": "幹事 alone is a broad organizer term; the qualified query, not the bare word, is the useful river mouth."
+    },
+    {
+      "locale": "es",
+      "query": "juegos de previa",
+      "search_url": "https://www.youtube.com/results?search_query=juegos+de+previa",
+      "visible_results": 3,
+      "party_game_relevant": 3,
+      "status": "verified_occasion_river_mouth",
+      "assessment": "All visible results were party-prep game collections or explainers. Prior TikTok evidence found eight relevant top-grid cards and multiple named-game branches.",
+      "representative_results": [
+        {
+          "title": "JUEGOS PARA LA PREVIA #1",
+          "url": "https://www.youtube.com/watch?v=M_L6_N3tS0s"
+        },
+        {
+          "title": "JUEGOS PARA PREVIAS - JUEGOS PARA TOMAR (EXPLICADOS)",
+          "url": "https://www.youtube.com/watch?v=go0Y5CTe2s8"
+        }
+      ],
+      "next_hops": [
+        "Ranking Secreto",
+        "Contexto Tragón",
+        "La Seta",
+        "juegos para tomar explicados"
+      ],
+      "cross_reference": "multilingual_tiktok_live_2026-07-16.json"
+    },
+    {
+      "locale": "fil-PH",
+      "query": "Pinoy parlor games host",
+      "search_url": "https://www.youtube.com/results?search_query=Pinoy+parlor+games+host",
+      "visible_results": 6,
+      "party_game_relevant": 6,
+      "status": "verified_qualified_river_mouth",
+      "assessment": "The local game umbrella plus host qualifier returned Christmas-party and physical parlor-game demonstrations. A separate logged-in Facebook run found Pinoy parlor games at 4/4 relevant.",
+      "representative_results": [
+        {
+          "title": "Chrismas Party Pinoy Games | Shoot the Chopstick in the bottle",
+          "url": "https://www.youtube.com/shorts/V-4oHa4a3NA"
+        },
+        {
+          "title": "The best Filipino games to try on your next party!",
+          "url": "https://www.youtube.com/shorts/rDIN58TnMpY"
+        },
+        {
+          "title": "Hilarious games for your Christmas Party",
+          "url": "https://www.youtube.com/watch?v=kRJhA8Tibd8"
+        }
+      ],
+      "next_hops": [
+        "Pinoy parlor games",
+        "pakulo",
+        "palaro",
+        "barkada Christmas party games"
+      ],
+      "cross_reference": "facebook_philippines_live_2026-07-16.json"
+    },
+    {
+      "locale": "en-IN",
+      "query": "freshers party anchoring script",
+      "search_url": "https://www.youtube.com/results?search_query=freshers+party+anchoring+script",
+      "visible_results": 2,
+      "party_host_script_relevant": 2,
+      "status": "verified_host_script_niche",
+      "assessment": "A narrow but exact college-youth hosting-script entrance. It leads to full scripts and anchoring tips rather than a broad river of game mechanisms.",
+      "representative_results": [
+        {
+          "title": "Anchoring Script for Freshers Party in College",
+          "url": "https://www.youtube.com/watch?v=QwIlLO7KBQQ"
+        },
+        {
+          "title": "How To Host Freshers Party at College | FULL ANCHORING SCRIPT",
+          "url": "https://www.youtube.com/watch?v=A7JUBYNUjWs"
+        }
+      ],
+      "caution": "Useful for主持流程, but weaker for discovering many distinct games."
+    },
+    {
+      "locale": "en-IN",
+      "query": "Tambola caller",
+      "search_url": "https://www.youtube.com/results?search_query=Tambola+caller",
+      "visible_results": 3,
+      "caller_or_game_relevant": 3,
+      "status": "verified_narrow_game_role",
+      "assessment": "A real local game-leading role, but the river is narrow and dominated by caller audio for one bingo-family game.",
+      "caution": "Do not treat it as a general Indian equivalent of 局头."
+    },
+    {
+      "locale": "id-ID",
+      "query": "permainan tongkrongan",
+      "search_url": "https://www.youtube.com/results?search_query=permainan+tongkrongan",
+      "visible_results": 1,
+      "party_game_relevant": 1,
+      "status": "platform_specific_verified_elsewhere",
+      "assessment": "Weak on this YouTube surface, but the prior TikTok logged-in run was 8/8 relevant. This is a TikTok-native river mouth, not a platform-universal one.",
+      "cross_reference": "tier2_tiktok_live_2026-07-16.json"
+    },
+    {
+      "locale": "pl-PL",
+      "query": "wodzirej zabawy",
+      "search_url": "https://www.youtube.com/results?search_query=wodzirej+zabawy",
+      "visible_results": 1,
+      "youth_party_game_relevant": 0,
+      "status": "dead_for_youth_game_river",
+      "assessment": "The only visible result was a wedding entertainer compilation. The role word is semantically plausible but does not open the desired youth game river here.",
+      "replacement_seed": "gry imprezowe",
+      "replacement_evidence": "Prior TikTok run: 8/8 relevant plus three near-exact creator usernames."
+    },
+    {
+      "locale": "th-TH",
+      "query": "พิธีกรเกม",
+      "search_url": "https://www.youtube.com/results?search_query=%E0%B8%9E%E0%B8%B4%E0%B8%98%E0%B8%B5%E0%B8%81%E0%B8%A3%E0%B9%80%E0%B8%81%E0%B8%A1",
+      "visible_results": 6,
+      "youth_party_game_relevant": 0,
+      "status": "dead_role_probe",
+      "assessment": "Results were television game-show hosts and generic MC training, not a youth party-game river.",
+      "replacement_seed": "เกมวงเหล้า",
+      "replacement_evidence": "Prior TikTok run: 8/8 relevant."
+    },
+    {
+      "locale": "id-ID",
+      "query": "pemandu permainan",
+      "search_url": "https://www.youtube.com/results?search_query=pemandu+permainan",
+      "visible_results": 0,
+      "status": "dead_role_probe",
+      "assessment": "A literal facilitator phrase produced no visible video results in this surface; it should not be promoted simply because its meaning looks correct."
+    },
+    {
+      "locale": "en-GB",
+      "query": "pres drinking games",
+      "search_url": "https://www.youtube.com/results?search_query=pres+drinking+games",
+      "visible_results": 8,
+      "true_pres_context_results": 0,
+      "status": "platform_collision",
+      "assessment": "YouTube interpreted pres as Presidents/President drinking-card games. The UK slang is real, but this exact query is not a clean YouTube river mouth.",
+      "next_probe": "pre-drinks games"
+    },
+    {
+      "locale": "en-US",
+      "query": "pregame games",
+      "search_url": "https://www.youtube.com/results?search_query=pregame+games",
+      "visible_results": 2,
+      "party_game_relevant": 0,
+      "status": "platform_collision",
+      "assessment": "Visible results were sports warmups. Prior TikTok evidence found this query strong, so the seed must always be stored with its target platform."
+    },
+    {
+      "locale": "en-NG",
+      "query": "Detty December party games",
+      "search_url": "https://www.youtube.com/results?search_query=Detty+December+party+games",
+      "visible_results": 10,
+      "clearly_nigerian_or_detty_context": 0,
+      "status": "platform_specific_verified_elsewhere",
+      "assessment": "YouTube returned generic Christmas/party games and dropped the local occasion signal. Prior TikTok evidence was 6/8 relevant, so keep this as a TikTok-localized seed only.",
+      "cross_reference": "tier2_tiktok_live_2026-07-16.json"
+    },
+    {
+      "locale": "en-ZA",
+      "query": "braai games",
+      "search_url": "https://www.youtube.com/results?search_query=braai+games",
+      "visible_results": 3,
+      "clearly_braai_context": 0,
+      "status": "unverified_on_youtube",
+      "assessment": "The visible results were generic party games; the local context term was not visibly preserved."
+    },
+    {
+      "locale": "fil-PH",
+      "query": "pakulo sa party",
+      "search_url": "https://www.youtube.com/results?search_query=pakulo+sa+party",
+      "visible_results": 3,
+      "explicit_pakulo_party_result": 1,
+      "status": "candidate_native_colloquial_seed",
+      "assessment": "One direct local result used MAGANDANG PAKULO SA PARTY; the rest were generic event/party content. Promising local wording, but not yet a dense river."
+    }
+  ],
+  "safety_and_privacy": {
+    "interactions": "No likes, comments, subscriptions, shares, messages, or purchases.",
+    "private_data": "No cookies, tokens, credentials, private account data, screenshots, or browsing history were stored.",
+    "youth_guard": "Alcohol-labeled seeds are discovery evidence only. Any product extraction must remove forced drinking, volume/speed goals, humiliation, sexual pressure, and exclusion."
+  }
+}

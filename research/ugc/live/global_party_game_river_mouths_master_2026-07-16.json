@@ -1,0 +1,415 @@
+{
+  "schema_version": "global-party-game-river-mouths-v1",
+  "generated_on": "2026-07-16",
+  "objective": "Find native terms or exact query phrases that behave like 局头 on Xiaohongshu: searching them should open a repeatable river of party games, rules, host skills, cards, scripts, apps or series creators. Semantic resemblance alone does not qualify.",
+  "coverage": {
+    "regional_entries": 103,
+    "verified": 50,
+    "candidate": 34,
+    "dead_or_negative": 12,
+    "risk_only": 7,
+    "regions": [
+      "East and Southeast Asia",
+      "Europe and Latin America",
+      "Anglosphere",
+      "India",
+      "Nigeria",
+      "South Africa"
+    ]
+  },
+  "source_files": [
+    "global_slang_east_asia_2026-07-16.md",
+    "global_slang_east_asia_2026-07-16.json",
+    "global_slang_europe_latam_2026-07-16.md",
+    "global_slang_europe_latam_2026-07-16.json",
+    "global_slang_anglo_south_africa_2026-07-16.md",
+    "global_slang_anglo_south_africa_2026-07-16.json",
+    "global_river_mouth_youtube_recheck_2026-07-16.json",
+    "multilingual_tiktok_live_2026-07-16.json",
+    "tier2_tiktok_live_2026-07-16.json",
+    "youtube_korea_live_2026-07-16.json",
+    "facebook_philippines_live_2026-07-16.json",
+    "pinterest_india_live_2026-07-16.json"
+  ],
+  "grading": {
+    "A_plus": "High-density ecosystem across multiple content forms or platforms; usable as a primary river mouth now.",
+    "A": "Repeated independent game, rule, script, card, app or creator-series results under an exact query.",
+    "B": "Real and productive bridge, but narrower, more institutional, or still dependent on a qualifier.",
+    "C": "Authentic term with weak actionable content yield; use only to discover people or context.",
+    "D": "Semantic lookalike, severe collision, or dead query; do not use as a primary seed."
+  },
+  "role_like_shortlist": [
+    {
+      "locale": "vi-VN",
+      "term": "quản trò",
+      "status": "verified",
+      "grade": "A-",
+      "river_type": "single-role-word",
+      "target_platforms": ["YouTube", "TikTok"],
+      "observed_density": "YouTube recheck: 12/12 visible results were role-related; conservatively 7/12 were direct group-game tutorials, skill lessons or game libraries.",
+      "why_it_matters": "Best current single-word functional analogue by search behavior: it leads to how-to-be-a-facilitator lessons, game-organization skills and numbered series.",
+      "next_hops": ["người quản trò", "kỹ năng quản trò", "nghệ thuật quản trò", "trò chơi sinh hoạt", "quản trò tiệc", "quản trò sinh viên"],
+      "caution": "Broader than youth nightlife; camps, schools, buses, team building and Werewolf are mixed in."
+    },
+    {
+      "locale": "en-GB",
+      "term": "social sec",
+      "status": "verified",
+      "grade": "B",
+      "river_type": "youth-organizer-role",
+      "target_platforms": ["TikTok", "Instagram", "The Student Room", "university society pages"],
+      "observed_density": "Multiple university society pages, handbooks, constitutions and idea discussions; game-mechanism density is lower than event-theme density.",
+      "why_it_matters": "A genuine youth organizer role in UK university societies rather than a dictionary translation.",
+      "next_hops": ["social sec ideas", "social sec themes", "social sec games", "sports society socials", "pres themes"],
+      "caution": "Institutional campus role, not a universal friend-group term."
+    },
+    {
+      "locale": "ja-JP",
+      "term": "幹事必見 + 飲み会ゲーム",
+      "status": "verified",
+      "grade": "A-",
+      "river_type": "qualified-organizer-role",
+      "target_platforms": ["YouTube", "TikTok", "note"],
+      "observed_density": "YouTube recheck: 5/5 visible results were drinking-party games, game lists or organizer progress tips.",
+      "why_it_matters": "The bare role 幹事 is broad, but the organizer-facing title shell 幹事必見 behaves like 局头必备/局头手册.",
+      "next_hops": ["幹事必見", "飲み会 盛り上がるゲーム", "忘年会ゲーム", "懇親会 進行術"],
+      "caution": "Use the qualified phrase; 幹事 alone is mostly booking, budgeting and etiquette."
+    },
+    {
+      "locale": "ko-KR",
+      "term": "술게임 장인",
+      "status": "candidate",
+      "grade": "B+",
+      "river_type": "youth-master-label",
+      "target_platforms": ["YouTube", "TikTok", "Instagram Reels"],
+      "observed_density": "YouTube recheck: 7/7 visible results were party-game content, but only one visible title used the exact role phrase.",
+      "why_it_matters": "A promising 'drinking-game master' framing that connects directly to lesson and short-demo clusters.",
+      "next_hops": ["술게임 강의", "술게임 특강", "민또술 시리즈", "흔하지 않은 술게임", "10초 술게임"],
+      "caution": "Requires multi-author exact-phrase validation before promotion to a stable Korean role label."
+    },
+    {
+      "locale": "fil-PH",
+      "term": "tanggero / tanggera / tig-tagay",
+      "status": "candidate",
+      "grade": "C+",
+      "river_type": "cultural-mechanism-role",
+      "target_platforms": ["TikTok", "Facebook", "YouTube"],
+      "observed_density": "Multiple cultural and academic sources confirm the shared-cup pourer/pace-controller role, but exact-search tutorials and creator series remain sparse.",
+      "why_it_matters": "One of the closest cultural roles to a person who controls a drinking circle's rhythm.",
+      "next_hops": ["tanggero tips", "tanggero rules", "tanggero inuman games", "tig-tagay tips"],
+      "caution": "Real role, weak game-content river; alcohol and shared-cup risk."
+    },
+    {
+      "locale": "vi-VN",
+      "term": "chủ xị",
+      "status": "candidate",
+      "grade": "C",
+      "river_type": "colloquial-drinking-host",
+      "target_platforms": ["TikTok", "YouTube"],
+      "observed_density": "YouTube recheck: 1/5 visible results directly connected the label to opening a music game; other results were host metaphors or general entertainment.",
+      "why_it_matters": "Closer than quản trò to a colloquial southern drinking-session controller, but much weaker as a content-discovery key.",
+      "next_hops": ["chủ xị bàn nhậu", "kinh nghiệm làm chủ xị", "luật nhậu chủ xị", "trò chơi của chủ xị"],
+      "caution": "Keep as cultural-role vocabulary, not the current primary game river mouth."
+    },
+    {
+      "locale": "en-IN",
+      "term": "Tambola caller",
+      "status": "verified",
+      "grade": "B",
+      "river_type": "single-game-host-role",
+      "target_platforms": ["YouTube", "Pinterest", "Google Play"],
+      "observed_density": "Caller tools, voice announcements, number nicknames and ticket generators are dense; YouTube recheck returned 3/3 caller/game results.",
+      "why_it_matters": "A real host-control tool river, but only for Tambola/Housie.",
+      "next_hops": ["Tambola caller funny lines", "Tambola number nicknames Hindi", "Tambola hosting ideas", "Bollywood Tambola"],
+      "caution": "Narrow and cross-age; not a general Indian equivalent of 局头."
+    }
+  ],
+  "primary_river_mouths": [
+    {
+      "locale": "ko-KR",
+      "query": "술게임 강의 / 술게임 특강 / 10초 술게임",
+      "status": "verified",
+      "grade": "A+",
+      "river_type": "course-and-series-carrier",
+      "target_platforms": ["YouTube", "TikTok"],
+      "observed_density": "Separate logged-in runs: 술게임 게임 설명 10/10 relevant; 술게임 강의 7/7 relevant.",
+      "next_hops": ["새내기 술게임", "MT 술게임", "술게임 01강", "박자게임 설명"],
+      "caution": "Explicit alcohol/19+ context; retain only safe rhythm, turn and response mechanics."
+    },
+    {
+      "locale": "es-AR",
+      "query": "juegos para la previa / juegos para previar",
+      "status": "verified",
+      "grade": "A+",
+      "river_type": "native-scene-plus-games",
+      "target_platforms": ["TikTok", "Instagram", "YouTube", "MercadoLibre Argentina"],
+      "observed_density": "TikTok Spanish run recorded 8 relevant top-grid cards; YouTube recheck 3/3 relevant; public product directories showed 162/33 result signals plus apps and card brands.",
+      "next_hops": ["Ranking Secreto", "Contexto Tragón", "La Seta", "cartas para la previa", "retos para la previa", "PreviaON"],
+      "caution": "Adult drinking and spicy-card branches require age/risk flags."
+    },
+    {
+      "locale": "pt-BR",
+      "query": "esquenta jogo / Esquenta, O Jogo",
+      "status": "verified",
+      "grade": "A+",
+      "river_type": "scene-slang-to-content-brand",
+      "target_platforms": ["TikTok", "Instagram", "Google Play", "MercadoLivre"],
+      "observed_density": "The local pre-party word has become a multi-product card/digital brand with Eu Nunca, Pesadão, Verdade ou Desafio, Casal and Digital branches.",
+      "next_hops": ["Esquenta Eu Nunca", "Esquenta Pesadão", "Esquenta Verdade ou Desafio", "resenha sem fim", "jogos para o esquenta"],
+      "caution": "Alcohol and +18 variants are common."
+    },
+    {
+      "locale": "en-US",
+      "query": "pregame games",
+      "status": "verified",
+      "grade": "A",
+      "river_type": "scene-plus-games",
+      "target_platforms": ["TikTok", "Instagram", "Pinterest", "public web"],
+      "observed_density": "Apps, 70+ game compendia, 1,800+ card apps, kits and college lists coexist; however the YouTube recheck returned sports warmups.",
+      "next_hops": ["pregame checklist", "pregame host", "pregame card game", "college pregame games", "pregame games no alcohol"],
+      "caution": "Platform-bound: do not treat the phrase as a clean YouTube seed; US alcohol age caveat."
+    },
+    {
+      "locale": "en-GB/en-AU",
+      "query": "pre-drinks games",
+      "status": "verified",
+      "grade": "A",
+      "river_type": "student-scene-plus-games",
+      "target_platforms": ["TikTok", "Instagram", "Pinterest", "student media"],
+      "observed_density": "Student lists, retail collections, multi-game kits and printables repeatedly use the exact phrase.",
+      "next_hops": ["pre-drinks cards UK", "freshers pre-drinks games", "pre-drinks games Australia", "Sip or Spill questions"],
+      "caution": "Use pre-drinks rather than pres as the primary query; pres collides with President/presentation on YouTube."
+    },
+    {
+      "locale": "en-US",
+      "query": "kickback games + party/cards/Black",
+      "status": "verified",
+      "grade": "A-",
+      "river_type": "culture-specific-scene-plus-games",
+      "target_platforms": ["TikTok", "Instagram", "Pinterest", "public web"],
+      "observed_density": "Localized cards, Black-culture trivia, small-party guides and interactive events recur after disambiguation.",
+      "next_hops": ["kickback card game", "kickback games Black", "cookout games Black family", "creative kickback games", "Black Card Revoked rules"],
+      "caution": "Bare kickback collides with firearm recoil, bribery and gaming; some products are 18+."
+    },
+    {
+      "locale": "ja-JP",
+      "query": "飲み会ゲーム / 幹事必見 飲み会ゲーム",
+      "status": "verified",
+      "grade": "A",
+      "river_type": "occasion-game-plus-organizer-shell",
+      "target_platforms": ["YouTube", "TikTok", "note", "Google Play"],
+      "observed_density": "Game collections, rules, organizer preparation, apps and qualified organizer-facing video titles recur.",
+      "next_hops": ["飲み会ゲーム 大学生", "飲み会ゲーム 道具なし", "宴会ゲーム", "罰ゲーム", "質問ゲーム"],
+      "caution": "Bare 盛り上げ役, 宴会部長, パリピ and 陽キャ do not produce a comparable game river."
+    },
+    {
+      "locale": "vi-VN",
+      "query": "trò chơi nhậu / trò chơi bàn nhậu",
+      "status": "verified",
+      "grade": "A",
+      "river_type": "native-drinking-scene-plus-games",
+      "target_platforms": ["TikTok", "YouTube", "Google Play"],
+      "observed_density": "The TikTok nhậu root outperformed the literal uống rượu phrasing; public guides expose game lists, apps, cards and host-led formats.",
+      "next_hops": ["luật chơi bàn nhậu", "câu hỏi bàn nhậu", "game nhậu", "trò chơi phạt rượu", "truth or dare tiếng Việt"],
+      "caution": "Alcohol-heavy; use quản trò when the goal is host skills rather than nightlife-scene content."
+    },
+    {
+      "locale": "th-TH",
+      "query": "เกมวงเหล้า / รวมเกมวงเหล้า / กติกาเกมวงเหล้า",
+      "status": "verified",
+      "grade": "A",
+      "river_type": "native-circle-game-carrier",
+      "target_platforms": ["TikTok", "Lemon8", "Google Play"],
+      "observed_density": "Logged-in TikTok run: 8/8 top-grid cards relevant, dominated by phone aggregators, cards, truth/dare and spinners.",
+      "next_hops": ["เกมวงเหล้า ไม่ใช้อุปกรณ์", "เกมวงเหล้า คำถาม", "เกมไพ่", "เกมทายใจ", "คำถามวงเหล้า"],
+      "caution": "The role probe พิธีกรเกม produced TV/game-show MC noise on YouTube."
+    },
+    {
+      "locale": "id-ID",
+      "query": "permainan tongkrongan / tebak-tebakan receh tongkrongan",
+      "status": "verified",
+      "grade": "A-",
+      "river_type": "youth-hangout-scene-plus-game",
+      "target_platforms": ["TikTok", "Instagram", "local publishers"],
+      "observed_density": "Logged-in TikTok permainan tongkrongan run: 8/8 relevant but commerce-heavy; the receh-riddle branch adds a dense, non-alcohol youth question river.",
+      "next_hops": ["games seru buat nongkrong", "kartu pertanyaan tongkrongan", "pertanyaan receh", "truth or dare tongkrongan", "games tanpa alat"],
+      "caution": "Filter board-game shops, cafés, videogames and gambling/slot SEO."
+    },
+    {
+      "locale": "fil-PH",
+      "query": "Pinoy parlor games / inuman games",
+      "status": "verified",
+      "grade": "A-",
+      "river_type": "local-game-umbrella-and-scene",
+      "target_platforms": ["Facebook Reels", "TikTok", "YouTube"],
+      "observed_density": "Logged-in Facebook Pinoy parlor games run: 4/4 relevant; YouTube qualified recheck: 6/6; inuman expands to cards, apps and local rule pages.",
+      "next_hops": ["pakulo", "palaro", "barkada Christmas party games", "inuman questions", "pa-games sa inuman"],
+      "caution": "Parlor games are cross-age; inuman is alcohol-linked."
+    },
+    {
+      "locale": "pl-PL",
+      "query": "gry imprezowe / bifor / gry na domówkę",
+      "status": "verified",
+      "grade": "A-",
+      "river_type": "party-game-carrier-plus-scene-slang",
+      "target_platforms": ["TikTok", "Instagram", "Google Play"],
+      "observed_density": "Logged-in TikTok gry imprezowe run: 8/8 relevant and three near-exact creator usernames; bifor also became a six-game mobile brand.",
+      "next_hops": ["gry na bifor", "gry na domówkę", "gry na telefon", "Prawda albo wypij", "Nigdy przenigdy"],
+      "caution": "Wodzirej and mistrz gry are false role entrances due to wedding/RPG collisions."
+    },
+    {
+      "locale": "es-CL",
+      "query": "juegos para carrete",
+      "status": "verified",
+      "grade": "A",
+      "river_type": "native-party-scene-plus-games",
+      "target_platforms": ["TikTok", "Instagram", "MercadoLibre Chile"],
+      "observed_density": "A native marketplace category, Chilean creator shops, card packs and local discussion form a repeatable ecosystem.",
+      "next_hops": ["prender el carrete", "cultura chupística", "previa y after", "retos para carrete", "penitencias carrete"],
+      "caution": "Alcohol-focused branches require adult flags."
+    },
+    {
+      "locale": "fr-FR",
+      "query": "jeux d'apéro / défis apéro / gages soirée",
+      "status": "verified",
+      "grade": "A",
+      "river_type": "occasion-plus-carrier",
+      "target_platforms": ["TikTok", "Instagram", "Google Play"],
+      "observed_density": "Apps, 300–400-card products, 150-card challenge boxes, rankings and rules recur; a logged-in TikTok sweep also found a strong apéro grid.",
+      "next_hops": ["jeu d'apéro entre potes", "cartes apéro", "jeux à boire sans cartes", "palmier jeu à boire"],
+      "caution": "Boute-en-train and ambianceur are real role words but weak game-river queries."
+    },
+    {
+      "locale": "de-DE",
+      "query": "Vorglühen Spiele / Trinkspiele",
+      "status": "verified",
+      "grade": "A+",
+      "river_type": "youth-preparty-scene-plus-rule-catalog",
+      "target_platforms": ["TikTok", "Instagram", "public rule catalogs"],
+      "observed_density": "German catalogs explicitly advertise 61+ and 200+ games; rules, card/question/no-material branches and branded formats are stable.",
+      "next_hops": ["Trinkspiele mit Karten", "Trinkspiele mit Fragen", "Trinkspiele ohne Material", "Klattschen Regeln", "Kings Cup Deutsch"],
+      "caution": "High alcohol risk; Stimmungskanone and Spielleiter are false content entrances."
+    },
+    {
+      "locale": "it-IT",
+      "query": "giochi da bere / giochi alcolici / giochi da pre-serata",
+      "status": "verified",
+      "grade": "A-",
+      "river_type": "content-carrier-with-scene-modifier",
+      "target_platforms": ["TikTok", "Instagram", "Google Play"],
+      "observed_density": "Apps with 1,500+ prompts, rule guides and named local formats recur; logged-in TikTok results were mixed but produced a native TV-format adaptation.",
+      "next_hops": ["app giochi da bere", "Non ho mai gioco", "Verità o bevi", "Drunk Jenga"],
+      "caution": "Pre-serata alone is weak; mattatore/anima della festa are semantic dead ends."
+    },
+    {
+      "locale": "es-MX",
+      "query": "juegos para la peda / juegos para precopeo",
+      "status": "verified",
+      "grade": "B+",
+      "river_type": "native-scene-slang-plus-games",
+      "target_platforms": ["TikTok", "Instagram", "Google Play", "MercadoLibre Mexico"],
+      "observed_density": "Local products, apps, cards and guides recur; la peda is the stronger colloquial scene root and precopeo a useful qualifier.",
+      "next_hops": ["retos para la peda", "cartas para la peda", "juegos de peda app", "preguntas para precopeo"],
+      "caution": "Adult drinking and spicy-card content is common."
+    },
+    {
+      "locale": "en-IN",
+      "query": "freshers party anchoring script",
+      "status": "verified",
+      "grade": "A",
+      "river_type": "college-host-handbook-carrier",
+      "target_platforms": ["YouTube", "Instagram", "public web"],
+      "observed_density": "Multiple current Hindi/English full scripts with openings, transitions, interaction fillers, games and hype lines; YouTube recheck returned 2/2 exact host-script results.",
+      "next_hops": ["freshers party games for anchors", "interaction fillers for anchors", "hype lines for freshers", "college fest anchoring script"],
+      "caution": "Highly youth-relevant, but many public results are SEO templates; verify creator-native use."
+    },
+    {
+      "locale": "en-NG",
+      "query": "Detty December party games",
+      "status": "verified",
+      "grade": "B+",
+      "river_type": "seasonal-youth-scene-plus-games",
+      "target_platforms": ["TikTok", "Instagram"],
+      "observed_density": "Logged-in TikTok run: 6/8 relevant, including a six-game list, local card products and game-night material; YouTube dropped the local signal and returned generic Christmas games.",
+      "next_hops": ["Detty December house party games", "Lagos kickback games", "Oblee szn prep", "Bestie Banter", "game night Lagos"],
+      "caution": "Platform-specific and alcohol/nightlife-heavy; hypeman is better for people discovery than game discovery."
+    },
+    {
+      "locale": "en-ZA",
+      "query": "braai games / braai card game",
+      "status": "verified",
+      "grade": "A-",
+      "river_type": "local-gathering-plus-game-products",
+      "target_platforms": ["TikTok", "Instagram", "local web"],
+      "observed_density": "Localized charades, Afrikaans card decks, braai prompt decks, lawn games and local discussions recur; YouTube recheck showed generic rather than clearly braai-specific results.",
+      "next_hops": ["Mzansi charades", "Afrikaans drinking game", "braai night games", "30 Seconds braai", "braai games for teens"],
+      "caution": "Cross-age and platform-specific; some products are alcohol-linked."
+    },
+    {
+      "locale": "en-CA/en-AU",
+      "query": "frosh leader games / O-week games",
+      "status": "candidate",
+      "grade": "B",
+      "river_type": "institutional-youth-orientation-carrier",
+      "target_platforms": ["TikTok", "Instagram", "university sites"],
+      "observed_density": "Handbooks, leader training, game nights, Mafia, Family Feud and Trivia exist, but current evidence is institution-heavy rather than creator-heavy.",
+      "next_hops": ["frosh leader icebreakers", "frosh week games", "O-week leader games", "O-week icebreakers Australia"],
+      "caution": "Needs student creator and logged-in platform validation."
+    },
+    {
+      "locale": "hi-IN/en-IN",
+      "query": "kitty party games Hindi",
+      "status": "verified",
+      "grade": "A",
+      "river_type": "adjacent-printable-handbook",
+      "target_platforms": ["Pinterest", "YouTube", "local web"],
+      "observed_density": "Logged-in Pinterest run: 9/10 relevant, dominated by written paper games, festival/food/film themes and printable cards.",
+      "next_hops": ["one minute kitty party games", "Hindi paper party game", "Musical Mazaa", "Bollywood emoji songs"],
+      "caution": "Predominantly adult women; retain as a mechanism and content-carrier sample, not youth slang."
+    }
+  ],
+  "semantic_lookalikes_to_reject": [
+    {
+      "terms": ["alma de la fiesta", "life and soul of the party", "anima della festa"],
+      "reason": "Generic idioms/personality descriptions; do not produce a repeatable game/rule/card river."
+    },
+    {
+      "terms": ["boute-en-train", "ambianceur", "Stimmungskanone", "mattatore", "dusza towarzystwa"],
+      "reason": "Real atmosphere-person words, but dictionary, literary, performance or generic-person noise dominates."
+    },
+    {
+      "terms": ["hype man", "hype person", "party starter", "vibe curator"],
+      "reason": "Music, professional-event, brand or marketing collisions overwhelm party-game tutorials."
+    },
+    {
+      "terms": ["wodzirej", "mistrz gry", "Spielleiter", "พิธีกรเกม", "pemandu permainan"],
+      "reason": "Wedding, RPG/tabletop, television-game-show or literal-translation collisions; exact search does not open the desired youth game river."
+    },
+    {
+      "terms": ["盛り上げ役", "宴会部長", "분위기 메이커", "badut tongkrongan", "cây hài", "chúa hề"],
+      "reason": "Vibe/clown/personality labels rather than game-curation roots."
+    },
+    {
+      "terms": ["previador", "previero", "capitán de la previa", "jefe de la previa", "puxa a resenha", "คนเปิดกฎ"],
+      "reason": "Plausible AI-generated or one-off constructions without a stable multi-author exact-search cluster."
+    }
+  ],
+  "risk_only_slang": [
+    "sesh head / sesh gremlin / seshlord",
+    "Oblee Szn",
+    "groovist",
+    "la peda +18/spicy branches",
+    "gacor/slot + tongkrongan",
+    "ตัวตึง",
+    "kaladkarin / bida-bida / pabida"
+  ],
+  "validation_protocol": [
+    "Search the exact native term on its target platform; do not begin with translated synonyms.",
+    "Record the first 20 visible results, relevant gameplay/host hits, unique creators and series accounts.",
+    "Extract recurring title shells, series numbers, cards/apps and creator self-labels from those results.",
+    "Re-search each new term verbatim; keep negative probes instead of rewriting them until something appears.",
+    "Bind every seed to a platform because the same phrase can work on TikTok and fail on YouTube.",
+    "Separate youth fit from search yield and keep alcohol/adult/cross-age flags explicit.",
+    "Promote a role word only when the bare or minimally qualified term itself produces a multi-author game-content river."
+  ]
+}

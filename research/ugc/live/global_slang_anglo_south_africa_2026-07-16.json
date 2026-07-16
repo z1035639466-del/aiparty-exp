@@ -1,0 +1,1354 @@
+{
+  "metadata": {
+    "title": "Global youth party-content rivers: Anglosphere, India, Nigeria and South Africa",
+    "generated_at": "2026-07-16",
+    "language": "zh-CN",
+    "scope": [
+      "United States",
+      "Canada",
+      "United Kingdom",
+      "Australia",
+      "India",
+      "Nigeria",
+      "South Africa"
+    ],
+    "core_criterion": "A term is valuable only when an exact local query repeatedly returns actionable party games, host scripts, cards, checklists, tutorials, tools or series creators. Semantic similarity to 局头 is insufficient.",
+    "collection_mode": "public_web_exact_query_audit",
+    "density_is": "qualitative evidence density, not a logged-in social-platform result count",
+    "status_values": [
+      "verified",
+      "candidate",
+      "dead-negative",
+      "risk-only"
+    ],
+    "river_grades": {
+      "A": "multiple independent game/script/card/tool/tutorial results under the exact query",
+      "B": "repeated guide/checklist/handbook/event results, but weak host-game mechanics",
+      "C": "authentic local term or role with sparse actionable content",
+      "D": "semantic lookalike, collision-heavy query or no content river"
+    },
+    "caveats": [
+      "Exact density must be re-counted on logged-in TikTok, Instagram, YouTube, Pinterest and Reddit.",
+      "Alcohol, drugs, sexualized cards and humiliating challenges require separate risk labels and must not be recommended to minors.",
+      "Kitty-party and some Tambola/braai material is cross-age or adult; it is retained as a mechanism/content-carrier sample, not a youth synonym."
+    ]
+  },
+  "top_findings": [
+    {
+      "term": "pregame games",
+      "region": "US / Anglosphere",
+      "river_grade": "A",
+      "reason": "game compendia, apps, 1,800+ card decks, kits and college listicles coexist"
+    },
+    {
+      "term": "pre-drinks games",
+      "region": "UK / Australia",
+      "river_grade": "A",
+      "reason": "student game lists, retail collections, kits and printables repeatedly use the exact phrase"
+    },
+    {
+      "term": "freshers party anchoring script",
+      "region": "India",
+      "river_grade": "A",
+      "reason": "modular host scripts, transitions, games, interaction fillers and hype lines; closest functional analogue to 局头手册"
+    },
+    {
+      "term": "kickback games",
+      "region": "US Black youth / urban youth",
+      "river_grade": "A-",
+      "reason": "localized cards, Black-culture trivia, interactive events and small-party guides"
+    },
+    {
+      "term": "braai games",
+      "region": "South Africa",
+      "river_grade": "A-",
+      "reason": "localized charades app, Afrikaans card games, braai decks and lawn-game suppliers"
+    }
+  ],
+  "river_mouth_types": {
+    "role_like_but_root_query_thin": [
+      "social chair",
+      "hypeman",
+      "frosh leader",
+      "anchor / MC"
+    ],
+    "high_yield_occasion_or_carrier_queries": [
+      "pregame games",
+      "kickback games",
+      "pre-drinks games",
+      "freshers party anchoring script",
+      "kitty party games",
+      "Tambola caller",
+      "braai games"
+    ],
+    "bridge_scene_queries": [
+      "Detty December guide",
+      "Dezemba starter pack",
+      "freshers guide",
+      "frosh handbook",
+      "O-week handbook"
+    ],
+    "participant_or_identity_terms_not_host_rivers": [
+      "groovist",
+      "Oblee Szn",
+      "IJGB",
+      "seshlord"
+    ]
+  },
+  "entries": [
+    {
+      "id": "us_pregame_games",
+      "region": "United States / Anglosphere",
+      "term": "pregame games",
+      "exact_queries": [
+        "\"pregame games\"",
+        "\"pregame checklist\"",
+        "\"pregame card game\"",
+        "\"pregame games\" college"
+      ],
+      "status": "verified",
+      "river_grade": "A",
+      "exact_search_density": "high",
+      "youth_fit": "high, with 21+ alcohol caveat in the US",
+      "content_match": [
+        "game compendium",
+        "host app",
+        "card app",
+        "party kit",
+        "college listicle",
+        "tag archive"
+      ],
+      "functional_gloss": "pre-event gathering content carrier rather than a host-role word",
+      "why_it_matters": "The exact phrase returns multiple independent, actionable content formats rather than dictionary definitions.",
+      "evidence": [
+        {
+          "title": "Pregame host-controlled party app",
+          "url": "https://www.pregameup.com/",
+          "signal": "RSVP, playlist, checklist and four games in one host flow"
+        },
+        {
+          "title": "70+ House Party & Pregame Drinking Games",
+          "url": "https://blog.xdares.com/house-party-pregame-drinking-games/",
+          "signal": "large game compendium"
+        },
+        {
+          "title": "Wrecked drinking games app",
+          "url": "https://play.google.com/store/apps/details?hl=en&id=com.bdgapps.Wrecked",
+          "signal": "1,800+ cards for pregames and pre-drinks"
+        },
+        {
+          "title": "Proper Pregames kit",
+          "url": "https://boxxproducts.com/",
+          "signal": "cups, cards and dice product bundle"
+        },
+        {
+          "title": "12 Best Pregame Drinking Games",
+          "url": "https://www.truthordare.website/blog/best-pregame-drinking-games",
+          "signal": "2026 game list"
+        },
+        {
+          "title": "Her Campus: games for your next pregame",
+          "url": "https://www.hercampus.com/school/ithaca/9-drinking-games-your-next-pregame-21/",
+          "signal": "college-media result"
+        },
+        {
+          "title": "Society19 pregame-games tag",
+          "url": "https://www.society19.com/tag/pregame-games/",
+          "signal": "topic archive"
+        }
+      ],
+      "downstream_seeds": [
+        "pregame checklist",
+        "pregame host",
+        "pregame card game",
+        "college pregame games",
+        "pregame games no alcohol",
+        "Kings Cup rules",
+        "Ride the Bus drinking game",
+        "Ring of Fire cards"
+      ],
+      "cautions": [
+        "alcohol-heavy",
+        "add sober/no-alcohol variants for minor-safe research"
+      ]
+    },
+    {
+      "id": "us_kickback_games",
+      "region": "United States, Black youth / urban youth; some Canadian spillover",
+      "term": "kickback games",
+      "exact_queries": [
+        "\"kickback games\" party",
+        "\"kickback card game\"",
+        "\"kickback games\" Black",
+        "\"cookout kickback games\""
+      ],
+      "status": "verified",
+      "river_grade": "A-",
+      "exact_search_density": "medium-high after disambiguation",
+      "youth_fit": "high",
+      "content_match": [
+        "card games",
+        "Black-culture trivia",
+        "small-party guide",
+        "interactive event format",
+        "creative-community event"
+      ],
+      "functional_gloss": "small, casual gathering scene that carries games and social prompts",
+      "why_it_matters": "The phrase exposes culturally specific products and activities, but must be combined with party/cards/games to avoid unrelated meanings.",
+      "evidence": [
+        {
+          "title": "BET: Black Card Revoked at your next kickback",
+          "url": "https://www.bet.com/article/v1mnqw/you-need-black-card-revoked-at-your-next-kickback-asap",
+          "signal": "Black-culture trivia described as a cookout/kickback game"
+        },
+        {
+          "title": "Who's the Biggest Hoe? adult card game",
+          "url": "https://www.etsy.com/listing/929070039/whos-the-biggest-hoe-adult-card",
+          "signal": "55-card product explicitly marketed for kickbacks"
+        },
+        {
+          "title": "What Is a Kickback Party? Ideas, Games & Food",
+          "url": "https://hugateen.com/activities/party-ideas/what-is-a-kickback-party/",
+          "signal": "actionable scene and games guide"
+        },
+        {
+          "title": "Creative Kickback DC",
+          "url": "https://partiful.com/e/FiG0Zas5ujqSNcf3WVso",
+          "signal": "BIPOC creator gathering with locally founded games"
+        },
+        {
+          "title": "The Creative's Kickback",
+          "url": "https://www.theslimcreative.com/events",
+          "signal": "curated event including Uno and beer pong"
+        },
+        {
+          "title": "The Kickback Ottawa",
+          "url": "https://comedybar.ca/shows/The-Kickback-Ottawa",
+          "signal": "Canadian comedy plus interactive-games format"
+        }
+      ],
+      "downstream_seeds": [
+        "kickback party ideas",
+        "kickback card game",
+        "kickback games Black",
+        "cookout games Black family",
+        "creative kickback games",
+        "kickback icebreakers",
+        "Black Card Revoked rules"
+      ],
+      "cautions": [
+        "kickback collides with firearm recoil, bribery and gaming terms",
+        "some cards are sexualized or 18+"
+      ]
+    },
+    {
+      "id": "uk_au_pre_drinks_games",
+      "region": "United Kingdom / Australia",
+      "term": "pre-drinks games",
+      "exact_queries": [
+        "\"pre-drinks games\"",
+        "\"pre drinks games\" uni",
+        "\"pre-drinks cards\" UK",
+        "\"pre-drinks games\" Australia"
+      ],
+      "status": "verified",
+      "river_grade": "A",
+      "exact_search_density": "high",
+      "youth_fit": "high, predominantly 18+ student context",
+      "content_match": [
+        "student game lists",
+        "retail collection",
+        "multi-game kit",
+        "printable cards",
+        "podcast game segment"
+      ],
+      "functional_gloss": "local content-carrier phrase for games before going out",
+      "evidence": [
+        {
+          "title": "Rules of Play: Essential Party Games for Pre-Drinks",
+          "url": "https://rulesofplay.co.uk/collections/essential-party-games-for-pre-drinks",
+          "signal": "UK retail collection"
+        },
+        {
+          "title": "Trunk of Drunk",
+          "url": "https://365games.co.uk/products/trunk-of-drunk-drinking-game",
+          "signal": "eight-game kit with rulebook"
+        },
+        {
+          "title": "Student Beans: Best Drinking Games for Students",
+          "url": "https://www.studentbeans.com/blog/uk/best-drinking-games-for-students",
+          "signal": "UK student media"
+        },
+        {
+          "title": "Save the Student: University Student Drinking Games",
+          "url": "https://www.savethestudent.org/freshers/university-student-drinking-games.html",
+          "signal": "freshers and student context"
+        },
+        {
+          "title": "Top 4 Pre-Drinking Games for Uni Students",
+          "url": "https://carolettings.com/student-blog/top-4-pre-drinking-games-for-uni-students/",
+          "signal": "university-specific game list"
+        },
+        {
+          "title": "Straya Squares printable game",
+          "url": "https://www.etsy.com/listing/4297185397/pre-drinks-games-printable-party-game-o",
+          "signal": "Australian localization and printable product"
+        },
+        {
+          "title": "Tell Me Cards",
+          "url": "https://tellme.cards/",
+          "signal": "party/pre-drinks web and PDF cards"
+        },
+        {
+          "title": "Over Drinks: Sip or Spill",
+          "url": "https://shows.acast.com/overdrinks/episodes/sip-or-spill-threesomes-getting-stood-up-our-most-embarrassi",
+          "signal": "Australian podcast calls it a favourite pre-drinks game"
+        }
+      ],
+      "downstream_seeds": [
+        "pre-drinks games uni",
+        "freshers pre-drinks games",
+        "pre-drinks cards UK",
+        "pre-drinks games Australia",
+        "pre-drinks games no alcohol",
+        "Sip or Spill questions"
+      ],
+      "cautions": [
+        "alcohol-heavy",
+        "18+ context"
+      ]
+    },
+    {
+      "id": "uk_pres_alias",
+      "region": "United Kingdom; some Australian use",
+      "term": "pres",
+      "exact_queries": [
+        "\"pres games\" uni",
+        "\"games at pres\"",
+        "\"pres ideas\" university"
+      ],
+      "status": "candidate",
+      "river_grade": "C",
+      "exact_search_density": "low as a standalone query; useful as an in-post alias",
+      "youth_fit": "high",
+      "content_match": [
+        "student discussion",
+        "slang definition",
+        "scattered drinking-game posts"
+      ],
+      "functional_gloss": "spoken abbreviation of pre-drinks",
+      "evidence": [
+        {
+          "title": "Urban Dictionary: pres",
+          "url": "https://www.urbandictionary.com/define.php?term=pres",
+          "signal": "slang validation"
+        },
+        {
+          "title": "UniUK: what do students eat at pres?",
+          "url": "https://www.reddit.com/r/UniUK/comments/1qqqkvk/what_do_students_eat_at_pres/",
+          "signal": "live student usage"
+        },
+        {
+          "title": "UniUK: lesser-known drinking games",
+          "url": "https://www.reddit.com/r/UniUK/comments/st7iey/good_lesser_known_drinking_games/",
+          "signal": "games used at pres"
+        }
+      ],
+      "downstream_seeds": [
+        "pre-drinks games",
+        "pres ideas uni",
+        "games at pres",
+        "freshers pres"
+      ],
+      "cautions": [
+        "strong collision with president/presentation abbreviations",
+        "do not use as the primary root query"
+      ]
+    },
+    {
+      "id": "india_freshers_anchoring_script",
+      "region": "India",
+      "term": "freshers party anchoring script",
+      "exact_queries": [
+        "\"freshers party anchoring script\"",
+        "\"freshers party anchoring script\" Hindi",
+        "\"interaction fillers\" freshers anchor",
+        "\"hype lines\" freshers party"
+      ],
+      "status": "verified",
+      "river_grade": "A",
+      "exact_search_density": "high",
+      "youth_fit": "very high; college newcomers",
+      "content_match": [
+        "full host script",
+        "opening lines",
+        "transitions",
+        "interaction fillers",
+        "games",
+        "hype lines",
+        "Hindi and English variants"
+      ],
+      "functional_gloss": "campus host knowledge package; closest functional match to 局头手册",
+      "why_it_matters": "It searches for the finished content artifact rather than attempting to translate the organizer role.",
+      "evidence": [
+        {
+          "title": "Mr Greg English: Anchoring Script for Freshers Party",
+          "url": "https://www.mrgregenglish.com/anchoring-script-freshers-party/",
+          "signal": "modular script, modern vibes, interaction fillers and hype lines"
+        },
+        {
+          "title": "English Compositions: Freshers Party Script",
+          "url": "https://englishcompositions.com/anchoring-script-for-freshers-party/",
+          "signal": "complete script artifact"
+        },
+        {
+          "title": "Testbook: Freshers Party Anchoring Script",
+          "url": "https://testbook.com/articles/anchoring-script-for-freshers-party",
+          "signal": "structured educational template"
+        },
+        {
+          "title": "Freshers Anchoring document",
+          "url": "https://www.scribd.com/document/536670673/freshers-anchoring",
+          "signal": "user-uploaded script"
+        },
+        {
+          "title": "Hindi Freshers Party Anchoring Script",
+          "url": "https://udtibaat.com/freshers-party-anchoring-script-in-hindi/",
+          "signal": "local-language variant"
+        },
+        {
+          "title": "Professional Freshers Party Anchoring Script",
+          "url": "https://speechbhashan.com/freshers-party-professional-anchoring-script/",
+          "signal": "2026 script content"
+        },
+        {
+          "title": "Hindi anchoring script and activities",
+          "url": "https://healerbaba.com/freshers-party-anchoring-script-in-hindi/",
+          "signal": "script plus activities"
+        }
+      ],
+      "downstream_seeds": [
+        "freshers party anchoring script Hindi",
+        "college fest anchoring script",
+        "freshers party games for anchors",
+        "interaction fillers for anchors",
+        "hype lines for freshers",
+        "Mr and Miss Fresher games",
+        "college event anchoring script reel"
+      ],
+      "cautions": [
+        "many SEO template pages; platform-native creator validation still needed"
+      ]
+    },
+    {
+      "id": "india_kitty_party_games",
+      "region": "India",
+      "term": "kitty party games",
+      "exact_queries": [
+        "\"kitty party games\"",
+        "\"one minute kitty party games\"",
+        "\"kitty party game printables\"",
+        "\"kitty party host script\""
+      ],
+      "status": "verified",
+      "river_grade": "A",
+      "exact_search_density": "very high",
+      "youth_fit": "low-to-medium; predominantly adult women",
+      "content_match": [
+        "large indexed game library",
+        "one-minute games",
+        "printables",
+        "theme guides",
+        "apps",
+        "private host tools"
+      ],
+      "functional_gloss": "strong mechanism and content-product river, not a youth-slang equivalent",
+      "evidence": [
+        {
+          "title": "PartyStuff game index",
+          "url": "https://partystuff.in/games?age_from=5",
+          "signal": "51 pages and 1,621 game items observed in the index"
+        },
+        {
+          "title": "10 One-Minute Indian Kitty Party Games",
+          "url": "https://www.venuelook.com/blog/10-one-minute-indian-kitty-party-games",
+          "signal": "reusable short-game format"
+        },
+        {
+          "title": "Kitty Party Games for Ladies",
+          "url": "https://www.fabulously.in/blog/kitty-party-games-for-ladies",
+          "signal": "game collection"
+        },
+        {
+          "title": "Kitty Party Games, Theme and Rules in Hindi",
+          "url": "https://dainikshodhmarathi.in/hin/Kitty-Party-Games%2C-Theme%2C-Rules-Ideas-in-hindi",
+          "signal": "local-language instructions"
+        },
+        {
+          "title": "1 Minute Kitty Party Game",
+          "url": "https://kirtibhite89.blogspot.com/2018/08/1-minute-kitty-party-game.html",
+          "signal": "personal-blog game artifact"
+        },
+        {
+          "title": "KittyParty.club",
+          "url": "https://www.kittyparty.club/",
+          "signal": "Tambola, quiz, Ludo, puzzles, one-minute games and private host"
+        },
+        {
+          "title": "PartyTambola for kitty party",
+          "url": "https://www.partytambola.in/tambola-for-kitty-party",
+          "signal": "themed caller/ticket product"
+        }
+      ],
+      "downstream_seeds": [
+        "one minute kitty party games",
+        "kitty party game printables",
+        "Hindi kitty party games",
+        "kitty party host script",
+        "theme kitty party games"
+      ],
+      "cautions": [
+        "audience_mismatch=adult_women",
+        "retain as a mechanism sample only"
+      ]
+    },
+    {
+      "id": "india_tambola_caller",
+      "region": "India",
+      "term": "Tambola caller / Tambola number calls",
+      "exact_queries": [
+        "\"Tambola caller\"",
+        "\"Tambola number calls\"",
+        "\"Tambola caller funny lines\"",
+        "\"Tambola number nicknames\" Hindi"
+      ],
+      "status": "verified",
+      "river_grade": "A",
+      "exact_search_density": "high",
+      "youth_fit": "medium; cross-age",
+      "content_match": [
+        "caller tools",
+        "voice announcements",
+        "90-number nickname lists",
+        "ticket generators",
+        "award rules",
+        "multilingual host flows"
+      ],
+      "functional_gloss": "host-control tool and callout-script river",
+      "evidence": [
+        {
+          "title": "What is Tambola?",
+          "url": "https://www.partytambola.in/tambola-meaning",
+          "signal": "rules and host flow"
+        },
+        {
+          "title": "Tambola Rules in Hindi",
+          "url": "https://www.partytambola.in/blog/tambola-game-rules-in-hindi",
+          "signal": "local-language rules"
+        },
+        {
+          "title": "All 90 Tambola Number Nicknames",
+          "url": "https://www.partytambola.in/blog/all-90-tambola-number-nicknames",
+          "signal": "complete callout/nickname list"
+        },
+        {
+          "title": "KittyParty.club caller",
+          "url": "https://www.kittyparty.club/",
+          "signal": "free caller and ticket generator"
+        },
+        {
+          "title": "Tmbola",
+          "url": "https://tmbola.in/",
+          "signal": "voice announcements in eight Indian languages and custom awards"
+        },
+        {
+          "title": "Electronic Tambola calling phrases",
+          "url": "https://4.imimg.com/data4/DN/AY/MY-17268396/tambola-bingo-housie-electronic-display.pdf",
+          "signal": "popular calling-phrase artifact"
+        }
+      ],
+      "downstream_seeds": [
+        "Tambola caller funny lines",
+        "Tambola number nicknames Hindi",
+        "Tambola hosting ideas",
+        "Tambola prizes",
+        "Bollywood Tambola theme",
+        "college Tambola game"
+      ],
+      "cautions": [
+        "cross-age rather than youth-exclusive"
+      ]
+    },
+    {
+      "id": "south_africa_braai_games",
+      "region": "South Africa",
+      "term": "braai games",
+      "exact_queries": [
+        "\"braai games\"",
+        "\"braai card game\"",
+        "\"Mzansi charades\"",
+        "\"Afrikaans drinking game\""
+      ],
+      "status": "verified",
+      "river_grade": "A-",
+      "exact_search_density": "medium-high",
+      "youth_fit": "medium-to-high; cross-age braai culture",
+      "content_match": [
+        "localized charades app",
+        "Afrikaans card deck",
+        "braai-themed prompt cards",
+        "lawn games",
+        "party-game discussion"
+      ],
+      "functional_gloss": "local gathering scene plus game-product river",
+      "evidence": [
+        {
+          "title": "Mzansi Charades",
+          "url": "https://mzansicharades.com/",
+          "signal": "20k+ downloads and one million games claimed; braai nights are a core use case"
+        },
+        {
+          "title": "En Toe Word Ons Dors",
+          "url": "https://braaiboy.co.za/product/braai-drinking-card-game-en-toe-word-ons-dors/",
+          "signal": "53-card Afrikaans deck and rulebook for braai/house parties"
+        },
+        {
+          "title": "Caught on Camera: Braai Edition",
+          "url": "https://boereboks.co.za/products/caught-on-camera-braai-edition",
+          "signal": "braai-themed interactive card product"
+        },
+        {
+          "title": "Bliss Lawn Games",
+          "url": "https://blisslawngames.co.za/",
+          "signal": "South African party lawn-game supplier"
+        },
+        {
+          "title": "Glow parties and after-dark games",
+          "url": "https://timetoparty.co.za/article/glow-parties-with-neon-quests-uv-games-and-after-dark-adventure/",
+          "signal": "local party-game media"
+        },
+        {
+          "title": "AskSouthAfrica braai and party-game discussion",
+          "url": "https://www.reddit.com/r/askSouthAfrica/comments/1houg59",
+          "signal": "community context"
+        }
+      ],
+      "downstream_seeds": [
+        "braai party games",
+        "braai card game",
+        "Mzansi charades",
+        "Afrikaans drinking game",
+        "braai night games",
+        "30 Seconds braai",
+        "braai games for teens"
+      ],
+      "cautions": [
+        "cross-age",
+        "some alcohol-linked products"
+      ]
+    },
+    {
+      "id": "uk_freshers_guide_games",
+      "region": "United Kingdom",
+      "term": "freshers games / freshers guide",
+      "exact_queries": [
+        "\"freshers games\"",
+        "\"freshers guide\" games",
+        "\"freshers icebreakers\" flatmates",
+        "\"freshers host checklist\""
+      ],
+      "status": "verified",
+      "river_grade": "B+",
+      "exact_search_density": "medium-high but broad",
+      "youth_fit": "very high",
+      "content_match": [
+        "student guide",
+        "flatmate icebreakers",
+        "event listings",
+        "party planning"
+      ],
+      "functional_gloss": "broad campus-entry scene and guide carrier",
+      "evidence": [
+        {
+          "title": "The Freshers Guide",
+          "url": "https://www.thefreshersguide.com/",
+          "signal": "dedicated guide brand"
+        },
+        {
+          "title": "Your Freshers Guide party-games event",
+          "url": "https://www.yourfreshersguide.com/event/fck-me-its-freshers-exeter-freshers-2026/",
+          "signal": "games within a freshers event"
+        },
+        {
+          "title": "Prospects: making the most of Freshers Week",
+          "url": "https://www.prospects.ac.uk/applying-for-university/university-life/making-the-most-of-freshers-week/",
+          "signal": "student guide"
+        },
+        {
+          "title": "Kingston: icebreakers for flatmates",
+          "url": "https://www.kingston.ac.uk/experience/kingston-connect/freshers-guide-icebreaker-activities-for-you-and-your-flatmates",
+          "signal": "actionable icebreakers"
+        },
+        {
+          "title": "Freshers Mayhem",
+          "url": "https://www.freshersmayhem.co.uk/",
+          "signal": "commercial freshers-content ecosystem"
+        }
+      ],
+      "downstream_seeds": [
+        "freshers flat games",
+        "freshers icebreakers",
+        "freshers pre-drinks games",
+        "freshers host checklist",
+        "freshers party ideas halls"
+      ],
+      "cautions": [
+        "commercial ticketing and official advice dilute host tutorials"
+      ]
+    },
+    {
+      "id": "nigeria_detty_december_guide",
+      "region": "Nigeria, especially Lagos",
+      "term": "Detty December guide / Detty December checklist",
+      "exact_queries": [
+        "\"Detty December guide\"",
+        "\"Detty December checklist\"",
+        "\"Detty December starter pack\"",
+        "\"Detty December house party games\""
+      ],
+      "status": "verified",
+      "river_grade": "B",
+      "exact_search_density": "high for guides; low for host games",
+      "youth_fit": "very high",
+      "content_match": [
+        "survival guide",
+        "budget checklist",
+        "event route",
+        "diaspora guide",
+        "prep list"
+      ],
+      "functional_gloss": "seasonal youth-party scene and checklist carrier",
+      "evidence": [
+        {
+          "title": "Sterling: Detty December survival guide",
+          "url": "https://sterling.ng/detty-december-a-simple-survival-guide-for-your-sanity-time-and-wallet/",
+          "signal": "sanity, time and wallet checklist"
+        },
+        {
+          "title": "PM News: guide to Oblee season",
+          "url": "https://pmnewsnigeria.com/2025/12/01/detty-december-guide-all-you-need-to-know-for-oblee-season-in-lagos/",
+          "signal": "Lagos scene guide"
+        },
+        {
+          "title": "BellaNaija: guide for diasporians",
+          "url": "https://www.bellanaija.com/2025/12/detty-december-guide-diasporians/",
+          "signal": "diaspora-oriented guide"
+        },
+        {
+          "title": "Nigerian Bulletin: ultimate Lagos checklist",
+          "url": "https://nigerianbulletin.com/ams/the-ultimate-lagos-detty-december-checklist-10-things-to-do-before-you-fly.20907/",
+          "signal": "ten-item checklist"
+        },
+        {
+          "title": "Pulse: Detty December prep list",
+          "url": "https://www.pulse.ng/articles/lifestyle/detty-december-prep-list-2025103010132802327",
+          "signal": "prep-list content"
+        },
+        {
+          "title": "Faaji: how to survive Detty December",
+          "url": "https://blog.faaji.app/how-to-survive-detty-december-2025/",
+          "signal": "local nightlife-platform guide"
+        }
+      ],
+      "downstream_seeds": [
+        "Detty December house party games",
+        "Lagos kickback games",
+        "IJGB party guide",
+        "Oblee szn prep",
+        "Detty December starter pack",
+        "Lagos nightlife checklist"
+      ],
+      "cautions": [
+        "guide river, not a demonstrated host-game river",
+        "nightlife and alcohol risk"
+      ]
+    },
+    {
+      "id": "south_africa_dezemba",
+      "region": "South Africa",
+      "term": "Dezemba guide / Dezemba starter pack",
+      "exact_queries": [
+        "\"Dezemba guide\"",
+        "\"Ke Dezemba\" guide",
+        "\"Dezemba starter pack\"",
+        "\"Dezemba party games\""
+      ],
+      "status": "verified",
+      "river_grade": "B",
+      "exact_search_density": "medium-high for guides and memes; low for host games",
+      "youth_fit": "high",
+      "content_match": [
+        "survival guide",
+        "starter-pack meme",
+        "budget/wellbeing advice",
+        "local-event framing"
+      ],
+      "functional_gloss": "localized festive-season scene and starter-pack carrier",
+      "evidence": [
+        {
+          "title": "Wise Move: survive Dezemba in Cape Town",
+          "url": "https://www.wisemove.co.za/post/local-tips-to-survive-dezemba-in-cape-town",
+          "signal": "local survival guide"
+        },
+        {
+          "title": "Time Out Johannesburg: Ke Dezemba",
+          "url": "https://www.timeout.com/johannesburg/news/ke-dezemba-a-jobugers-guide-to-surviving-sas-silly-season-120225",
+          "signal": "Joburg guide"
+        },
+        {
+          "title": "dotsure festive-season survival guide",
+          "url": "https://www.dotsure.co.za/blogs/festive-season-survival-guide",
+          "signal": "survival-guide content"
+        },
+        {
+          "title": "Joburg Style: balance fun and wellbeing",
+          "url": "https://www.joburgstyle.co.za/dezemba-how-to-balance-fun-and-well-being/",
+          "signal": "wellbeing guide"
+        },
+        {
+          "title": "Briefly: Dezemba starter pack TikTok",
+          "url": "https://briefly.co.za/people/231075-man-welcomes-december-tiktok-video-south-africa-proud/",
+          "signal": "starter-pack short-video evidence"
+        },
+        {
+          "title": "South African Tourism: December renamed Dezemba",
+          "url": "https://www.southafrica.net/zw/en/travel/article/family-travel-playbook",
+          "signal": "official validation of local usage"
+        }
+      ],
+      "downstream_seeds": [
+        "Ke Dezemba starter pack",
+        "Dezemba party games",
+        "Dezemba house party",
+        "Dezemba braai games",
+        "Dezemba checklist TikTok"
+      ],
+      "cautions": [
+        "scene and meme river rather than host-game river"
+      ]
+    },
+    {
+      "id": "canada_frosh",
+      "region": "Canada",
+      "term": "frosh handbook / frosh leader games",
+      "exact_queries": [
+        "\"frosh handbook\"",
+        "\"frosh leader games\"",
+        "\"frosh leader icebreakers\"",
+        "\"frosh week games\""
+      ],
+      "status": "candidate",
+      "river_grade": "B",
+      "exact_search_density": "medium; institution-heavy",
+      "youth_fit": "very high",
+      "content_match": [
+        "freshman handbook",
+        "leader training",
+        "game night",
+        "orientation programming"
+      ],
+      "functional_gloss": "campus orientation operator and handbook path",
+      "evidence": [
+        {
+          "title": "Queen's Frosh Handbook",
+          "url": "https://www.queensu.ca/accessibility/students/future-new-students-disabilities/orientations",
+          "signal": "every incoming student receives a Frosh Handbook"
+        },
+        {
+          "title": "McGill SUS Frosh 2026",
+          "url": "https://susmcgill.ca/frosh",
+          "signal": "130 Frosh Leaders, game night and welcome booklet"
+        },
+        {
+          "title": "University of Manitoba Engineering Frosh FAQ",
+          "url": "https://frosh.umes.mb.ca/faq.php",
+          "signal": "frosh-handbook route"
+        },
+        {
+          "title": "University of Toronto: behind Frosh Week",
+          "url": "https://www.utoronto.ca/news/behind-scenes-orientation-2012",
+          "signal": "leader training and local term usage"
+        },
+        {
+          "title": "Queen's Journal: frosh leaders",
+          "url": "https://www.queensjournal.ca/get-to-know-your-frosh-leaders/",
+          "signal": "student-paper operator profiles"
+        }
+      ],
+      "downstream_seeds": [
+        "frosh leader icebreakers",
+        "frosh week games",
+        "frosh leader tips",
+        "orientation leader games Canada",
+        "frosh handbook PDF"
+      ],
+      "cautions": [
+        "official/student-union content dominates",
+        "platform-native creator density not yet shown"
+      ]
+    },
+    {
+      "id": "australia_oweek",
+      "region": "Australia",
+      "term": "O-week games / O-week handbook",
+      "exact_queries": [
+        "\"O-week games\" Australia",
+        "\"O-week handbook\"",
+        "\"O-week games night\"",
+        "\"O-week leader games\""
+      ],
+      "status": "candidate",
+      "river_grade": "B",
+      "exact_search_density": "medium; campus/club-heavy",
+      "youth_fit": "very high",
+      "content_match": [
+        "orientation handbook",
+        "games night",
+        "Mafia",
+        "Family Feud",
+        "Trivia",
+        "large physical games"
+      ],
+      "functional_gloss": "orientation-week event and handbook path",
+      "evidence": [
+        {
+          "title": "University of Sydney SRC O-Week Handbook",
+          "url": "https://srcusyd.net.au/about/about-us/",
+          "signal": "named O-Week Handbook publication"
+        },
+        {
+          "title": "UNSW O-Week Games Night 2026",
+          "url": "https://events.humanitix.com/unsw-owk-games-26",
+          "signal": "current games-night event"
+        },
+        {
+          "title": "ANU CSSA O-week Epic Games Night",
+          "url": "https://cs.club.anu.edu.au/news/",
+          "signal": "student-club games night"
+        },
+        {
+          "title": "Monash O-Week agenda",
+          "url": "https://www.monash.edu/__data/assets/pdf_file/0008/2275181/For-homepage-and-agenda-tab-O-Week-Agenda-for-VFairs-24_07-1.pdf",
+          "signal": "Mafia, Family Feud and Trivia"
+        },
+        {
+          "title": "Commando Challenge for O-week",
+          "url": "https://www.planetentertainment.com.au/product/commando-challenge-obstacle-course",
+          "signal": "large physical game marketed to universities"
+        }
+      ],
+      "downstream_seeds": [
+        "O-week leader games",
+        "O-week icebreakers Australia",
+        "O-week party games",
+        "orientation host tips Australia",
+        "O-week games TikTok"
+      ],
+      "cautions": [
+        "official and event-platform results dominate",
+        "organic creator river not yet demonstrated"
+      ]
+    },
+    {
+      "id": "nigeria_hypeman",
+      "region": "Nigeria",
+      "term": "hypeman",
+      "exact_queries": [
+        "\"hypeman tips\" Nigeria",
+        "\"how to be a hypeman\" Nigeria",
+        "\"hypeman crowd control\" Lagos",
+        "\"hypeman lines\" Nigeria"
+      ],
+      "status": "candidate",
+      "river_grade": "C",
+      "exact_search_density": "low for instruction; high for profiles/bookings",
+      "youth_fit": "high",
+      "content_match": [
+        "artist profile",
+        "booking page",
+        "event lineup",
+        "one podcast/tutorial path"
+      ],
+      "functional_gloss": "authentic energy operator, but a weak root query for tutorials",
+      "evidence": [
+        {
+          "title": "Top hypemen for Detty December in Lagos",
+          "url": "https://thelagosweekender.com/top-hypemen-to-look-out-for-this-detty-december-in-lagos/",
+          "signal": "local operator list"
+        },
+        {
+          "title": "The Energy Conductors Podcast",
+          "url": "https://podcasts.apple.com/ng/podcast/the-energy-conductors-podcast/id1514306211",
+          "signal": "rare series with advice on becoming a hypeman/MC"
+        },
+        {
+          "title": "BlackboyMCM profile",
+          "url": "https://tribuneonlineng.com/meet-blackboymcm-nigerian-hypeman-making-his-mark-in-gospel-entertainment/",
+          "signal": "local profile"
+        },
+        {
+          "title": "How to be a hypeman for a DJ",
+          "url": "https://finalscratch.com/blog/how-to-be-a-hypeman-for-a-dj/",
+          "signal": "general instructional result, not Nigeria-specific"
+        }
+      ],
+      "downstream_seeds": [
+        "hypeman name + tips",
+        "hypeman MC set",
+        "hypeman crowd control",
+        "Lagos hypeman call and response",
+        "Detty December hypeman"
+      ],
+      "cautions": [
+        "role authenticity must not be mistaken for content-river density",
+        "discover names first, then search name plus technique"
+      ]
+    },
+    {
+      "id": "south_africa_groovist",
+      "region": "South Africa",
+      "term": "groovist",
+      "exact_queries": [
+        "\"groovist\" South Africa",
+        "\"groovist tips\"",
+        "\"groovist games\""
+      ],
+      "status": "candidate",
+      "river_grade": "C",
+      "exact_search_density": "medium for identity/memes; low for actionable party content",
+      "youth_fit": "high",
+      "content_match": [
+        "short-video personality",
+        "dance",
+        "nightlife identity",
+        "meme"
+      ],
+      "functional_gloss": "partygoer/vibe participant, not an organizer or host",
+      "evidence": [
+        {
+          "title": "Bona: groovist who does not drink",
+          "url": "https://www.bona.co.za/lifestyle/mzansi-reacts-to-groovist-who-doesnt-drink/",
+          "signal": "youth short-video usage"
+        },
+        {
+          "title": "Briefly: amapiano groovists dance",
+          "url": "https://briefly.co.za/people/163558-groovists-amapiano-dance-viral-spreads-joy-tiktok/",
+          "signal": "TikTok dance identity"
+        },
+        {
+          "title": "Gagasi FM: groove companion",
+          "url": "https://getitmagazine.co.za/ballito-umhlanga/blog/2024/11/29/gagasi-fm-your-perfect-december-groove-companion/",
+          "signal": "December groove context"
+        }
+      ],
+      "downstream_seeds": [
+        "groove starter pack South Africa",
+        "groove checklist",
+        "amapiano dance challenge",
+        "Dezemba groovist"
+      ],
+      "cautions": [
+        "identity term, not host role",
+        "no demonstrated games/tutorial river"
+      ]
+    },
+    {
+      "id": "south_africa_jol",
+      "region": "South Africa",
+      "term": "jol",
+      "exact_queries": [
+        "\"jol games\" South Africa",
+        "\"student jol\" games",
+        "\"matric jol\""
+      ],
+      "status": "candidate",
+      "river_grade": "C/D",
+      "exact_search_density": "high for definitions/general party use; low for games",
+      "youth_fit": "high",
+      "content_match": [
+        "dictionary",
+        "general party reference",
+        "scattered event usage"
+      ],
+      "functional_gloss": "authentic local party/have-fun word, not a content carrier by itself",
+      "evidence": [
+        {
+          "title": "Oxford Learner's Dictionaries: jol",
+          "url": "https://www.oxfordlearnersdictionaries.com/us/definition/english/jol_1",
+          "signal": "usage validation"
+        },
+        {
+          "title": "Dictionary of South African English: jol",
+          "url": "https://dsae.co.za/entry/jol/e03505",
+          "signal": "local historical usage"
+        },
+        {
+          "title": "Collins: jol",
+          "url": "https://www.collinsdictionary.com/dictionary/english/jol",
+          "signal": "usage validation"
+        }
+      ],
+      "downstream_seeds": [
+        "student jol",
+        "matric jol",
+        "jol starter pack",
+        "jol party ideas"
+      ],
+      "cautions": [
+        "dictionary validation does not constitute a content river",
+        "use only as a context modifier"
+      ]
+    },
+    {
+      "id": "us_social_chair",
+      "region": "United States campus Greek life",
+      "term": "social chair / social chair ideas",
+      "exact_queries": [
+        "\"social chair ideas\" sorority",
+        "\"social chair event ideas\"",
+        "\"fraternity social chair\" games"
+      ],
+      "status": "candidate",
+      "river_grade": "C",
+      "exact_search_density": "low-to-medium for ideas; high for policy and job duties",
+      "youth_fit": "high",
+      "content_match": [
+        "university policy",
+        "officer responsibilities",
+        "Pinterest boards",
+        "scattered Reddit advice"
+      ],
+      "functional_gloss": "authentic campus event operator, weak content-carrier root",
+      "evidence": [
+        {
+          "title": "University of Arizona social-events policy",
+          "url": "https://greek.arizona.edu/fsp/social-events-policy",
+          "signal": "role and policy visibility"
+        },
+        {
+          "title": "UNO officer responsibilities",
+          "url": "https://www.unomaha.edu/student-life/involvement/omaha-greeks/policies-and-procedures/officer-responsibilities.php",
+          "signal": "official role definition"
+        },
+        {
+          "title": "Pinterest: social-chair ideas",
+          "url": "https://www.pinterest.com/ideas/social-chair-ideas-sorority/944428488503/",
+          "signal": "thin idea-board river"
+        },
+        {
+          "title": "Reddit Frat social-chair discussion",
+          "url": "https://www.reddit.com/r/Frat/comments/1me7k9w",
+          "signal": "scattered peer discussion"
+        }
+      ],
+      "downstream_seeds": [
+        "sorority social chair TikTok",
+        "social chair event ideas",
+        "fraternity social calendar",
+        "social chair reveal"
+      ],
+      "cautions": [
+        "role-function similarity to 局头 is not enough",
+        "institutional risk-management pages dominate root search"
+      ]
+    },
+    {
+      "id": "nigeria_oblee_ijgb",
+      "region": "Nigeria",
+      "term": "Oblee Szn / IJGB",
+      "exact_queries": [
+        "\"Oblee Szn\"",
+        "\"Oblee starter pack\"",
+        "\"IJGB guide\"",
+        "\"IJGB house party games\""
+      ],
+      "status": "candidate",
+      "river_grade": "C",
+      "exact_search_density": "medium for music/events/lifestyle; low for games",
+      "youth_fit": "high",
+      "content_match": [
+        "festival slang explainer",
+        "music",
+        "event",
+        "diaspora lifestyle guide"
+      ],
+      "functional_gloss": "seasonal mood and returnee identity terms, not host-content roots",
+      "evidence": [
+        {
+          "title": "Vanguard: Oblee and other Detty December slang",
+          "url": "https://dettidecember.vanguardngr.com/story/oblee-balling-other-festivities-slang-common-during-detty-december/",
+          "signal": "local slang validation"
+        },
+        {
+          "title": "The Nation: from Outside to Oblee",
+          "url": "https://thenationonlineng.net/from-outside-to-oblee-how-youths-drive-thriving-lagos-nightlife/",
+          "signal": "youth nightlife context"
+        },
+        {
+          "title": "Pulse: IJGB meaning",
+          "url": "https://www.pulse.ng/story/ijgb-meaning-2025111111344469892",
+          "signal": "returnee identity validation"
+        },
+        {
+          "title": "Vanguard Detty December slang guidebook",
+          "url": "https://dettidecember.vanguardngr.com/guidebook/detty-december-some-slangs-you-should-get-familiar-with-as-a-first-timer-in-lagos/",
+          "signal": "scene-language guide"
+        }
+      ],
+      "downstream_seeds": [
+        "Oblee starter pack",
+        "IJGB Detty December checklist",
+        "IJGB house party games",
+        "Oblee szn prep"
+      ],
+      "cautions": [
+        "authentic slang does not equal actionable-content density"
+      ]
+    },
+    {
+      "id": "global_hype_person_party_starter",
+      "region": "English-speaking markets",
+      "term": "hype person / party starter",
+      "exact_queries": [
+        "\"hype person\" party tips",
+        "\"party starter\" games host"
+      ],
+      "status": "dead-negative",
+      "river_grade": "D",
+      "exact_search_density": "low; collision-heavy",
+      "youth_fit": "medium",
+      "content_match": [
+        "dictionary",
+        "music",
+        "product name",
+        "generic marketing copy"
+      ],
+      "functional_gloss": "semantic lookalike to 局头 but not a stable search river",
+      "evidence": [
+        {
+          "title": "Dictionary.com: hype person",
+          "url": "https://www.dictionary.com/browse/hype-person",
+          "signal": "definition-only result illustrates the problem"
+        }
+      ],
+      "downstream_seeds": [],
+      "cautions": [
+        "do not promote based on semantic similarity",
+        "use scene plus artifact queries instead"
+      ]
+    },
+    {
+      "id": "uk_au_seshlord",
+      "region": "United Kingdom / Australia",
+      "term": "seshlord",
+      "exact_queries": [
+        "\"seshlord\"",
+        "\"seshlord tips\"",
+        "\"seshlord games\""
+      ],
+      "status": "risk-only",
+      "river_grade": "D",
+      "exact_search_density": "medium for memes/definitions; negligible for tutorials",
+      "youth_fit": "high",
+      "content_match": [
+        "meme",
+        "dictionary",
+        "alcohol/drug glorification"
+      ],
+      "functional_gloss": "heavy-session identity, not a party facilitator",
+      "evidence": [
+        {
+          "title": "Urban Dictionary: seshlord",
+          "url": "https://www.urbandictionary.com/define.php?term=Seshlord",
+          "signal": "slang/meme validation only"
+        }
+      ],
+      "downstream_seeds": [],
+      "cautions": [
+        "substance-risk term",
+        "do not treat as a replicable youth-playbook river"
+      ]
+    },
+    {
+      "id": "south_africa_vibe_curator",
+      "region": "South Africa",
+      "term": "vibe curator",
+      "exact_queries": [
+        "\"vibe curator\" South Africa",
+        "\"vibe curator tips\" party"
+      ],
+      "status": "dead-negative",
+      "river_grade": "D",
+      "exact_search_density": "low",
+      "youth_fit": "medium",
+      "content_match": [
+        "event-company self-description",
+        "personal branding"
+      ],
+      "functional_gloss": "branding phrase, not stable local youth slang",
+      "evidence": [
+        {
+          "title": "HiSide self-description",
+          "url": "https://hiside.co.za/hiside-who/",
+          "signal": "example of brand language rather than a content river"
+        }
+      ],
+      "downstream_seeds": [],
+      "cautions": [
+        "do not infer local adoption from isolated brand copy"
+      ]
+    }
+  ],
+  "recommended_platform_validation": {
+    "sample_size_per_query": 50,
+    "priority_queries": [
+      "freshers party anchoring script",
+      "pregame games",
+      "kickback games Black",
+      "pre-drinks games",
+      "braai games",
+      "Tambola caller funny lines",
+      "Detty December house party games",
+      "Dezemba braai games"
+    ],
+    "metrics": [
+      "valid_game_or_host_hits",
+      "series_creator_hits",
+      "local_language_hits",
+      "noise_hits",
+      "underage_or_harm_risk"
+    ],
+    "search_formula": "local_scene_term + content_artifact + operator_action",
+    "content_artifacts": [
+      "games",
+      "guide",
+      "checklist",
+      "handbook",
+      "anchoring script",
+      "caller",
+      "cards",
+      "starter pack",
+      "icebreakers"
+    ],
+    "operator_actions": [
+      "host",
+      "crowd control",
+      "interaction fillers",
+      "hype lines",
+      "call and response",
+      "rules",
+      "printable",
+      "game night"
+    ]
+  }
+}
