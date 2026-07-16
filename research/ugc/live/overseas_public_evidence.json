@@ -1,0 +1,930 @@
+{
+  "generated_at": "2026-07-16",
+  "status_legend": {
+    "verified": "The source explicitly uses the term in a drinking, party, or party-game context.",
+    "candidate": "The term or format is adjacent and useful for discovery, but is only a partial role match, locally bounded, or supported by an index/mirror.",
+    "ambiguous": "A likely false friend or generic role that must not be treated as equivalent without stronger contextual evidence."
+  },
+  "items": [
+    {
+      "locale": "en",
+      "platform": "public rules site",
+      "query": "drinking game Game Master party rules",
+      "term": "Game Master",
+      "status": "verified",
+      "evidence_url": "https://www.drinkingdojo.com/en/articles/horse-race",
+      "short_reason": "Horse Race assigns a designated Game Master to narrate the race and reveal cards, making this a direct flow-control role.",
+      "safety_flags": ["alcohol", "rapid_drinking"]
+    },
+    {
+      "locale": "en-US",
+      "platform": "Reddit",
+      "query": "\"drinking game-master\" party",
+      "term": "drinking game-master",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/seduction/comments/qkh85d/",
+      "short_reason": "A user explicitly describes acting as the drinking game-master for flip cup, beer pong, and King's Cup at a party.",
+      "safety_flags": ["alcohol", "sexual_content", "peer_pressure"]
+    },
+    {
+      "locale": "en",
+      "platform": "Reddit",
+      "query": "game host versus game master meaning",
+      "term": "game host",
+      "status": "ambiguous",
+      "evidence_url": "https://www.reddit.com/r/EnglishLearning/comments/mostnl/",
+      "short_reason": "The discussion distinguishes hosting the event from controlling the game; game host alone is too broad to equal a drinking-game flow leader.",
+      "safety_flags": []
+    },
+    {
+      "locale": "en",
+      "platform": "web app",
+      "query": "one phone host-controlled party games",
+      "term": "host-controlled; one phone drives",
+      "status": "verified",
+      "evidence_url": "https://www.pregameup.com/",
+      "short_reason": "Pregame explicitly presents one-phone, host-controlled play and bundles Truth or Dare, King's Cup, Flip Cup timing, and a Beer Pong bracket.",
+      "safety_flags": ["alcohol", "peer_pressure"]
+    },
+    {
+      "locale": "en",
+      "platform": "Google Play",
+      "query": "Party Starter drinking games app",
+      "term": "Party Starter",
+      "status": "verified",
+      "evidence_url": "https://play.google.com/store/apps/details?id=com.heavyfork.partystarter",
+      "short_reason": "The app packages common prompt and card games including Most Likely To, Never Have I Ever, King's Cup, and Truth or Dare.",
+      "safety_flags": ["alcohol", "sexual_content", "peer_pressure"]
+    },
+    {
+      "locale": "en-US",
+      "platform": "Apple App Store",
+      "query": "Most Likely To drinking game app",
+      "term": "Most Likely To",
+      "status": "verified",
+      "evidence_url": "https://apps.apple.com/us/app/most-likely-to-drinking-games/id1367125936",
+      "short_reason": "The listing verifies Most Likely To as a standalone party/drinking-game prompt format suitable for vote-and-point discovery queries.",
+      "safety_flags": ["alcohol", "humiliation", "peer_pressure"]
+    },
+    {
+      "locale": "en-US",
+      "platform": "TikTok Shop",
+      "query": "TikTok party cards do it or drink confess or drink",
+      "term": "Party Cards",
+      "status": "verified",
+      "evidence_url": "https://shop.tiktok.com/us/pdp/party-cards-ultimate-drinking-card-game-for-parties-birthdays/1732087625190314969",
+      "short_reason": "The public product page structures party prompts into seven modes and allows custom penalties, closely matching a portable host playbook.",
+      "safety_flags": ["alcohol", "forced_drinking", "sexual_content", "smoking", "money_betting", "peer_pressure"]
+    },
+    {
+      "locale": "en-US",
+      "platform": "TikTok Creative Center",
+      "query": "#drinking TikTok trend",
+      "term": "#drinking",
+      "status": "candidate",
+      "evidence_url": "https://ads.tiktok.com/business/creativecenter/hashtag/drinking/pc/en?countryCode=US&period=365",
+      "short_reason": "This is an official public trend-discovery entry point, but the hashtag is too broad to prove any specific host role or mechanic.",
+      "safety_flags": ["alcohol", "underage_risk"]
+    },
+    {
+      "locale": "en",
+      "platform": "brand site",
+      "query": "Gen Z party game record TikTok Reels dares confessions",
+      "term": "SPILL",
+      "status": "verified",
+      "evidence_url": "https://spillthegame.com/en",
+      "short_reason": "SPILL positions its prompts as written for Gen Z and combines dares, confessions, group challenges, and built-in recording for TikTok or Reels.",
+      "safety_flags": ["alcohol", "sexual_content", "privacy_recording", "humiliation", "peer_pressure"]
+    },
+    {
+      "locale": "en-US",
+      "platform": "Reddit",
+      "query": "Gen Z party foul slang",
+      "term": "party foul",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/GenZ/comments/1dfp6vx",
+      "short_reason": "A Gen Z community discussion uses party foul as a social label for an undesirable party action, making it useful slang for reaction and etiquette content.",
+      "safety_flags": ["humiliation", "peer_pressure"]
+    },
+    {
+      "locale": "en",
+      "platform": "YouTube",
+      "query": "drinking game master party",
+      "term": "drinking game master party",
+      "status": "candidate",
+      "evidence_url": "https://www.youtube.com/results?search_query=drinking+game+master+party",
+      "short_reason": "This official YouTube search URL is a reproducible discovery route, not evidence that every returned video contains the target role.",
+      "safety_flags": ["alcohol", "underage_risk"]
+    },
+    {
+      "locale": "es-AR",
+      "platform": "Reddit",
+      "query": "previa juegos para tomar Argentina",
+      "term": "previa",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/argentina/comments/rky28m/juegos_para_tomar_o_para_previa/",
+      "short_reason": "An Argentina discussion naturally uses previa as the pre-party context in which the group requests drinking games.",
+      "safety_flags": ["alcohol", "underage_risk"]
+    },
+    {
+      "locale": "es-AR",
+      "platform": "Reddit",
+      "query": "escabiar juegos previa",
+      "term": "escabiar",
+      "status": "candidate",
+      "evidence_url": "https://www.reddit.com/r/argentina/comments/rky28m/juegos_para_tomar_o_para_previa/",
+      "short_reason": "The thread uses this colloquial Argentina drinking verb; it is a useful local query expansion but should not be generalized to all Spanish locales.",
+      "safety_flags": ["alcohol"]
+    },
+    {
+      "locale": "es-AR",
+      "platform": "Reddit",
+      "query": "juegos para tomar previa",
+      "term": "juegos para tomar",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/argentina/comments/rky28m/juegos_para_tomar_o_para_previa/",
+      "short_reason": "This is the thread's native umbrella phrase for the requested drinking-game category.",
+      "safety_flags": ["alcohol"]
+    },
+    {
+      "locale": "es-AR",
+      "platform": "Reddit",
+      "query": "Amigos de mierda juego para tomar",
+      "term": "Amigos de mierda",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/argentina/comments/rky28m/juegos_para_tomar_o_para_previa/",
+      "short_reason": "Players read who-in-the-group prompts and point simultaneously, a direct Spanish-language analogue of vote-and-point prompt decks.",
+      "safety_flags": ["alcohol", "humiliation", "peer_pressure", "sexual_content"]
+    },
+    {
+      "locale": "es-AR",
+      "platform": "Reddit",
+      "query": "Dedo juego para tomar Argentina",
+      "term": "Dedo",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/argentina/comments/rky28m/juegos_para_tomar_o_para_previa/",
+      "short_reason": "The described thumb-on-table reaction game provides a local mechanic and name, rather than a literal translation from English.",
+      "safety_flags": ["alcohol", "rapid_drinking"]
+    },
+    {
+      "locale": "es-AR",
+      "platform": "Reddit",
+      "query": "Palmera juego cartas botella previa",
+      "term": "Palmera",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/argentina/comments/rky28m/juegos_para_tomar_o_para_previa/",
+      "short_reason": "The thread describes cards arranged around a bottle under the local game name Palmera, useful for native-name discovery.",
+      "safety_flags": ["alcohol", "rapid_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "es-LATAM",
+      "platform": "TikTok mirror/index",
+      "query": "#palapeda TikTok",
+      "term": "#palapeda",
+      "status": "candidate",
+      "evidence_url": "https://urlebird.com/hash/palapeda/",
+      "short_reason": "A public third-party index exposes TikTok captions and neighboring terms, but individual clips should be rechecked on TikTok before promotion to verified.",
+      "safety_flags": ["alcohol", "sexual_content", "peer_pressure"]
+    },
+    {
+      "locale": "es-LATAM",
+      "platform": "TikTok Shop",
+      "query": "Pa La Peda card game TikTok Shop",
+      "term": "Pa La Peda",
+      "status": "candidate",
+      "evidence_url": "https://shop.tiktok.com/us/pdp/pa-la-peda-guys-night-game-126-fun-cards-epic-memories/1731093476722774950",
+      "short_reason": "The public product URL confirms a TikTok Shop card-game presence, while the regional meaning and exact prompt set require further direct-page verification.",
+      "safety_flags": ["alcohol", "sexual_content", "peer_pressure"]
+    },
+    {
+      "locale": "es",
+      "platform": "Google Play",
+      "query": "Ring of Fire Maestro del Pulgar español",
+      "term": "Maestro del Pulgar",
+      "status": "verified",
+      "evidence_url": "https://play.google.com/store/apps/details?hl=es&id=com.miguelsepu99.ringoffire",
+      "short_reason": "The Spanish Ring of Fire listing names Maestro del Pulgar as a card-rule role, a verified micro-role but not a whole-party host.",
+      "safety_flags": ["alcohol", "rapid_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "es-ES",
+      "platform": "event-service site",
+      "query": "animador fiesta juegos adultos alcohol",
+      "term": "animador",
+      "status": "ambiguous",
+      "evidence_url": "https://www.barcelonanoche.com/actividades/animacion-comica/",
+      "short_reason": "The term commonly describes paid event entertainment or comic animation, so it must not be equated with an informal drinking-game host without game-specific evidence.",
+      "safety_flags": []
+    },
+    {
+      "locale": "it-IT",
+      "platform": "Reddit",
+      "query": "giochi alcolici festa diciottesimo",
+      "term": "giochi alcolici",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/italy/comments/15sod2r/festa_dei_18_anni/",
+      "short_reason": "An Italian community discussion uses giochi alcolici in the context of an eighteenth-birthday party.",
+      "safety_flags": ["alcohol", "underage_risk"]
+    },
+    {
+      "locale": "it-IT",
+      "platform": "research PDF",
+      "query": "preserata giovani Italia nightlife",
+      "term": "preserata",
+      "status": "verified",
+      "evidence_url": "https://research.edgehill.ac.uk/files/100644506/19.LibroNotteBrava.pdf",
+      "short_reason": "Nightlife research documents preserata as an Italian pre-evening/pre-party phase, making it a strong scene qualifier.",
+      "safety_flags": ["alcohol"]
+    },
+    {
+      "locale": "it-IT",
+      "platform": "Apple App Store",
+      "query": "Picolo gioco da festa nomi giocatori",
+      "term": "Picolo",
+      "status": "verified",
+      "evidence_url": "https://apps.apple.com/it/app/picolo-gioco-da-festa/id1001473964",
+      "short_reason": "Players enter their names and the app drives the party prompts, demonstrating the phone-as-host pattern in Italian.",
+      "safety_flags": ["alcohol", "sexual_content", "peer_pressure"]
+    },
+    {
+      "locale": "it-IT",
+      "platform": "brand site",
+      "query": "Tazzo gioco festa Hard Sexy Non ho mai",
+      "term": "Tazzo",
+      "status": "verified",
+      "evidence_url": "https://tazzo.app/",
+      "short_reason": "Tazzo offers more than a thousand Italian cards and Base, Hard, and Sexy modes, a clear example of mode-based escalation and localized prompt decks.",
+      "safety_flags": ["alcohol", "sexual_content", "humiliation", "peer_pressure"]
+    },
+    {
+      "locale": "it-IT",
+      "platform": "Wikipedia",
+      "query": "Patruni e sutta gioco carte bere",
+      "term": "Patruni e sutta",
+      "status": "candidate",
+      "evidence_url": "https://it.wikipedia.org/wiki/Patruni_e_sutta",
+      "short_reason": "The page documents a regional Italian drinking card game, useful for local discovery but supported here by a secondary source.",
+      "safety_flags": ["alcohol", "forced_drinking", "rapid_drinking"]
+    },
+    {
+      "locale": "it-IT",
+      "platform": "rules site",
+      "query": "Flip Cup preserata animatore perfetto",
+      "term": "animatore perfetto",
+      "status": "candidate",
+      "evidence_url": "https://toz-app.com/it/blog/drinking-games/flip-cup",
+      "short_reason": "A Flip Cup guide uses the phrase for someone energizing a pre-party, but it is descriptive promotion rather than a stable named role.",
+      "safety_flags": ["alcohol", "rapid_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "it-IT",
+      "platform": "rules site",
+      "query": "Drunk Jenga Maestro del Pollice Maestro delle Domande",
+      "term": "Maestro del Pollice; Maestro delle Domande",
+      "status": "verified",
+      "evidence_url": "https://psycatgames.com/it/magazine/party-games/drunk-jenga/",
+      "short_reason": "The Italian rules explicitly name two persistent in-game micro-roles, useful as role-card terms but not as whole-party organizers.",
+      "safety_flags": ["alcohol", "rapid_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "it-IT",
+      "platform": "general games site",
+      "query": "capogioco gioco conversazione",
+      "term": "capogioco",
+      "status": "ambiguous",
+      "evidence_url": "https://herway.net/it/giochi-di-conversazione-per-rompere-il-ghiaccio/",
+      "short_reason": "Capogioco can mean the person leading a generic conversation game, but the cited use is not specific to alcohol or youth-party culture.",
+      "safety_flags": []
+    },
+    {
+      "locale": "fr-FR",
+      "platform": "Reddit",
+      "query": "jeu des pouces soirée alcool",
+      "term": "jeu des pouces",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/FranceDetendue/comments/1h4armh/quel_jeu_dalcool_vous_a_le_plus_traumatis%C3%A9/",
+      "short_reason": "French players identify the thumb-reaction mechanic under the native name jeu des pouces in a drinking-game discussion.",
+      "safety_flags": ["alcohol", "rapid_drinking"]
+    },
+    {
+      "locale": "fr-FR",
+      "platform": "Reddit",
+      "query": "pyramide jeu alcool règles soirée",
+      "term": "pyramide",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/FranceDetendue/comments/1h4armh/quel_jeu_dalcool_vous_a_le_plus_traumatis%C3%A9/",
+      "short_reason": "The community thread uses pyramide as a familiar French drinking-game name and discusses its harsh escalation.",
+      "safety_flags": ["alcohol", "rapid_drinking", "forced_drinking"]
+    },
+    {
+      "locale": "fr-FR",
+      "platform": "Reddit",
+      "query": "palmier jeu alcool règles",
+      "term": "palmier",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/FranceDetendue/comments/1h4armh/quel_jeu_dalcool_vous_a_le_plus_traumatis%C3%A9/",
+      "short_reason": "Palmier appears as a native game name in the same first-hand French discussion.",
+      "safety_flags": ["alcohol", "rapid_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "fr-FR",
+      "platform": "Reddit",
+      "query": "jeu alcool règles ajoutées chaque soirée",
+      "term": "règles maison évolutives",
+      "status": "candidate",
+      "evidence_url": "https://www.reddit.com/r/FranceDetendue/comments/1h4armh/quel_jeu_dalcool_vous_a_le_plus_traumatis%C3%A9/",
+      "short_reason": "A player describes rules that accumulate across nights and must be learned after an absence, a strong content analogue to a group-specific memo rather than a fixed lexical term.",
+      "safety_flags": ["alcohol", "rapid_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "fr-FR",
+      "platform": "Apple App Store",
+      "query": "Picolo jeu en soirée noms joueurs",
+      "term": "Picolo",
+      "status": "verified",
+      "evidence_url": "https://apps.apple.com/fr/app/picolo-jeu-en-soir%C3%A9e/id1001473964",
+      "short_reason": "The localized app listing bundles familiar French party games and lets the app deliver prompts, supporting the phone-as-host format.",
+      "safety_flags": ["alcohol", "sexual_content", "peer_pressure"]
+    },
+    {
+      "locale": "fr-FR",
+      "platform": "rules site",
+      "query": "Maître du jeu rouge ou noir alcool",
+      "term": "Maître du jeu",
+      "status": "verified",
+      "evidence_url": "https://www.aperolt.com/jeux-dalcool/rouge-ou-noir",
+      "short_reason": "The rules explicitly assign one player as Maître du jeu to manage cards and questions, with an option to rotate the role.",
+      "safety_flags": ["alcohol", "rapid_drinking"]
+    },
+    {
+      "locale": "fr-FR",
+      "platform": "rules site",
+      "query": "Maître du Jeu musique maudite jeu alcool",
+      "term": "Maître du Jeu",
+      "status": "verified",
+      "evidence_url": "https://www.jeux-alcool.com/jeu-musique-maudite/",
+      "short_reason": "A second French drinking-game source assigns a named Maître du Jeu to control a music-trigger mechanic.",
+      "safety_flags": ["alcohol", "rapid_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "fr-FR",
+      "platform": "youth health site",
+      "query": "capitaine de soirée définition",
+      "term": "capitaine de soirée",
+      "status": "ambiguous",
+      "evidence_url": "https://www.filsantejeunes.com/sam-capitaine-de-soiree-5340",
+      "short_reason": "This is the sober designated driver/safety role, not the person leading party games; it is a critical false friend and positive safety role.",
+      "safety_flags": []
+    },
+    {
+      "locale": "fr-FR",
+      "platform": "public education wiki",
+      "query": "présoirée alcool jeunes",
+      "term": "présoirée",
+      "status": "verified",
+      "evidence_url": "https://edutechwiki.unige.ch/fr/Happy_Night",
+      "short_reason": "The public harm-prevention material uses présoirée for the pre-party phase, making it a useful scene qualifier with a safety context.",
+      "safety_flags": ["alcohol", "underage_risk"]
+    },
+    {
+      "locale": "fr-FR",
+      "platform": "event listing",
+      "query": "animateur soirée jeux Paris",
+      "term": "animateur",
+      "status": "ambiguous",
+      "evidence_url": "https://www.toutes-mes-sorties.com/sortie-1069545-soiree-joueurs-anonymes-au-de-12-paris-11-mercredi-13-mai-2026",
+      "short_reason": "Animateur commonly labels a generic event or board-game facilitator, so alcohol-specific evidence is required before treating it as a target role.",
+      "safety_flags": []
+    },
+    {
+      "locale": "pt-BR",
+      "platform": "Google Play",
+      "query": "Picolo jogo de festa nomes participantes",
+      "term": "Picolo",
+      "status": "verified",
+      "evidence_url": "https://play.google.com/store/apps/details?hl=pt_BR&id=com.picolo.android",
+      "short_reason": "The Brazilian Portuguese listing has participants enter names and then delegates the game flow to the app, while naming several local classic games.",
+      "safety_flags": ["alcohol", "sexual_content", "peer_pressure"]
+    },
+    {
+      "locale": "pt-BR",
+      "platform": "Apple App Store",
+      "query": "esquenta jogo de beber perguntas",
+      "term": "esquenta",
+      "status": "verified",
+      "evidence_url": "https://apps.apple.com/pt/app/drink-and-tell-drinking-game/id977435351",
+      "short_reason": "The localized app description uses esquenta for the pre-party context and combines it with randomized taboo questions.",
+      "safety_flags": ["alcohol", "sexual_content", "privacy_recording", "peer_pressure"]
+    },
+    {
+      "locale": "pt-BR",
+      "platform": "rules site",
+      "query": "rolê esquenta King's Cup regras",
+      "term": "rolê",
+      "status": "verified",
+      "evidence_url": "https://toz-app.com/pt/blog/card-games/kings-cup",
+      "short_reason": "The Portuguese guide naturally frames King's Cup as a game for a rolê or esquenta, providing native scene vocabulary.",
+      "safety_flags": ["alcohol"]
+    },
+    {
+      "locale": "pt-BR",
+      "platform": "rules site",
+      "query": "Mestre do Dedão King's Cup",
+      "term": "Mestre do Dedão",
+      "status": "verified",
+      "evidence_url": "https://toz-app.com/pt/blog/card-games/kings-cup",
+      "short_reason": "The guide names Mestre do Dedão as a persistent card-rule role, a verified micro-role rather than an overall party organizer.",
+      "safety_flags": ["alcohol", "rapid_drinking"]
+    },
+    {
+      "locale": "pt-BR",
+      "platform": "rules site",
+      "query": "Mestre das Perguntas King's Cup",
+      "term": "Mestre das Perguntas",
+      "status": "verified",
+      "evidence_url": "https://toz-app.com/pt/blog/card-games/kings-cup",
+      "short_reason": "The guide names Mestre das Perguntas as another in-game rule-holder, useful for querying role cards and call-and-response mechanics.",
+      "safety_flags": ["alcohol", "rapid_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "pt",
+      "platform": "web app",
+      "query": "Quem é mais provável jogo de beber",
+      "term": "Quem é mais provável",
+      "status": "verified",
+      "evidence_url": "https://mostlikelyto.app/pt/most-likely-to-drinking-game/",
+      "short_reason": "The localized web game verifies the Portuguese vote-and-point prompt format under its native title.",
+      "safety_flags": ["alcohol", "humiliation", "peer_pressure"]
+    },
+    {
+      "locale": "pt-BR",
+      "platform": "magazine site",
+      "query": "jogos com bebidas regras",
+      "term": "jogos com bebidas",
+      "status": "verified",
+      "evidence_url": "https://manualdohomemmoderno.com.br/bebidas/aprenda-a-fazer-os-jogos-com-bebidas",
+      "short_reason": "This is a public Brazilian umbrella phrase and rules-list entry point for multiple drinking-game mechanics.",
+      "safety_flags": ["alcohol", "rapid_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "pt-BR",
+      "platform": "board-game database",
+      "query": "cartas funcionam como mestre do jogo beber",
+      "term": "cartas como Mestre do Jogo",
+      "status": "candidate",
+      "evidence_url": "https://ludopedia.com.br/jogo/drinking-quest-belch-of-the-wild",
+      "short_reason": "The product framing suggests cards can assume a game-master function, but it is an RPG/drinking hybrid rather than evidence of a general party-host term.",
+      "safety_flags": ["alcohol", "rapid_drinking"]
+    },
+    {
+      "locale": "de-DE",
+      "platform": "Reddit",
+      "query": "Trinkspielapp eigene Fragen Party Vorglühen",
+      "term": "Trinkspielapp",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/de/comments/o2znq9/trinkspielapp_entwickeln_ich_brauche_eure/",
+      "short_reason": "A German app-design thread uses Trinkspielapp and discusses modes, prompts, levels, and safety, showing the playbook-as-app pattern.",
+      "safety_flags": ["alcohol", "sexual_content", "peer_pressure"]
+    },
+    {
+      "locale": "de-DE",
+      "platform": "Reddit",
+      "query": "Vorglühen drinking German",
+      "term": "Vorglühen",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/DoesNotTranslate/comments/2uqxpf/german_vorgl%C3%BChen_lit_preglowing_having_predrinks/",
+      "short_reason": "The discussion explicitly explains Vorglühen as drinking before going out, making it the core German pre-party query qualifier.",
+      "safety_flags": ["alcohol"]
+    },
+    {
+      "locale": "de-DE",
+      "platform": "Reddit",
+      "query": "Trinkspielapp eigene Fragen Decks 18+ Challenge",
+      "term": "eigene Fragen / eigene Decks",
+      "status": "candidate",
+      "evidence_url": "https://www.reddit.com/r/de/comments/o2znq9/trinkspielapp_entwickeln_ich_brauche_eure/",
+      "short_reason": "Commenters propose custom questions, tags, decks, escalating levels, and SFW/NSFW separation; this is a content-format candidate, not a fixed slang term.",
+      "safety_flags": ["alcohol", "sexual_content", "humiliation", "peer_pressure"]
+    },
+    {
+      "locale": "de-DE",
+      "platform": "Wikipedia",
+      "query": "Flunkyball Trinkspiel Regeln",
+      "term": "Flunkyball / Bierball",
+      "status": "verified",
+      "evidence_url": "https://de.wikipedia.org/wiki/Flunkyball",
+      "short_reason": "The public reference documents the German outdoor team drinking game and its alternative name Bierball.",
+      "safety_flags": ["alcohol", "rapid_drinking", "physical_risk"]
+    },
+    {
+      "locale": "de-DE",
+      "platform": "Wikipedia",
+      "query": "Flunkyball regionale Regeln Hausregeln",
+      "term": "regionale Regeln / Hausregeln",
+      "status": "verified",
+      "evidence_url": "https://de.wikipedia.org/wiki/Flunkyball",
+      "short_reason": "Flunkyball is described with regional variants and rules set by groups, a close analogue to a local memo of evolving house rules.",
+      "safety_flags": ["alcohol", "rapid_drinking", "physical_risk"]
+    },
+    {
+      "locale": "de-DE",
+      "platform": "rules site",
+      "query": "Busfahrer Trinkspiel Spielregeln Video",
+      "term": "Busfahrer",
+      "status": "verified",
+      "evidence_url": "https://busfahrer-trinkspiel.com/pages/spielregeln",
+      "short_reason": "A dedicated public rules page verifies Busfahrer as a German card drinking game and pairs text rules with a rules video.",
+      "safety_flags": ["alcohol", "rapid_drinking", "forced_drinking"]
+    },
+    {
+      "locale": "de-DE",
+      "platform": "game list",
+      "query": "Mäxchen Meiern Schocken Trinkspiele",
+      "term": "Mäxchen / Meiern / Schocken",
+      "status": "verified",
+      "evidence_url": "https://www.darepong.eu/trinkspiele/",
+      "short_reason": "The German game list supplies native game names that are more productive search anchors than translated generic terms.",
+      "safety_flags": ["alcohol", "rapid_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "de-DE",
+      "platform": "rules site",
+      "query": "Flunkyball Schiedsrichter Regelwerk",
+      "term": "Schiedsrichter",
+      "status": "candidate",
+      "evidence_url": "https://flunkyball.webnode.page/regelwerk/",
+      "short_reason": "Some Flunkyball rules assign a referee to enforce play, but this is a sport-like adjudicator rather than a general drinking-party host.",
+      "safety_flags": ["alcohol", "rapid_drinking", "physical_risk"]
+    },
+    {
+      "locale": "de-DE",
+      "platform": "rules page with embedded video",
+      "query": "Flunkyball Regeln Video YouTube",
+      "term": "Flunkyball Regelvideo",
+      "status": "candidate",
+      "evidence_url": "https://beerpong.de/pages/flunkyball",
+      "short_reason": "The rules page embeds a video alongside the written mechanics, making it a reproducible path into YouTube-style rule explainers.",
+      "safety_flags": ["alcohol", "rapid_drinking", "physical_risk"]
+    },
+    {
+      "locale": "ko-KR",
+      "platform": "Google Play",
+      "query": "술겜왕 술게임 술자리 게임모음",
+      "term": "술겜왕",
+      "status": "verified",
+      "evidence_url": "https://play.google.com/store/apps/details?hl=bs&id=com.sulgamewang.app",
+      "short_reason": "The listing presents a localized app with sixteen drinking/party games, large mission and penalty pools, and both app-run and self-run modes.",
+      "safety_flags": ["alcohol", "peer_pressure", "humiliation", "privacy_recording"]
+    },
+    {
+      "locale": "ko-KR",
+      "platform": "Google Play",
+      "query": "술게임 술자리 게임모음",
+      "term": "술게임 / 술자리 게임",
+      "status": "verified",
+      "evidence_url": "https://play.google.com/store/apps/details?hl=bs&id=com.sulgamewang.app",
+      "short_reason": "The app title and description explicitly use the native umbrella terms for drinking and drinking-table games.",
+      "safety_flags": ["alcohol"]
+    },
+    {
+      "locale": "ko-KR",
+      "platform": "Google Play",
+      "query": "술자리 분위기 메이커 앱",
+      "term": "술자리 분위기 메이커",
+      "status": "verified",
+      "evidence_url": "https://play.google.com/store/apps/details?hl=bs&id=com.sulgamewang.app",
+      "short_reason": "The app calls itself a mood-maker for drinking gatherings, strong evidence that software can occupy the functional role of the playbook/flow leader.",
+      "safety_flags": ["alcohol", "peer_pressure"]
+    },
+    {
+      "locale": "ko-KR",
+      "platform": "Google Play",
+      "query": "아파트 게임 술게임",
+      "term": "아파트 게임",
+      "status": "verified",
+      "evidence_url": "https://play.google.com/store/apps/details?hl=bs&id=com.sulgamewang.app",
+      "short_reason": "The localized app lists Apartment Game among self-run Korean drinking-table games.",
+      "safety_flags": ["alcohol", "rapid_drinking"]
+    },
+    {
+      "locale": "ko-KR",
+      "platform": "Google Play",
+      "query": "눈치 게임 바니바니 술게임",
+      "term": "눈치 게임 / 바니바니",
+      "status": "verified",
+      "evidence_url": "https://play.google.com/store/apps/details?hl=bs&id=com.sulgamewang.app",
+      "short_reason": "The listing supplies two native reaction/rhythm game names, useful anchors for short-form demonstrations and rule explainers.",
+      "safety_flags": ["alcohol", "rapid_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "ko-KR",
+      "platform": "Google Play",
+      "query": "벌칙 룰렛 술자리 게임",
+      "term": "벌칙 룰렛",
+      "status": "verified",
+      "evidence_url": "https://play.google.com/store/apps/details?hl=bs&id=com.sulgamewang.app",
+      "short_reason": "Penalty roulette is an explicit app-run module and demonstrates how a host memo becomes randomized phone logic; the listing also includes a non-drink option.",
+      "safety_flags": ["alcohol", "humiliation", "peer_pressure"]
+    },
+    {
+      "locale": "ko-KR",
+      "platform": "education PDF",
+      "query": "인싸 분위기 메이커 뜻",
+      "term": "인싸",
+      "status": "candidate",
+      "evidence_url": "https://static.ebs.co.kr/images/public/lectures/2023/11/1/9/60228612/f37840cf-4a38-445f-add4-bf7a0a9975cc.pdf",
+      "short_reason": "EBS learning material links the social idea of a life-of-the-party mood maker with current Korean inssa vocabulary, but it does not prove a formal game-host role.",
+      "safety_flags": ["peer_pressure"]
+    },
+    {
+      "locale": "ko-KR",
+      "platform": "YouTube",
+      "query": "ROSÉ Bruno Mars APT official video drinking game",
+      "term": "아파트 / APT. game",
+      "status": "verified",
+      "evidence_url": "https://www.youtube.com/watch?v=ekr2nIex040",
+      "short_reason": "The official music video is a stable cross-platform anchor for the APT name; cultural-origin claims should be paired with a separate explanatory source.",
+      "safety_flags": ["alcohol", "underage_risk"]
+    },
+    {
+      "locale": "ko-KR",
+      "platform": "culture news",
+      "query": "아파트 술게임 Z세대 숏폼 밈",
+      "term": "아파트 술게임 숏폼 밈",
+      "status": "candidate",
+      "evidence_url": "https://culture.seoul.co.kr/news/newsView.php?id=20241028026005",
+      "short_reason": "The cultural report connects the Korean drinking-game origin to Z/Alpha culture and global short-form circulation, complementing the official YouTube artifact.",
+      "safety_flags": ["alcohol", "underage_risk"]
+    },
+    {
+      "locale": "ko-KR",
+      "platform": "government PDF",
+      "query": "갑분싸 뜻 분위기",
+      "term": "갑분싸",
+      "status": "candidate",
+      "evidence_url": "https://www.moj.go.kr/HP/TCOR/cor_06/cor_0601/ebook/201901/cor_201901.pdf",
+      "short_reason": "A government publication documents the slang for a suddenly cold atmosphere; it is useful for rescue-the-vibe queries but is not a host title.",
+      "safety_flags": ["peer_pressure"]
+    },
+    {
+      "locale": "ko-KR",
+      "platform": "general language usage",
+      "query": "진행자 술자리 게임",
+      "term": "진행자",
+      "status": "ambiguous",
+      "evidence_url": "https://toz-app.com/ko/blog/drinking-games/top-10-drinking-games-for-parties",
+      "short_reason": "Proceeding/facilitator language can describe anyone running an activity, but the term is too generic to establish a youth drinking-party identity.",
+      "safety_flags": []
+    },
+    {
+      "locale": "ja-JP",
+      "platform": "community game site",
+      "query": "幹事さん必見 飲みゲー",
+      "term": "幹事さん必見",
+      "status": "verified",
+      "evidence_url": "https://nomi-game.work/",
+      "short_reason": "The community drinking-game site directly addresses organizers and provides categorized games plus web tools, closely matching a digital organizer's manual.",
+      "safety_flags": ["alcohol", "underage_risk", "peer_pressure"]
+    },
+    {
+      "locale": "ja-JP",
+      "platform": "community game site",
+      "query": "飲みゲー 一覧",
+      "term": "飲みゲー",
+      "status": "verified",
+      "evidence_url": "https://nomi-game.work/",
+      "short_reason": "The site uses this colloquial abbreviation for drinking-party games and groups standard, rhythm, psychology, and unusual formats.",
+      "safety_flags": ["alcohol"]
+    },
+    {
+      "locale": "ja-JP",
+      "platform": "HR/organization site",
+      "query": "幹事 司会者 飲み会ゲーム 進行",
+      "term": "幹事（司会者）",
+      "status": "verified",
+      "evidence_url": "https://jinzaii.or.jp/5817",
+      "short_reason": "The guide explicitly places the organizer/MC in front of the group to lead a call-and-response party game.",
+      "safety_flags": ["alcohol", "peer_pressure"]
+    },
+    {
+      "locale": "ja-JP",
+      "platform": "event guide",
+      "query": "飲み会 ゲーム司会 盛り上げ役 幹事",
+      "term": "ゲーム司会 / 盛り上げ役",
+      "status": "candidate",
+      "evidence_url": "https://gourmetplus.jp/guide/1378/",
+      "short_reason": "The event guide suggests separating the game MC and mood-making helper from the broader organizer role, but these remain descriptive roles rather than slang identities.",
+      "safety_flags": ["peer_pressure"]
+    },
+    {
+      "locale": "ja-JP",
+      "platform": "community game site",
+      "query": "山手線ゲーム 飲み会",
+      "term": "山手線ゲーム",
+      "status": "verified",
+      "evidence_url": "https://nomi-game.work/",
+      "short_reason": "The site lists Yamanote Line Game among standard drinking-party games, a strong native category-chain query anchor.",
+      "safety_flags": ["alcohol", "rapid_drinking"]
+    },
+    {
+      "locale": "ja-JP",
+      "platform": "community game site",
+      "query": "王様ゲーム Web 飲み会",
+      "term": "王様ゲーム",
+      "status": "verified",
+      "evidence_url": "https://nomi-game.work/",
+      "short_reason": "The site provides a web tool for King's Game, directly showing how a phone/browser can replace cards and part of the facilitator's work.",
+      "safety_flags": ["alcohol", "sexual_content", "humiliation", "peer_pressure"]
+    },
+    {
+      "locale": "ja-JP",
+      "platform": "community game site",
+      "query": "飲みゲー 投稿 オリジナル ゲーム",
+      "term": "投稿型オリジナル飲みゲー",
+      "status": "verified",
+      "evidence_url": "https://nomi-game.work/",
+      "short_reason": "The platform invites and organizes locally created games, functioning as a community-maintained playbook rather than a single authoritative rules list.",
+      "safety_flags": ["alcohol", "underage_risk", "peer_pressure"]
+    },
+    {
+      "locale": "ja-JP",
+      "platform": "event-media guide",
+      "query": "飲みゲー 幹事 企画術",
+      "term": "幹事の企画術",
+      "status": "verified",
+      "evidence_url": "https://ennoshita.app/event/media/7sJE29P4eX1JpcQCgP7asX/",
+      "short_reason": "The guide combines the colloquial drinking-game term with organizer planning techniques, a direct Japanese search path for manual-like content.",
+      "safety_flags": ["alcohol", "peer_pressure"]
+    },
+    {
+      "locale": "ja-JP",
+      "platform": "Reddit",
+      "query": "飲み会 コール 一気飲み",
+      "term": "コール",
+      "status": "candidate",
+      "evidence_url": "https://www.reddit.com/r/lowlevelaware/comments/1tsxa05/",
+      "short_reason": "The term appears in a drinking context as a group chant/call, but it is chiefly useful as a risk marker for coordinated pressure or chugging.",
+      "safety_flags": ["alcohol", "forced_drinking", "rapid_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "fil-PH",
+      "platform": "academic paper PDF",
+      "query": "tanggero gunner tig-tagay Filipino drinking session role",
+      "term": "tanggero",
+      "status": "candidate",
+      "evidence_url": "https://philssj.org/index.php/main/article/download/494/264/",
+      "short_reason": "The paper documents a facilitator who refills and passes a shared glass and controls shot pace/amount; this is the closest flow-controller found but not a game-prompt host.",
+      "safety_flags": ["alcohol", "rapid_drinking", "shared_cup_hygiene", "peer_pressure"]
+    },
+    {
+      "locale": "fil-PH",
+      "platform": "academic paper PDF",
+      "query": "gunner tig-tagay role inuman",
+      "term": "gunner / tig-tagay",
+      "status": "candidate",
+      "evidence_url": "https://philssj.org/index.php/main/article/download/494/264/",
+      "short_reason": "The study records these as alternative labels for the person pouring/passing and pacing drinks, so they are adjacent role terms rather than proven game-master synonyms.",
+      "safety_flags": ["alcohol", "rapid_drinking", "shared_cup_hygiene", "peer_pressure"]
+    },
+    {
+      "locale": "fil-PH",
+      "platform": "rules/list site",
+      "query": "inuman games barkada Filipino",
+      "term": "inuman",
+      "status": "verified",
+      "evidence_url": "https://toz-app.com/fil/blog/drinking-games/top-10-drinking-games-for-parties",
+      "short_reason": "The Filipino guide uses inuman as the native drinking-session context and organizes party games around that scene.",
+      "safety_flags": ["alcohol"]
+    },
+    {
+      "locale": "fil-PH",
+      "platform": "rules/list site",
+      "query": "barkada inuman games",
+      "term": "barkada",
+      "status": "verified",
+      "evidence_url": "https://toz-app.com/fil/blog/drinking-games/top-10-drinking-games-for-parties",
+      "short_reason": "The guide frames the game list around a friend-group/barkada context, making it a productive local social qualifier.",
+      "safety_flags": ["alcohol", "peer_pressure"]
+    },
+    {
+      "locale": "fil-PH",
+      "platform": "Reddit",
+      "query": "Sagot o lagot inuman game",
+      "term": "Sagot o lagot",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/Philippines/comments/131roam/what_games_does_filipinos_play_whenever_theres_a/",
+      "short_reason": "Filipino users name Sagot o lagot among games played during gatherings, providing a native truth-or-consequence query anchor.",
+      "safety_flags": ["alcohol", "sexual_content", "humiliation", "peer_pressure"]
+    },
+    {
+      "locale": "fil-PH",
+      "platform": "Reddit",
+      "query": "Pinoy Henyo inuman game barkada",
+      "term": "Pinoy Henyo",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/Philippines/comments/131roam/what_games_does_filipinos_play_whenever_theres_a/",
+      "short_reason": "Community members list Pinoy Henyo among gathering games, useful for local guessing-game content even though it is not inherently a drinking game.",
+      "safety_flags": ["alcohol"]
+    },
+    {
+      "locale": "fil-PH",
+      "platform": "rules/list site",
+      "query": "level ng kaguluhan inuman games",
+      "term": "level ng kaguluhan",
+      "status": "verified",
+      "evidence_url": "https://toz-app.com/fil/blog/drinking-games/top-10-drinking-games-for-parties",
+      "short_reason": "The guide uses a chaos-level framing alongside group size, equipment, and energy, closely matching a host's game-selection matrix.",
+      "safety_flags": ["alcohol", "rapid_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "fil-PH",
+      "platform": "Reddit",
+      "query": "inuman KJ ayaw uminom",
+      "term": "KJ",
+      "status": "candidate",
+      "evidence_url": "https://www.reddit.com/r/AskPH/comments/1ujhc74/why_is_inuman_the_default_social_activity_in_the/",
+      "short_reason": "A refusal-to-drink discussion treats KJ as a feared label for spoiling the fun, making it a peer-pressure marker rather than a game role.",
+      "safety_flags": ["alcohol", "forced_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "fil-PH",
+      "platform": "Reddit",
+      "query": "walwalan type ng inuman",
+      "term": "walwalan",
+      "status": "candidate",
+      "evidence_url": "https://www.reddit.com/r/Philippines/comments/zn8pq8/",
+      "short_reason": "The community uses walwalan for a heavy/high-intensity drinking style; it is useful for risk detection, not a recommended mechanic.",
+      "safety_flags": ["alcohol", "rapid_drinking", "forced_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "fil-PH",
+      "platform": "Reddit",
+      "query": "one tagayan system inuman",
+      "term": "one tagayan system",
+      "status": "candidate",
+      "evidence_url": "https://www.reddit.com/r/Philippines/comments/1666ot1/",
+      "short_reason": "The shared-glass drinking system is a contextual practice relevant to the tanggero role, but it carries hygiene and coercion risks and is not a game-host identity.",
+      "safety_flags": ["alcohol", "shared_cup_hygiene", "forced_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "en-IN",
+      "platform": "Reddit",
+      "query": "drinking games house party India homies",
+      "term": "Indian house-party drinking games",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/indiasocial/comments/16tomq2/drinking_games_for_a_house_party/",
+      "short_reason": "An India-focused community asks for games for a house party of eight to ten people, providing a real local discovery context without inventing a Hindi role term.",
+      "safety_flags": ["alcohol", "peer_pressure"]
+    },
+    {
+      "locale": "en-IN",
+      "platform": "Reddit",
+      "query": "Cheers to the Governor Beer Pong India house party",
+      "term": "Cheers to the Governor / Beer Pong",
+      "status": "verified",
+      "evidence_url": "https://www.reddit.com/r/indiasocial/comments/16tomq2/drinking_games_for_a_house_party/",
+      "short_reason": "The thread recommends these named games in an India house-party setting, demonstrating imported English game vocabulary in local use.",
+      "safety_flags": ["alcohol", "rapid_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "en-IN",
+      "platform": "Reddit",
+      "query": "host knows drinking game house party India",
+      "term": "host knows the game",
+      "status": "candidate",
+      "evidence_url": "https://www.reddit.com/r/indiasocial/comments/16tomq2/drinking_games_for_a_house_party/",
+      "short_reason": "A comment suggests that a host who knows the game helps the group, but host remains a generic English role rather than a verified local youth slang term.",
+      "safety_flags": ["alcohol"]
+    },
+    {
+      "locale": "en-IN",
+      "platform": "Reddit",
+      "query": "drinking game app participant names truth dare India",
+      "term": "participant-name truth/dare app",
+      "status": "candidate",
+      "evidence_url": "https://www.reddit.com/r/indiasocial/comments/16tomq2/drinking_games_for_a_house_party/",
+      "short_reason": "A user describes a website/app that takes participant names and randomly assigns truth or dare, a phone-as-host format without a stable product name in the thread.",
+      "safety_flags": ["alcohol", "sexual_content", "humiliation", "peer_pressure", "privacy_recording"]
+    },
+    {
+      "locale": "en-IN",
+      "platform": "brand site",
+      "query": "Dring Indian drinking card game savage dares",
+      "term": "Dring",
+      "status": "verified",
+      "evidence_url": "https://dring.in/",
+      "short_reason": "The primary Indian product site presents Dring as an Indian drinking game centered on dares and challenges, a localized card-deck playbook.",
+      "safety_flags": ["alcohol", "sexual_content", "humiliation", "peer_pressure"]
+    },
+    {
+      "locale": "en-IN",
+      "platform": "culture magazine",
+      "query": "desi card games Indian house party Dring",
+      "term": "desi card games",
+      "status": "verified",
+      "evidence_url": "https://www.masalathai.com/masala-recommends/a-list-of-desi-card-games-to-ramp-up-the-fun-at-your-next-house-party",
+      "short_reason": "The article uses desi card games as a localized house-party category and discusses Indian prompt/deck products including privacy-sensitive dares.",
+      "safety_flags": ["alcohol", "sexual_content", "privacy_recording", "humiliation", "peer_pressure"]
+    }
+  ]
+}

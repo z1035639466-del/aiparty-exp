@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "collected_at": "2026-07-16T15:55:00+08:00",
+  "platform": "douyin",
+  "session_surface": "in_app_browser",
+  "login_state": "logged_in",
+  "collection_mode": "manual visible-search review; no engagement actions",
+  "queries": [
+    {
+      "query_id": "douyin_zh_001",
+      "query": "局头备忘录",
+      "search_url": "https://www.douyin.com/search/%E5%B1%80%E5%A4%B4%E5%A4%87%E5%BF%98%E5%BD%95",
+      "status": "verified",
+      "signals": [
+        "一个合格局头的备忘录",
+        "局头专属备忘录",
+        "带台备忘录",
+        "局头备忘录小程序",
+        "局头备忘录动作小人",
+        "390条带台抓手指游戏与投稿审核"
+      ],
+      "safety_flags": ["alcohol", "adult_context"]
+    },
+    {
+      "query_id": "douyin_zh_002",
+      "query": "通天带 局头",
+      "search_url": "https://www.douyin.com/search/%E9%80%9A%E5%A4%A9%E5%B8%A6%20%E5%B1%80%E5%A4%B4",
+      "status": "verified_cluster",
+      "signals": [
+        "通天代",
+        "局头通天带台",
+        "通天带压迫感",
+        "顶帅打法",
+        "冷脸萌带台",
+        "带台前摇",
+        "组局通天带"
+      ],
+      "interpretation_note": "The 代/带 relationship appears pun-like in context but remains an inference pending creator-level validation.",
+      "safety_flags": ["alcohol", "appearance_gatekeeping", "privacy", "forced_pairing"]
+    },
+    {
+      "query_id": "douyin_zh_003",
+      "query": "夯到拉 局头",
+      "search_url": "https://www.douyin.com/search/%E5%A4%AF%E5%88%B0%E6%8B%89%20%E5%B1%80%E5%A4%B4",
+      "status": "verified",
+      "signals": [
+        "酒吧五款局头从夯到拉排名",
+        "锐评上海局头",
+        "快来认领你的局头",
+        "扬州局头从夯到拉排名",
+        "顶帅局头"
+      ],
+      "safety_flags": ["public_shaming", "personal_ranking"]
+    },
+    {
+      "query_id": "douyin_zh_004",
+      "query": "夜店酒吧黑话 局头",
+      "search_url": "https://www.douyin.com/search/%E5%A4%9C%E5%BA%97%E9%85%92%E5%90%A7%E9%BB%91%E8%AF%9D%20%E5%B1%80%E5%A4%B4",
+      "status": "challenge_blocked",
+      "signals": ["drag-image verification appeared before result review"],
+      "safety_flags": []
+    }
+  ],
+  "constraints": [
+    "Search result pages did not expose stable post URLs in the accessible snapshot, so only canonical search URLs are stored.",
+    "The final verification challenge was not bypassed.",
+    "No private account surfaces, screenshots, or authentication parameters are stored."
+  ]
+}

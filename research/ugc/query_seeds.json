@@ -1,0 +1,874 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-07-16T00:00:00+08:00",
+  "checked_at": "2026-07-16",
+  "purpose": "Public-web-verified multilingual seed lexicon for discovering party-game hosts, atmosphere makers, occasions, game anchors, and penalties before platform-native validation.",
+  "status_definitions": {
+    "verified": "A public page directly ties the term to the target party, drinking-game, facilitation, atmosphere, or penalty context.",
+    "candidate": "The term is plausible and has partial or professional-domain evidence, but needs platform autocomplete and post-sample validation before promotion.",
+    "ambiguous": "The term has a common competing meaning, names a neighboring concept rather than the intended axis, or would create noisy results if searched alone. Always pair it with verified anchors."
+  },
+  "method": {
+    "validation_level": "public_web_semantic_signal",
+    "not_yet_validated": [
+      "platform-native search volume",
+      "autocomplete frequency",
+      "hashtag activity",
+      "creator density",
+      "current recommendation-feed prevalence"
+    ],
+    "query_formula": "occasion × role × (game_anchor OR penalty)",
+    "promotion_rule": "Promote candidate or ambiguous terms only after platform-native autocomplete plus a manually reviewed sample of at least 20 results shows repeated target-context use."
+  },
+  "sources": {
+    "zh_17173": {
+      "url": "https://news.17173.com/content/05022026/130111320.shtml",
+      "source_type": "publisher",
+      "signal": "Uses 局头 for people who gather participants, arrange tables, split costs, and organize nightlife drinking sessions."
+    },
+    "zh_sohu_jutou": {
+      "url": "https://www.sohu.com/a/879464389_122064669",
+      "source_type": "publisher",
+      "signal": "Links 局头 or nightclub salespeople with drinking games used to 带气氛."
+    },
+    "zh_cowlevel": {
+      "url": "https://cowlevel.net/article/2149409",
+      "source_type": "community",
+      "signal": "Describes 酒桌游戏 as social icebreakers and discusses drinking punishments."
+    },
+    "zh_kge": {
+      "url": "https://www.g-hi.com/news/30.html",
+      "source_type": "publisher",
+      "signal": "Uses K歌局 for a singing, drinking, and game occasion."
+    },
+    "zh_homebar": {
+      "url": "https://m.thepaper.cn/newsDetail_forward_26428642",
+      "source_type": "publisher",
+      "signal": "Reports Homebar social gatherings with drinks and games; supports the occasion concept but not the exact compound homebar局."
+    },
+    "zh_truth": {
+      "url": "https://toz-app.com/zh-Hans/blog/drinking-games/truth-or-drink",
+      "source_type": "publisher",
+      "signal": "Uses 大冒险 and 惩罚 in a drinking-game explanation."
+    },
+    "zh_host": {
+      "url": "https://www.sessionhd.com/news/202603/10806.html",
+      "source_type": "publisher",
+      "signal": "Describes a drinking icebreaker host controlling pace and activity."
+    },
+    "zh_atmosphere": {
+      "url": "https://www.sohu.com/a/1000466271_122667672",
+      "source_type": "publisher",
+      "signal": "Uses Homebar 氛围官 and NPC for hosts who run icebreaker games."
+    },
+    "zh_kge_forum": {
+      "url": "https://www.moonbbs.com/thread-4334341-1-1.html",
+      "source_type": "community",
+      "signal": "Community post uses K歌局 alongside drinking and dice games."
+    },
+    "ko_always": {
+      "url": "https://alwayscorp.co.kr/games/nunchi-game",
+      "source_type": "publisher",
+      "signal": "Frames a game for 술자리, MT, and 회식."
+    },
+    "ko_play": {
+      "url": "https://play.google.com/store/apps/details?hl=bs&id=com.sulgamewang.app",
+      "source_type": "app_store",
+      "signal": "App copy combines 술게임, 벌칙 룰렛, 회식, MT, 술자리, and 분위기 메이커."
+    },
+    "ko_khan": {
+      "url": "https://www.khan.co.kr/article/200101291925101",
+      "source_type": "publisher",
+      "signal": "Describes a preselected 사회자 conducting a 술자리 game."
+    },
+    "ko_ajou": {
+      "url": "https://www.ajou.ac.kr/mba/comunity/notice.do?articleNo=346079&attachNo=304799&mode=download",
+      "source_type": "official",
+      "signal": "University safety material mentions 벌주 as punishment for making a game mistake."
+    },
+    "ko_orbi": {
+      "url": "https://orbi.kr/00020873605",
+      "source_type": "community",
+      "signal": "A 술게임 guide uses 권주가 as punishment background music, making it a neighboring music term rather than a generic penalty."
+    },
+    "ko_insider": {
+      "url": "https://andorphine.tistory.com/57",
+      "source_type": "community",
+      "signal": "Uses 술자리 인싸 for a person who leads atmosphere and games."
+    },
+    "ko_games": {
+      "url": "https://ioiwwwioi.com/%EC%88%A0%EC%9E%90%EB%A6%AC-%EA%B2%8C%EC%9E%84-%EC%B6%94%EC%B2%9C%EF%BD%9C%EB%B6%84%EC%9C%84%EA%B8%B0-%EC%82%B4%EB%A6%AC%EB%8A%94-%EC%88%A0%EA%B2%8C%EC%9E%84-5%EA%B0%80%EC%A7%80-%EB%AA%A8%EC%9D%8C/",
+      "source_type": "publisher",
+      "signal": "Collects 술자리 games that revive 분위기 and discusses 벌칙 alternatives."
+    },
+    "ko_dictionary": {
+      "url": "https://www.korean.go.kr/common/download.do?book_seq=355&c_file_name=0736b8dc-bde5-435b-84e8-0ad2bc4fea3f_0.pdf&downGubun=bookDataView&file_path=bookData&o_file_name=%ED%8A%B9%EC%88%98%EC%96%B8%EC%96%B4-02-22.pdf",
+      "source_type": "official",
+      "signal": "Official language material defines 권주가 as a song urging people to drink."
+    },
+    "en_pregame": {
+      "url": "https://en.wikipedia.org/wiki/Pregaming",
+      "source_type": "reference",
+      "signal": "Documents pregame/pre-drink usage and drinking games."
+    },
+    "en_kickback": {
+      "url": "https://www.therip.com/perspectives/2013/03/14/parties-suck-have-a-kickback/",
+      "source_type": "publisher",
+      "signal": "Connects kickback with alcohol, beer pong, and drinking games."
+    },
+    "en_function": {
+      "url": "https://slang.net/meaning/function",
+      "source_type": "dictionary",
+      "signal": "Records function as party slang where alcohol is commonly central, while the word remains highly polysemous."
+    },
+    "en_predrinks": {
+      "url": "https://www.board-game.co.uk/top-5-games-for-pre-drinks/",
+      "source_type": "publisher",
+      "signal": "UK article directly combines pre-drinks with games."
+    },
+    "en_pres": {
+      "url": "https://www.reddit.com/r/UniUK/comments/1qqqkvk/what_do_students_eat_at_pres/",
+      "source_type": "community",
+      "signal": "UK student discussion uses pres for a pre-going-out drinking context."
+    },
+    "en_host": {
+      "url": "https://www.pregameup.com/",
+      "source_type": "publisher",
+      "signal": "Describes host-controlled pregame games including truth-or-dare mechanics."
+    },
+    "en_social_chair": {
+      "url": "https://www.turnipbloodent.com/the-perfect-southern-fraternity-party",
+      "source_type": "publisher",
+      "signal": "Describes a social chair planning and throwing fraternity parties."
+    },
+    "en_hype": {
+      "url": "https://abutlercompany.com/party-hosts",
+      "source_type": "publisher",
+      "signal": "Party-host service describes the role as bartender, hype man, social glue, and game runner."
+    },
+    "en_forfeit": {
+      "url": "https://www.reddit.com/r/UniUK/comments/13kgnyr",
+      "source_type": "community",
+      "signal": "UK pres discussion uses forfeits for game consequences."
+    },
+    "en_ringleader": {
+      "url": "https://dictionary.cambridge.org/dictionary/english/ringleader",
+      "source_type": "dictionary",
+      "signal": "Defines ringleader primarily as leader of a harmful or illegal group, creating a strong false-positive risk."
+    },
+    "en_instigator": {
+      "url": "https://dictionary.cambridge.org/dictionary/english/instigator",
+      "source_type": "dictionary",
+      "signal": "Defines instigator as a person causing an event, especially a bad one; too broad and negative alone."
+    },
+    "en_party_soul": {
+      "url": "https://dictionary.cambridge.org/dictionary/english/life-and-soul-of-the-party",
+      "source_type": "dictionary",
+      "signal": "Defines life and soul of the party as the energetic, funny center of social activity."
+    },
+    "en_host_dict": {
+      "url": "https://dictionary.cambridge.org/dictionary/english/host",
+      "source_type": "dictionary",
+      "signal": "Defines host as a person who organizes a party."
+    },
+    "en_dares": {
+      "url": "https://blog.xdares.com/truth-or-dare-drinking-game/",
+      "source_type": "publisher",
+      "signal": "Directly connects dares with a drinking-party game."
+    },
+    "es_previa": {
+      "url": "https://lapreviagame.com/",
+      "source_type": "publisher",
+      "signal": "Combines previa, retos, rules, and castigo in a party game."
+    },
+    "es_carrete": {
+      "url": "https://borracho.cl/",
+      "source_type": "publisher",
+      "signal": "Chilean site combines juegos para tomar, carrete, and desafíos."
+    },
+    "es_castigo": {
+      "url": "https://pasalochancho.cl/juego/lud8/",
+      "source_type": "publisher",
+      "signal": "Uses carretear and drinking as a castigo in a game."
+    },
+    "es_soul": {
+      "url": "https://psycatgames.com/es/magazine/party-games/buffalo/",
+      "source_type": "publisher",
+      "signal": "Uses alma de la fiesta within a drinking-game article."
+    },
+    "es_animador_ar": {
+      "url": "https://lapachangashow.com.ar/",
+      "source_type": "publisher",
+      "signal": "Professional animador service runs party games."
+    },
+    "es_animador_mx": {
+      "url": "https://fiestamovil.com.mx/",
+      "source_type": "publisher",
+      "signal": "Professional animador breaks the ice and runs games."
+    },
+    "it_biscuit": {
+      "url": "https://psycatgames.com/it/magazine/party-games/biscuit-party/",
+      "source_type": "publisher",
+      "signal": "Combines gioco da bere, serata, and penitenze."
+    },
+    "it_games": {
+      "url": "https://www.ilrespirodellestelle.com/post/i-10-giochi-alcolici-da-bere-pi%C3%B9-divertenti-per-serate-tra-amici",
+      "source_type": "publisher",
+      "signal": "Combines giochi alcolici, serata, penitenze, and sfide."
+    },
+    "it_animatore": {
+      "url": "https://henpartyljubljana.com/it/partito/pomeriggio-giro-dei-pub/",
+      "source_type": "publisher",
+      "signal": "Professional guide/animatore runs alcohol games and challenges."
+    },
+    "it_mattatore": {
+      "url": "https://www.musiqua.it/band/make-the-party-29295",
+      "source_type": "publisher",
+      "signal": "Uses mattatore della serata for a high-energy entertainment role."
+    },
+    "it_mazziere": {
+      "url": "https://www.treccani.it/vocabolario/mazziere1/",
+      "source_type": "dictionary",
+      "signal": "Defines mazziere as a card dealer, not a general party host."
+    },
+    "it_mazziere_game": {
+      "url": "https://psycatgames.com/it/magazine/party-games/ride-the-bus/",
+      "source_type": "publisher",
+      "signal": "Uses mazziere inside one drinking card game, confirming facilitator-only scope."
+    },
+    "it_aperitivo": {
+      "url": "https://play.google.com/store/apps/details?hl=it&id=studio.overheat.traknard",
+      "source_type": "app_store",
+      "signal": "App copy connects giochi da bere with aperitivi and serata."
+    },
+    "fr_captain": {
+      "url": "https://apps.apple.com/fr/app/captain-tise-jeu-%C3%A0-boire/id818362543",
+      "source_type": "app_store",
+      "signal": "Combines jeu à boire, apéro, soirée, défis, and gages."
+    },
+    "fr_traknard": {
+      "url": "https://traknard.com/fr/games",
+      "source_type": "publisher",
+      "signal": "Combines jeux à boire, apéro, soirée, and défis."
+    },
+    "fr_maitre": {
+      "url": "https://www.aperolt.com/jeux-dalcool/rouge-ou-noir",
+      "source_type": "publisher",
+      "signal": "Uses Maître du jeu as the person directing a drinking game."
+    },
+    "fr_boute_dict": {
+      "url": "https://dictionary.cambridge.org/dictionary/french-english/boute-en-train",
+      "source_type": "dictionary",
+      "signal": "Defines boute-en-train as the life and soul of a party."
+    },
+    "fr_boute_games": {
+      "url": "https://koudou.scouts-europe.org/boute-en-train-fait-jouer-ta-patrouille",
+      "source_type": "publisher",
+      "signal": "Shows a boute-en-train organizing games, supporting a game-leading atmosphere role."
+    },
+    "fr_gages": {
+      "url": "https://www.animyjob.com/mag-article/100-defis-et-gages-pour-animer-toutes-vos-soirees-idees-fun/24-12-25/1404",
+      "source_type": "publisher",
+      "signal": "Combines gages, défis, soirée, and apéro."
+    },
+    "fr_animateur": {
+      "url": "https://www.azefir.com/animation/cocktail-salon/jeux-quizz/stands-defis/",
+      "source_type": "publisher",
+      "signal": "Professional animateur runs challenge games at a cocktail soirée."
+    },
+    "pt_role": {
+      "url": "https://boraprorole.com.br/melhores-jogos-de-beber-com-amigos",
+      "source_type": "publisher",
+      "signal": "Combines rolê, jogos para beber, and castigos."
+    },
+    "pt_esquenta": {
+      "url": "https://jogosujocompany.com.br/",
+      "source_type": "merchant",
+      "signal": "Brazilian product copy connects festa, esquenta, resenha, and drinking games."
+    },
+    "pt_market": {
+      "url": "https://www.magazineluiza.com.br/busca/verdade%2Bou%2Bdesafio%2Bjogo%2Bde%2Bbeber/",
+      "source_type": "merchant",
+      "signal": "Market listings combine esquenta/rolê with verdade-ou-desafio drinking-game products."
+    },
+    "pt_brincadeira": {
+      "url": "https://www.aulete.com.br/JOGO",
+      "source_type": "dictionary",
+      "signal": "Shows brincadeira as a broad game/play word, not uniquely a drinking-game term."
+    },
+    "pt_prenda": {
+      "url": "https://tempolivre.umcomo.com.br/jogos-de-bebidas/",
+      "source_type": "publisher",
+      "signal": "Uses prenda or prêmio in a drinking-games page, but prenda also commonly means gift."
+    },
+    "pt_prenda_app": {
+      "url": "https://apkpure.net/beerita-o-jogo-de-beber/com.lupacoarts.Beerita_Free",
+      "source_type": "app_store",
+      "signal": "App description uses uma prenda for an action to perform in a drinking game."
+    },
+    "pt_puxador": {
+      "url": "https://sites.google.com/view/o-outro-lado-das-organizadas/p%C3%A1gina-inicial",
+      "source_type": "community",
+      "signal": "Uses puxador for a football-crowd chant leader rather than a drinking-party host."
+    },
+    "de_vorgluehen": {
+      "url": "https://vorgluehen.com/",
+      "source_type": "publisher",
+      "signal": "Combines Vorglühen with Trinkspiel and party."
+    },
+    "de_spielleiter": {
+      "url": "https://www.spielregeln.de/picolo-trinkspiel.html",
+      "source_type": "publisher",
+      "signal": "Uses Spielleiter for a drinking game."
+    },
+    "de_play": {
+      "url": "https://play.google.com/store/apps/details?hl=de&id=com.pmapplications.locogames",
+      "source_type": "app_store",
+      "signal": "Combines Vorglühen, Trinkspiel, Spielleiter, tasks, and rules."
+    },
+    "de_stimmung": {
+      "url": "https://www.duden.de/rechtschreibung/Stimmungskanone",
+      "source_type": "dictionary",
+      "signal": "Defines Stimmungskanone as a person who creates a lively atmosphere."
+    },
+    "de_trinkspiel": {
+      "url": "https://de.wikipedia.org/wiki/Trinkspiel",
+      "source_type": "reference",
+      "signal": "Documents Trinkspiel and Strafe terminology."
+    },
+    "de_flunky": {
+      "url": "https://www.spielregeln.de/flunkyball.html",
+      "source_type": "publisher",
+      "signal": "Uses Strafe within a drinking game."
+    },
+    "de_partyspiele": {
+      "url": "https://spielwiki.de/images/0/03/111_Partyspiele.pdf",
+      "source_type": "reference",
+      "signal": "Party-game collection uses Partyspiele, Strafe, and Spielleiter."
+    },
+    "ja_yason": {
+      "url": "https://yas-on.co.jp/media/detail/20260405-3/",
+      "source_type": "publisher",
+      "signal": "Describes 飲み会 games and 幹事 progressing the games."
+    },
+    "ja_space": {
+      "url": "https://www.spacemarket.com/magazine/know-how/party/drinking-party-game/",
+      "source_type": "publisher",
+      "signal": "Offers drinking-party games for 幹事."
+    },
+    "ja_gourmet": {
+      "url": "https://gourmetplus.jp/guide/1378/",
+      "source_type": "publisher",
+      "signal": "Combines 宴会 games with a dedicated game MC/司会 role."
+    },
+    "ja_play": {
+      "url": "https://play.google.com/store/apps/details?hl=ja&id=com.cglabs.tipsy_box",
+      "source_type": "app_store",
+      "signal": "Combines 飲み会ゲーム, party, and 罰ゲーム."
+    },
+    "ja_batsu": {
+      "url": "https://hedgehog.ryukyu/batugame-kitui/",
+      "source_type": "publisher",
+      "signal": "Discusses 罰ゲーム for company/home drinking and calls someone 盛り上げ役."
+    },
+    "ja_toz": {
+      "url": "https://toz-app.com/ja/blog/drinking-games/top-10-drinking-games-for-parties",
+      "source_type": "publisher",
+      "signal": "Combines 飲み会 games, 罰ゲーム, and 幹事."
+    },
+    "ja_hotpepper": {
+      "url": "https://www.hotpepper.jp/doc/bounenkai/nandemo/game_kaisya.html",
+      "source_type": "publisher",
+      "signal": "Collects games for company drinking parties."
+    },
+    "ph_culture": {
+      "url": "https://en.wikipedia.org/wiki/Drinking_culture_of_the_Philippines",
+      "source_type": "reference",
+      "signal": "Distinguishes inuman session, tagay toast/round, barkada peer group, and tanggero pourer."
+    },
+    "ph_booky": {
+      "url": "https://booky.ph/blog/padis-point/",
+      "source_type": "publisher",
+      "signal": "Combines inuman with barkada, drinking games, and Drink or Dare."
+    },
+    "ph_speed": {
+      "url": "https://www.speed.ph/jollibee-party-package-timezone/",
+      "source_type": "publisher",
+      "signal": "Party package includes a dedicated host and parlor games."
+    },
+    "ph_acpaci": {
+      "url": "https://www.acpaci.com.ph/index.php/news/archives/25-fellowship/95-acpaci-celebrates-wild-wild-west-christmas-party",
+      "source_type": "organization",
+      "signal": "Event report says the host prepared parlor games."
+    },
+    "ph_walwal_market": {
+      "url": "https://shopee.ph/list/walwal",
+      "source_type": "merchant",
+      "signal": "Search listings expose Walwal Cards and Pinoy Dare drinking-game products."
+    },
+    "ph_walwal_slang": {
+      "url": "https://thesmartlocal.ph/tagalog-slang-words/",
+      "source_type": "publisher",
+      "signal": "Defines walwal as heavy partying/drinking slang, not a penalty category."
+    },
+    "ph_hostcue": {
+      "url": "https://balita.mb.com.ph/2023/12/14/pang-year-end-party-game-the-boat-is-sinking-math-edition-kinaaliwan/",
+      "source_type": "publisher",
+      "signal": "Describes host cues in a Filipino parlor game."
+    },
+    "in_tmbola": {
+      "url": "https://tmbola.in/",
+      "source_type": "publisher",
+      "signal": "Indian kitty-party game service uses host and caller terminology."
+    },
+    "in_playtambola": {
+      "url": "https://www.playtambola.co.in/",
+      "source_type": "publisher",
+      "signal": "Uses anchor/entertainer and host for Tambola events."
+    },
+    "in_kitty": {
+      "url": "https://www.partytambola.in/tambola-for-kitty-party",
+      "source_type": "publisher",
+      "signal": "Combines kitty-party host, Tambola, dare cards, and booby prize."
+    },
+    "in_bollywood": {
+      "url": "https://www.partystuff.in/themes/bollywood",
+      "source_type": "publisher",
+      "signal": "Uses host or Tambola caller for a themed party game."
+    },
+    "in_caller": {
+      "url": "https://partystuff.in/tambola",
+      "source_type": "publisher",
+      "signal": "Uses Tambola Anchor Host and host/organiser/caller."
+    },
+    "in_punishment": {
+      "url": "https://partystuff.in/posts/5-themes-for-your-summer-kitty-party",
+      "source_type": "publisher",
+      "signal": "Combines kitty party, punishment Tambola, and a host assigning a dare."
+    },
+    "in_antakshari": {
+      "url": "https://sec.edu.in/activities_extension/antakshari2024.pdf",
+      "source_type": "official",
+      "signal": "Institutional event report identifies a host opening an antakshari activity."
+    },
+    "in_kitty_reference": {
+      "url": "https://en.wikipedia.org/wiki/Kitty_party",
+      "source_type": "reference",
+      "signal": "Defines kitty party as an Indian social event hosted in rotation by members."
+    },
+    "in_party_games": {
+      "url": "https://playday.in/blog/best-party-games-india",
+      "source_type": "publisher",
+      "signal": "Connects antakshari with Indian family functions and party games."
+    },
+    "in_anchor": {
+      "url": "https://www.thefarmretreat.co.in/desitnation-events",
+      "source_type": "publisher",
+      "signal": "Professional party anchor runs games; evidence is event-service usage and the venue prohibits alcohol."
+    }
+  },
+  "locales": [
+    {
+      "id": "zh",
+      "language_tags": ["zh-CN"],
+      "regions": ["CN"],
+      "priority_platforms": ["xiaohongshu", "douyin"],
+      "axes": {
+        "occasion": [
+          {"term": "酒局", "status": "verified", "source_ids": ["zh_17173", "zh_cowlevel"], "note": "Strong general drinking-session anchor."},
+          {"term": "局", "status": "ambiguous", "source_ids": ["zh_17173"], "note": "Very broad alone; pair with drinking/game/role terms."},
+          {"term": "homebar局", "status": "candidate", "source_ids": ["zh_homebar", "zh_atmosphere"], "note": "Homebar occasion is evidenced, but exact compound needs Xiaohongshu autocomplete validation."},
+          {"term": "Homebar", "status": "verified", "source_ids": ["zh_homebar", "zh_atmosphere"], "note": "Useful venue/community anchor; pair with 破冰 or 氛围官."},
+          {"term": "K歌局", "status": "verified", "source_ids": ["zh_kge", "zh_kge_forum"], "note": "Singing-and-drinking occasion with game overlap."}
+        ],
+        "role": [
+          {"term": "局头", "status": "verified", "role_kind": "host", "source_ids": ["zh_17173", "zh_sohu_jutou"], "note": "High-value native role word for an organizer/host who assembles and energizes the session."},
+          {"term": "氛围官", "status": "verified", "role_kind": "host", "source_ids": ["zh_atmosphere"], "note": "Homebar staff/host role that runs icebreakers."},
+          {"term": "氛围组", "status": "candidate", "role_kind": "hype", "source_ids": ["zh_sohu_jutou"], "note": "Likely atmosphere-maker label; needs native-platform density check."},
+          {"term": "社牛", "status": "candidate", "role_kind": "hype", "source_ids": ["zh_atmosphere"], "note": "Broad personality label; pair with 酒局/破冰/游戏."},
+          {"term": "带节奏的", "status": "ambiguous", "role_kind": "hype", "source_ids": ["zh_host"], "note": "Descriptive phrase and highly polysemous; never search alone."},
+          {"term": "NPC", "status": "candidate", "role_kind": "host", "source_ids": ["zh_atmosphere"], "note": "Homebar service-role usage exists, but gaming false positives are large."}
+        ],
+        "game_anchor": [
+          {"term": "喝酒游戏", "status": "verified", "source_ids": ["zh_sohu_jutou", "zh_truth"], "note": "Direct high-recall anchor."},
+          {"term": "酒桌游戏", "status": "verified", "source_ids": ["zh_cowlevel"], "note": "Direct table/social-game anchor."},
+          {"term": "破冰", "status": "verified", "source_ids": ["zh_host", "zh_atmosphere"], "note": "Strong facilitation intent; pair with scene terms."},
+          {"term": "团建", "status": "candidate", "source_ids": ["zh_host"], "note": "Broad corporate occasion, useful only when paired with games or penalties."}
+        ],
+        "penalty": [
+          {"term": "大冒险", "status": "verified", "source_ids": ["zh_truth"], "note": "Direct truth-or-dare/drinking-game consequence."},
+          {"term": "惩罚", "status": "verified", "source_ids": ["zh_truth", "zh_cowlevel"], "note": "Generic but directly used in drinking-game context."},
+          {"term": "罚酒", "status": "verified", "source_ids": ["zh_cowlevel"], "note": "Common alcohol consequence; safety review required."},
+          {"term": "整蛊", "status": "candidate", "source_ids": ["zh_truth"], "note": "Prank axis overlaps party games but needs platform co-occurrence validation."},
+          {"term": "整人", "status": "ambiguous", "source_ids": ["zh_truth"], "note": "Broad prank/harm intent; pair with harmless game anchors and apply safety filter."}
+        ]
+      },
+      "starter_queries": [
+        {"query": "局头 喝酒游戏", "priority": "P0", "intent": "native host role + direct game anchor"},
+        {"query": "局头 酒局 大冒险", "priority": "P0", "intent": "host + occasion + consequence"},
+        {"query": "氛围官 Homebar 破冰", "priority": "P0", "intent": "newer venue-host role"},
+        {"query": "K歌局 带局 游戏", "priority": "P1", "intent": "occasion-specific facilitator language"},
+        {"query": "社牛 酒桌游戏 惩罚", "priority": "P1", "intent": "hype-personality branch"},
+        {"query": "氛围组 酒局 罚酒", "priority": "P1", "intent": "atmosphere-role branch"}
+      ]
+    },
+    {
+      "id": "ko",
+      "language_tags": ["ko-KR"],
+      "regions": ["KR"],
+      "priority_platforms": ["youtube", "tiktok", "korean_forums"],
+      "axes": {
+        "occasion": [
+          {"term": "술자리", "status": "verified", "source_ids": ["ko_always", "ko_khan", "ko_games"], "note": "General drinking-session anchor."},
+          {"term": "회식", "status": "verified", "source_ids": ["ko_always", "ko_play"], "note": "Work dinner/drinking occasion."},
+          {"term": "MT", "status": "verified", "source_ids": ["ko_always", "ko_play"], "note": "University/team retreat occasion with game density."}
+        ],
+        "role": [
+          {"term": "사회자", "status": "verified", "role_kind": "host", "source_ids": ["ko_khan"], "note": "Explicit facilitator for a drinking-session game."},
+          {"term": "주최자", "status": "candidate", "role_kind": "host", "source_ids": ["ko_khan"], "note": "Generic organizer; validate native self-label use."},
+          {"term": "분위기메이커", "status": "verified", "role_kind": "hype", "source_ids": ["ko_play"], "note": "Direct atmosphere-maker wording in 술게임 copy."},
+          {"term": "인싸", "status": "candidate", "role_kind": "hype", "source_ids": ["ko_insider"], "note": "Actual 술자리 usage exists, but it is a broad social-personality label."}
+        ],
+        "game_anchor": [
+          {"term": "술게임", "status": "verified", "source_ids": ["ko_play", "ko_games"], "note": "Direct drinking-game anchor."},
+          {"term": "술자리 게임", "status": "verified", "source_ids": ["ko_khan", "ko_games"], "note": "High-precision phrase."},
+          {"term": "순발력게임", "status": "candidate", "source_ids": ["ko_always"], "note": "Mechanic family that overlaps MT/술자리 games but is not drinking-specific."}
+        ],
+        "penalty": [
+          {"term": "벌칙", "status": "verified", "source_ids": ["ko_play", "ko_games"], "note": "Direct general consequence term."},
+          {"term": "벌주", "status": "verified", "source_ids": ["ko_ajou"], "note": "Alcoholic penalty for a game mistake; safety review required."},
+          {"term": "권주가", "status": "ambiguous", "source_ids": ["ko_orbi", "ko_dictionary"], "note": "A drinking-urging song and sometimes punishment BGM, not a generic penalty label."}
+        ]
+      },
+      "starter_queries": [
+        {"query": "술자리 사회자 술게임", "priority": "P0", "intent": "facilitator + direct game"},
+        {"query": "MT 분위기메이커 벌칙", "priority": "P0", "intent": "retreat hype role + penalty"},
+        {"query": "회식 사회자 술자리 게임", "priority": "P0", "intent": "work dinner facilitator"},
+        {"query": "술자리 인싸 게임", "priority": "P1", "intent": "personality/hype branch"},
+        {"query": "술게임 벌주", "priority": "P1", "intent": "alcohol penalty branch"},
+        {"query": "권주가 벌칙 BGM", "priority": "P2", "intent": "neighboring music atom; do not treat as generic penalty"}
+      ]
+    },
+    {
+      "id": "en",
+      "language_tags": ["en-US", "en-GB"],
+      "regions": ["US", "GB"],
+      "priority_platforms": ["tiktok", "instagram", "reddit"],
+      "axes": {
+        "occasion": [
+          {"term": "pregame", "status": "verified", "region_scope": ["US"], "source_ids": ["en_pregame", "en_host"], "note": "Strong US before-going-out drinking occasion."},
+          {"term": "kickback", "status": "verified", "region_scope": ["US"], "source_ids": ["en_kickback"], "note": "Smaller informal party with alcohol/game overlap."},
+          {"term": "function", "status": "ambiguous", "region_scope": ["US"], "source_ids": ["en_function"], "note": "Documented party slang but extremely polysemous; always pair with party/game anchors."},
+          {"term": "pres", "status": "verified", "region_scope": ["GB"], "source_ids": ["en_pres", "en_forfeit"], "note": "UK student shorthand for pre-drinks."},
+          {"term": "pre-drinks", "status": "verified", "region_scope": ["GB"], "source_ids": ["en_predrinks"], "note": "Strong UK occasion anchor."}
+        ],
+        "role": [
+          {"term": "host", "status": "verified", "role_kind": "host", "source_ids": ["en_host", "en_hype", "en_host_dict"], "note": "Organizer/facilitator; pair with pregame or drinking games to reduce event-service noise."},
+          {"term": "MC", "status": "candidate", "role_kind": "host", "source_ids": ["en_hype"], "note": "Common event facilitator but professional/event noise is high."},
+          {"term": "hype man", "status": "verified", "role_kind": "hype", "source_ids": ["en_hype"], "note": "Direct party-energy role usage."},
+          {"term": "life of the party", "status": "verified", "role_kind": "hype", "source_ids": ["en_party_soul"], "note": "Native personality label; use game/occasion anchors to find actionable content."},
+          {"term": "social chair", "status": "verified", "role_kind": "host", "region_scope": ["US"], "source_ids": ["en_social_chair"], "note": "Strong organizer term within fraternity/sorority settings."},
+          {"term": "ringleader", "status": "ambiguous", "role_kind": "host", "source_ids": ["en_ringleader"], "note": "Dominant harmful/illegal sense; use only in exact party co-occurrence queries."},
+          {"term": "instigator", "status": "ambiguous", "role_kind": "hype", "source_ids": ["en_instigator"], "note": "Broad negative causal role; use only with party/drinking anchors."}
+        ],
+        "game_anchor": [
+          {"term": "drinking games", "status": "verified", "source_ids": ["en_pregame", "en_kickback", "en_host"], "note": "Direct anchor."},
+          {"term": "party games", "status": "verified", "source_ids": ["en_hype"], "note": "Broader nonalcohol-safe anchor."},
+          {"term": "uni drinking games", "status": "verified", "region_scope": ["GB"], "source_ids": ["en_predrinks", "en_forfeit"], "note": "High-precision UK student branch."}
+        ],
+        "penalty": [
+          {"term": "dares", "status": "verified", "source_ids": ["en_dares", "en_host"], "note": "Direct consequence/challenge term."},
+          {"term": "truth or drink", "status": "verified", "source_ids": ["en_host", "en_dares"], "note": "Game/penalty hybrid with high discoverability."},
+          {"term": "forfeits", "status": "verified", "region_scope": ["GB"], "source_ids": ["en_forfeit"], "note": "Strong UK consequence term."},
+          {"term": "punishment", "status": "candidate", "source_ids": ["en_host"], "note": "Semantically valid but broad; pair with game context."}
+        ]
+      },
+      "starter_queries": [
+        {"query": "pregame host drinking games", "priority": "P0", "intent": "US facilitator content"},
+        {"query": "kickback hype man dares", "priority": "P0", "intent": "US atmosphere-maker content"},
+        {"query": "pres host forfeits", "priority": "P0", "intent": "UK pre-drinks branch"},
+        {"query": "pre-drinks life of the party games", "priority": "P1", "intent": "UK hype-personality branch"},
+        {"query": "social chair party games", "priority": "P1", "intent": "US Greek-life organizer branch"},
+        {"query": "function instigator drinking games", "priority": "P2", "intent": "ambiguous slang probe; inspect noise"}
+      ]
+    },
+    {
+      "id": "es",
+      "language_tags": ["es-ES", "es-MX", "es-AR", "es-CL"],
+      "regions": ["ES", "MX", "AR", "CL"],
+      "priority_platforms": ["tiktok", "instagram"],
+      "axes": {
+        "occasion": [
+          {"term": "previa", "status": "verified", "source_ids": ["es_previa"], "note": "Before-party occasion across several Latin American markets."},
+          {"term": "carrete", "status": "verified", "region_scope": ["CL"], "source_ids": ["es_carrete", "es_castigo"], "note": "Strong Chilean party/drinking anchor."}
+        ],
+        "role": [
+          {"term": "animador", "status": "candidate", "role_kind": "host", "source_ids": ["es_animador_ar", "es_animador_mx"], "note": "Runs games and breaks ice, but evidence is mainly professional entertainment services."},
+          {"term": "el alma de la fiesta", "status": "verified", "role_kind": "hype", "source_ids": ["es_soul"], "note": "Native atmosphere-person label used in drinking-game context."},
+          {"term": "anfitrión", "status": "candidate", "role_kind": "host", "source_ids": ["es_previa"], "note": "Generic host; validate creator self-label and game-leading use."}
+        ],
+        "game_anchor": [
+          {"term": "juegos para tomar", "status": "verified", "source_ids": ["es_carrete"], "note": "Direct Latin American drinking-game anchor."},
+          {"term": "juegos de previa", "status": "verified", "source_ids": ["es_previa"], "note": "High-precision occasion/game compound."},
+          {"term": "juegos para fiestas", "status": "verified", "source_ids": ["es_soul", "es_animador_mx"], "note": "Broader nonalcohol-safe party-game anchor."}
+        ],
+        "penalty": [
+          {"term": "castigos", "status": "verified", "source_ids": ["es_previa", "es_castigo"], "note": "Direct game-consequence term."},
+          {"term": "retos", "status": "verified", "source_ids": ["es_previa"], "note": "Direct challenge term."},
+          {"term": "desafíos", "status": "verified", "source_ids": ["es_carrete"], "note": "Direct challenge term, especially useful in Chilean material."}
+        ]
+      },
+      "starter_queries": [
+        {"query": "previa animador retos", "priority": "P0", "intent": "facilitator + challenge"},
+        {"query": "previa alma de la fiesta juegos", "priority": "P0", "intent": "atmosphere-maker branch"},
+        {"query": "carrete juegos para tomar castigos", "priority": "P0", "intent": "Chile-specific game branch"},
+        {"query": "carrete alma de la fiesta desafíos", "priority": "P1", "intent": "Chile-specific hype branch"},
+        {"query": "juegos de previa anfitrión", "priority": "P1", "intent": "generic host probe"}
+      ]
+    },
+    {
+      "id": "it",
+      "language_tags": ["it-IT"],
+      "regions": ["IT"],
+      "priority_platforms": ["tiktok", "instagram"],
+      "axes": {
+        "occasion": [
+          {"term": "serata", "status": "verified", "source_ids": ["it_biscuit", "it_games", "it_aperitivo"], "note": "Broad evening/party occasion; pair with games."},
+          {"term": "aperitivo", "status": "verified", "source_ids": ["it_aperitivo"], "note": "Strong pre-dinner drink occasion with party-game overlap."}
+        ],
+        "role": [
+          {"term": "animatore", "status": "candidate", "role_kind": "host", "source_ids": ["it_animatore"], "note": "Runs games/challenges, but evidence is professional pub-crawl service usage."},
+          {"term": "mattatore", "status": "verified", "role_kind": "hype", "source_ids": ["it_mattatore"], "note": "Native high-energy star/driver of the evening."},
+          {"term": "mazziere", "status": "ambiguous", "role_kind": "host", "source_ids": ["it_mazziere", "it_mazziere_game"], "note": "Card dealer or one-game facilitator, not a general party leader."}
+        ],
+        "game_anchor": [
+          {"term": "giochi da bere", "status": "verified", "source_ids": ["it_biscuit", "it_aperitivo"], "note": "Direct drinking-game anchor."},
+          {"term": "giochi alcolici", "status": "verified", "source_ids": ["it_games", "it_animatore"], "note": "Direct alcohol-game anchor."}
+        ],
+        "penalty": [
+          {"term": "penitenze", "status": "verified", "source_ids": ["it_biscuit", "it_games"], "note": "Direct forfeit/consequence term."},
+          {"term": "sfide", "status": "verified", "source_ids": ["it_games", "it_animatore"], "note": "Direct challenge term."}
+        ]
+      },
+      "starter_queries": [
+        {"query": "serata animatore giochi da bere", "priority": "P0", "intent": "facilitator content"},
+        {"query": "aperitivo mattatore giochi", "priority": "P0", "intent": "atmosphere-maker branch"},
+        {"query": "giochi alcolici penitenze", "priority": "P0", "intent": "penalty mechanics"},
+        {"query": "serata mattatore sfide", "priority": "P1", "intent": "hype + challenge"},
+        {"query": "mazziere giochi da bere", "priority": "P2", "intent": "card-facilitator probe; expect narrow results"}
+      ]
+    },
+    {
+      "id": "fr",
+      "language_tags": ["fr-FR", "fr-BE"],
+      "regions": ["FR", "BE"],
+      "priority_platforms": ["tiktok", "instagram"],
+      "axes": {
+        "occasion": [
+          {"term": "apéro", "status": "verified", "source_ids": ["fr_captain", "fr_traknard", "fr_gages"], "note": "Strong before-meal/drinks occasion."},
+          {"term": "soirée", "status": "verified", "source_ids": ["fr_captain", "fr_traknard", "fr_gages"], "note": "Broad party/evening anchor; pair with games."}
+        ],
+        "role": [
+          {"term": "maître du jeu", "status": "verified", "role_kind": "host", "source_ids": ["fr_maitre"], "note": "Explicit drinking-game leader."},
+          {"term": "boute-en-train", "status": "verified", "role_kind": "hype", "source_ids": ["fr_boute_dict", "fr_boute_games"], "note": "Native life-of-the-party label with game-leading support."},
+          {"term": "animateur", "status": "candidate", "role_kind": "host", "source_ids": ["fr_animateur"], "note": "Runs challenge games, but evidence is mainly professional events."}
+        ],
+        "game_anchor": [
+          {"term": "jeux à boire", "status": "verified", "source_ids": ["fr_captain", "fr_traknard", "fr_maitre"], "note": "Direct drinking-game anchor."},
+          {"term": "jeux d’apéro", "status": "verified", "source_ids": ["fr_captain", "fr_gages"], "note": "High-precision apéro game phrase."},
+          {"term": "jeux de soirée", "status": "verified", "source_ids": ["fr_traknard", "fr_gages"], "note": "Broader party-game anchor."}
+        ],
+        "penalty": [
+          {"term": "gages", "status": "verified", "source_ids": ["fr_captain", "fr_gages"], "note": "Direct forfeit/dare term."},
+          {"term": "défis", "status": "verified", "source_ids": ["fr_captain", "fr_traknard", "fr_gages"], "note": "Direct challenge term."}
+        ]
+      },
+      "starter_queries": [
+        {"query": "apéro maître du jeu gages", "priority": "P0", "intent": "facilitator + forfeit"},
+        {"query": "soirée boute-en-train jeux", "priority": "P0", "intent": "atmosphere-maker branch"},
+        {"query": "jeux à boire maître du jeu", "priority": "P0", "intent": "high-precision role content"},
+        {"query": "jeux d’apéro défis", "priority": "P1", "intent": "challenge mechanics"},
+        {"query": "soirée animateur jeux", "priority": "P1", "intent": "professional/generic host probe"}
+      ]
+    },
+    {
+      "id": "pt",
+      "language_tags": ["pt-BR", "pt-PT"],
+      "regions": ["BR", "PT"],
+      "priority_platforms": ["tiktok", "instagram"],
+      "axes": {
+        "occasion": [
+          {"term": "esquenta", "status": "verified", "region_scope": ["BR"], "source_ids": ["pt_esquenta", "pt_market"], "note": "Strong Brazilian pre-party occasion."},
+          {"term": "rolê", "status": "verified", "region_scope": ["BR"], "source_ids": ["pt_role", "pt_market"], "note": "Brazilian outing/party anchor with drinking-game overlap."},
+          {"term": "resenha", "status": "candidate", "region_scope": ["BR"], "source_ids": ["pt_esquenta"], "note": "Social gathering/chatter usage appears in game marketing; validate platform sense."}
+        ],
+        "role": [
+          {"term": "animador", "status": "candidate", "role_kind": "host", "source_ids": ["pt_role"], "note": "Plausible facilitator but needs native UGC validation; professional noise likely."},
+          {"term": "anfitrião", "status": "candidate", "role_kind": "host", "source_ids": ["pt_esquenta"], "note": "Generic host; pair with game/occasion terms."},
+          {"term": "o puxador", "status": "ambiguous", "role_kind": "hype", "source_ids": ["pt_puxador"], "note": "Public evidence strongly favors football-crowd chant leader, not drinking-party host."}
+        ],
+        "game_anchor": [
+          {"term": "jogos para beber", "status": "verified", "source_ids": ["pt_role", "pt_market"], "note": "Direct drinking-game anchor."},
+          {"term": "jogos de bebidas", "status": "verified", "source_ids": ["pt_prenda"], "note": "Direct drinking-games collection phrasing."},
+          {"term": "brincadeiras", "status": "candidate", "source_ids": ["pt_brincadeira"], "note": "Broad play/activity word; pair with festa/esquenta/beber."}
+        ],
+        "penalty": [
+          {"term": "castigos", "status": "verified", "source_ids": ["pt_role"], "note": "Direct consequence term in drinking-game context."},
+          {"term": "desafios", "status": "verified", "source_ids": ["pt_market"], "note": "Direct challenge term in drinking-game products."},
+          {"term": "prendas", "status": "ambiguous", "source_ids": ["pt_prenda", "pt_prenda_app"], "note": "Can mean a forfeit/action in game pages but commonly means gifts; always pair with games."}
+        ]
+      },
+      "starter_queries": [
+        {"query": "esquenta jogos para beber castigos", "priority": "P0", "intent": "Brazil pre-party mechanics"},
+        {"query": "rolê animador jogos", "priority": "P0", "intent": "facilitator probe"},
+        {"query": "rolê jogos para beber desafios", "priority": "P0", "intent": "challenge mechanics"},
+        {"query": "resenha anfitrião brincadeiras", "priority": "P1", "intent": "gathering-host branch"},
+        {"query": "jogos de bebidas prendas", "priority": "P2", "intent": "ambiguous forfeit term; inspect gift noise"},
+        {"query": "o puxador festa jogos", "priority": "P2", "intent": "false-friend probe; expect football/music noise"}
+      ]
+    },
+    {
+      "id": "de",
+      "language_tags": ["de-DE", "de-AT"],
+      "regions": ["DE", "AT"],
+      "priority_platforms": ["tiktok", "instagram"],
+      "axes": {
+        "occasion": [
+          {"term": "Vorglühen", "status": "verified", "source_ids": ["de_vorgluehen", "de_play"], "note": "Strong pre-party drinking occasion."}
+        ],
+        "role": [
+          {"term": "Spielleiter", "status": "verified", "role_kind": "host", "source_ids": ["de_spielleiter", "de_play", "de_partyspiele"], "note": "Explicit game leader."},
+          {"term": "Stimmungskanone", "status": "verified", "role_kind": "hype", "source_ids": ["de_stimmung"], "note": "Native label for someone who creates lively atmosphere; pair with party/game anchors."},
+          {"term": "Gastgeber", "status": "candidate", "role_kind": "host", "source_ids": ["de_partyspiele"], "note": "Generic host; validate game-leading self-label use."}
+        ],
+        "game_anchor": [
+          {"term": "Trinkspiele", "status": "verified", "source_ids": ["de_vorgluehen", "de_trinkspiel", "de_flunky"], "note": "Direct drinking-games anchor."},
+          {"term": "Partyspiele", "status": "verified", "source_ids": ["de_partyspiele"], "note": "Broader party-games anchor."}
+        ],
+        "penalty": [
+          {"term": "Strafe", "status": "verified", "source_ids": ["de_trinkspiel", "de_flunky", "de_partyspiele"], "note": "Direct penalty term in drinking/party games."},
+          {"term": "Aufgaben", "status": "candidate", "source_ids": ["de_play"], "note": "Challenge/task concept but broad outside games."}
+        ]
+      },
+      "starter_queries": [
+        {"query": "Vorglühen Spielleiter Trinkspiele", "priority": "P0", "intent": "facilitator content"},
+        {"query": "Vorglühen Stimmungskanone Partyspiele", "priority": "P0", "intent": "atmosphere-maker branch"},
+        {"query": "Trinkspiele Spielleiter Strafe", "priority": "P0", "intent": "high-precision role + penalty"},
+        {"query": "Partyspiele Stimmungskanone Aufgaben", "priority": "P1", "intent": "nonalcohol-safe atmosphere branch"},
+        {"query": "Gastgeber Vorglühen Spiele", "priority": "P1", "intent": "generic host probe"}
+      ]
+    },
+    {
+      "id": "ja",
+      "language_tags": ["ja-JP"],
+      "regions": ["JP"],
+      "priority_platforms": ["tiktok", "youtube", "instagram"],
+      "axes": {
+        "occasion": [
+          {"term": "飲み会", "status": "verified", "source_ids": ["ja_yason", "ja_space", "ja_play", "ja_toz"], "note": "Strong general drinking-party anchor."},
+          {"term": "宴会", "status": "verified", "source_ids": ["ja_gourmet", "ja_hotpepper"], "note": "Banquet/company-party occasion with organized games."}
+        ],
+        "role": [
+          {"term": "幹事", "status": "verified", "role_kind": "host", "source_ids": ["ja_yason", "ja_space", "ja_toz"], "note": "Organizer who progresses games; high-value native role."},
+          {"term": "司会者", "status": "verified", "role_kind": "host", "source_ids": ["ja_gourmet"], "note": "Explicit MC/facilitator role for banquet games."},
+          {"term": "盛り上げ役", "status": "verified", "role_kind": "hype", "source_ids": ["ja_batsu"], "note": "Native atmosphere-maker role in party-game context."},
+          {"term": "MC", "status": "candidate", "role_kind": "host", "source_ids": ["ja_gourmet"], "note": "Used in event copy but English abbreviation produces entertainment/professional noise."}
+        ],
+        "game_anchor": [
+          {"term": "飲み会ゲーム", "status": "verified", "source_ids": ["ja_yason", "ja_space", "ja_play", "ja_toz"], "note": "High-precision drinking-party game phrase."},
+          {"term": "宴会ゲーム", "status": "verified", "source_ids": ["ja_gourmet", "ja_hotpepper"], "note": "High-precision banquet game phrase."}
+        ],
+        "penalty": [
+          {"term": "罰ゲーム", "status": "verified", "source_ids": ["ja_play", "ja_batsu", "ja_toz"], "note": "Direct game-penalty term."}
+        ]
+      },
+      "starter_queries": [
+        {"query": "飲み会 幹事 ゲーム", "priority": "P0", "intent": "organizer tutorials"},
+        {"query": "宴会 司会者 罰ゲーム", "priority": "P0", "intent": "banquet facilitator + penalty"},
+        {"query": "飲み会 盛り上げ役 ゲーム", "priority": "P0", "intent": "atmosphere-maker branch"},
+        {"query": "宴会ゲーム 幹事", "priority": "P1", "intent": "high-precision organizer content"},
+        {"query": "飲み会 MC 罰ゲーム", "priority": "P1", "intent": "MC wording probe"}
+      ]
+    },
+    {
+      "id": "ph",
+      "language_tags": ["en-PH", "fil-PH"],
+      "regions": ["PH"],
+      "priority_platforms": ["facebook", "tiktok", "youtube"],
+      "axes": {
+        "occasion": [
+          {"term": "inuman", "status": "verified", "source_ids": ["ph_culture", "ph_booky"], "note": "Strong Filipino drinking-session anchor."},
+          {"term": "tagay", "status": "ambiguous", "source_ids": ["ph_culture"], "note": "Primarily toast/round/shared-shot action, not the occasion itself."},
+          {"term": "barkada", "status": "ambiguous", "source_ids": ["ph_culture", "ph_booky"], "note": "Peer group, not an occasion; useful only as a social-context anchor."},
+          {"term": "Christmas party", "status": "verified", "source_ids": ["ph_acpaci"], "note": "High-density Filipino parlor-game occasion, not necessarily alcohol-centered."}
+        ],
+        "role": [
+          {"term": "host", "status": "verified", "role_kind": "host", "source_ids": ["ph_speed", "ph_acpaci", "ph_hostcue"], "note": "Direct party/parlor-game facilitator."},
+          {"term": "emcee", "status": "candidate", "role_kind": "host", "source_ids": ["ph_acpaci"], "note": "Common event facilitator, but professional/event noise is high."},
+          {"term": "life of the party", "status": "candidate", "role_kind": "hype", "source_ids": ["ph_booky"], "note": "English hype-role label; needs Filipino platform validation."},
+          {"term": "tanggero", "status": "candidate", "role_kind": "facilitator", "source_ids": ["ph_culture"], "note": "Native pourer/round facilitator, not necessarily the game host; preserve as a neighboring role."
+          }
+        ],
+        "game_anchor": [
+          {"term": "parlor games", "status": "verified", "source_ids": ["ph_speed", "ph_acpaci", "ph_hostcue"], "note": "Strong Filipino party-game umbrella."},
+          {"term": "drinking games", "status": "verified", "source_ids": ["ph_booky"], "note": "Direct alcohol-game anchor."},
+          {"term": "larong pinoy", "status": "candidate", "source_ids": ["ph_hostcue"], "note": "Broad Filipino traditional games; pair with party/host terms."},
+          {"term": "Drink or Dare", "status": "verified", "source_ids": ["ph_booky"], "note": "Local English game/product phrase."}
+        ],
+        "penalty": [
+          {"term": "dares", "status": "verified", "source_ids": ["ph_booky", "ph_walwal_market"], "note": "Direct challenge/consequence term."},
+          {"term": "walwal", "status": "ambiguous", "source_ids": ["ph_walwal_slang"], "note": "Heavy-partying/drinking slang, not a penalty term."},
+          {"term": "walwal cards", "status": "verified", "source_ids": ["ph_walwal_market"], "note": "Useful product/query handle for local dare-card mechanics."}
+        ]
+      },
+      "starter_queries": [
+        {"query": "inuman host drinking games", "priority": "P0", "intent": "drinking-session facilitator"},
+        {"query": "inuman barkada Drink or Dare", "priority": "P0", "intent": "social-group game branch"},
+        {"query": "Christmas party host parlor games", "priority": "P0", "intent": "high-density party-game occasion"},
+        {"query": "emcee parlor games Philippines", "priority": "P1", "intent": "event facilitator branch"},
+        {"query": "tanggero inuman games", "priority": "P1", "intent": "neighboring pourer/facilitator role"},
+        {"query": "walwal cards dares", "priority": "P1", "intent": "local product/mechanic discovery"},
+        {"query": "tagay host games", "priority": "P2", "intent": "ambiguous toast/round probe"}
+      ]
+    },
+    {
+      "id": "in",
+      "language_tags": ["en-IN", "hi-IN"],
+      "regions": ["IN"],
+      "priority_platforms": ["instagram", "youtube", "pinterest"],
+      "axes": {
+        "occasion": [
+          {"term": "kitty party", "status": "verified", "source_ids": ["in_tmbola", "in_kitty", "in_kitty_reference"], "note": "Strong Indian social-party occasion with organized games."},
+          {"term": "family function", "status": "verified", "source_ids": ["in_party_games"], "note": "Broad Indian family-event occasion with antakshari/game overlap."},
+          {"term": "Diwali party", "status": "candidate", "source_ids": ["in_bollywood"], "note": "Plausible seasonal party occasion; needs platform-native game-density validation."}
+        ],
+        "role": [
+          {"term": "host", "status": "verified", "role_kind": "host", "source_ids": ["in_tmbola", "in_kitty", "in_antakshari"], "note": "Direct activity/party facilitator."},
+          {"term": "Tambola caller", "status": "verified", "role_kind": "host", "source_ids": ["in_tmbola", "in_bollywood", "in_caller"], "note": "High-precision game-leading role and strong creator/service discovery handle."},
+          {"term": "anchor", "status": "verified", "role_kind": "host", "source_ids": ["in_playtambola", "in_caller", "in_anchor"], "note": "Common Indian event facilitator wording; pair with party/Tambola to reduce media-anchor noise."},
+          {"term": "entertainer", "status": "candidate", "role_kind": "hype", "source_ids": ["in_playtambola"], "note": "Professional atmosphere role; broad outside parties."}
+        ],
+        "game_anchor": [
+          {"term": "Tambola", "status": "verified", "source_ids": ["in_tmbola", "in_playtambola", "in_caller"], "note": "Core Indian party-game anchor."},
+          {"term": "Housie", "status": "verified", "source_ids": ["in_tmbola", "in_caller"], "note": "Alternate bingo-family anchor used in India."},
+          {"term": "antakshari", "status": "verified", "source_ids": ["in_antakshari", "in_party_games"], "note": "High-value song-chain game anchor for family functions."},
+          {"term": "kitty party games", "status": "verified", "source_ids": ["in_kitty", "in_punishment"], "note": "High-precision occasion/game phrase."},
+          {"term": "party games", "status": "verified", "source_ids": ["in_party_games", "in_anchor"], "note": "Broad nonalcohol-safe anchor."}
+        ],
+        "penalty": [
+          {"term": "dare", "status": "verified", "source_ids": ["in_kitty", "in_punishment"], "note": "Direct challenge/consequence term."},
+          {"term": "punishment", "status": "verified", "source_ids": ["in_punishment"], "note": "Direct game-consequence usage in kitty-party material."},
+          {"term": "booby prize", "status": "candidate", "source_ids": ["in_kitty"], "note": "Consolation/loser reward rather than a penalty, but can surface dare-card mechanics."}
+        ]
+      },
+      "starter_queries": [
+        {"query": "kitty party host games dare", "priority": "P0", "intent": "occasion + facilitator + consequence"},
+        {"query": "Tambola caller punishment", "priority": "P0", "intent": "high-precision game leader"},
+        {"query": "Tambola anchor kitty party", "priority": "P0", "intent": "Indian event-role wording"},
+        {"query": "family function antakshari host", "priority": "P0", "intent": "song-chain facilitator"},
+        {"query": "kitty party games booby prize dare", "priority": "P1", "intent": "loser-reward/challenge mechanics"},
+        {"query": "Diwali party anchor games", "priority": "P1", "intent": "seasonal occasion probe"}
+      ]
+    }
+  ]
+}

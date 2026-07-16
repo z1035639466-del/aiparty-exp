@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "run_at": "2026-07-16T16:08:00+08:00",
+  "manifest": "research/ugc/batch_sources.json",
+  "cache_dir": ".ugc-cache",
+  "cache_committed": false,
+  "limits": {
+    "jobs": 4,
+    "timeout_seconds_per_item": 25,
+    "max_bytes_per_item": 5000000,
+    "resume": true,
+    "user_agent_policy": "transparent project identifier with repository contact URL"
+  },
+  "summary": {
+    "manifest_sources": 36,
+    "enabled": 17,
+    "downloaded": 17,
+    "failed": 0,
+    "disabled": 19,
+    "downloaded_bytes": 1414047
+  },
+  "items": [
+    {"id": "hf_namuwiki_size_probe", "bytes": 699},
+    {"id": "wikimedia_kowiki_checksum_probe", "bytes": 13600},
+    {"id": "commoncrawl_catalog_probe", "bytes": 34403},
+    {"id": "arctic_shift_subreddit_probe", "bytes": 63},
+    {"id": "arctic_shift_download_index_probe", "bytes": 10458},
+    {"id": "academic_torrents_2026_06_details_probe", "bytes": 21174},
+    {"id": "listicle_psycat_en", "bytes": 61831},
+    {"id": "listicle_psycat_de", "bytes": 66668},
+    {"id": "listicle_psycat_es", "bytes": 65990},
+    {"id": "listicle_psycat_fr", "bytes": 68088},
+    {"id": "listicle_psycat_it", "bytes": 65667},
+    {"id": "listicle_psycat_pt", "bytes": 65194},
+    {"id": "listicle_psycat_pl", "bytes": 66126},
+    {"id": "listicle_philippine_primer_party_games", "bytes": 109974},
+    {"id": "listicle_ph_staycations_pinoy_parlor", "bytes": 125059},
+    {"id": "listicle_india_partie_adult_party_games", "bytes": 153812},
+    {"id": "listicle_india_firstcry_kitty_party_games", "bytes": 485241}
+  ],
+  "notes": [
+    "The first attempt without an identifying User-Agent produced HTTP 403/406 responses on 12 sources.",
+    "After adding a transparent project User-Agent and ordinary Accept headers, all 17 enabled probes downloaded successfully.",
+    "No CAPTCHA, authentication wall, proxy, or anti-bot challenge was bypassed.",
+    "Large parquet, wiki dumps, Reddit corpora, WARC payloads, and torrent payloads remained disabled."
+  ]
+}

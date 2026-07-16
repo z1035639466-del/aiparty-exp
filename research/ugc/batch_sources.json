@@ -1,0 +1,399 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-07-16",
+  "purpose": "Executable Track B manifest. Only supported downloader fields appear inside sources; audit metadata lives at the top level.",
+  "default_policy": {
+    "enabled_scope": "Only small metadata/API probes and bounded public HTML pages are enabled.",
+    "large_downloads": "All corpora, article dumps, WARC payloads and torrent descriptors remain disabled until explicitly selected.",
+    "raw_content": "Keep raw downloads in the ignored cache; commit only short, attributed, rewritten mechanism facts.",
+    "rights": "Publicly reachable does not mean openly licensed. Obey source terms, attribution, privacy, deletion and removal requirements."
+  },
+  "status_by_id": {
+    "hf_namuwiki_size_probe": "ready_probe",
+    "hf_namuwiki_full_parquet": "disabled_large_rights_review",
+    "wikimedia_kowiki_checksum_probe": "ready_probe",
+    "wikimedia_kowiki_titles": "disabled_selective",
+    "wikimedia_kowiki_articles": "disabled_large",
+    "wikimedia_enwiki_titles": "disabled_large",
+    "wikimedia_dewiki_titles": "disabled_selective",
+    "wikimedia_eswiki_titles": "disabled_selective",
+    "wikimedia_frwiki_titles": "disabled_selective",
+    "wikimedia_itwiki_titles": "disabled_selective",
+    "wikimedia_ptwiki_titles": "disabled_selective",
+    "wikimedia_jawiki_titles": "disabled_selective",
+    "wikimedia_tlwiki_titles": "disabled_selective",
+    "wikimedia_hiwiki_titles": "disabled_selective",
+    "wikimedia_viwiki_titles": "disabled_selective",
+    "wikimedia_thwiki_titles": "disabled_selective",
+    "wikimedia_idwiki_titles": "disabled_selective",
+    "wikimedia_plwiki_titles": "disabled_selective",
+    "commoncrawl_catalog_probe": "ready_probe",
+    "arctic_shift_subreddit_probe": "ready_probe",
+    "arctic_shift_download_index_probe": "ready_probe",
+    "academic_torrents_2026_06_details_probe": "ready_probe",
+    "academic_torrents_reddit_month_2026_06": "disabled_large",
+    "academic_torrents_reddit_2005_2025_monthly": "disabled_critical",
+    "academic_torrents_reddit_2005_2025_subreddits": "disabled_critical_selective_only",
+    "listicle_psycat_en": "ready_probe",
+    "listicle_psycat_de": "ready_probe",
+    "listicle_psycat_es": "ready_probe",
+    "listicle_psycat_fr": "ready_probe",
+    "listicle_psycat_it": "ready_probe",
+    "listicle_psycat_pt": "ready_probe",
+    "listicle_psycat_pl": "ready_probe",
+    "listicle_philippine_primer_party_games": "ready_probe",
+    "listicle_ph_staycations_pinoy_parlor": "ready_probe",
+    "listicle_india_partie_adult_party_games": "ready_probe",
+    "listicle_india_firstcry_kitty_party_games": "ready_probe"
+  },
+  "volume_by_id": {
+    "hf_namuwiki_size_probe": "699 B response; describes 2,357,235,583 B, 565,293-row dataset",
+    "hf_namuwiki_full_parquet": "2,357,235,583 B compressed; about 9,701,946,000 B decoded memory",
+    "wikimedia_kowiki_checksum_probe": "13,600 B",
+    "wikimedia_kowiki_titles": "8,646,363 B",
+    "wikimedia_kowiki_articles": "1,316,647,609 B compressed",
+    "wikimedia_enwiki_titles": "108,706,389 B",
+    "wikimedia_dewiki_titles": "29,501,372 B",
+    "wikimedia_eswiki_titles": "23,744,781 B",
+    "wikimedia_frwiki_titles": "27,587,611 B",
+    "wikimedia_itwiki_titles": "18,049,554 B",
+    "wikimedia_ptwiki_titles": "12,134,708 B",
+    "wikimedia_jawiki_titles": "15,749,518 B",
+    "wikimedia_tlwiki_titles": "988,453 B",
+    "wikimedia_hiwiki_titles": "1,995,710 B",
+    "wikimedia_viwiki_titles": "9,723,871 B",
+    "wikimedia_thwiki_titles": "3,293,378 B",
+    "wikimedia_idwiki_titles": "8,912,219 B",
+    "wikimedia_plwiki_titles": "13,981,755 B",
+    "commoncrawl_catalog_probe": "34,403 B catalog; latest collection CC-MAIN-2026-25",
+    "arctic_shift_subreddit_probe": "one JSON row",
+    "arctic_shift_download_index_probe": "10,458 B",
+    "academic_torrents_2026_06_details_probe": "single HTML details page; referenced payload 70.38 GiB",
+    "academic_torrents_reddit_month_2026_06": "small descriptor; opening it can fetch 70.38 GiB",
+    "academic_torrents_reddit_2005_2025_monthly": "small descriptor; payload 3.80 TiB, 488 files",
+    "academic_torrents_reddit_2005_2025_subreddits": "small descriptor; payload 3.97 TiB, 79,955 files",
+    "listicle_psycat_en": "single public HTML page",
+    "listicle_psycat_de": "single public HTML page",
+    "listicle_psycat_es": "single public HTML page",
+    "listicle_psycat_fr": "single public HTML page",
+    "listicle_psycat_it": "single public HTML page",
+    "listicle_psycat_pt": "single public HTML page",
+    "listicle_psycat_pl": "single public HTML page",
+    "listicle_philippine_primer_party_games": "single public HTML page",
+    "listicle_ph_staycations_pinoy_parlor": "125,059 B HTML",
+    "listicle_india_partie_adult_party_games": "153,812 B HTML",
+    "listicle_india_firstcry_kitty_party_games": "single public HTML page"
+  },
+  "risk_by_family": {
+    "huggingface": "CC BY-NC-SA: noncommercial, attribution and share-alike; historical raw text includes contributor identifiers.",
+    "wikimedia": "Latest aliases are mutable; pin dated dumps and hashes. Page-specific imports/exceptions and attribution still apply.",
+    "common_crawl": "The archive is not a blanket content license. Query CDX first and fetch only the exact WARC byte range.",
+    "arctic_shift": "Unofficial rate-limited archive with no uptime guarantee or blanket dataset license; honor privacy and removals.",
+    "academic_torrents": "Reddit dataset license fields are blank. Torrent descriptors can trigger 70 GiB to multi-TiB transfers.",
+    "url_list": "Public HTML is copyrighted editorial material. Cache privately; retain only URLs and short rewritten facts."
+  },
+  "references": {
+    "huggingface_dataset": "https://huggingface.co/datasets/heegyu/namuwiki-extracted",
+    "wikimedia_dump_docs": "https://meta.wikimedia.org/wiki/Data_dumps/What%27s_available_for_download",
+    "common_crawl_docs": "https://commoncrawl.org/cdxj-index",
+    "common_crawl_terms": "https://commoncrawl.org/terms-of-use",
+    "arctic_shift_docs": "https://github.com/ArthurHeitmann/arctic_shift",
+    "academic_torrents_terms": "https://academictorrents.com/terms.php",
+    "reddit_data_api_terms": "https://redditinc.com/policies/data-api-terms",
+    "psycat_terms": "https://psycatgames.com/terms-of-service/"
+  },
+  "payload_hashes": {
+    "RC_2026-06.zst": "2bb00d6677f32cd4974d2cc1f4ae0f9d39c63aed61dedfd2cfe663dbf070b912",
+    "RS_2026-06.zst": "4aa6978212825c5ae81d32517ed88c7fad6abc2682bac9c572a42592e56cf781"
+  },
+  "sources": [
+    {
+      "id": "hf_namuwiki_size_probe",
+      "url": "https://datasets-server.huggingface.co/size?dataset=heegyu%2Fnamuwiki-extracted",
+      "filename": "hf_namuwiki_size.json",
+      "license": "CC BY-NC-SA 2.0 KR as declared by the dataset card; attribution, noncommercial use and share-alike required.",
+      "kind": "huggingface",
+      "enabled": true
+    },
+    {
+      "id": "hf_namuwiki_full_parquet",
+      "url": "https://huggingface.co/datasets/heegyu/namuwiki-extracted/resolve/refs%2Fconvert%2Fparquet/default/train/0000.parquet",
+      "filename": "hf_namuwiki_extracted_0000.parquet",
+      "license": "CC BY-NC-SA 2.0 KR as declared by the dataset card; attribution, noncommercial use and share-alike required.",
+      "kind": "huggingface",
+      "enabled": false
+    },
+    {
+      "id": "wikimedia_kowiki_checksum_probe",
+      "url": "https://dumps.wikimedia.org/kowiki/latest/kowiki-latest-sha1sums.txt",
+      "filename": "wikimedia_kowiki_sha1sums.txt",
+      "license": "Manifest metadata; underlying Wikimedia text is generally CC BY-SA 4.0 and GFDL, with per-page exceptions and attribution duties.",
+      "kind": "wikimedia",
+      "enabled": true
+    },
+    {
+      "id": "wikimedia_kowiki_titles",
+      "url": "https://dumps.wikimedia.org/kowiki/latest/kowiki-latest-all-titles-in-ns0.gz",
+      "filename": "wikimedia_kowiki_titles_ns0.gz",
+      "license": "Most article text: CC BY-SA 4.0 and GFDL; per-page exceptions/imported text may apply. Preserve attribution and license notices.",
+      "kind": "wikimedia",
+      "enabled": false
+    },
+    {
+      "id": "wikimedia_kowiki_articles",
+      "url": "https://dumps.wikimedia.org/kowiki/latest/kowiki-latest-pages-articles.xml.bz2",
+      "filename": "wikimedia_kowiki_pages_articles.xml.bz2",
+      "license": "Most article text: CC BY-SA 4.0 and GFDL; per-page exceptions/imported text may apply. Preserve attribution and license notices.",
+      "kind": "wikimedia",
+      "enabled": false
+    },
+    {
+      "id": "wikimedia_enwiki_titles",
+      "url": "https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-all-titles-in-ns0.gz",
+      "filename": "wikimedia_enwiki_titles_ns0.gz",
+      "license": "Most article text: CC BY-SA 4.0 and GFDL; per-page exceptions/imported text may apply. Preserve attribution and license notices.",
+      "kind": "wikimedia",
+      "enabled": false
+    },
+    {
+      "id": "wikimedia_dewiki_titles",
+      "url": "https://dumps.wikimedia.org/dewiki/latest/dewiki-latest-all-titles-in-ns0.gz",
+      "filename": "wikimedia_dewiki_titles_ns0.gz",
+      "license": "Most article text: CC BY-SA 4.0 and GFDL; per-page exceptions/imported text may apply. Preserve attribution and license notices.",
+      "kind": "wikimedia",
+      "enabled": false
+    },
+    {
+      "id": "wikimedia_eswiki_titles",
+      "url": "https://dumps.wikimedia.org/eswiki/latest/eswiki-latest-all-titles-in-ns0.gz",
+      "filename": "wikimedia_eswiki_titles_ns0.gz",
+      "license": "Most article text: CC BY-SA 4.0 and GFDL; per-page exceptions/imported text may apply. Preserve attribution and license notices.",
+      "kind": "wikimedia",
+      "enabled": false
+    },
+    {
+      "id": "wikimedia_frwiki_titles",
+      "url": "https://dumps.wikimedia.org/frwiki/latest/frwiki-latest-all-titles-in-ns0.gz",
+      "filename": "wikimedia_frwiki_titles_ns0.gz",
+      "license": "Most article text: CC BY-SA 4.0 and GFDL; per-page exceptions/imported text may apply. Preserve attribution and license notices.",
+      "kind": "wikimedia",
+      "enabled": false
+    },
+    {
+      "id": "wikimedia_itwiki_titles",
+      "url": "https://dumps.wikimedia.org/itwiki/latest/itwiki-latest-all-titles-in-ns0.gz",
+      "filename": "wikimedia_itwiki_titles_ns0.gz",
+      "license": "Most article text: CC BY-SA 4.0 and GFDL; per-page exceptions/imported text may apply. Preserve attribution and license notices.",
+      "kind": "wikimedia",
+      "enabled": false
+    },
+    {
+      "id": "wikimedia_ptwiki_titles",
+      "url": "https://dumps.wikimedia.org/ptwiki/latest/ptwiki-latest-all-titles-in-ns0.gz",
+      "filename": "wikimedia_ptwiki_titles_ns0.gz",
+      "license": "Most article text: CC BY-SA 4.0 and GFDL; per-page exceptions/imported text may apply. Preserve attribution and license notices.",
+      "kind": "wikimedia",
+      "enabled": false
+    },
+    {
+      "id": "wikimedia_jawiki_titles",
+      "url": "https://dumps.wikimedia.org/jawiki/latest/jawiki-latest-all-titles-in-ns0.gz",
+      "filename": "wikimedia_jawiki_titles_ns0.gz",
+      "license": "Most article text: CC BY-SA 4.0 and GFDL; per-page exceptions/imported text may apply. Preserve attribution and license notices.",
+      "kind": "wikimedia",
+      "enabled": false
+    },
+    {
+      "id": "wikimedia_tlwiki_titles",
+      "url": "https://dumps.wikimedia.org/tlwiki/latest/tlwiki-latest-all-titles-in-ns0.gz",
+      "filename": "wikimedia_tlwiki_titles_ns0.gz",
+      "license": "Most article text: CC BY-SA 4.0 and GFDL; per-page exceptions/imported text may apply. Preserve attribution and license notices.",
+      "kind": "wikimedia",
+      "enabled": false
+    },
+    {
+      "id": "wikimedia_hiwiki_titles",
+      "url": "https://dumps.wikimedia.org/hiwiki/latest/hiwiki-latest-all-titles-in-ns0.gz",
+      "filename": "wikimedia_hiwiki_titles_ns0.gz",
+      "license": "Most article text: CC BY-SA 4.0 and GFDL; per-page exceptions/imported text may apply. Preserve attribution and license notices.",
+      "kind": "wikimedia",
+      "enabled": false
+    },
+    {
+      "id": "wikimedia_viwiki_titles",
+      "url": "https://dumps.wikimedia.org/viwiki/latest/viwiki-latest-all-titles-in-ns0.gz",
+      "filename": "wikimedia_viwiki_titles_ns0.gz",
+      "license": "Most article text: CC BY-SA 4.0 and GFDL; per-page exceptions/imported text may apply. Preserve attribution and license notices.",
+      "kind": "wikimedia",
+      "enabled": false
+    },
+    {
+      "id": "wikimedia_thwiki_titles",
+      "url": "https://dumps.wikimedia.org/thwiki/latest/thwiki-latest-all-titles-in-ns0.gz",
+      "filename": "wikimedia_thwiki_titles_ns0.gz",
+      "license": "Most article text: CC BY-SA 4.0 and GFDL; per-page exceptions/imported text may apply. Preserve attribution and license notices.",
+      "kind": "wikimedia",
+      "enabled": false
+    },
+    {
+      "id": "wikimedia_idwiki_titles",
+      "url": "https://dumps.wikimedia.org/idwiki/latest/idwiki-latest-all-titles-in-ns0.gz",
+      "filename": "wikimedia_idwiki_titles_ns0.gz",
+      "license": "Most article text: CC BY-SA 4.0 and GFDL; per-page exceptions/imported text may apply. Preserve attribution and license notices.",
+      "kind": "wikimedia",
+      "enabled": false
+    },
+    {
+      "id": "wikimedia_plwiki_titles",
+      "url": "https://dumps.wikimedia.org/plwiki/latest/plwiki-latest-all-titles-in-ns0.gz",
+      "filename": "wikimedia_plwiki_titles_ns0.gz",
+      "license": "Most article text: CC BY-SA 4.0 and GFDL; per-page exceptions/imported text may apply. Preserve attribution and license notices.",
+      "kind": "wikimedia",
+      "enabled": false
+    },
+    {
+      "id": "commoncrawl_catalog_probe",
+      "url": "https://index.commoncrawl.org/collinfo.json",
+      "filename": "commoncrawl_collinfo.json",
+      "license": "Common Crawl Terms of Use; crawled content keeps each origin's copyright and terms. The crawl is not an open-content license.",
+      "kind": "common_crawl",
+      "enabled": true
+    },
+    {
+      "id": "arctic_shift_subreddit_probe",
+      "url": "https://arctic-shift.photon-reddit.com/api/subreddits/search?fields=display_name%2Csubscribers&limit=1&subreddit=DrinkingGames",
+      "filename": "arctic_shift_drinkinggames_probe.json",
+      "license": "No archive dataset license stated. Reddit User Content is owned by users; contributor rights, Reddit terms, privacy and removals apply.",
+      "kind": "arctic_shift",
+      "enabled": true
+    },
+    {
+      "id": "arctic_shift_download_index_probe",
+      "url": "https://raw.githubusercontent.com/ArthurHeitmann/arctic_shift/master/download_links.md",
+      "filename": "arctic_shift_download_links.md",
+      "license": "No repository or archive dataset license stated. Treat this file as discovery metadata, not a license to reuse Reddit content.",
+      "kind": "arctic_shift",
+      "enabled": true
+    },
+    {
+      "id": "academic_torrents_2026_06_details_probe",
+      "url": "https://academictorrents.com/details/3bac8bd352bbb74bbb23df4273cf3da5d66ee5a5",
+      "filename": "academic_torrents_reddit_2026_06_details.html",
+      "license": "Dataset license field is blank. Hosting terms do not grant reuse rights; Reddit contributor rights, privacy and removal duties remain.",
+      "kind": "academic_torrents",
+      "enabled": true
+    },
+    {
+      "id": "academic_torrents_reddit_month_2026_06",
+      "url": "https://academictorrents.com/download/3bac8bd352bbb74bbb23df4273cf3da5d66ee5a5.torrent",
+      "filename": "academic_torrents_reddit_2026_06.torrent",
+      "license": "Dataset license field is blank. Hosting terms do not grant reuse rights; Reddit contributor rights, privacy and removal duties remain.",
+      "kind": "academic_torrents",
+      "enabled": false
+    },
+    {
+      "id": "academic_torrents_reddit_2005_2025_monthly",
+      "url": "https://academictorrents.com/download/3d426c47c767d40f82c7ef0f47c3acacedd2bf44.torrent",
+      "filename": "academic_torrents_reddit_2005_2025_monthly.torrent",
+      "license": "Dataset license field is blank. Hosting terms do not grant reuse rights; Reddit contributor rights, privacy and removal duties remain.",
+      "kind": "academic_torrents",
+      "enabled": false
+    },
+    {
+      "id": "academic_torrents_reddit_2005_2025_subreddits",
+      "url": "https://academictorrents.com/download/3e3f64dee22dc304cdd2546254ca1f8e8ae542b4.torrent",
+      "filename": "academic_torrents_reddit_2005_2025_subreddits.torrent",
+      "license": "Dataset license field is blank. Hosting terms do not grant reuse rights; Reddit contributor rights, privacy and removal duties remain.",
+      "kind": "academic_torrents",
+      "enabled": false
+    },
+    {
+      "id": "listicle_psycat_en",
+      "url": "https://psycatgames.com/magazine/party-games/student-drinking-games",
+      "filename": "listicle_psycat_en.html",
+      "license": "Copyrighted site content; no open license. PsyCat terms reserve IP. Cache privately, extract/rewrite facts only, and do not redistribute HTML.",
+      "kind": "url_list",
+      "enabled": true
+    },
+    {
+      "id": "listicle_psycat_de",
+      "url": "https://psycatgames.com/de/magazine/party-games/student-drinking-games",
+      "filename": "listicle_psycat_de.html",
+      "license": "Copyrighted site content; no open license. PsyCat terms reserve IP. Cache privately, extract/rewrite facts only, and do not redistribute HTML.",
+      "kind": "url_list",
+      "enabled": true
+    },
+    {
+      "id": "listicle_psycat_es",
+      "url": "https://psycatgames.com/es/magazine/party-games/student-drinking-games",
+      "filename": "listicle_psycat_es.html",
+      "license": "Copyrighted site content; no open license. PsyCat terms reserve IP. Cache privately, extract/rewrite facts only, and do not redistribute HTML.",
+      "kind": "url_list",
+      "enabled": true
+    },
+    {
+      "id": "listicle_psycat_fr",
+      "url": "https://psycatgames.com/fr/magazine/party-games/student-drinking-games",
+      "filename": "listicle_psycat_fr.html",
+      "license": "Copyrighted site content; no open license. PsyCat terms reserve IP. Cache privately, extract/rewrite facts only, and do not redistribute HTML.",
+      "kind": "url_list",
+      "enabled": true
+    },
+    {
+      "id": "listicle_psycat_it",
+      "url": "https://psycatgames.com/it/magazine/party-games/student-drinking-games",
+      "filename": "listicle_psycat_it.html",
+      "license": "Copyrighted site content; no open license. PsyCat terms reserve IP. Cache privately, extract/rewrite facts only, and do not redistribute HTML.",
+      "kind": "url_list",
+      "enabled": true
+    },
+    {
+      "id": "listicle_psycat_pt",
+      "url": "https://psycatgames.com/pt/magazine/party-games/student-drinking-games",
+      "filename": "listicle_psycat_pt.html",
+      "license": "Copyrighted site content; no open license. PsyCat terms reserve IP. Cache privately, extract/rewrite facts only, and do not redistribute HTML.",
+      "kind": "url_list",
+      "enabled": true
+    },
+    {
+      "id": "listicle_psycat_pl",
+      "url": "https://psycatgames.com/pl/magazine/party-games/student-drinking-games",
+      "filename": "listicle_psycat_pl.html",
+      "license": "Copyrighted site content; no open license. PsyCat terms reserve IP. Cache privately, extract/rewrite facts only, and do not redistribute HTML.",
+      "kind": "url_list",
+      "enabled": true
+    },
+    {
+      "id": "listicle_philippine_primer_party_games",
+      "url": "https://primer.com.ph/tips-guides/2016/12/26/common-filipino-party-games",
+      "filename": "listicle_philippine_primer_party_games.html",
+      "license": "Publisher copyright; no open license stated. Public access is not a reuse grant. Cache privately and keep only attributed, rewritten facts.",
+      "kind": "url_list",
+      "enabled": true
+    },
+    {
+      "id": "listicle_ph_staycations_pinoy_parlor",
+      "url": "https://staycations.ph/ultimate-list-of-pinoy-parlor-games",
+      "filename": "listicle_ph_staycations_pinoy_parlor.html",
+      "license": "Publisher copyright; no open license stated. Public access is not a reuse grant. Cache privately and keep only attributed, rewritten facts.",
+      "kind": "url_list",
+      "enabled": true
+    },
+    {
+      "id": "listicle_india_partie_adult_party_games",
+      "url": "https://partie.in/blog/best-party-games-for-adults-india",
+      "filename": "listicle_india_partie_adult_party_games.html",
+      "license": "Publisher copyright; no open license stated. Public access is not a reuse grant. Cache privately and keep only attributed, rewritten facts.",
+      "kind": "url_list",
+      "enabled": true
+    },
+    {
+      "id": "listicle_india_firstcry_kitty_party_games",
+      "url": "https://parenting.firstcry.com/articles/25-fun-kitty-party-games-ideas",
+      "filename": "listicle_india_firstcry_kitty_party_games.html",
+      "license": "Publisher copyright; no open license stated. Public access is not a reuse grant. Cache privately and keep only attributed, rewritten facts.",
+      "kind": "url_list",
+      "enabled": true
+    }
+  ]
+}

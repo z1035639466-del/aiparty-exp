@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "collected_at": "2026-07-16T15:30:00+08:00",
+  "platform": "tiktok",
+  "session_surface": "ads_browser",
+  "login_state": "logged_in",
+  "collection_mode": "manual visible-search review; no engagement actions",
+  "metrics_note": "Visible counts are volatile platform snapshots, not normalized popularity measures.",
+  "queries": [
+    {
+      "query_id": "tiktok_en_001",
+      "query": "drinking game host",
+      "search_url": "https://www.tiktok.com/search?q=drinking%20game%20host",
+      "status": "candidate",
+      "reason": "Relevant hosted-game results exist, but autocomplete and many cards use generic game-host meanings.",
+      "signals": ["drunk spelling bee host", "game night host", "cocktail club", "sexualized game-night outlier"],
+      "safety_flags": ["alcohol", "adult_content"]
+    },
+    {
+      "query_id": "tiktok_en_002",
+      "query": "pregame games",
+      "search_url": "https://www.tiktok.com/search?q=pregame%20games",
+      "status": "verified",
+      "reason": "Multiple creators and named games appeared together, with platform expansion into party/game-night terms.",
+      "signals": ["predrink", "Calabria game", "I love London", "Stir the Pot", "Golf Pong", "homemade card game"],
+      "direct_sources": ["https://www.tiktok.com/@sophiasternnn/video/7655457549533072670"],
+      "safety_flags": ["alcohol"]
+    },
+    {
+      "query_id": "tiktok_en_003",
+      "query": "drunk spelling bee",
+      "search_url": "https://www.tiktok.com/search?q=drunk%20spelling%20bee",
+      "status": "verified",
+      "reason": "Repeated multi-creator format with several stable title variants and high visible engagement.",
+      "signals": ["drunken bee", "tipsy spelling bee", "Tequila & The Bee", "Spell or Shots"],
+      "direct_sources": ["https://www.tiktok.com/@breeahknee/video/7627950562385923341"],
+      "safety_flags": ["alcohol", "money_prize_outlier"]
+    },
+    {
+      "query_id": "tiktok_en_004",
+      "query": "drinking game prompts",
+      "search_url": "https://www.tiktok.com/search?q=drinking%20game%20prompts",
+      "status": "verified",
+      "reason": "Cards, handwritten lists, swipeable prompts, and DIY decks dominate the visible sample.",
+      "signals": ["50-card handwritten list", "swipe to play", "drink if it applies", "girls-night prompt deck"],
+      "direct_sources": ["https://www.tiktok.com/@erin.aitchison65/video/6849048450517011718"],
+      "safety_flags": ["alcohol", "privacy", "sexual_content", "humiliation"]
+    },
+    {
+      "query_id": "tiktok_en_005",
+      "query": "party game prompt cards",
+      "search_url": "https://www.tiktok.com/search?q=party%20game%20prompt%20cards",
+      "status": "ambiguous",
+      "reason": "Sparse exact matches; results broaden to word association, card tutorials, and generic game-night ideas.",
+      "signals": ["game night ideas", "word association game", "Grab The Mic"],
+      "safety_flags": []
+    },
+    {
+      "query_id": "tiktok_en_006",
+      "query": "game night host ideas",
+      "search_url": "https://www.tiktok.com/search?q=game%20night%20host%20ideas",
+      "status": "verified",
+      "reason": "Multiple creators publish hosting tutorials, budget versions, non-negotiables, and couples-friendly variants.",
+      "signals": ["how to host", "game-night non-negotiables", "on a budget", "couples-friendly"],
+      "safety_flags": []
+    },
+    {
+      "query_id": "tiktok_en_007",
+      "query": "stir the pot drinking game",
+      "search_url": "https://www.tiktok.com/search?q=stir%20the%20pot%20drinking%20game",
+      "status": "verified",
+      "reason": "Repeated branded and player-made results, plus adjacent friend-testing games.",
+      "signals": ["Stir the Pot", "You Lie You Drink", "adult party game", "friend-group test"],
+      "direct_sources": ["https://www.tiktok.com/@taxeddd/video/7650674201870880013"],
+      "safety_flags": ["alcohol", "adult_content", "humiliation", "relationship_harm"]
+    },
+    {
+      "query_id": "youtube_en_001",
+      "query": "drunk spelling bee party game",
+      "search_url": "https://www.youtube.com/results?search_query=drunk%20spelling%20bee%20party%20game",
+      "status": "verified_cross_platform",
+      "reason": "YouTube returned several Shorts and an adult long-form spelling game, including a high-view Short.",
+      "signals": ["Drunk Spelling Bee", "game night", "Spelling Bee Game for Adults"],
+      "direct_sources": ["https://www.youtube.com/shorts/q17wxH_eu-Q"],
+      "safety_flags": ["alcohol", "adult_content"]
+    }
+  ],
+  "constraints": [
+    "Instagram was unavailable in the supplied session.",
+    "No private profile, recommendation history, messages, or account settings were inspected.",
+    "No screenshots or authentication parameters are stored in the repository."
+  ]
+}
