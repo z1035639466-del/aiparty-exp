@@ -1,0 +1,114 @@
+{
+  "schema_version": "ugc-live-evidence-v1",
+  "captured_at": "2026-07-16T00:00:00+08:00",
+  "platform": "youtube",
+  "session_surface": "in_app_browser",
+  "login_state": "logged_in",
+  "locale": "ko-KR",
+  "query_runs": [
+    {
+      "query_id": "youtube_ko_001",
+      "query": "술게임 게임 설명",
+      "access_outcome": "success",
+      "sample_size": 10,
+      "relevant_count": 10,
+      "search_url": "https://www.youtube.com/results?search_query=%EC%88%A0%EA%B2%8C%EC%9E%84+%EA%B2%8C%EC%9E%84+%EC%84%A4%EB%AA%85",
+      "visible_results": [
+        {
+          "title": "새내기를 위한 7분 술게임 특강 (새터 가기 전 필수시청)",
+          "url": "https://www.youtube.com/watch?v=OXkGVMEsCAs",
+          "duration": "7:35"
+        },
+        {
+          "title": "[10초 술게임] 홍삼게임 #쭈루쭈루",
+          "url": "https://www.youtube.com/watch?v=JY-lVzl88O4",
+          "duration": "0:16"
+        },
+        {
+          "title": "리본이 알려주는 술게임 1탄! ㅣ 딸기, 두부, 이중모션 게임",
+          "url": "https://www.youtube.com/watch?v=BBGtegbWToY",
+          "duration": "6:38"
+        },
+        {
+          "title": "[10초 술게임] 바니바니게임",
+          "url": "https://www.youtube.com/watch?v=9rM-uHns5_w"
+        },
+        {
+          "title": "[10초 술게임] 딸기당근수박참외메론게임",
+          "url": "https://www.youtube.com/watch?v=YC3KIfeBixw"
+        },
+        {
+          "title": "[10초 술게임] 출석부게임",
+          "url": "https://www.youtube.com/watch?v=vSqkdPZL1RQ"
+        },
+        {
+          "title": "[10초 술게임] 두부게임",
+          "url": "https://www.youtube.com/watch?v=SB5YjpNMQO4"
+        },
+        {
+          "title": "[10초 술게임] 딸기게임",
+          "url": "https://www.youtube.com/watch?v=IlMk1ph51Hk"
+        },
+        {
+          "title": "[10초 술게임] 오렌지게임",
+          "url": "https://www.youtube.com/watch?v=51akYnh4rP0"
+        },
+        {
+          "title": "[10초 술게임] 더게임오브데스",
+          "url": "https://www.youtube.com/watch?v=nh5uNYCQ76Y"
+        }
+      ],
+      "finding": "The first ten visible results were all Korean drinking-game tutorials or named-game demonstrations. The recurring content carriers were 특강, 1탄 and 10초 술게임 rather than a stable person-role slang term."
+    }
+  ],
+  "detail_reviews": [
+    {
+      "source_url": "https://www.youtube.com/watch?v=OXkGVMEsCAs",
+      "title": "새내기를 위한 7분 술게임 특강 (새터 가기 전 필수시청)",
+      "channel": "모두의 교실",
+      "visible_metrics": {
+        "views": "320K",
+        "likes": "6409",
+        "channel_subscribers": "875",
+        "published": "2 years ago"
+      },
+      "description_context": "A seven-minute lecture for freshmen before 새터, MT and other events; the creator says it covers basic games and asks viewers to leave newer games in comments.",
+      "description_chapters": [
+        {
+          "time": "00:00",
+          "label": "시작"
+        },
+        {
+          "time": "00:38",
+          "label": "박자게임"
+        },
+        {
+          "time": "03:25",
+          "label": "기타 기본게임"
+        },
+        {
+          "time": "07:16",
+          "label": "마무리"
+        }
+      ],
+      "transcript_status": "The transcript surface was opened, but no segment text loaded. Only the creator-written description and chapter labels are treated as directly observed text.",
+      "mechanism_signal": "Tutorial packaging plus rhythm-game and basic-game chapters is structurally equivalent to a host handbook or lesson series.",
+      "safety_guard": "Game demonstrations may attach failure to alcohol. Product use must keep only rhythm, turn order and response mechanics, with points or opt-in non-alcohol alternatives."
+    }
+  ],
+  "cross_reference": {
+    "report": "p2_p3_public_discovery_2026-07-16.md",
+    "note": "The separate public-web sweep verified six additional Korean videos with Korean automatic-caption tracks. It did not claim transcript text when the anonymous caption body was empty."
+  },
+  "limitations": [
+    "Search order, metrics and availability are a dated personalized snapshot.",
+    "Only one result was opened for a full in-app detail review in this live pass.",
+    "No transcript segment text was stored or inferred when the transcript panel returned no segments.",
+    "No comments were copied; the description's request for newer-game comments is recorded only as a discovery route."
+  ],
+  "privacy": {
+    "stored_session_tokens": false,
+    "stored_screenshots": false,
+    "interactions_performed": []
+  }
+}

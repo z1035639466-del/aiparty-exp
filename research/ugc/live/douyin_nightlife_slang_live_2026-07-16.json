@@ -1,0 +1,167 @@
+{
+  "schema_version": "ugc-live-evidence-v1",
+  "captured_at": "2026-07-16",
+  "platform": "douyin",
+  "session_surface": "in_app_browser",
+  "login_state": "logged_in",
+  "collection_mode": "manual review of one visible search result set and three fixed video pages; no engagement actions",
+  "scope": "Native Douyin follow-up for nightlife slang, group-organizer roles, and market or recruitment taxonomies after the user completed the platform challenge.",
+  "query_run": {
+    "query_id": "douyin_zh_004",
+    "query": "夜店酒吧黑话 局头",
+    "seed_term": "夜店酒吧黑话",
+    "seed_status": "verified",
+    "axis": "slang_probe",
+    "access_outcome": "success",
+    "visible_sample": {
+      "unit": "result_cards",
+      "sample_size": 18,
+      "relevant_count": 18,
+      "relevance_scope": "酒吧黑话、组局、局头行业、A仔、卡颜、带台或相关科普与招募"
+    },
+    "related_searches": [
+      "酒吧局头文案",
+      "酒吧局头怎么找",
+      "夜店酒吧原声",
+      "酒吧局头前摇教学",
+      "局头标准长相",
+      "局头什么意思",
+      "上海局头",
+      "局头怎么入行"
+    ],
+    "representative_creators": [
+      "西门坤",
+      "Soundcheck-Kiki",
+      "siyo",
+      "花坠",
+      "上海酒吧 小黄鱼",
+      "失败的魏",
+      "慕斯日记",
+      "小软",
+      "魏辰宇"
+    ],
+    "additional_visible_labels": [
+      "局头话术合集",
+      "00后女生揭秘行业黑话",
+      "酒吧公式化打法",
+      "如何从零成为局头",
+      "让局头崩溃的A仔",
+      "杭州组局dd"
+    ],
+    "finding": "在本次人工可见样本中，黑话内容与招募、行业教程和角色科普强共现；该结果只能说明本轮可见搜索结构，不能外推为全站比例。",
+    "source_urls": [
+      "https://www.douyin.com/video/7601468954973128313",
+      "https://www.douyin.com/video/7512594170679676217",
+      "https://www.douyin.com/video/7536564276333956403"
+    ]
+  },
+  "detail_reviews": [
+    {
+      "source_url": "https://www.douyin.com/video/7601468954973128313",
+      "title": "#酒吧 #喝酒 #抓手指 #舞拳 #带台 这些话都是什么意思？",
+      "published_on": "2026-01-31",
+      "visible_metrics": {
+        "likes": "1.6万",
+        "comments": "487",
+        "saves": "2226",
+        "shares": "2255"
+      },
+      "content_signal": "标题把抓手指、舞拳、带台与酒吧语境并列，是后续逐词回搜的入口。",
+      "transcript_status": "页面没有可用章节或转写；本记录不据标题猜测具体词义。",
+      "classification": "discovery_lead_only"
+    },
+    {
+      "source_url": "https://www.douyin.com/video/7512594170679676217",
+      "series_context": "酒吧吐槽合集第68集；页面显示合集已到100集",
+      "duration": "4:06",
+      "published_on": "2025-06-06",
+      "visible_metrics": {
+        "likes": "4323",
+        "comments": "375",
+        "saves": "617",
+        "shares": "777"
+      },
+      "chapter_level_summary": {
+        "roles": [
+          {
+            "label": "营销",
+            "observed_function": "偏向订台与接待。"
+          },
+          {
+            "label": "局头",
+            "observed_function": "位于玩家和营销之间，常跨多个酒吧活动，并通过朋友圈招募。"
+          },
+          {
+            "label": "玩家",
+            "observed_function": "会玩的玩家可能被当作局头或枪手，也可能只是喜欢玩。"
+          }
+        ]
+      },
+      "comment_signal": "评论区进一步出现玩家与A仔区别、纯玩家因会带台被误认成局头、同城招募等问题；仅保存语义转述，不保存评论者身份。",
+      "interpretation": "角色边界更像由带台能力和商业功能构成的连续谱，而不是跨城市稳定、互斥的职位名称。",
+      "classification": "role_boundary_evidence"
+    },
+    {
+      "source_url": "https://www.douyin.com/video/7536564276333956403",
+      "title_summary": "分享12种酒吧局",
+      "duration": "1:47",
+      "published_on": "2025-08-09",
+      "visible_metrics": {
+        "likes": "1.1万",
+        "comments": "151",
+        "saves": "1601",
+        "shares": "1453"
+      },
+      "chapter_level_categories": [
+        "拥挤型局",
+        "罗汉局",
+        "卡颜局",
+        "性别比例高度偏斜的皇帝局或武则天局",
+        "后场模特类",
+        "通A或AA拼卡",
+        "女A男免",
+        "男A女免",
+        "朋友局"
+      ],
+      "interpretation": "这些标签主要描述市场、招募、价格、性别比例和排斥结构，不是聚会玩法 taxonomy。",
+      "risk_flags": [
+        "外貌筛选",
+        "性别差别待遇",
+        "过度拥挤",
+        "陌生人拼卡",
+        "招募与价格不透明"
+      ],
+      "product_policy": "只用于语境识别与风险审核，禁止转化为匹配、定价、招募或玩法功能。",
+      "classification": "risk_market_taxonomy"
+    }
+  ],
+  "cross_source_findings": [
+    {
+      "finding": "局头、玩家、营销、A仔和枪手等词的边界会随作者、城市、场所与商业功能变化。",
+      "confidence": "medium",
+      "reason": "一条详情页给出角色连续谱，搜索页另有多条行业科普和招募内容，但本轮没有建立全国统一定义。"
+    },
+    {
+      "finding": "夜场黑话内容与招募、行业入门、带台教学和公式化打法强共现。",
+      "confidence": "high_within_visible_sample",
+      "reason": "本轮18条人工可见结果均落在相关语境，并出现多个对应标题和相关搜索。"
+    },
+    {
+      "finding": "酒吧局型标签是市场与排斥分类，不应被误收为游戏机制。",
+      "confidence": "high",
+      "reason": "固定页章节分类围绕人数密度、性别比例、外貌筛选、价格和拼卡关系。"
+    }
+  ],
+  "safety_and_privacy": {
+    "gameplay_separation": "风险黑话不进入玩法库，只进入独立风险词典或审核规则。",
+    "no_productization": [
+      "卡颜或外貌筛选",
+      "性别差别价格或资格",
+      "陌生人招募与拼卡",
+      "不透明的代理或招募关系"
+    ],
+    "stored": "固定公开视频链接、人工可见展示指标、标题或章节级转述与风险判断。",
+    "not_stored": "会话令牌、登录参数、截图、长字幕、长评论、评论者身份或互动记录。",
+    "interaction_policy": "未点赞、评论、关注、私信、分享或发布内容。"
+  }
+}

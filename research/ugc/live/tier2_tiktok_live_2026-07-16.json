@@ -1,0 +1,352 @@
+{
+  "schema_version": "1.0",
+  "report_id": "tier2_tiktok_live_2026-07-16",
+  "platform": "TikTok",
+  "captured_on": "2026-07-16",
+  "access_context": "ADS 浏览器中的 TikTok 登录态",
+  "scope": {
+    "included_locales": [
+      "th-TH",
+      "id-ID",
+      "pl-PL",
+      "en-NG"
+    ],
+    "queries_run": 4,
+    "grid_cards_reviewed": 32,
+    "grid_cards_judged_relevant": 30
+  },
+  "collection_rules": {
+    "grid_detail_separation": "搜索网格只用于判断查询词的召回结构；机制只在详情页亲眼可见时记录。",
+    "metric_policy": "只保存采集时页面可见的展示值；K 等单位保持原样，不换算为精确整数。",
+    "comment_policy": "评论只做语义转述，不保存评论者身份。",
+    "content_policy": "不补猜未播放、未展示或被商品提示遮挡的规则。",
+    "privacy_policy": "未保存会话令牌、登录凭据、浏览历史或截图。",
+    "interaction_policy": "未点赞、评论、关注、私信、分享或购买。"
+  },
+  "locale_results": [
+    {
+      "locale": "th-TH",
+      "language": "Thai",
+      "region": "Thailand",
+      "query": "เกมวงเหล้า",
+      "seed_status": "verified",
+      "query_assessment": "本轮强场景入口；首屏八张均与酒局游戏、卡牌或聚会游戏工具相关。",
+      "grid_snapshot": {
+        "sample_size": 8,
+        "relevant_count": 8,
+        "visible_cards": [
+          {
+            "label": "Mission Meow 真心话/大冒险",
+            "visible_likes": "1324"
+          },
+          {
+            "label": "CardFinity 聚合 App",
+            "visible_likes": "138"
+          },
+          {
+            "label": "额头卡",
+            "visible_likes": "8"
+          },
+          {
+            "label": "Truth or Dare 成人盒",
+            "visible_likes": "296"
+          },
+          {
+            "label": "Mission Meow",
+            "visible_likes": "750"
+          },
+          {
+            "label": "Spot It",
+            "visible_likes": "4"
+          },
+          {
+            "label": "Truth/Dare 卡",
+            "visible_likes": "26"
+          },
+          {
+            "label": "转盘按钮类",
+            "visible_likes": "24"
+          }
+        ]
+      },
+      "detail_observation": {
+        "url": "https://www.tiktok.com/@cardfinity.th/photo/7556876354130791688?q=%E0%B9%80%E0%B8%81%E0%B8%A1%E0%B8%A7%E0%B8%87%E0%B9%80%E0%B8%AB%E0%B8%A5%E0%B9%89%E0%B8%B2",
+        "content_format": "photo",
+        "visible_post_date": "2025-10-2",
+        "visible_metrics": {
+          "likes": "139",
+          "comments": "0",
+          "saves": "58"
+        },
+        "caption_paraphrase": "把酒局中常见的热门游戏聚合进一个 App。页面列出 Truth or Dare、Never Have I Ever 和 King's Cup，并展示全部、成人、双人等分类。",
+        "mechanism_observed": "可确认它是由单台手机连续供题和切换游戏的聚合载体；没有据此补写各子游戏的完整规则。",
+        "carrier_inference": "单手机可承担局头、手册或备忘录式的冷启动与带场功能。",
+        "risk_classification": "含成人分类和强饮酒语境；成人题面、饮酒数量及强迫性后果均不可直接进入产品题库。",
+        "safe_adaptation": "保留单手机聚合、分组筛选和轮流供题；默认无酒精、分级展示、明确跳过权，并彻底移除成人越界与强饮后果。"
+      },
+      "supported_atoms": [
+        "单手机聚合载体",
+        "按场景或人数分组",
+        "连续供题",
+        "游戏间快速切换"
+      ]
+    },
+    {
+      "locale": "id-ID",
+      "language": "Indonesian",
+      "region": "Indonesia",
+      "query": "permainan tongkrongan",
+      "seed_status": "verified",
+      "query_assessment": "本轮强聚会社交场景入口；首屏八张均相关，但桌游、商品和桌游咖啡馆内容占比明显。",
+      "grid_snapshot": {
+        "sample_size": 8,
+        "relevant_count": 8,
+        "visible_cards": [
+          {
+            "label": "激烈桌游",
+            "visible_likes": "1044"
+          },
+          {
+            "label": "四人桌游",
+            "visible_likes": "535"
+          },
+          {
+            "label": "让 tongkrongan 热闹的游戏",
+            "visible_likes": "218.9K"
+          },
+          {
+            "label": "UNO 变体",
+            "visible_likes": "57"
+          },
+          {
+            "label": "三类桌游",
+            "visible_likes": "25"
+          },
+          {
+            "label": "Truth/Dare 卡",
+            "visible_likes": "13"
+          },
+          {
+            "label": "Carrom",
+            "visible_likes": "17"
+          },
+          {
+            "label": "桌游咖啡馆",
+            "visible_likes": "8198"
+          }
+        ]
+      },
+      "detail_observation": {
+        "url": "https://www.tiktok.com/@mainanberdua/video/7622587793058876692?q=permainan%20tongkrongan",
+        "content_format": "video",
+        "visible_post_date": "3-29",
+        "visible_metrics": {
+          "likes": "218.9K",
+          "comments": "2196",
+          "saves": "39.8K"
+        },
+        "caption_paraphrase": "邀请观众标记想一起玩的人。",
+        "comment_signals_paraphrased": [
+          "评论主要询问购买方式。",
+          "作者把购买需求引向黄色购物车。"
+        ],
+        "playback_status": "页面受 TikTok Shop 提示影响，未能播放并核验机制。",
+        "mechanism_observed": null,
+        "atom_decision": "不从该详情页提取玩法原子，也不猜测商品规则。",
+        "risk_classification": "机制未知；主要明确的是商品导向和商业污染。"
+      },
+      "supported_atoms": [],
+      "search_root_inference": "`tongkrongan` 在本轮能稳定召回聚会社交游戏，但后续筛选必须区分可复刻机制、成品桌游、购物内容与场所广告。"
+    },
+    {
+      "locale": "pl-PL",
+      "language": "Polish",
+      "region": "Poland",
+      "query": "gry imprezowe",
+      "seed_status": "verified",
+      "query_assessment": "首屏八张均为聚会游戏内容，同时出现三个与查询词精确相近的用户名，兼有内容词与账号生态入口价值。",
+      "account_signals": [
+        {
+          "username": "gryimprezowe",
+          "visible_metrics": null
+        },
+        {
+          "username": "gry.imprezowe",
+          "visible_metrics": null
+        },
+        {
+          "username": "gry.imprezowe6",
+          "visible_metrics": {
+            "followers": "1147",
+            "likes": "62.5K"
+          }
+        }
+      ],
+      "grid_snapshot": {
+        "sample_size": 8,
+        "relevant_count": 8,
+        "visible_cards": [
+          {
+            "label": "Nie Masz Psychy",
+            "visible_likes": "738"
+          },
+          {
+            "label": "Mafia",
+            "visible_likes": "509"
+          },
+          {
+            "label": "Impostor",
+            "visible_likes": "8177"
+          },
+          {
+            "label": "朋友题卡",
+            "visible_likes": "53"
+          },
+          {
+            "label": "派对片",
+            "visible_likes": null
+          },
+          {
+            "label": "Impostor 波兰语第 69 集",
+            "visible_likes": null
+          },
+          {
+            "label": "提示词玩法",
+            "visible_likes": null
+          },
+          {
+            "label": "三个聚会游戏",
+            "visible_likes": null
+          }
+        ]
+      },
+      "detail_observation": {
+        "url": "https://www.tiktok.com/@msbro090/video/7635645140769525024?q=gry%20imprezowe",
+        "content_format": "video",
+        "visible_post_date": "5-3",
+        "visible_metrics": {
+          "likes": "8177",
+          "comments": "146",
+          "saves": "511"
+        },
+        "visible_text": "Zgadujcie razem z impostorem hasło",
+        "visible_scene": "画面中有三名参与者。",
+        "mechanism_observed": "存在一名隐藏的卧底角色；参与者与卧底共同猜一个口令。除这两个结构外，不补写未见的回合、提示分配或胜负规则。",
+        "comment_signals_paraphrased": [
+          "有人要求在结尾揭晓词语。",
+          "有人想继续看更多同类内容。",
+          "有人抱怨自己没有拿到提示。"
+        ],
+        "risk_classification": "隐藏身份与猜词机制本身可安全使用；需避免针对个人的羞辱、排挤或泄露私密信息。",
+        "safe_adaptation": "保留隐藏角色和共同猜口令，并显式设计提示发放、结尾揭晓、跳过权与非羞辱性词库。"
+      },
+      "supported_atoms": [
+        "隐藏角色",
+        "共同猜口令",
+        "提示信息差",
+        "结尾揭晓"
+      ]
+    },
+    {
+      "locale": "en-NG",
+      "language": "English",
+      "region": "Nigeria",
+      "query": "Detty December party games",
+      "seed_status": "verified",
+      "query_assessment": "季节性聚会入口有效；首屏八张中保守判定六张相关，内容混合游戏清单、活动广告、桌面装置、户外活动和游戏夜。",
+      "grid_snapshot": {
+        "sample_size": 8,
+        "relevant_count": 6,
+        "visible_cards": [
+          {
+            "label": "六个游戏清单",
+            "visible_likes": "1076",
+            "classification": "relevant"
+          },
+          {
+            "label": "Liverpool reaction/game",
+            "visible_likes": "7",
+            "classification": "visible_adjacent"
+          },
+          {
+            "label": "Abuja 活动广告",
+            "visible_likes": "15",
+            "classification": "event_ad_not_gameplay"
+          },
+          {
+            "label": "Lagos 桌面按钮",
+            "visible_likes": "26",
+            "classification": "visible_adjacent"
+          },
+          {
+            "label": "Detty tour",
+            "visible_likes": "6",
+            "classification": "visible_adjacent"
+          },
+          {
+            "label": "Bestie Banter",
+            "visible_likes": "51",
+            "classification": "visible_adjacent"
+          },
+          {
+            "label": "户外锥桶游戏",
+            "visible_likes": "121",
+            "classification": "visible_adjacent"
+          },
+          {
+            "label": "game night",
+            "visible_likes": "23",
+            "classification": "visible_adjacent"
+          }
+        ],
+        "counting_note": "相关数按现场保守判断记为 6/8；活动广告明确不算玩法，另有一张弱相关内容未计入。表中的 visible_adjacent 仅表示网格可见，不能单独视为已核验玩法。",
+        "related_searches": [
+          "Fun Games To Download",
+          "Childhood Games",
+          "TikTok Games To Play",
+          "Game Night Ideas"
+        ]
+      },
+      "detail_observation": {
+        "url": "https://www.tiktok.com/@talkdirtytv/video/7566096246268562695?q=Detty%20December%20party%20games",
+        "content_format": "video",
+        "visible_post_date": "2025-10-27",
+        "visible_duration": "42s",
+        "visible_metrics": {
+          "likes": "1076",
+          "comments": "16",
+          "saves": "400"
+        },
+        "title_caption_paraphrase": "列出六种让宾客保持参与的游戏。",
+        "visible_items": [
+          "第 3 项 Conce Conce（Concentration Drinking Card Game）",
+          "后段 Guilty Party"
+        ],
+        "mechanism_observed": "只能确认这是商业卡牌游戏清单和主持选品载体；未看到足够卡面与完整演示，不能推断具体规则。",
+        "comment_signals_paraphrased": [
+          "有人认为理解游戏后饮酒会更有趣。",
+          "有人询问购买地点。",
+          "有人询问价格。"
+        ],
+        "risk_classification": "强饮酒与可能的羞辱/负罪感风险；商业卡面未核验，不能直接复制。",
+        "safe_adaptation": "只借鉴六项清单和主持选品结构；题面必须另行安全审查，删除饮酒强迫、指认羞辱和隐私越界。"
+      },
+      "supported_atoms": [
+        "六项游戏清单",
+        "主持选品载体"
+      ]
+    }
+  ],
+  "cross_locale_findings": [
+    "泰语 `เกมวงเหล้า`、印尼语 `permainan tongkrongan`、波兰语 `gry imprezowe` 和尼日利亚季节词 `Detty December` 都比抽象的 party game 更能进入本地场景，但这是单次登录态快照。",
+    "单手机 App、账号簇、商品卡牌清单和季节性清单都可以承担局头手册式的内容载体；载体价值与具体规则安全性必须分开判断。",
+    "印尼和尼日利亚结果显示商品与活动污染明显；详情不能播放或卡面未显示时，必须停止在载体层，不能生成玩法原子。",
+    "波兰 Impostor 是本轮唯一可由详情明确支持的原生机制：隐藏角色与共同猜口令。"
+  ],
+  "limitations": [
+    "这是 ADS 浏览器中单次 TikTok 登录态快照，不是全平台统计。",
+    "排序和互动数受时间、地区、账号与个性化影响，之后可能变化。",
+    "网格相关只证明查询词召回，不代表每张内容都完成规则核验。",
+    "没有保存截图、会话令牌或评论者身份，也没有穷尽展开所有卡面和评论。"
+  ]
+}

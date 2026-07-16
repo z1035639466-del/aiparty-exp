@@ -1,0 +1,625 @@
+{
+  "generated_at": "2026-07-16",
+  "scope": [
+    "vi-VN",
+    "th-TH",
+    "id-ID",
+    "pl-PL",
+    "en-NG"
+  ],
+  "methodology": {
+    "collection_mode": "Public-web supplementary discovery only; no private content, interaction, login bypass, or claim of a complete logged-in TikTok crawl.",
+    "confidence_legend": {
+      "high": "Locale-specific source directly supports the native term, role, or party-game mechanism.",
+      "medium": "Useful candidate from a localized storefront, commercial source, secondary report, or adjacent professional context; platform-density validation is still needed.",
+      "low": "Ambiguous or weakly contextualized lead retained only to prevent false equivalence."
+    },
+    "important_limit": "Country App Store and Google Play pages can be publisher-localized. They support query and format discovery, but do not by themselves prove organic local slang use."
+  },
+  "evidence": [
+    {
+      "locale": "vi-VN",
+      "native_query": "chủ xị bàn nhậu",
+      "url": "https://baocantho.com.vn/ban-them-ve-van-hoa-ruou-o-nam-bo-a21213.html",
+      "platform": "Báo Cần Thơ",
+      "mechanism_or_term": "chủ xị — shared-cup controller in a southern drinking session",
+      "confidence": "high",
+      "short_paraphrase": "The article describes a southern drinking circle using one shared cup managed by the chủ xị. This is a strong region-specific control role, not proof of a universal youth-game label.",
+      "safety_flags": ["alcohol", "shared_cup", "peer_pressure"]
+    },
+    {
+      "locale": "vi-VN",
+      "native_query": "chủ xị buổi nhậu nghĩa là gì",
+      "url": "https://baobinhdinh.vn/viewer.aspx?mabb=146944&macm=6&macmp=7",
+      "platform": "Báo Bình Định",
+      "mechanism_or_term": "chủ xị — host or principal person of a drinking gathering",
+      "confidence": "high",
+      "short_paraphrase": "A language column explains the common sense of chủ xị as the host of a drinking gathering and traces it to the person presiding over a banquet.",
+      "safety_flags": ["alcohol"]
+    },
+    {
+      "locale": "vi-VN",
+      "native_query": "bài Huệ NocOut KOSAY nhậu bạn bè",
+      "url": "https://shop-vn.tiktok.com/pdp/1730043106653407720",
+      "platform": "TikTok Shop Vietnam",
+      "mechanism_or_term": "bài Huệ / NocOut / KOSAY — native product and hashtag cluster",
+      "confidence": "high",
+      "short_paraphrase": "A Vietnam TikTok Shop listing labels a 68-card drinking challenge game with the aliases bài Huệ, NocOut and KOSAY and tags it for friends, beer and drinking gatherings.",
+      "safety_flags": ["alcohol", "peer_pressure"]
+    },
+    {
+      "locale": "vi-VN",
+      "native_query": "bài Huệ lá liên kết nặng đô cực lầy",
+      "url": "https://shop-vn.tiktok.com/pdp/1729496541567879214",
+      "platform": "TikTok Shop Vietnam",
+      "mechanism_or_term": "two-phone randomizer, delayed challenge, linked-card multiplier",
+      "confidence": "high",
+      "short_paraphrase": "The listing and visible review text describe one phone recording player names and spinning a wheel, another randomizing cards, delayed challenges, and linked cards that can double a consequence. Reviews use cực lầy and nặng đô for a very rowdy or intense version.",
+      "safety_flags": ["alcohol", "rapid_drinking", "binge_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "vi-VN",
+      "native_query": "U Là Trời bài uống rượu game tiệc ăn nhậu",
+      "url": "https://shop-vn.tiktok.com/pdp/1730395889607149668",
+      "platform": "TikTok Shop Vietnam",
+      "mechanism_or_term": "U Là Trời — 18+ card-game title and hashtag bundle",
+      "confidence": "high",
+      "short_paraphrase": "A 50-card 18+ listing bundles the title U Là Trời with Vietnamese discovery tags for drinking cards, party games, ăn nhậu and games say rượu.",
+      "safety_flags": ["alcohol", "adult_content"]
+    },
+    {
+      "locale": "vi-VN",
+      "native_query": "Trải Lòng For Couple gamenhau bainhau trò chơi uống rượu",
+      "url": "https://shop-vn.tiktok.com/pdp/1731165167699133813",
+      "platform": "TikTok Shop Vietnam",
+      "mechanism_or_term": "deep-talk couple deck plus gamenhau / bainhau query aliases",
+      "confidence": "high",
+      "short_paraphrase": "A Vietnam-made couple deck combines questions and tasks with native tags such as gamenhau, bainhau and trò chơi uống rượu, showing how relationship disclosure formats enter the same discovery river.",
+      "safety_flags": ["alcohol", "sensitive_disclosure", "relationship_conflict"]
+    },
+    {
+      "locale": "vi-VN",
+      "native_query": "Bộ Bài Uống Đê 83 lá tụ tập bạn bè",
+      "url": "https://shop-vn.tiktok.com/pdp/1729597225663892283",
+      "platform": "TikTok Shop Vietnam",
+      "mechanism_or_term": "Uống Đê — imperative-style game title",
+      "confidence": "medium",
+      "short_paraphrase": "A TikTok Shop product uses Uống Đê as the title of an 83-card hot-trend gathering game, making it a useful native title/query candidate rather than a verified role term.",
+      "safety_flags": ["alcohol", "peer_pressure"]
+    },
+    {
+      "locale": "vi-VN",
+      "native_query": "XÍCH 69 lá bài cho cặp đôi",
+      "url": "https://shop-vn.tiktok.com/pdp/1729773072180153245",
+      "platform": "TikTok Shop Vietnam",
+      "mechanism_or_term": "XÍCH — intimacy and challenge deck for couples",
+      "confidence": "medium",
+      "short_paraphrase": "A high-volume couple-card listing uses 69 prompts and challenges, showing an adjacent intimacy format that needs consent and age gating before reuse.",
+      "safety_flags": ["sexual_content", "sensitive_disclosure", "consent", "adult_content"]
+    },
+    {
+      "locale": "vi-VN",
+      "native_query": "bài uống rượu khuấy động bữa tiệc",
+      "url": "https://play.google.com/store/apps/details?hl=vi&id=com.stark.drinking",
+      "platform": "Google Play Vietnam",
+      "mechanism_or_term": "mode selection, draw a card, follow the instruction",
+      "confidence": "medium",
+      "short_paraphrase": "A Vietnamese storefront page presents a drinking-card app as a way to energize a party: choose a mode, draw a card and follow its instruction. Treat the Vietnamese wording as localized discovery evidence, not automatic proof of local slang.",
+      "safety_flags": ["alcohol", "peer_pressure"]
+    },
+    {
+      "locale": "vi-VN",
+      "native_query": "Truth or Dare Quay Chai trò chơi uống cho nhóm",
+      "url": "https://apps.apple.com/vn/app/truth-or-dare-quay-chai/id6743131623?l=vi",
+      "platform": "Apple App Store Vietnam",
+      "mechanism_or_term": "spin-the-bottle selection plus truth-or-dare modes",
+      "confidence": "medium",
+      "short_paraphrase": "A localized Vietnam storefront combines bottle spinning with group or couple truth-and-challenge modes. It is a useful mechanism query but not verified organic Vietnamese UGC.",
+      "safety_flags": ["alcohol", "sexual_content", "sensitive_disclosure", "consent"]
+    },
+    {
+      "locale": "vi-VN",
+      "native_query": "quản trò MC dẫn dắt trò chơi tiệc",
+      "url": "https://www.mocquan.vn/blogs/news/dung-ngoi-khong-yen-voi-top-5-tro-choi-tiec-van-minh-hap-dan",
+      "platform": "Mộc Quán",
+      "mechanism_or_term": "quản trò / MC dẫn dắt — functional party facilitator",
+      "confidence": "medium",
+      "short_paraphrase": "A Vietnamese party-game guide says a quản trò or MC can lead activities and lift the atmosphere. This is a functional facilitator label, but it is more generic and professional than the colloquial chủ xị.",
+      "safety_flags": []
+    },
+    {
+      "locale": "vi-VN",
+      "native_query": "quản trò đếm 1 đến 10 đoán bài hát trò chơi tiệc",
+      "url": "https://www.nshop.com.vn/blogs/go-hobby-news/choi-gi-trong-tiec-don-giao-thua",
+      "platform": "nShop Vietnam",
+      "mechanism_or_term": "countdown-led song guessing and balance challenge",
+      "confidence": "medium",
+      "short_paraphrase": "A local party guide uses a quản trò countdown to run a song-guessing game and also proposes a balance challenge, supporting music cue and timed-host formats without requiring alcohol.",
+      "safety_flags": ["physical_balance"]
+    },
+
+    {
+      "locale": "th-TH",
+      "native_query": "เกมวงเหล้า กติกา ผ่านได้ ไม่บังคับแตะตัว",
+      "url": "https://www.lemon8-app.com/%40nightlife.run/7476034298936820241?region=th",
+      "platform": "Lemon8 Thailand",
+      "mechanism_or_term": "เกมวงเหล้า — pre-agreed rules, pass option, no-go zones",
+      "confidence": "high",
+      "short_paraphrase": "A Thai UGC post groups five drinking-circle games and recommends agreeing rules before play, allowing pauses, defining no-go zones, avoiding forced touch or calls, and offering a pass with an alternative action or story.",
+      "safety_flags": ["alcohol", "consent", "privacy", "peer_pressure"]
+    },
+    {
+      "locale": "th-TH",
+      "native_query": "เกมวงเหล้า คนเปิดกฎ อ่านกฎ",
+      "url": "https://www.lemon8-app.com/%40nightlife.run/7476034298936820241?region=th",
+      "platform": "Lemon8 Thailand",
+      "mechanism_or_term": "คนเปิดกฎ / อ่านกฎ — temporary rule-reader function",
+      "confidence": "high",
+      "short_paraphrase": "The same post assigns rule opening or reading to a player when a dispute occurs. This is a verifiable function, not evidence of a stable Thai slang title equivalent to 局头.",
+      "safety_flags": ["alcohol"]
+    },
+    {
+      "locale": "th-TH",
+      "native_query": "เกมวงเหล้า ออนไลน์ จอทีวี สุ่มเลข Notes",
+      "url": "https://www.lemon8-app.com/%40nightlife.run/7476034298936820241?region=th",
+      "platform": "Lemon8 Thailand",
+      "mechanism_or_term": "phone/web randomizer cast to a TV or tablet",
+      "confidence": "high",
+      "short_paraphrase": "The post adapts drinking-circle games for small groups by listing tasks in Notes, using random numbers on a phone or website, and displaying the game on a larger screen.",
+      "safety_flags": ["alcohol"]
+    },
+    {
+      "locale": "th-TH",
+      "native_query": "Spin The Shot เกมปาร์ตี้ ภารกิจ ไม่ดื่มแอลกอฮอล์",
+      "url": "https://www.lemon8-app.com/%40mai.in.th/7518685060525507090?region=th",
+      "platform": "Lemon8 Thailand",
+      "mechanism_or_term": "spinner selects drink, answer, or mission; non-alcohol mode",
+      "confidence": "high",
+      "short_paraphrase": "A Thai UGC post gives light, couple, bar and large-party versions of Spin The Shot and explicitly suggests non-alcoholic drinks, water, food and limits. Its visual spinner is also described as clip-friendly.",
+      "safety_flags": ["alcohol", "sexual_content", "consent"]
+    },
+    {
+      "locale": "th-TH",
+      "native_query": "เกมปาร์ตี้ ห้ามพูดคำ ต่อเรื่อง ความจำ rapid fire",
+      "url": "https://www.lemon8-app.com/%40my__rose/7546145743448490497?region=th",
+      "platform": "Lemon8 Thailand",
+      "mechanism_or_term": "forbidden word, story chain, memory chain, rapid-fire answer",
+      "confidence": "high",
+      "short_paraphrase": "A Thai UGC list supplies ten reusable party mechanisms, including a forbidden word, collaborative story, memory chain, two truths and a lie, twenty questions and rapid-fire answers.",
+      "safety_flags": ["peer_pressure"]
+    },
+    {
+      "locale": "th-TH",
+      "native_query": "ดื่มรอบวง หมดแก้ว สายแข็ง เกมวงเหล้า",
+      "url": "https://www.lemon8-app.com/%40kanzensouth2/7294556891479360002?region=th",
+      "platform": "Lemon8 Thailand",
+      "mechanism_or_term": "ดื่มรอบวง / หมดแก้ว and identity label สายแข็ง",
+      "confidence": "high",
+      "short_paraphrase": "A Thai post shows command blocks such as drink around the circle and finish the glass, alongside audience labels such as สายปาร์ตี้ and สายแข็ง. These are high-risk source signals to filter, not recommended rules.",
+      "safety_flags": ["alcohol", "rapid_drinking", "binge_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "th-TH",
+      "native_query": "Finger Dice เกมวงเหล้า สุ่มคนดื่ม",
+      "url": "https://play.google.com/store/apps/details?hl=th&id=com.ToolsCompany.FingerPicker",
+      "platform": "Google Play Thailand",
+      "mechanism_or_term": "multi-finger random selector",
+      "confidence": "medium",
+      "short_paraphrase": "A Thai storefront page describes a finger-picker used in เกมวงเหล้า to randomly select a person or drinking consequence. It supports a phone-as-selector format, with localized-language caveats.",
+      "safety_flags": ["alcohol", "peer_pressure", "physical_contact"]
+    },
+    {
+      "locale": "th-TH",
+      "native_query": "LuckyPoke เกมวงเหล้า รูปเพื่อน บทลงโทษ",
+      "url": "https://apps.apple.com/th/app/luckypoke-%E0%B9%80%E0%B8%81%E0%B8%A1%E0%B8%88-%E0%B8%A1%E0%B8%81%E0%B8%A5-%E0%B8%AD%E0%B8%87/id6757243641?l=th",
+      "platform": "Apple App Store Thailand",
+      "mechanism_or_term": "custom photo grid with punishment or reward cells",
+      "confidence": "medium",
+      "short_paraphrase": "A localized Thai storefront lets users build a poke grid from friend photos and assign rewards or punishments for gatherings, truth-or-dare and เกมวงเหล้า.",
+      "safety_flags": ["privacy", "humiliation", "peer_pressure"]
+    },
+    {
+      "locale": "th-TH",
+      "native_query": "วงล้อหมุน truth or dare เกมปาร์ตี้",
+      "url": "https://apps.apple.com/th/app/lucky-wheel-%E0%B8%A7%E0%B8%87%E0%B8%A5-%E0%B8%AD%E0%B8%AB%E0%B8%A1-%E0%B8%99-chooser/id6752469323?l=th",
+      "platform": "Apple App Store Thailand",
+      "mechanism_or_term": "weighted custom wheel and randomizer",
+      "confidence": "medium",
+      "short_paraphrase": "A Thai storefront positions a customizable weighted wheel for truth-or-dare, party decisions and random selection. It is a format lead rather than proof of native slang.",
+      "safety_flags": ["peer_pressure"]
+    },
+    {
+      "locale": "th-TH",
+      "native_query": "สายดริ๊งก์ แอปเกมวงเหล้า",
+      "url": "https://www.traveloka.com/th-th/explore/activities/best-drinking-game-apps-party/1001216",
+      "platform": "Traveloka Thailand",
+      "mechanism_or_term": "สายดริ๊งก์ — drinking-party audience identity",
+      "confidence": "medium",
+      "short_paraphrase": "A Thai article addresses สายดริ๊งก์ while listing party drinking apps. The expression is an audience identity, not a rules-controller or host role.",
+      "safety_flags": ["alcohol"]
+    },
+    {
+      "locale": "th-TH",
+      "native_query": "เกมสายเมา เกมไพ่วงเหล้า truth or drink",
+      "url": "https://toz-app.com/th/blog/drinking-games",
+      "platform": "TOZ Thai",
+      "mechanism_or_term": "เกมสายเมา / เกมวงเหล้า / เกมปาร์ตี้ query family",
+      "confidence": "medium",
+      "short_paraphrase": "A localized Thai guide groups the phrases เกมสายเมา, เกมวงเหล้า and เกมปาร์ตี้ around truth-or-drink and adult party formats. Use as a query family pending organic-platform validation.",
+      "safety_flags": ["alcohol", "adult_content", "sensitive_disclosure"]
+    },
+
+    {
+      "locale": "id-ID",
+      "native_query": "badut di tongkrongan pencair suasana mood booster",
+      "url": "https://www.froyonion.com/news/potensi-diri/alasan-kenapa-nongkrong-bisa-memberimu-banyak-inspirasi-baru",
+      "platform": "Froyonion",
+      "mechanism_or_term": "badut di tongkrongan / pencair suasana — informal hype personality",
+      "confidence": "high",
+      "short_paraphrase": "A local youth publication describes the badut di tongkrongan as the person whose jokes and antics break the ice and lift the group's mood. This is a hype-person analogue, not necessarily the game organizer.",
+      "safety_flags": ["humiliation"]
+    },
+    {
+      "locale": "id-ID",
+      "native_query": "permainan saat nongkrong jujur atau tantangan putar botol",
+      "url": "https://www.jawapos.com/hobi-kesenangan/016514020/10-permainan-seru-anti-boring-saat-nongkrong-bersama-teman-dan-keluarga",
+      "platform": "Jawa Pos",
+      "mechanism_or_term": "nongkrong + jujur atau tantangan + bottle selection",
+      "confidence": "high",
+      "short_paraphrase": "A local Indonesian guide recommends truth-or-dare for nongkrong and uses a spun bottle to choose the next player, supporting both the native activity context and selector mechanic.",
+      "safety_flags": ["sensitive_disclosure", "consent", "peer_pressure"]
+    },
+    {
+      "locale": "id-ID",
+      "native_query": "tantangan gokil nongkrong teruskan lagu",
+      "url": "https://www.hipwee.com/hiburan/6-ide-tantangan-gokil-buat-kongkow-bareng-teman-teman-berani-coba/",
+      "platform": "Hipwee",
+      "mechanism_or_term": "Teruskan Lagu — continue-the-song challenge",
+      "confidence": "high",
+      "short_paraphrase": "A local youth article proposes playful challenges for nongkrong, including continuing the next lyric or line of a song. The useful mechanism is musical turn-taking, not reproduction of lyrics.",
+      "safety_flags": ["peer_pressure"]
+    },
+    {
+      "locale": "id-ID",
+      "native_query": "game buat nongkrong tongkrongan bestie aib ngakak pecah",
+      "url": "https://toz-app.com/id/blog",
+      "platform": "TOZ Indonesia",
+      "mechanism_or_term": "nongkrong / tongkrongan / bestie / aib / pecah query cluster",
+      "confidence": "medium",
+      "short_paraphrase": "A current Indonesian-language party-game hub repeatedly uses nongkrong, tongkrongan, bestie, aib, ngakak and pecah around formats such as lower-a-finger, most-likely and impostor games. Localization means the terms still need platform-density checking.",
+      "safety_flags": ["sensitive_disclosure", "humiliation"]
+    },
+    {
+      "locale": "id-ID",
+      "native_query": "sirkel pre-game nongkrong after-party makin pecah",
+      "url": "https://toz-app.com/id/blog/drinking-games/top-10-drinking-games-for-parties",
+      "platform": "TOZ Indonesia",
+      "mechanism_or_term": "sirkel / pre-game / nongkrong / after-party / pecah",
+      "confidence": "medium",
+      "short_paraphrase": "A 2026 Indonesian-language guide frames party games as a way to manage the group's rhythm and make a night pecah, using sirkel, pre-game, nongkrong and after-party as discovery roots.",
+      "safety_flags": ["alcohol", "peer_pressure"]
+    },
+    {
+      "locale": "id-ID",
+      "native_query": "pesta nongkrong permainan minum tantangan",
+      "url": "https://play.google.com/store/apps/details?hl=id&id=com.Panja",
+      "platform": "Google Play Indonesia",
+      "mechanism_or_term": "task/question deck with drink as consequence",
+      "confidence": "medium",
+      "short_paraphrase": "A localized storefront describes a pre-party game built from silly tasks and questions, with drinking as the consequence for refusal or failure. It is useful format evidence but not necessarily locally authored slang.",
+      "safety_flags": ["alcohol", "peer_pressure"]
+    },
+    {
+      "locale": "id-ID",
+      "native_query": "game pembohong nongkrong oper ponsel voting",
+      "url": "https://play.google.com/store/apps/details?hl=id&id=io.jkgwak.liargame",
+      "platform": "Google Play Indonesia",
+      "mechanism_or_term": "hidden liar, pass-the-phone, accusation vote, final guess",
+      "confidence": "medium",
+      "short_paraphrase": "A current Indonesian storefront party game assigns a hidden liar, passes the phone, opens discussion and voting, then gives the accused liar a final guess. This is a strong reusable no-material mechanic.",
+      "safety_flags": ["social_deception", "peer_pressure"]
+    },
+    {
+      "locale": "id-ID",
+      "native_query": "Paranoia nongkrong pertanyaan berani tantangan pedas",
+      "url": "https://play.google.com/store/apps/details?hl=id&id=com.fliportell",
+      "platform": "Google Play Indonesia",
+      "mechanism_or_term": "random target selection with bold questions or spicy challenges",
+      "confidence": "medium",
+      "short_paraphrase": "A localized storefront positions Paranoia for house parties and nongkrong, using random player selection, bold questions and spicy challenges. Adult and consent controls are essential.",
+      "safety_flags": ["sexual_content", "sensitive_disclosure", "consent", "adult_content"]
+    },
+    {
+      "locale": "id-ID",
+      "native_query": "tebak tebakan nongkrong charades",
+      "url": "https://play.google.com/store/apps/details?hl=id&id=com.charadasai",
+      "platform": "Google Play Indonesia",
+      "mechanism_or_term": "Tebak Tebakan — phone-based charades and guessing",
+      "confidence": "medium",
+      "short_paraphrase": "A localized storefront connects Tebak Tebakan with nongkrong and party use, supporting head-up charades and team guessing as a low-risk format lead.",
+      "safety_flags": []
+    },
+    {
+      "locale": "id-ID",
+      "native_query": "MC pencair suasana memandu ice breaking games",
+      "url": "https://www.expedition17.com/2026/01/jasa-mc-outbound-bandung-bikin-acara-family-gathering-makin-seru.html",
+      "platform": "Expedition 17 Indonesia",
+      "mechanism_or_term": "MC — professional flow controller and icebreaker leader",
+      "confidence": "medium",
+      "short_paraphrase": "A local service page gives the MC responsibility for guiding icebreakers and games and keeping an event lively. It validates the professional function, not an informal youth nickname.",
+      "safety_flags": []
+    },
+    {
+      "locale": "id-ID",
+      "native_query": "pemandu permainan games indoor",
+      "url": "https://tripee.co.id/product/games-indoor-bali",
+      "platform": "Tripee Indonesia",
+      "mechanism_or_term": "pemandu permainan — game facilitator",
+      "confidence": "medium",
+      "short_paraphrase": "A local activity provider describes indoor games guided by an experienced pemandu permainan. The phrase is functionally exact but belongs to a professional activity context rather than youth slang.",
+      "safety_flags": []
+    },
+
+    {
+      "locale": "pl-PL",
+      "native_query": "Melo gra na domówkę melanż ekipa",
+      "url": "https://apps.apple.com/pl/app/melo-gra-imprezowa/id6451415571?l=pl",
+      "platform": "Apple App Store Poland",
+      "mechanism_or_term": "domówka / melanż / ekipa plus skip-any-card consent rule",
+      "confidence": "high",
+      "short_paraphrase": "A Polish-developed party app uses domówka, melanż and ekipa around truth, challenge and never-have-I-ever decks, and explicitly lets any player skip a prompt without explanation.",
+      "safety_flags": ["alcohol", "sexual_content", "sensitive_disclosure", "consent"]
+    },
+    {
+      "locale": "pl-PL",
+      "native_query": "tryb Mistrza Gry zadania zasady ankiety",
+      "url": "https://play.google.com/store/apps/details?hl=pl&id=com.pmapplications.locogames",
+      "platform": "Google Play Poland",
+      "mechanism_or_term": "Mistrz Gry — app-supported game master mode",
+      "confidence": "high",
+      "short_paraphrase": "A Polish party app has a Classic game-master mode in which the Mistrz Gry draws tasks, rules and polls. This is the strongest Tier-2 Polish rules-controller handle found.",
+      "safety_flags": ["alcohol", "adult_content", "peer_pressure"]
+    },
+    {
+      "locale": "pl-PL",
+      "native_query": "słownik imprezowy bifor bibka balety",
+      "url": "https://partybuskrakow.pl/slownik-imprezowy-a-z/",
+      "platform": "Party Bus Kraków",
+      "mechanism_or_term": "bifor / bibka / balety — Polish youth party lexicon",
+      "confidence": "high",
+      "short_paraphrase": "A Polish party glossary defines common informal roots including bifor, bibka and balety. They expand occasion discovery but are not host-role labels.",
+      "safety_flags": ["alcohol"]
+    },
+    {
+      "locale": "pl-PL",
+      "native_query": "gry alkoholowe bifor gruba domówka Mistrz Pytań",
+      "url": "https://toz-app.com/pl/blog/drinking-games/top-10-drinking-games-for-parties",
+      "platform": "TOZ Poland",
+      "mechanism_or_term": "Mistrz Pytań plus evolving rules and party-rhythm framing",
+      "confidence": "medium",
+      "short_paraphrase": "A current Polish-language guide uses bifor, gruba domówka and ekipa while describing evolving-rule drinking games and the Mistrz Pytań role. Treat it as a localized query and mechanism source.",
+      "safety_flags": ["alcohol", "rapid_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "pl-PL",
+      "native_query": "Butelka domówka Prawda czy Wyzwanie własne pytania",
+      "url": "https://play.google.com/store/apps/details?hl=pl&id=com.nixstudio.spin_the_bottle",
+      "platform": "Google Play Poland",
+      "mechanism_or_term": "bottle spin plus custom truth and challenge cards",
+      "confidence": "medium",
+      "short_paraphrase": "A current Polish storefront app combines a spun bottle with Prawda czy Wyzwanie and user-authored questions or challenges for a domówka.",
+      "safety_flags": ["sexual_content", "sensitive_disclosure", "consent", "peer_pressure"]
+    },
+    {
+      "locale": "pl-PL",
+      "native_query": "gra impostor domówka głosowanie wyzwania",
+      "url": "https://play.google.com/store/apps/details?hl=pl&id=com.optiflow.imposter",
+      "platform": "Google Play Poland",
+      "mechanism_or_term": "hidden traitor, discussion, vote, funny challenge",
+      "confidence": "medium",
+      "short_paraphrase": "A current Polish storefront game uses a hidden traitor, group discussion, voting and a challenge stage, providing a reusable short-round social-deception format.",
+      "safety_flags": ["social_deception", "peer_pressure"]
+    },
+    {
+      "locale": "pl-PL",
+      "native_query": "Nigdy w życiu domówka kara",
+      "url": "https://play.google.com/store/apps/details?hl=pl&id=net.sourcepaper.hnwl",
+      "platform": "Google Play Poland",
+      "mechanism_or_term": "pre-agreed kara for never-have-I-ever prompts",
+      "confidence": "medium",
+      "short_paraphrase": "A Polish storefront never-have-I-ever app tells the group to agree a kara, or consequence, before playing through a large prompt bank. The pre-agreement is reusable; coercive punishments are not.",
+      "safety_flags": ["alcohol", "sensitive_disclosure", "peer_pressure"]
+    },
+    {
+      "locale": "pl-PL",
+      "native_query": "dusza towarzystwa gry imprezowe",
+      "url": "https://pytanienasniadanie.tvp.pl/37595222/gry-dzieki-ktorym-zostaniesz-dusza-towarzystwa",
+      "platform": "TVP",
+      "mechanism_or_term": "dusza towarzystwa — life-of-the-party personality",
+      "confidence": "medium",
+      "short_paraphrase": "A Polish media article links party games with becoming the dusza towarzystwa. The phrase denotes a socially energizing personality, not the person who owns or enforces the rules.",
+      "safety_flags": []
+    },
+    {
+      "locale": "pl-PL",
+      "native_query": "wodzirej konkursy gry taneczne organizator zabawy",
+      "url": "https://pca.rzeszow.pl/pozytywne-trio/",
+      "platform": "PCA Rzeszów",
+      "mechanism_or_term": "wodzirej — professional event leader",
+      "confidence": "medium",
+      "short_paraphrase": "A Polish event page describes a wodzirej leading contests, movement and dance games and organizing the fun. It is a professional event role, not necessarily casual Gen-Z slang.",
+      "safety_flags": []
+    },
+    {
+      "locale": "pl-PL",
+      "native_query": "Blok Ekipa Na Melanżu ziomki nie grasz nie pijesz",
+      "url": "https://www.ceneo.pl/44425906",
+      "platform": "Ceneo Poland",
+      "mechanism_or_term": "melanż / ziomki and repeat-or-drink memory chain",
+      "confidence": "high",
+      "short_paraphrase": "A Polish-market 18+ card game uses melanż and ziomki and builds a memory-and-repeat chain around drinking consequences. The slang is useful; the pressure-based drinking rule is not recommended.",
+      "safety_flags": ["alcohol", "rapid_drinking", "binge_drinking", "peer_pressure"]
+    },
+    {
+      "locale": "pl-PL",
+      "native_query": "beforek domówka zadania pytania rytm imprezy",
+      "url": "https://play.google.com/store/apps/details?hl=pl&id=com.ultimatepartyapp.drinkinggameflat",
+      "platform": "Google Play Poland",
+      "mechanism_or_term": "beforek / domówka plus app-paced question and task stream",
+      "confidence": "medium",
+      "short_paraphrase": "A Polish storefront drinking app uses beforek and domówka and frames its prompts as a way to keep the party rhythm. It supports occasion queries and app-as-host pacing.",
+      "safety_flags": ["alcohol", "peer_pressure"]
+    },
+
+    {
+      "locale": "en-NG",
+      "native_query": "Truth or Drink Nigeria real gist Detty December squad",
+      "url": "https://thegameshop.ng/products/truth-or-drink/1943828?location=null",
+      "platform": "The Game Shop Nigeria",
+      "mechanism_or_term": "warm-up to dangerous escalation decks with Nigerian English/Pidgin rule card",
+      "confidence": "high",
+      "short_paraphrase": "A Nigerian retailer localizes Truth or Drink for Detty December house parties, university hostels, NYSC nights and wedding after-parties, using real gist and squad and a rule card in English and Pidgin.",
+      "safety_flags": ["alcohol", "sexual_content", "sensitive_disclosure", "peer_pressure", "humiliation"]
+    },
+    {
+      "locale": "en-NG",
+      "native_query": "Truth or Drink Nigeria five seconds group votes double drink",
+      "url": "https://thegameshop.ng/products/truth-or-drink/1943828?location=null",
+      "platform": "The Game Shop Nigeria",
+      "mechanism_or_term": "five-second answer window, group lie-vote, doubled consequence",
+      "confidence": "high",
+      "short_paraphrase": "The same listing has a selected player answer quickly or drink and lets the group vote on whether an answer is a lie, potentially doubling the drinking consequence. This is a documented high-risk variant to filter.",
+      "safety_flags": ["alcohol", "rapid_drinking", "binge_drinking", "peer_pressure", "humiliation"]
+    },
+    {
+      "locale": "en-NG",
+      "native_query": "Truth or Drink Nigeria water pepper soup alternative punishment",
+      "url": "https://thegameshop.ng/products/truth-or-drink/1943828?location=null",
+      "platform": "The Game Shop Nigeria",
+      "mechanism_or_term": "non-alcohol substitution mixed with unsafe punishment suggestions",
+      "confidence": "high",
+      "short_paraphrase": "The listing permits water or pepper soup instead of alcohol, but also mentions physical punishments. Preserve only the non-alcohol substitution; reject any mandatory exercise or hitting.",
+      "safety_flags": ["unsafe_physical_punishment", "peer_pressure"]
+    },
+    {
+      "locale": "en-NG",
+      "native_query": "Nigerian party games host planner MC hype players owambe",
+      "url": "https://blog.notjustevent.com/10-unique-party-game-ideas-for-hosts-planers/",
+      "platform": "NotJustEvent Nigeria",
+      "mechanism_or_term": "host/MC selects games for crowd and vibe, then hypes players",
+      "confidence": "high",
+      "short_paraphrase": "A Nigerian event guide tells hosts and planners to match games to the crowd and vibe and use the MC to hype players, with local framing such as owambe, abeg and party sweet die.",
+      "safety_flags": ["physical_activity", "privacy"]
+    },
+    {
+      "locale": "en-NG",
+      "native_query": "Nigeria hypeman sets tone mood energizes crowd",
+      "url": "https://guardian.ng/life/culture-lifestyle/hype-culture-in-nigeria/",
+      "platform": "Guardian Nigeria",
+      "mechanism_or_term": "hypeman — atmosphere conductor distinct from MC",
+      "confidence": "high",
+      "short_paraphrase": "A Nigerian culture article describes the hypeman as setting the tone and mood, energizing the crowd and involving participants, a stronger atmosphere-role analogue than a rules-only host.",
+      "safety_flags": []
+    },
+    {
+      "locale": "en-NG",
+      "native_query": "female hypeman Nigeria energy conductor party DJ sessions",
+      "url": "https://www.okayafrica.com/what-its-like-to-be-a-female-hypeman-in-nigeria/1427020",
+      "platform": "OkayAfrica",
+      "mechanism_or_term": "hype-person as energy conductor across DJ sets",
+      "confidence": "high",
+      "short_paraphrase": "A 2026 profile calls the Nigerian hype-person an energy conductor who guides a party through DJ sessions. This supports a DJ-plus-hype role stream rather than a card-game moderator alone.",
+      "safety_flags": []
+    },
+    {
+      "locale": "en-NG",
+      "native_query": "Nigeria hypeman event host coordinate afterparty life of party",
+      "url": "https://punchng.com/my-life-as-bad-boy-timz-hypeman-sceed-barms/",
+      "platform": "Punch Nigeria",
+      "mechanism_or_term": "event host in formal flow, hypeman at after-party",
+      "confidence": "high",
+      "short_paraphrase": "A Nigerian interview draws a useful role split: the event host coordinates the programme, while the same person can become the life of the party as a hypeman at an after-party.",
+      "safety_flags": []
+    },
+    {
+      "locale": "en-NG",
+      "native_query": "Nigeria hypeman university tour crowd energy 2026",
+      "url": "https://punchng.com/dj-dewik-hypeman-best-shine-at-soundcity-on-tour/",
+      "platform": "Punch Nigeria",
+      "mechanism_or_term": "DJ and hypeman pair for campus crowd energy",
+      "confidence": "high",
+      "short_paraphrase": "A 2026 report describes a DJ and hypeman pairing that drives energy and excitement on a Nigerian university tour, corroborating the role among a youth audience.",
+      "safety_flags": []
+    },
+    {
+      "locale": "en-NG",
+      "native_query": "Nigerian hypeman call and response TikTok lamba Dorime",
+      "url": "https://www.tandfonline.com/doi/full/10.1080/00083968.2025.2462217",
+      "platform": "Taylor & Francis academic article",
+      "mechanism_or_term": "call-and-response chants, TikTok mixes, lamba and Dorime context",
+      "confidence": "high",
+      "short_paraphrase": "A recent study places hypemen in Nigerian youth gatherings and social media, highlighting call-and-response performance, TikTok mixes and Pidgin-inflected hype language. It also notes status and illicit-wealth associations that require care.",
+      "safety_flags": ["classism", "financial_glorification", "illicit_activity_reference"]
+    },
+    {
+      "locale": "en-NG",
+      "native_query": "Nigerian hypemen lamba shedibala shedibolo TikTok",
+      "url": "https://notjustok.com/article/lists/hypemen-in-nigeria/",
+      "platform": "NotJustOk",
+      "mechanism_or_term": "lamba plus viral shedibala/shedibolo audio",
+      "confidence": "high",
+      "short_paraphrase": "A Nigerian music outlet links hypemen with lamba and documents a hypeman audio phrase that became a TikTok sound. This is a direct bridge from the atmosphere role to short-video remix discovery.",
+      "safety_flags": []
+    },
+    {
+      "locale": "en-NG",
+      "native_query": "Detty December Lagos rules TikTok series",
+      "url": "https://travelnoire.com/detty-december-lagos/",
+      "platform": "Travel Noire",
+      "mechanism_or_term": "TikTok rules/manual series for navigating Detty December",
+      "confidence": "high",
+      "short_paraphrase": "A report documents a creator's TikTok series of rules for partying safely and smartly in Lagos during Detty December. It is a strong short-video analogue to a party memo or handbook, though not a game-rules series.",
+      "safety_flags": ["nightlife", "privacy", "personal_safety"]
+    },
+    {
+      "locale": "en-NG",
+      "native_query": "Ganusi una go party abeg Nigerian slang 2025",
+      "url": "https://lists.ng/these-15-nigerian-slangs-broke-the-internet-in-2025-and-we-are-still-saying-them/",
+      "platform": "Lists.ng",
+      "mechanism_or_term": "Ganusi — playful request to join a plan or vibe",
+      "confidence": "medium",
+      "short_paraphrase": "A 2026 Nigerian slang roundup explains Ganusi as a playful request to join a plan and gives a party-context example. It is a current discovery term, not a game role.",
+      "safety_flags": []
+    },
+    {
+      "locale": "en-NG",
+      "native_query": "Truth or Drink Nigeria dealer revealing answer",
+      "url": "https://rehmie.com.ng/p/truth-or-drink-game-card-524797",
+      "platform": "Rehmie Nigeria",
+      "mechanism_or_term": "dealer-mediated question and revealing-answer reward",
+      "confidence": "medium",
+      "short_paraphrase": "A Nigerian marketplace listing describes five decks, questions between two players, an answer-or-drink choice, and a dealer who awards a revealing response. Dealer is a functional game role, not youth slang.",
+      "safety_flags": ["alcohol", "sexual_content", "sensitive_disclosure", "peer_pressure"]
+    },
+    {
+      "locale": "en-NG",
+      "native_query": "truth or drink questions party friends Nigeria",
+      "url": "https://www.legit.ng/1397048-50-great-truth-drink-questions-a-fun-party-friends.html",
+      "platform": "Legit.ng",
+      "mechanism_or_term": "localized truth-or-drink prompt bank",
+      "confidence": "medium",
+      "short_paraphrase": "A Nigerian publication supplies a truth-or-drink question bank for friends. It corroborates local discoverability of the format but should not be reused without adult, consent and disclosure safeguards.",
+      "safety_flags": ["alcohol", "sexual_content", "sensitive_disclosure", "peer_pressure"]
+    },
+    {
+      "locale": "en-NG",
+      "native_query": "MC Nigeria official host controls audience games",
+      "url": "https://nigerianqueries.com/become-mc-nigeria/",
+      "platform": "Nigerian Queries",
+      "mechanism_or_term": "MC — official host and audience-flow controller",
+      "confidence": "medium",
+      "short_paraphrase": "A current Nigerian guide defines the MC as the official host who controls audience flow. It supports the formal rules-and-schedule role, distinct from the hypeman's energy function.",
+      "safety_flags": []
+    }
+  ]
+}

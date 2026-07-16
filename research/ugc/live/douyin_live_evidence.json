@@ -5,6 +5,9 @@
   "session_surface": "in_app_browser",
   "login_state": "logged_in",
   "collection_mode": "manual visible-search review; no engagement actions",
+  "follow_up_status": "completed",
+  "superseded_by": "douyin_nightlife_slang_live_2026-07-16.json",
+  "follow_up_note": "该文件保留首次遇到验证挑战的历史状态；用户随后完成验证，douyin_zh_004 已在后续报告中以 18/18 相关结果和三个固定详情页完成复核。",
   "queries": [
     {
       "query_id": "douyin_zh_001",
@@ -63,7 +66,7 @@
   ],
   "constraints": [
     "Search result pages did not expose stable post URLs in the accessible snapshot, so only canonical search URLs are stored.",
-    "The final verification challenge was not bypassed.",
+    "The challenge was not bypassed programmatically; the user completed it, and the query was subsequently reviewed in douyin_nightlife_slang_live_2026-07-16.json.",
     "No private account surfaces, screenshots, or authentication parameters are stored."
   ]
 }

@@ -1,0 +1,150 @@
+{
+  "schema_version": "1.0",
+  "report_id": "pinterest_india_live_2026-07-16",
+  "platform": "Pinterest",
+  "captured_on": "2026-07-16",
+  "access_context": "内置浏览器中的 Pinterest 登录态",
+  "scope": {
+    "queries_run": 2,
+    "grid_pins_reviewed": 21,
+    "grid_pins_judged_relevant": 14,
+    "direct_pin_pages_recorded": 5,
+    "region_focus": "India",
+    "language_focus": [
+      "Hindi",
+      "English"
+    ]
+  },
+  "collection_rules": {
+    "grid_detail_separation": "搜索网格用于记录可见标题与视觉主题；详情页只有在文本直接支持时才记录内容定位或高层机制。",
+    "mechanism_policy": "不抄写图片内题表，不从未完整核验的图文推导可执行规则，也不把标题簇直接写成玩法原子。",
+    "identity_policy": "只记录公开 Pin 页面显示的创作者名称或账号，不保存账号、会话参数或评论者身份。",
+    "interaction_policy": "全程只读；未关注、收藏、评论、分享或访问账号设置。",
+    "privacy_policy": "未保存截图、Cookie、会话令牌、登录凭据或个性化参数。"
+  },
+  "query_records": [
+    {
+      "query_id": "pinterest_in_antakshari_001",
+      "query": "antakshari party game India",
+      "search_url": "https://www.pinterest.com/search/pins/?q=antakshari%20party%20game%20India",
+      "seed_status": "candidate",
+      "grid_snapshot": {
+        "sample_size": 11,
+        "relevant_count": 5,
+        "counting_policy": "只把标题或画面明确指向 Antakshari、Bollywood 或 kitty-party 猜歌/猜名的 Pin 计为相关；桌游与未命名内容按噪声处理。",
+        "visible_title_variants": [
+          "Antakshari Party Games – DIY",
+          "Ladies kitty party game in Hindi: Movies Antakshari",
+          "Hindi actress names",
+          "Emoji Guess Bollywood Songs",
+          "Bollywood Akshar/Antakshari Jeopardy"
+        ],
+        "noise_note": "其余六张包含桌游或无法仅凭当前标题/画面确认的未命名内容，未扩大相关数。"
+      },
+      "direct_evidence": [
+        {
+          "page_type": "pin",
+          "url": "https://www.pinterest.com/pin/26529085299245272/",
+          "creator": {
+            "public_name_or_handle": "asawapoonam9"
+          },
+          "title": "Antakshari Party Games – DIY",
+          "outbound_domain": "lovesnd.com",
+          "evidence_level": "detail_page_carrier_only",
+          "description_support": "详情标题与描述只足以确认它是 Antakshari 聚会游戏的 DIY 载体，并提供站外延伸入口。",
+          "mechanism_status": "insufficient_for_complete_rules",
+          "mechanism_recorded": null,
+          "exclusion_reason": "详情没有提供足够完整、可独立核验的规则。"
+        },
+        {
+          "page_type": "pin",
+          "url": "https://www.pinterest.com/pin/685321268272812864/",
+          "creator": {
+            "public_name_or_handle": "shiwangi peswani"
+          },
+          "title": "Ladies kitty party game in Hindi: Movies Antakshari",
+          "outbound_domain": "kittygroups",
+          "evidence_level": "detail_page_occasion_and_format",
+          "description_support": "详情描述明确把 Movies Antakshari 定位为 Hindi kitty party 游戏，并说明面向不同年龄层的女性参与者。",
+          "mechanism_status": "occasion_and_guessing_theme_only",
+          "mechanism_recorded": "只确认电影主题的 Antakshari/猜名方向；未复制题表，也未补写回合与计分规则。"
+        }
+      ],
+      "boards_observed": [],
+      "board_note": "本轮没有获得可独立核验的公开 board 名称或 board 页面，因此不把创作者和站外域名误写成 board。",
+      "query_assessment": "可用的发现词，但召回较宽；Antakshari、Bollywood、kitty party、Hindi actress、emoji song guessing 和 Jeopardy 变体可继续交叉扩词。"
+    },
+    {
+      "query_id": "pinterest_in_kitty_hindi_001",
+      "query": "kitty party games Hindi",
+      "search_url": "https://www.pinterest.com/search/pins/?q=kitty%20party%20games%20Hindi",
+      "seed_status": "verified",
+      "grid_snapshot": {
+        "sample_size": 10,
+        "relevant_count": 9,
+        "counting_policy": "九张 Pin 的标题或替代文本明确指向 Hindi kitty-party 游戏；一张未命名内容不作相关判断。",
+        "visible_title_variants": [
+          "Easy Hindi Kitty Party Game – guess Indian sweets names",
+          "New Written Paper Game",
+          "Soaps Brands",
+          "Teej Solah Singaar Word Search",
+          "Hindi Paper Party Game",
+          "card game",
+          "paper party archives",
+          "Musical Mazaa"
+        ],
+        "noise_note": "一张未命名 Pin 没有足够标题或替代文本支持，未计入相关。"
+      },
+      "direct_evidence": [
+        {
+          "page_type": "pin",
+          "url": "https://www.pinterest.com/pin/6614730696752068/",
+          "creator": {
+            "public_name_or_handle": "shiwangi peswani"
+          },
+          "outbound_domain": "kittygroups",
+          "evidence_level": "detail_page_high_level_mechanism",
+          "description_support": "详情描述明确这是一个简单的文字谜题，目标是猜印度糖果和甜点名称。",
+          "mechanism_status": "high_level_only",
+          "mechanism_recorded": "可确认纸面谜题和猜印度甜点名这一高层结构；未抄写图中题目、答案或完整操作步骤。",
+          "comments_status": "closed"
+        },
+        {
+          "page_type": "pin",
+          "url": "https://www.pinterest.com/pin/585468020351672807/",
+          "creator": null,
+          "title": null,
+          "evidence_level": "title_level_cluster_evidence",
+          "description_support": "该固定 Pin 可支持 Hindi kitty-party 书面题卡标题簇的存在；本轮记录没有把具体标题与此 URL 一一配对。",
+          "mechanism_status": "not_recorded",
+          "mechanism_recorded": null
+        },
+        {
+          "page_type": "pin",
+          "url": "https://www.pinterest.com/pin/641270434485908894/",
+          "creator": null,
+          "title": null,
+          "evidence_level": "title_level_cluster_evidence",
+          "description_support": "该固定 Pin 可支持 Hindi kitty-party 书面题卡标题簇的存在；本轮记录没有把具体标题与此 URL 一一配对。",
+          "mechanism_status": "not_recorded",
+          "mechanism_recorded": null
+        }
+      ],
+      "boards_observed": [],
+      "board_note": "本轮没有获得可独立核验的公开 board 名称或 board 页面。",
+      "query_assessment": "强本地入口；书面题卡、猜词、字谜、品牌与节庆主题的密度明显高于更宽的 Antakshari 查询。"
+    }
+  ],
+  "cross_query_findings": [
+    "`kitty party games Hindi` 的首屏相关密度为 9/10，高于本轮 `antakshari party game India` 的 5/11；这是当前登录态快照，不代表永久排序。",
+    "印度 Pinterest 的关键载体是可打印纸题、视觉 Pin 与站外题库入口，形态上与局头手册/备忘录同构。",
+    "标题簇可用于继续扩词，但题图文字、答案表和完整规则必须单独核验，不能直接抄图或自动转成机制原子。",
+    "Movies Antakshari、Bollywood emoji guessing、Hindi actress names、甜点名谜题、品牌题与 Teej 节庆字谜共同显示，本地内容常用熟悉的电影、饮食、品牌和节庆语义做题面。"
+  ],
+  "limitations": [
+    "这是已登录 Pinterest 的单次首屏与详情页快照，不是全站统计。",
+    "搜索排序受时间、地区、账号与个性化影响，相关数只反映本轮保守人工判断。",
+    "两张固定 Pin 仅保留标题簇证据，因本轮记录未包含一一对应标题和创作者而保持空值。",
+    "没有复制图片内题表、答案或长段描述，也没有把未完整核验的内容写成可执行规则。"
+  ]
+}

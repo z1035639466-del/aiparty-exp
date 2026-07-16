@@ -1,0 +1,142 @@
+{
+  "schema_version": "ugc-live-evidence-v1",
+  "captured_at": "2026-07-16",
+  "platform": "facebook",
+  "country": "Philippines",
+  "session_surface": "in_app_browser",
+  "login_state": "logged_in",
+  "collection_mode": "manual review of logged-in Facebook Reels search results and two fixed public video pages; read-only",
+  "queries": [
+    {
+      "query_id": "facebook_ph_001",
+      "query": "Pinoy parlor games",
+      "search_url": "https://www.facebook.com/search/videos/?q=Pinoy%20parlor%20games",
+      "access_outcome": "success",
+      "visible_sample": {
+        "unit": "article",
+        "sample_size": 4,
+        "relevant_count": 4
+      },
+      "assessment": "High-density native Reels query in this visible sample.",
+      "visible_results": [
+        {
+          "public_page_or_creator": "Top Pinoy Moments",
+          "title": "Ranking Pinoy Parlor Games Funny Moments",
+          "duration": "1:10",
+          "published_on": "2025-02-23",
+          "search_surface_views": "1.2M",
+          "canonical_url": "https://www.facebook.com/watch/?v=672723811987684"
+        },
+        {
+          "public_page_or_creator": "Jinky Lira Babad",
+          "title": "Funny Pinoy Parlor Games",
+          "duration": "1:54",
+          "published_on": "2025-01-30",
+          "search_surface_views": "4K",
+          "canonical_url": "https://www.facebook.com/watch/?v=638997451912484"
+        },
+        {
+          "public_page_or_creator": "Pinoy's Funniest Videos",
+          "title": null,
+          "duration": "0:15",
+          "published_on": "2025-06-18",
+          "search_surface_views": "6.7K",
+          "canonical_url": "https://www.facebook.com/watch/?v=737527838933206"
+        },
+        {
+          "public_page_or_creator": "Ghee-Emz Pakulo & Palaro",
+          "title": null,
+          "duration": "0:35",
+          "published_on": "2023-03-14",
+          "search_surface_views": "13K",
+          "canonical_url": "https://www.facebook.com/watch/?v=934647504220696"
+        }
+      ]
+    },
+    {
+      "query_id": "facebook_ph_002",
+      "query": "barkada party games",
+      "search_url": "https://www.facebook.com/search/videos/?q=barkada%20party%20games",
+      "access_outcome": "success",
+      "visible_sample": {
+        "unit": "article",
+        "sample_size": 2,
+        "broadly_relevant_count": 2,
+        "core_party_game_count": 1,
+        "commercial_venue_or_board_game_count": 1
+      },
+      "assessment": "Broadly relevant but lower density: the visible sample mixed a party-game Reel with commercial board-game venue content.",
+      "visible_results": [
+        {
+          "public_page_or_creator": "Dailiavlogs",
+          "title": "Jack en Poy Barkada edition / Barkada Christmas Party Games! Jack en Poy ubusan ng Lahi!",
+          "duration": "2:37",
+          "published_on": "2024-12-16",
+          "search_surface_views": "4.6K",
+          "canonical_url": "https://www.facebook.com/watch/?v=630802402608235",
+          "classification": "core_party_game_result"
+        },
+        {
+          "public_page_or_creator": "WhenInManila / All Aboard XP",
+          "title": null,
+          "duration": "0:20",
+          "published_on": "2023-02-19",
+          "canonical_url": "https://www.facebook.com/reel/2069971316536684/",
+          "classification": "commercial_board_game_venue_noise"
+        }
+      ]
+    }
+  ],
+  "detail_reviews": [
+    {
+      "source_url": "https://www.facebook.com/watch/?v=672723811987684",
+      "title": "Ranking Pinoy Parlor Games Funny Moments",
+      "duration": "1:10",
+      "visible_metrics_on_detail": {
+        "reactions": "79K",
+        "comments": "145",
+        "views": "1.9M"
+      },
+      "hashtags": [
+        "#parlorgames",
+        "#partygames",
+        "#Philippines"
+      ],
+      "visible_scene_signal": "An outdoor multi-person physical activity with balloons and a ranking presentation layer was visible.",
+      "rule_status": "Insufficient for a complete rule reconstruction; excluded from the atom library.",
+      "public_comment_signal": "Only affective or mention-style responses were visible; no rule explanation was observed. Commenter identities were not retained."
+    },
+    {
+      "source_url": "https://www.facebook.com/watch/?v=630802402608235",
+      "title": "Jack en Poy Barkada edition / Barkada Christmas Party Games! Jack en Poy ubusan ng Lahi!",
+      "duration": "2:37",
+      "visible_metrics_on_detail": {
+        "reactions": "19",
+        "comments": "4",
+        "views": "8.5K"
+      },
+      "visible_scene_signal": "An indoor multi-person gathering with balloon props was visible. The title supports a Jack en Poy, barkada, Christmas-party and elimination-themed framing.",
+      "rule_status": "No complete transcript or rule sequence was observed; excluded from the atom library.",
+      "public_comment_signal": "Visible comments supported a friends-playing-together and gift or gathering context, but did not provide a complete rule explanation. Commenter identities were not retained."
+    }
+  ],
+  "findings": [
+    {
+      "finding": "Logged-in Facebook Reels search was accessible and returned native Philippine party-game results.",
+      "confidence": "high"
+    },
+    {
+      "finding": "Pinoy parlor games was the higher-density query in this small visible sample: 4/4 relevant versus barkada party games, whose 2 broadly relevant results included one commercial venue or board-game result.",
+      "confidence": "high_within_visible_sample"
+    },
+    {
+      "finding": "Facebook detail pages can provide stable public URLs, presentation context and engagement signals, but the two reviewed pages did not expose enough rule detail for game atoms.",
+      "confidence": "high"
+    }
+  ],
+  "privacy_and_interaction_policy": {
+    "stored": "Public page or creator labels, canonical public URLs, visible titles, dates, durations, display metrics, scene-level signals and paraphrased comment signals.",
+    "not_stored": "Private-group content, commenter identities, account identifiers beyond public page or creator labels, session parameters, cookies, tokens, screenshots or long comment text.",
+    "interactions": "No likes, reactions, follows, group joins, comments, messages or shares were performed."
+  }
+}

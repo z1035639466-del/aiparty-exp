@@ -1,0 +1,270 @@
+{
+  "schema_version": 1,
+  "collected_at": "2026-07-16",
+  "platform": "xiaohongshu",
+  "session_surface": "in_app_browser",
+  "login_state": "logged_in",
+  "collection_mode": "manual review of visible search results and four fixed public post pages; no engagement actions",
+  "scope": "Second-wave validation of candidate mechanism terms and nightlife slang discovered in the first Xiaohongshu pass.",
+  "queries": [
+    {
+      "query_id": "xhs_zh_016",
+      "query": "逆抓顺打",
+      "axis": "mechanism_probe",
+      "status": "rejected_for_party_collection",
+      "visible_sample": {
+        "unit": "result_cards",
+        "count_min": 20
+      },
+      "relevant_count": 0,
+      "observation": "The visible results were overwhelmingly mahjong or card-game content, with no stable party-game use observed.",
+      "source_urls": []
+    },
+    {
+      "query_id": "xhs_zh_017",
+      "query": "逆抓顺打 局头",
+      "axis": "mechanism_plus_role_probe",
+      "status": "ambiguous_dead_end",
+      "visible_sample": {
+        "unit": "result_cards",
+        "count": 19
+      },
+      "exact_relevant_count": 0,
+      "observation": "No exact combined use was visible. The page fell back to generic items about 局头, 局头备忘录, and 抓手指.",
+      "source_urls": []
+    },
+    {
+      "query_id": "xhs_zh_018",
+      "query": "什么叫中抓",
+      "axis": "mechanism_probe",
+      "status": "rejected_for_party_collection",
+      "visible_sample": {
+        "unit": "result_cards",
+        "count": 15
+      },
+      "relevant_count": 0,
+      "observation": "The visible results were almost entirely Chinese audio-drama or radio-drama content rather than a party-game term.",
+      "source_urls": []
+    },
+    {
+      "query_id": "xhs_zh_019",
+      "query": "逢三抓手",
+      "axis": "named_mechanism",
+      "status": "verified",
+      "visible_sample": {
+        "unit": "result_cards",
+        "count": 18
+      },
+      "relevant_count_min": 12,
+      "observation": "A dense cluster of training, icebreaker, team-building, dinner-table, and host-led party results used the same named reaction-game family.",
+      "source_urls": [
+        "https://www.xiaohongshu.com/explore/66bdc8d2000000001e01faff"
+      ]
+    },
+    {
+      "query_id": "xhs_zh_020",
+      "query": "酒吧A仔",
+      "axis": "nightlife_role_slang",
+      "status": "verified_risk_slang",
+      "visible_sample": {
+        "unit": "result_cards",
+        "count": 13
+      },
+      "relevant_count_min": 12,
+      "observation": "Nearly every visible result used A仔 in a nightlife or bar-grouping context. This is a role and market-slang entry, not a game-mechanism entry.",
+      "source_urls": [
+        "https://www.xiaohongshu.com/explore/68ce9850000000000702b1e8",
+        "https://www.xiaohongshu.com/explore/6a0095c2000000003601db96"
+      ]
+    },
+    {
+      "query_id": "xhs_zh_021",
+      "query": "收枪版",
+      "axis": "variant_label_probe",
+      "status": "rejected_for_party_collection",
+      "visible_sample": {
+        "unit": "result_cards",
+        "count": 19
+      },
+      "relevant_count": 0,
+      "observation": "The visible results concerned game skins or weapon trading; no party-game meaning was observed.",
+      "source_urls": []
+    },
+    {
+      "query_id": "xhs_zh_022",
+      "query": "抓手指收枪版",
+      "axis": "named_game_plus_variant_probe",
+      "status": "fallback_only",
+      "visible_sample": {
+        "unit": "result_cards",
+        "count": 18
+      },
+      "exact_relevant_count": 0,
+      "broader_relevant_count_min": 7,
+      "observation": "No exact 收枪版 variant appeared, but the query returned multiple broader 抓手指 tutorials, origin stories, host notes, complete-version claims, and atmosphere-led variants.",
+      "source_urls": []
+    },
+    {
+      "query_id": "xhs_zh_023",
+      "query": "抓手指100种玩法 2026",
+      "axis": "compilation_format",
+      "status": "verified_risk_heavy_source",
+      "visible_sample": {
+        "unit": "fixed_posts",
+        "count": 1,
+        "slides_reviewed": 7
+      },
+      "relevant_count": 1,
+      "observation": "All seven images in the fixed post were reviewed manually. The compilation mixes reusable trigger structures with many alcohol, contact, privacy, smoking, fire, and physical-safety risks.",
+      "source_urls": [
+        "https://www.xiaohongshu.com/explore/69f0cbac000000003701f730"
+      ]
+    }
+  ],
+  "fixed_sources": [
+    {
+      "source_id": "xhs_post_66bdc8d2",
+      "title": "培训相关 | 破冰小游戏01 逢三抓手",
+      "url": "https://www.xiaohongshu.com/explore/66bdc8d2000000001e01faff",
+      "evidence_type": "named_game_mechanism",
+      "paraphrased_observation": "Players form a circle and prepare one hand to catch a neighbor while keeping the other hand ready to escape. A narrated target-digit cue triggers the simultaneous reaction. Multiple rounds can add false cues or pacing changes.",
+      "productization": "Suitable as an alcohol-free reflex game when the target cue, hand placement, and opt-out are explained before play.",
+      "safety_flags": [
+        "hand_contact",
+        "startle_or_reflex"
+      ]
+    },
+    {
+      "source_id": "xhs_post_68ce9850",
+      "title": "夜店酒吧黑话",
+      "url": "https://www.xiaohongshu.com/explore/68ce9850000000000702b1e8",
+      "evidence_type": "nightlife_slang_glossary",
+      "paraphrased_observation": "The post groups organizer, recruiting, ordinary-participant, price, eligibility, table-composition, and appearance-gating vocabulary. It is evidence for a nightlife market lexicon, not for a party-game rule set.",
+      "safety_flags": [
+        "commercial_recruitment",
+        "gendered_pricing",
+        "appearance_gatekeeping",
+        "privacy",
+        "possible_exploitation"
+      ]
+    },
+    {
+      "source_id": "xhs_post_6a0095c2",
+      "title": "酒吧小白科普",
+      "url": "https://www.xiaohongshu.com/explore/6a0095c2000000003601db96",
+      "evidence_type": "nightlife_role_explainer",
+      "paraphrased_observation": "A second explainer independently places 局头, management or recruiting roles, A仔, male/female free-entry labels, and venue sales in a role hierarchy. This corroborates the role cluster without making every definition universal.",
+      "safety_flags": [
+        "commercial_recruitment",
+        "gendered_access",
+        "adult_nightlife_context"
+      ]
+    },
+    {
+      "source_id": "xhs_post_69f0cbac",
+      "title": "2026年 还有人去酒吧不知道怎么玩！",
+      "url": "https://www.xiaohongshu.com/explore/69f0cbac000000003701f730",
+      "evidence_type": "seven_image_game_compilation",
+      "paraphrased_observation": "The seven-image compilation contains a large set of trigger ideas. Only reusable mechanism classes and risk categories were retained; individual unsafe prompts were not transcribed.",
+      "safety_flags": [
+        "forced_alcohol",
+        "smoking_or_fire",
+        "mouth_or_object_transfer",
+        "unwanted_body_contact",
+        "sexualized_or_gendered_prompt",
+        "private_device_or_gallery_access",
+        "physical_or_ice_hazard",
+        "assigning_consequences_to_others"
+      ]
+    }
+  ],
+  "slang_evidence": [
+    {
+      "term": "A仔",
+      "evidence_level": "corroborated_by_two_explainer_posts",
+      "working_interpretation": "In these two posts, an ordinary male participant who pays or shares the table cost, rather than the organizer or host.",
+      "caveat": "Nightlife usage can vary by city, venue, and creator. Treat this as a working interpretation, not a universal dictionary definition."
+    },
+    {
+      "term": "女A",
+      "evidence_level": "single_glossary_post_with_cluster_support",
+      "working_interpretation": "Presented as a female counterpart within the same participant and payment vocabulary.",
+      "caveat": "Requires more creator-level and city-level corroboration before formal normalization."
+    },
+    {
+      "term": "女甩",
+      "evidence_level": "single_public_comment_only",
+      "working_interpretation": "One commenter described a transfer between organizers when a participant group could not be assembled.",
+      "caveat": "Do not promote this to a stable definition without repeated independent use."
+    },
+    {
+      "term": "👋6",
+      "evidence_level": "single_public_comment_only",
+      "working_interpretation": "One commenter treated it as price-related shorthand involving six units received.",
+      "caveat": "The unit and scope are unclear; retain only as an unverified search lead."
+    }
+  ],
+  "unverified_related_slang": [
+    "枪手",
+    "代理",
+    "老登",
+    "行情",
+    "得吃",
+    "模子哥/姐",
+    "怪兽",
+    "男免/女免",
+    "罗汉局",
+    "女围局",
+    "皇帝局",
+    "死台",
+    "卡颜局",
+    "洗客",
+    "卡座局",
+    "卡代理",
+    "火拼",
+    "漏价",
+    "男派"
+  ],
+  "safe_mechanism_classes": [
+    {
+      "mechanism": "target_cue_reaction",
+      "description": "A spoken target cue triggers catch-and-escape or another low-contact reflex action.",
+      "guard": "Explain hand placement and allow a no-contact gesture substitute."
+    },
+    {
+      "mechanism": "screen_self_reference",
+      "description": "A displayed instruction refers to the act of viewing the screen itself, creating a harmless reveal or point trigger.",
+      "guard": "Use points or a playful task rather than drinking."
+    },
+    {
+      "mechanism": "provided_device_state",
+      "description": "A host-provided calculator, app screen, or fictional device state becomes the trigger.",
+      "guard": "Never require participants to expose private apps, messages, galleries, contacts, or location."
+    },
+    {
+      "mechanism": "music_or_gesture_timing",
+      "description": "A beat or gesture sequence determines when players act.",
+      "guard": "Keep movements simple, seated-friendly, and skippable."
+    },
+    {
+      "mechanism": "pass_guess_chain",
+      "description": "Use a safe object pass, secret-hand guess, or action chain to build timing and memory.",
+      "guard": "No mouth transfer, fragile objects, forced touch, or unsafe speed."
+    },
+    {
+      "mechanism": "randomizer",
+      "description": "A die, card, or coin selects a player, category, or harmless task.",
+      "guard": "No money, alcohol quantity, humiliation, or non-consensual assignment."
+    }
+  ],
+  "separation_rule": {
+    "gameplay_river": "Only named mechanisms, reusable trigger structures, and safe adaptations enter the gameplay collection.",
+    "risk_slang_river": "Recruiting, price, eligibility, appearance-gating, and participant-market slang stays in a separate risk lexicon and is never turned into a game mechanic."
+  },
+  "constraints": [
+    "No screenshots, authentication tokens, session query parameters, private account data, or long copied captions are stored.",
+    "Visible-card counts are manual lower-bound snapshots rather than platform-wide prevalence estimates.",
+    "Single-comment explanations are retained only as low-confidence search leads.",
+    "Unsafe rules from the seven-image compilation are represented only as risk categories and safe mechanism classes."
+  ]
+}

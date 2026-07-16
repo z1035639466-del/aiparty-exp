@@ -1,0 +1,322 @@
+{
+  "schema_version": "1.0",
+  "report_id": "multilingual_tiktok_live_2026-07-16",
+  "platform": "TikTok",
+  "captured_on": "2026-07-16",
+  "access_context": "ADS 浏览器中的 TikTok 登录态",
+  "scope": {
+    "included_locales": [
+      "es",
+      "it",
+      "fr",
+      "pt-BR",
+      "de",
+      "vi"
+    ],
+    "excluded_platforms": [
+      "小红书",
+      "抖音",
+      "Instagram",
+      "Facebook",
+      "YouTube"
+    ],
+    "paused_locales": [
+      "th",
+      "id",
+      "pl",
+      "ng"
+    ],
+    "pause_reason": "本阶段检测到用户桌面输入后暂停 ADS 浏览器操作；随后四地已在独立报告中完成首轮原生补扫。"
+  },
+  "follow_up_status": "completed_in_separate_report",
+  "follow_up_report": "tier2_tiktok_live_2026-07-16.json",
+  "collection_rules": {
+    "metric_policy": "仅记录采集时页面可见的展示值；K 等单位保持原样，不换算为精确整数。",
+    "comment_policy": "只记录评论呈现的需求、歧义、玩法变体或安全信号；评论内容一律转述，不保存评论者身份。",
+    "content_policy": "标题、页面可见玩法名和查询词按页面展示保留；机制说明采用研究性转述。",
+    "privacy_policy": "未保存私密数据、会话令牌、登录凭据、浏览历史或截图。",
+    "interaction_policy": "未点赞、评论、关注、私信或分享。"
+  },
+  "locale_results": [
+    {
+      "locale": "es",
+      "language": "Spanish",
+      "query": "juegos de previa",
+      "query_assessment": "强场景入口；结果集中在聚会前游戏、卡牌和可复刻的小组机制。",
+      "grid_snapshot": {
+        "relevant_visible_cards": 8,
+        "captured_examples": [
+          {
+            "label": "Ranking Secreto",
+            "visible_likes": "45.9K"
+          },
+          {
+            "label": "El mejor juego de previa",
+            "visible_likes": "26.5K"
+          },
+          {
+            "label": "5 best games",
+            "visible_likes": "20.8K"
+          },
+          {
+            "label": "Contexto Tragón",
+            "visible_likes": "4,346"
+          },
+          {
+            "label": "invented couple game",
+            "visible_likes": "26.2K"
+          },
+          {
+            "label": "La Seta",
+            "visible_likes": null
+          }
+        ],
+        "note": "顶部可见网格中共判定 8 张相关卡；这里只列出现场明确记录了名称或描述的 6 个例子，不补造其余两张卡的信息。"
+      },
+      "detail_observation": {
+        "url": "https://www.tiktok.com/@aula404.madrid/photo/7654174238043114775?q=juegos%20de%20previa",
+        "content_format": "photo",
+        "visible_metrics": {
+          "likes": "45.9K",
+          "comments": "21",
+          "saves": "25.9K"
+        },
+        "visible_game_name": "Ranking Secreto",
+        "player_count": "3+",
+        "approximate_duration": "~15 min",
+        "mechanism_paraphrase": "一人秘密选择一个分类，并在私下按该标准给若干玩家排序。全组只能看到排名，然后用最多五轮提问推断隐藏标准。原内容把猜中与否连接到饮酒惩罚。",
+        "comment_signals_paraphrased": [
+          "有人要求给出完整示例，说明仅靠规则摘要不容易立即理解。",
+          "有人直接反馈说明偏混乱，提示产品化时需要一轮演示或样例卡。",
+          "有人以不饮酒参与者为笑点，反向证明玩法需要明确的无酒精等价路径。"
+        ],
+        "risk_classification": "原版含饮酒输赢条件；可保留推理和秘密排序机制，但不应要求饮酒。",
+        "safe_adaptation": "把结果改成积分、获得线索、执行轻量任务或自愿小口无酒精饮品；任何饮用选项都必须可跳过。"
+      },
+      "atoms": [
+        "秘密标准",
+        "隐藏排序",
+        "限轮提问",
+        "群体推断"
+      ]
+    },
+    {
+      "locale": "it",
+      "language": "Italian",
+      "query": "giochi da bere",
+      "query_assessment": "结果混合；仍能定位到以意大利电视节目为母体的本地化改编。",
+      "grid_snapshot": {
+        "result_mix": "本地与非本地内容混合"
+      },
+      "detail_observation": {
+        "url": "https://www.tiktok.com/@leonardosartore_/photo/7360100743988120864?q=giochi%20da%20bere",
+        "content_format": "photo",
+        "visible_metrics": {
+          "likes": "556",
+          "comments": "3",
+          "saves": "343"
+        },
+        "visible_title": "Giochi Alcolici Pt.1 / Affari Tuoi Alcolico",
+        "mechanism_paraphrase": "把意大利电视节目中的选包选择结构改成红、蓝两组后果清单，再用骰子、纸牌或硬币提供随机性。后果呈递进式，并包含把饮酒责任转给他人的安排。",
+        "risk_classification": "高风险：以酒精量、升级和指定他人饮用为核心，可能形成强迫与过量消费。",
+        "safe_adaptation": "只保留选包、两色后果表和随机揭示；后果全部替换成积分、题目或非羞辱性轻任务，不保留饮酒量与指定他人饮用。"
+      },
+      "atoms": [
+        "本土电视格式改编",
+        "选包揭示",
+        "双色后果表",
+        "骰子/纸牌/硬币随机"
+      ]
+    },
+    {
+      "locale": "fr",
+      "language": "French",
+      "query": "jeux d'apéro",
+      "query_assessment": "强场景入口；apéro 结果覆盖桌游、露台游戏、情侣游戏和自创规则，并非只指饮酒游戏。",
+      "grid_snapshot": {
+        "captured_examples": [
+          "Top 3 apéro",
+          "Box Apéro Game",
+          "5 terrace games",
+          "selection terrace",
+          "couple games",
+          "invent-a-rule"
+        ]
+      },
+      "detail_observation": {
+        "url": "https://www.tiktok.com/@by.natachou/photo/7658003400159792417?q=jeux%20d%27ap%C3%A9ro",
+        "content_format": "photo",
+        "visible_metrics": {
+          "likes": "9",
+          "comments": "0",
+          "saves": "6"
+        },
+        "caption_paraphrase": "内容介绍三种适合 apéro、可覆盖不同聚会氛围的游戏。",
+        "visible_slide": {
+          "game": "LEGO Brick Like This",
+          "player_count": "2+",
+          "themes": [
+            "builder",
+            "nostalgia"
+          ]
+        },
+        "mechanism_paraphrase": "用积木搭建和怀旧感承担聚会互动，不依赖酒精输赢条件。",
+        "risk_classification": "低风险；主要需要注意小零件和参与可达性。",
+        "safe_adaptation": "可直接采用搭建、描述和猜测结构，并为不便操作小积木的人提供大尺寸材料或口头参与方式。"
+      },
+      "atoms": [
+        "共同搭建",
+        "描述与复现",
+        "怀旧触发",
+        "非酒精 apéro"
+      ]
+    },
+    {
+      "locale": "pt-BR",
+      "language": "Portuguese (Brazil)",
+      "query": "jogos para beber",
+      "query_assessment": "英语与葡语结果混合；本地内容出现以赛事间歇为场景的快速节奏玩法。",
+      "grid_snapshot": {
+        "result_mix": "英语与巴西葡语内容混合"
+      },
+      "detail_observation": {
+        "url": "https://www.tiktok.com/@linaa.alves/video/7655718195424283912?q=jogos%20para%20beber",
+        "content_format": "video",
+        "visible_metrics": {
+          "likes": "2,398",
+          "comments": "10",
+          "saves": "643"
+        },
+        "caption_paraphrase": "把玩法定位为巴西杯比赛间歇可快速开始、规则简单的小游戏。",
+        "visible_action_paraphrase": "一组参与者跟随 Eric Prydz 曲目进行快速手势和淘汰节奏循环。",
+        "comment_signals_paraphrased": [
+          "有人询问所用歌曲版本，表明音乐是玩法识别和复刻的关键依赖。",
+          "有人调侃其中一位参与者胜场很多，说明连胜和表现对比会自然成为评论话题。"
+        ],
+        "risk_classification": "机制本身可安全化；如果把淘汰或失误绑定饮酒，会形成速度型连续消费风险。",
+        "safe_adaptation": "保留 BGM、手势、节拍和淘汰/轮换，但胜负只计积分或决定下一轮领拍者。"
+      },
+      "atoms": [
+        "BGM 驱动",
+        "快速手势",
+        "节拍同步",
+        "淘汰与轮换"
+      ]
+    },
+    {
+      "locale": "de",
+      "language": "German",
+      "query": "Trinkspiele",
+      "query_assessment": "结果既有户外和电子游戏叠加玩法，也有关系测试及带成人双关的自制内容；风险跨度大。",
+      "grid_snapshot": {
+        "captured_examples": [
+          "Flunkyball",
+          "Overcooked 2 drinking overlay",
+          "Battle Ball",
+          "relationship test",
+          "provocative homemade adult pun"
+        ]
+      },
+      "detail_observation": {
+        "url": "https://www.tiktok.com/@legamoszockt/video/7662399197722823969?q=Trinkspiele",
+        "content_format": "video",
+        "visible_metrics": {
+          "likes": "71",
+          "comments": "4",
+          "saves": "15"
+        },
+        "visible_recency": "1 day old",
+        "mechanism_paraphrase": "给合作电子游戏 Overcooked 2 叠加线下惩罚：关卡失败就触发一次 shot。",
+        "comment_signals_paraphrased": [
+          "有人追问是否使用伏特加，说明评论会把游戏惩罚进一步具体化为烈酒。",
+          "有人先以未成年人饮酒为笑点，随后又表明酒精有害，呈现出未成年人暴露与风险意识并存的评论语境。"
+        ],
+        "risk_classification": "高风险：失败可重复触发烈酒惩罚，并存在未成年人暴露语境。",
+        "safe_adaptation": "只把关卡失败转换为扣分、换角色、限制下一轮操作或完成无害挑战；完全移除酒精惩罚。"
+      },
+      "atoms": [
+        "电子游戏叠加规则",
+        "失败触发器",
+        "合作压力",
+        "跨屏互动"
+      ]
+    },
+    {
+      "locale": "vi",
+      "language": "Vietnamese",
+      "queries": [
+        {
+          "query": "trò chơi uống rượu",
+          "query_assessment": "可找到派对 UNO、提示词应用和真心话/大冒险牌组，但本地结果密度弱于 `trò chơi nhậu`。",
+          "grid_snapshot": {
+            "captured_examples": [
+              "Party UNO",
+              "prompt app",
+              "truth-or-dare deck"
+            ]
+          },
+          "detail_observation": {
+            "url": "https://www.tiktok.com/@nhieehere/video/7644187836157070613?q=tr%C3%B2%20ch%C6%A1i%20u%E1%BB%91ng%20r%C6%B0%E1%BB%A3u",
+            "content_format": "video",
+            "visible_metrics": {
+              "likes": "138",
+              "comments": "135",
+              "saves": "30"
+            },
+            "caption_paraphrase": "当一群人没有现成游戏时，可以使用这副牌组；页面标签涉及 drinkinggame、thachhaythat、truthordare、giaitri 和 boardgames。",
+            "mechanism_paraphrase": "用现成卡组持续提供真心话、大冒险或挑战提示，解决聚会中不知道玩什么的问题。",
+            "risk_classification": "提示牌可能包含饮酒、隐私或越界挑战；未逐张核验的卡面不可直接复制。",
+            "safe_adaptation": "采用分级提示、明确跳过权、禁隐私胁迫和禁饮酒惩罚的提示卡框架。"
+          }
+        },
+        {
+          "query": "trò chơi nhậu",
+          "query_assessment": "本轮明显更强的本地搜索根；原生结果密度和玩法相关度更高。",
+          "grid_snapshot": {
+            "captured_examples": [
+              "Tới Nóc deck",
+              "Top những trò chơi tốn bia nhất",
+              "21.4K guessing game"
+            ]
+          },
+          "detail_observation": {
+            "url": "https://www.tiktok.com/@nhivahao92/video/7636742685469986068?q=tr%C3%B2%20ch%C6%A1i%20nh%E1%BA%ADu",
+            "content_format": "video",
+            "visible_metrics": {
+              "likes": "21.4K",
+              "comments": "153",
+              "saves": "647"
+            },
+            "visible_text": "Trò chơi đoán từ – Nhậu xong làm gì: B...",
+            "mechanism_paraphrase": "给出问题和首字母，让参与者快速猜出符合条件的词或短语；评论区继续补充带梗的答案变体。",
+            "comment_signals_paraphrased": [
+              "评论者持续提供不同的玩笑答案，说明首字母题面天然能在评论区形成低门槛续写和本地梗分叉。"
+            ],
+            "risk_classification": "猜词机制本身低风险；题面若绑定饮酒、羞辱或成人内容，需要单独过滤。",
+            "safe_adaptation": "保留主题、首字母和限时猜词，用积分或连胜记录替代饮酒后果。"
+          }
+        }
+      ],
+      "search_root_inference": "在本次快照中，`nhậu` 比直译式 `uống rượu` 更能召回越南本地聚会玩法内容。这是本轮搜索证据，不应外推为所有时间、账号和地区都相同。",
+      "atoms": [
+        "提示卡续玩",
+        "真心话/大冒险框架",
+        "首字母猜词",
+        "评论区答案变体"
+      ]
+    }
+  ],
+  "cross_locale_findings": [
+    "本地搜索根通常不是对英语 drinking game 的逐词翻译：西语 previa、法语 apéro、越南语 nhậu 都带有场景和文化语义。",
+    "可复刻内容常借用本地熟悉的载体：意大利电视节目、德国合作电子游戏、巴西赛事间歇与音乐节奏。",
+    "评论的高价值主要在三类信号：规则是否难懂、复刻所需素材或 BGM、以及本地答案和玩法变体。",
+    "所有饮酒触发器都可拆成独立机制，并替换为积分、轮换、线索或自愿轻任务。"
+  ],
+  "limitations": [
+    "这是单次登录态可见页面快照，不是完整平台抓取。",
+    "搜索排序受时间、地区、账号和个性化影响；只把本轮可见结果用于发现，不把排名当作稳定结论。",
+    "未保存截图，也未对未展开的全部幻灯片、完整音轨或所有评论做穷尽式转录。",
+    "可见互动数是页面当时的显示值，之后可能变化。",
+    "本报告当时因检测到用户桌面输入而暂停泰语、印尼语、波兰语和尼日利亚；四地随后已在 tier2_tiktok_live_2026-07-16.json 完成首轮原生补扫。"
+  ]
+}

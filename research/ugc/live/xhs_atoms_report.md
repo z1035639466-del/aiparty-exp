@@ -1,34 +1,34 @@
 # UGC Collection Report
 
-- Records: 28
-- Source URLs: 3
-- Forced-drinking atoms: 13
+- Records: 30
+- Source URLs: 5
+- Forced-drinking atoms: 14
 - Yellow/adult atoms: 5
 
 ## Track
 
 | Value | Count |
 |---|---:|
-| live | 28 |
+| live | 30 |
 
 ## Platform
 
 | Value | Count |
 |---|---:|
-| xiaohongshu | 28 |
+| xiaohongshu | 30 |
 
 ## Language
 
 | Value | Count |
 |---|---:|
-| zh-CN | 28 |
+| zh-CN | 30 |
 
 ## Atom type
 
 | Value | Count |
 |---|---:|
-| parlor_game | 11 |
-| screen_self_ref | 7 |
+| parlor_game | 12 |
+| screen_self_ref | 8 |
 | other | 6 |
 | bgm_chant | 2 |
 | drinking_overlay | 2 |
@@ -37,6 +37,6 @@
 
 | Value | Count |
 |---|---:|
-| none | 23 |
+| none | 25 |
 | yellow | 3 |
 | adult | 2 |

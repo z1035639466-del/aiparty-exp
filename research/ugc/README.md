@@ -5,15 +5,29 @@
 ## 文件
 
 - `live/collection_summary_2026-07-16.md`：本轮数字、核心答案、文件索引与研究空白的总入口。
+- `live/completion_audit_2026-07-16.md`：逐平台、逐方法、逐轨道的完成/部分/未完成审计，是回答“清单是否全部查完”的权威边界。
 - `query_seeds.json`：中文、韩文、英文、西班牙文、意大利文、法文、葡萄牙文、德文、日文、菲律宾和印度场景的三轴词表，并补充必要的游戏锚点、首轮查询和公开来源。
 - `p0_query_log.csv`：平台原生验证日志。每搜索一次写一行，保留自动补全、相关词、标签、创作者、结果抽样和登录结果。
-- `atoms.jsonl`：已人工看过原帖、完成改写、来源与安全标注的机制原子库；不复制原帖长文案。
+- `atoms.jsonl`：已人工看过登录态原帖、完成改写、来源与安全标注的 39 条活体机制原子；不复制原帖长文案。
+- `batch_atoms.jsonl`：17 个小体量批量探针解析、跨语言合并后的 29 条机制原子。
+- `all_atoms.jsonl`：上述两轨合并并再次去重后的 68 条可直接验证原子，是本轮推荐的统一读取入口。
 - `live/xhs_discovery_2026-07-16.md`：小红书“局头”词河、二次回搜和风险词发现。
+- `live/xhs_second_wave_2026-07-16.md`：`逢三抓手`、无效候选词、`A仔` 风险词河与 2026 百玩法图集的第二波核验。
 - `live/douyin_discovery_2026-07-16.md`：抖音“通天代/带、前摇、从夯到拉、锐评”等黑话证据。
+- `live/douyin_nightlife_slang_live_2026-07-16.md`：验证码解除后的夜场黑话原生补扫、局头角色连续谱与 12 类风险局型。
 - `live/tiktok_ads_discovery_2026-07-16.md`：TikTok ADS 登录态中的 pregame、提示卡、命名玩法和主持词。
+- `live/multilingual_tiktok_live_2026-07-16.md`：TikTok 西、意、法、巴葡、德、越六语登录态视频/评论补扫。
+- `live/tier2_tiktok_live_2026-07-16.md`：TikTok 泰、印尼、波兰、尼日利亚四地 ADS 登录态原生补扫。
+- `live/facebook_philippines_live_2026-07-16.md`：Facebook 菲律宾 `Pinoy parlor games` 与 `barkada party games` 登录态 Reels 补扫。
+- `live/pinterest_india_live_2026-07-16.md`：Pinterest 印度 Antakshari 与 Hindi kitty-party 视觉题卡补扫。
+- `live/youtube_korea_live_2026-07-16.md`：韩国 YouTube 登录态首屏、详情章节与字幕访问边界。
 - `live/z_gen_slang_crosswalk_2026-07-16.md`：中外功能对照；明确它不是逐字翻译表。
 - `live/overseas_public_discovery_2026-07-16.md`：多语种公开网页、YouTube、Reddit、应用商店与规则站的补充证据。
+- `live/p2_p3_public_discovery_2026-07-16.md`：印度 Instagram/Pinterest、菲律宾 Facebook/TikTok/社区、韩国 YouTube 的公开证据补扫。
+- `live/tier2_public_discovery_2026-07-16.md`：越南、泰国、印尼、波兰、尼日利亚五地补扫。
 - `live/batch_probe_run_2026-07-16.md`：17 个小体量批量探针的实跑结果；大 dump 与 torrent payload 保持禁用。
+- `live/batch_parse_2026-07-16.md`：11 个内容页的解析、75→29 去重和版权/安全审计。
+- `live/all_atoms_report_2026-07-16.md`：68 条双轨原子的统一统计。
 
 ## 状态怎么读
 

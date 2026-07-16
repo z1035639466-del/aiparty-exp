@@ -1,0 +1,633 @@
+{
+  "atoms": [
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": true,
+      "id": "ugc_0bdd26ee9843e887",
+      "source_ids": [
+        "listicle_psycat_de",
+        "listicle_psycat_en",
+        "listicle_psycat_es",
+        "listicle_psycat_fr",
+        "listicle_psycat_it",
+        "listicle_psycat_pl",
+        "listicle_psycat_pt"
+      ],
+      "title": "花色字母抢词"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_12ffd3e93c5a9bca",
+      "source_ids": [
+        "listicle_ph_staycations_pinoy_parlor"
+      ],
+      "title": "胶带网格室内穿越"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "drinking_overlay",
+      "forced_drinking": true,
+      "id": "ugc_1a1e675b406934e6",
+      "source_ids": [
+        "listicle_psycat_de",
+        "listicle_psycat_en",
+        "listicle_psycat_es",
+        "listicle_psycat_fr",
+        "listicle_psycat_it",
+        "listicle_psycat_pl",
+        "listicle_psycat_pt"
+      ],
+      "title": "积木抽取触发任务"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_1c72e1519a84559c",
+      "source_ids": [
+        "listicle_india_firstcry_kitty_party_games"
+      ],
+      "title": "名人纸条双人表演猜词"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_35f870c5e1d7399d",
+      "source_ids": [
+        "listicle_ph_staycations_pinoy_parlor",
+        "listicle_philippine_primer_party_games"
+      ],
+      "title": "低位奖券绳格"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "drinking_overlay",
+      "forced_drinking": true,
+      "id": "ugc_39e3d35d8bb98cab",
+      "source_ids": [
+        "listicle_psycat_de",
+        "listicle_psycat_en",
+        "listicle_psycat_es",
+        "listicle_psycat_fr",
+        "listicle_psycat_it",
+        "listicle_psycat_pl",
+        "listicle_psycat_pt"
+      ],
+      "title": "四步翻牌预测"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_4a324d2be50557ef",
+      "source_ids": [
+        "listicle_ph_staycations_pinoy_parlor"
+      ],
+      "title": "手持勺青柠接力"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": true,
+      "id": "ugc_4e9d6d2e727a6023",
+      "source_ids": [
+        "listicle_psycat_de",
+        "listicle_psycat_en",
+        "listicle_psycat_es",
+        "listicle_psycat_fr",
+        "listicle_psycat_it",
+        "listicle_psycat_pl",
+        "listicle_psycat_pt"
+      ],
+      "title": "循环报点与匹配拍标"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_5825e60e96e28e28",
+      "source_ids": [
+        "listicle_ph_staycations_pinoy_parlor"
+      ],
+      "title": "口令人数快速成组"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_5f7850aacef90cbd",
+      "source_ids": [
+        "listicle_ph_staycations_pinoy_parlor",
+        "listicle_philippine_primer_party_games"
+      ],
+      "title": "逐轮缩小舞蹈站位"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_61ef59ab83a35000",
+      "source_ids": [
+        "listicle_india_firstcry_kitty_party_games"
+      ],
+      "title": "牌面碎片限时配对"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_665c598cbb5453de",
+      "source_ids": [
+        "listicle_india_firstcry_kitty_party_games"
+      ],
+      "title": "背对背禁名描述"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_6a401cea76a10087",
+      "source_ids": [
+        "listicle_ph_staycations_pinoy_parlor",
+        "listicle_philippine_primer_party_games"
+      ],
+      "title": "安全清单寻物"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_7575e2d483285cce",
+      "source_ids": [
+        "listicle_india_firstcry_kitty_party_games"
+      ],
+      "title": "托盘物件限时回忆"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_78f4a71438bfd285",
+      "source_ids": [
+        "listicle_india_partie_adult_party_games"
+      ],
+      "title": "无声表演猜电影"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_7b43d1e94a61708e",
+      "source_ids": [
+        "listicle_ph_staycations_pinoy_parlor"
+      ],
+      "title": "本地文化图标宾果"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "song_chain",
+      "forced_drinking": false,
+      "id": "ugc_7f49906af2fa1e05",
+      "source_ids": [
+        "listicle_india_firstcry_kitty_party_games"
+      ],
+      "title": "指定词歌曲清单"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "drinking_overlay",
+      "forced_drinking": true,
+      "id": "ugc_883a3dd79df63b5f",
+      "source_ids": [
+        "listicle_psycat_de",
+        "listicle_psycat_en",
+        "listicle_psycat_es",
+        "listicle_psycat_fr",
+        "listicle_psycat_it",
+        "listicle_psycat_pl",
+        "listicle_psycat_pt"
+      ],
+      "title": "公开配料口味盲猜"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_8ffe5aaa81f778b2",
+      "source_ids": [
+        "listicle_india_partie_adult_party_games"
+      ],
+      "title": "逐句共创故事"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_9774649a97c33c9b",
+      "source_ids": [
+        "listicle_india_partie_adult_party_games"
+      ],
+      "title": "叙事主持切换昼夜阶段"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "bgm_chant",
+      "forced_drinking": false,
+      "id": "ugc_9ba67940afdafa77",
+      "source_ids": [
+        "listicle_india_firstcry_kitty_party_games"
+      ],
+      "title": "歌曲片段后定向问答"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_9e7209fc628043d1",
+      "source_ids": [
+        "listicle_ph_staycations_pinoy_parlor",
+        "listicle_philippine_primer_party_games"
+      ],
+      "title": "受限回复猜词"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "bgm_chant",
+      "forced_drinking": false,
+      "id": "ugc_a51cb56752f6fc7c",
+      "source_ids": [
+        "listicle_india_firstcry_kitty_party_games"
+      ],
+      "title": "英译歌名反向识别"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_b017bb67b937bc08",
+      "source_ids": [
+        "listicle_philippine_primer_party_games"
+      ],
+      "title": "音乐停顿定格"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "song_chain",
+      "forced_drinking": false,
+      "id": "ugc_c652927a5a497548",
+      "source_ids": [
+        "listicle_india_partie_adult_party_games"
+      ],
+      "title": "结尾音节歌曲接龙"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_ca02a64a2e7e732e",
+      "source_ids": [
+        "listicle_india_partie_adult_party_games"
+      ],
+      "title": "宝莱坞禁词描述"
+    },
+    {
+      "adult_level": "yellow",
+      "atom_type": "parlor_game",
+      "forced_drinking": true,
+      "id": "ugc_e396c020df1c83b5",
+      "source_ids": [
+        "listicle_psycat_de",
+        "listicle_psycat_en",
+        "listicle_psycat_es",
+        "listicle_psycat_fr",
+        "listicle_psycat_it",
+        "listicle_psycat_pl",
+        "listicle_psycat_pt"
+      ],
+      "title": "自愿任务主持轮换"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "parlor_game",
+      "forced_drinking": false,
+      "id": "ugc_e669cea0342e1c9b",
+      "source_ids": [
+        "listicle_india_partie_adult_party_games"
+      ],
+      "title": "盖牌声明与质疑"
+    },
+    {
+      "adult_level": "none",
+      "atom_type": "drinking_overlay",
+      "forced_drinking": true,
+      "id": "ugc_f3d2375dbe1e5a6d",
+      "source_ids": [
+        "listicle_psycat_de",
+        "listicle_psycat_en",
+        "listicle_psycat_es",
+        "listicle_psycat_fr",
+        "listicle_psycat_it",
+        "listicle_psycat_pl",
+        "listicle_psycat_pt"
+      ],
+      "title": "同点牌救援与目标转移"
+    }
+  ],
+  "generated_at": "2026-07-16T00:00:00+08:00",
+  "inputs": {
+    "cache": ".ugc-cache (gitignored)",
+    "manifest": "research/ugc/batch_sources.json"
+  },
+  "schema_version": 1,
+  "sources": [
+    {
+      "atom_count": 0,
+      "atom_ids": [],
+      "bytes": 699,
+      "id": "hf_namuwiki_size_probe",
+      "kind": "huggingface",
+      "license": "CC BY-NC-SA 2.0 KR as declared by the dataset card; attribution, noncommercial use and share-alike required.",
+      "note": "仅为 Hugging Face 数据集体量与行数元数据，未下载正文。",
+      "source_url": "https://datasets-server.huggingface.co/size?dataset=heegyu%2Fnamuwiki-extracted",
+      "status": "metadata_only"
+    },
+    {
+      "atom_count": 0,
+      "atom_ids": [],
+      "bytes": 13600,
+      "id": "wikimedia_kowiki_checksum_probe",
+      "kind": "wikimedia",
+      "license": "Manifest metadata; underlying Wikimedia text is generally CC BY-SA 4.0 and GFDL, with per-page exceptions and attribution duties.",
+      "note": "仅为 Wikimedia 校验和清单，不含百科正文。",
+      "source_url": "https://dumps.wikimedia.org/kowiki/latest/kowiki-latest-sha1sums.txt",
+      "status": "metadata_only"
+    },
+    {
+      "atom_count": 0,
+      "atom_ids": [],
+      "bytes": 34403,
+      "id": "commoncrawl_catalog_probe",
+      "kind": "common_crawl",
+      "license": "Common Crawl Terms of Use; crawled content keeps each origin's copyright and terms. The crawl is not an open-content license.",
+      "note": "仅为 Common Crawl 集合目录，不含目标网页 WARC 内容。",
+      "source_url": "https://index.commoncrawl.org/collinfo.json",
+      "status": "metadata_only"
+    },
+    {
+      "atom_count": 0,
+      "atom_ids": [],
+      "bytes": 63,
+      "id": "arctic_shift_subreddit_probe",
+      "kind": "arctic_shift",
+      "license": "No archive dataset license stated. Reddit User Content is owned by users; contributor rights, Reddit terms, privacy and removals apply.",
+      "note": "仅返回子版块发现元数据，不含帖子或评论机制。",
+      "source_url": "https://arctic-shift.photon-reddit.com/api/subreddits/search?fields=display_name%2Csubscribers&limit=1&subreddit=DrinkingGames",
+      "status": "metadata_only"
+    },
+    {
+      "atom_count": 0,
+      "atom_ids": [],
+      "bytes": 10458,
+      "id": "arctic_shift_download_index_probe",
+      "kind": "arctic_shift",
+      "license": "No repository or archive dataset license stated. Treat this file as discovery metadata, not a license to reuse Reddit content.",
+      "note": "仅为存档下载索引，不含 Reddit 帖子或评论正文。",
+      "source_url": "https://raw.githubusercontent.com/ArthurHeitmann/arctic_shift/master/download_links.md",
+      "status": "metadata_only"
+    },
+    {
+      "atom_count": 0,
+      "atom_ids": [],
+      "bytes": 21174,
+      "id": "academic_torrents_2026_06_details_probe",
+      "kind": "academic_torrents",
+      "license": "Dataset license field is blank. Hosting terms do not grant reuse rights; Reddit contributor rights, privacy and removal duties remain.",
+      "note": "仅为 70.38 GiB 月度数据集详情页，未打开 torrent payload。",
+      "source_url": "https://academictorrents.com/details/3bac8bd352bbb74bbb23df4273cf3da5d66ee5a5",
+      "status": "metadata_only"
+    },
+    {
+      "atom_count": 7,
+      "atom_ids": [
+        "ugc_0bdd26ee9843e887",
+        "ugc_1a1e675b406934e6",
+        "ugc_39e3d35d8bb98cab",
+        "ugc_4e9d6d2e727a6023",
+        "ugc_883a3dd79df63b5f",
+        "ugc_e396c020df1c83b5",
+        "ugc_f3d2375dbe1e5a6d"
+      ],
+      "bytes": 61831,
+      "id": "listicle_psycat_en",
+      "kind": "url_list",
+      "license": "Copyrighted site content; no open license. PsyCat terms reserve IP. Cache privately, extract/rewrite facts only, and do not redistribute HTML.",
+      "note": "短标记核验通过；只提交改写后的机制事实。",
+      "source_url": "https://psycatgames.com/magazine/party-games/student-drinking-games",
+      "status": "content_parsed"
+    },
+    {
+      "atom_count": 7,
+      "atom_ids": [
+        "ugc_0bdd26ee9843e887",
+        "ugc_1a1e675b406934e6",
+        "ugc_39e3d35d8bb98cab",
+        "ugc_4e9d6d2e727a6023",
+        "ugc_883a3dd79df63b5f",
+        "ugc_e396c020df1c83b5",
+        "ugc_f3d2375dbe1e5a6d"
+      ],
+      "bytes": 66668,
+      "id": "listicle_psycat_de",
+      "kind": "url_list",
+      "license": "Copyrighted site content; no open license. PsyCat terms reserve IP. Cache privately, extract/rewrite facts only, and do not redistribute HTML.",
+      "note": "短标记核验通过；只提交改写后的机制事实。",
+      "source_url": "https://psycatgames.com/de/magazine/party-games/student-drinking-games",
+      "status": "content_parsed"
+    },
+    {
+      "atom_count": 7,
+      "atom_ids": [
+        "ugc_0bdd26ee9843e887",
+        "ugc_1a1e675b406934e6",
+        "ugc_39e3d35d8bb98cab",
+        "ugc_4e9d6d2e727a6023",
+        "ugc_883a3dd79df63b5f",
+        "ugc_e396c020df1c83b5",
+        "ugc_f3d2375dbe1e5a6d"
+      ],
+      "bytes": 65990,
+      "id": "listicle_psycat_es",
+      "kind": "url_list",
+      "license": "Copyrighted site content; no open license. PsyCat terms reserve IP. Cache privately, extract/rewrite facts only, and do not redistribute HTML.",
+      "note": "短标记核验通过；只提交改写后的机制事实。",
+      "source_url": "https://psycatgames.com/es/magazine/party-games/student-drinking-games",
+      "status": "content_parsed"
+    },
+    {
+      "atom_count": 7,
+      "atom_ids": [
+        "ugc_0bdd26ee9843e887",
+        "ugc_1a1e675b406934e6",
+        "ugc_39e3d35d8bb98cab",
+        "ugc_4e9d6d2e727a6023",
+        "ugc_883a3dd79df63b5f",
+        "ugc_e396c020df1c83b5",
+        "ugc_f3d2375dbe1e5a6d"
+      ],
+      "bytes": 68088,
+      "id": "listicle_psycat_fr",
+      "kind": "url_list",
+      "license": "Copyrighted site content; no open license. PsyCat terms reserve IP. Cache privately, extract/rewrite facts only, and do not redistribute HTML.",
+      "note": "短标记核验通过；只提交改写后的机制事实。",
+      "source_url": "https://psycatgames.com/fr/magazine/party-games/student-drinking-games",
+      "status": "content_parsed"
+    },
+    {
+      "atom_count": 7,
+      "atom_ids": [
+        "ugc_0bdd26ee9843e887",
+        "ugc_1a1e675b406934e6",
+        "ugc_39e3d35d8bb98cab",
+        "ugc_4e9d6d2e727a6023",
+        "ugc_883a3dd79df63b5f",
+        "ugc_e396c020df1c83b5",
+        "ugc_f3d2375dbe1e5a6d"
+      ],
+      "bytes": 65667,
+      "id": "listicle_psycat_it",
+      "kind": "url_list",
+      "license": "Copyrighted site content; no open license. PsyCat terms reserve IP. Cache privately, extract/rewrite facts only, and do not redistribute HTML.",
+      "note": "短标记核验通过；只提交改写后的机制事实。",
+      "source_url": "https://psycatgames.com/it/magazine/party-games/student-drinking-games",
+      "status": "content_parsed"
+    },
+    {
+      "atom_count": 7,
+      "atom_ids": [
+        "ugc_0bdd26ee9843e887",
+        "ugc_1a1e675b406934e6",
+        "ugc_39e3d35d8bb98cab",
+        "ugc_4e9d6d2e727a6023",
+        "ugc_883a3dd79df63b5f",
+        "ugc_e396c020df1c83b5",
+        "ugc_f3d2375dbe1e5a6d"
+      ],
+      "bytes": 65194,
+      "id": "listicle_psycat_pt",
+      "kind": "url_list",
+      "license": "Copyrighted site content; no open license. PsyCat terms reserve IP. Cache privately, extract/rewrite facts only, and do not redistribute HTML.",
+      "note": "短标记核验通过；只提交改写后的机制事实。",
+      "source_url": "https://psycatgames.com/pt/magazine/party-games/student-drinking-games",
+      "status": "content_parsed"
+    },
+    {
+      "atom_count": 7,
+      "atom_ids": [
+        "ugc_0bdd26ee9843e887",
+        "ugc_1a1e675b406934e6",
+        "ugc_39e3d35d8bb98cab",
+        "ugc_4e9d6d2e727a6023",
+        "ugc_883a3dd79df63b5f",
+        "ugc_e396c020df1c83b5",
+        "ugc_f3d2375dbe1e5a6d"
+      ],
+      "bytes": 66126,
+      "id": "listicle_psycat_pl",
+      "kind": "url_list",
+      "license": "Copyrighted site content; no open license. PsyCat terms reserve IP. Cache privately, extract/rewrite facts only, and do not redistribute HTML.",
+      "note": "短标记核验通过；只提交改写后的机制事实。",
+      "source_url": "https://psycatgames.com/pl/magazine/party-games/student-drinking-games",
+      "status": "content_parsed"
+    },
+    {
+      "atom_count": 5,
+      "atom_ids": [
+        "ugc_35f870c5e1d7399d",
+        "ugc_5f7850aacef90cbd",
+        "ugc_6a401cea76a10087",
+        "ugc_9e7209fc628043d1",
+        "ugc_b017bb67b937bc08"
+      ],
+      "bytes": 109974,
+      "id": "listicle_philippine_primer_party_games",
+      "kind": "url_list",
+      "license": "Publisher copyright; no open license stated. Public access is not a reuse grant. Cache privately and keep only attributed, rewritten facts.",
+      "note": "短标记核验通过；只提交改写后的机制事实。",
+      "source_url": "https://primer.com.ph/tips-guides/2016/12/26/common-filipino-party-games",
+      "status": "content_parsed"
+    },
+    {
+      "atom_count": 8,
+      "atom_ids": [
+        "ugc_12ffd3e93c5a9bca",
+        "ugc_35f870c5e1d7399d",
+        "ugc_4a324d2be50557ef",
+        "ugc_5825e60e96e28e28",
+        "ugc_5f7850aacef90cbd",
+        "ugc_6a401cea76a10087",
+        "ugc_7b43d1e94a61708e",
+        "ugc_9e7209fc628043d1"
+      ],
+      "bytes": 125059,
+      "id": "listicle_ph_staycations_pinoy_parlor",
+      "kind": "url_list",
+      "license": "Publisher copyright; no open license stated. Public access is not a reuse grant. Cache privately and keep only attributed, rewritten facts.",
+      "note": "短标记核验通过；只提交改写后的机制事实。",
+      "source_url": "https://staycations.ph/ultimate-list-of-pinoy-parlor-games",
+      "status": "content_parsed"
+    },
+    {
+      "atom_count": 6,
+      "atom_ids": [
+        "ugc_78f4a71438bfd285",
+        "ugc_8ffe5aaa81f778b2",
+        "ugc_9774649a97c33c9b",
+        "ugc_c652927a5a497548",
+        "ugc_ca02a64a2e7e732e",
+        "ugc_e669cea0342e1c9b"
+      ],
+      "bytes": 153812,
+      "id": "listicle_india_partie_adult_party_games",
+      "kind": "url_list",
+      "license": "Publisher copyright; no open license stated. Public access is not a reuse grant. Cache privately and keep only attributed, rewritten facts.",
+      "note": "短标记核验通过；只提交改写后的机制事实。",
+      "source_url": "https://partie.in/blog/best-party-games-for-adults-india",
+      "status": "content_parsed"
+    },
+    {
+      "atom_count": 7,
+      "atom_ids": [
+        "ugc_1c72e1519a84559c",
+        "ugc_61ef59ab83a35000",
+        "ugc_665c598cbb5453de",
+        "ugc_7575e2d483285cce",
+        "ugc_7f49906af2fa1e05",
+        "ugc_9ba67940afdafa77",
+        "ugc_a51cb56752f6fc7c"
+      ],
+      "bytes": 485241,
+      "id": "listicle_india_firstcry_kitty_party_games",
+      "kind": "url_list",
+      "license": "Publisher copyright; no open license stated. Public access is not a reuse grant. Cache privately and keep only attributed, rewritten facts.",
+      "note": "短标记核验通过；只提交改写后的机制事实。",
+      "source_url": "https://parenting.firstcry.com/articles/25-fun-kitty-party-games-ideas",
+      "status": "content_parsed"
+    }
+  ],
+  "summary": {
+    "content_source_count": 11,
+    "deduplicated_atom_count": 29,
+    "downloaded_probe_count": 17,
+    "duplicates_collapsed": 46,
+    "enabled_probe_count": 17,
+    "forced_drinking_atom_count": 7,
+    "metadata_only_source_count": 6,
+    "raw_candidate_record_count": 75,
+    "retained_source_url_count": 11,
+    "yellow_or_adult_atom_count": 1
+  }
+}
