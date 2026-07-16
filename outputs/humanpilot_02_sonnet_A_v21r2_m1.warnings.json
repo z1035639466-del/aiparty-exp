@@ -1,0 +1,8 @@
+{
+  "file": "humanpilot_02_sonnet_A_v21r2_m1.json",
+  "spec_version": "v2.1.1",
+  "warnings": [
+    "dead_prop:命运转盘",
+    "dead_prop:定时炸弹"
+  ]
+}

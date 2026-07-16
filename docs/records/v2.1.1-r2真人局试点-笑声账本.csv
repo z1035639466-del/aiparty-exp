@@ -1,0 +1,4 @@
+session_id,date,game_file,players_n,duration_min,first_laugh_s,laugh_events,group_laugh_events,peak_laugh_n,dead_air_events,rule_questions,opt_outs,completed,would_replay_yes,host_notes
+1,,humanpilot_01_haiku_A_v21r2.json,3,,,,,,,,,,,
+2,,humanpilot_02_sonnet_A_v21r2_m1.json,3,,,,,,,,,,,
+3,,humanpilot_03_sonnet_C_v21r2_m1.json,4,,,,,,,,,,,
