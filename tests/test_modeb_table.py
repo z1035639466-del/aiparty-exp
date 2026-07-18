@@ -48,11 +48,33 @@ def test_openai_compat_payload_shape(monkeypatch):
 
     monkeypatch.setattr(transports, "_post_json", fake_post)
     monkeypatch.setenv("DEEPSEEK_API_KEY", "dk-test")
-    t = transports.OpenAICompatTransport()
+    t = transports.make_transport("deepseek")
     assert t.complete("SYS", [{"role": "user", "content": "hi"}]) == "ok"
-    assert captured["url"].endswith("/chat/completions")
+    assert captured["url"] == "https://api.deepseek.com/chat/completions"
     assert captured["payload"]["messages"][0] == {"role": "system", "content": "SYS"}
-    assert captured["payload"]["model"] == "deepseek-chat"
+    assert captured["payload"]["model"] == "deepseek-v4-pro"
+
+
+def test_cn_provider_registry_matches_bidding_config():
+    """五家注册表与 run_cn_bidding.py(aiparty-cn-bidding-rerun-20260715)同源核对。"""
+    from modeb.transports import CN_PROVIDERS, make_transport
+    import run_cn_bidding as bidding
+    by_base = {p.base_url: p.requested_model for p in bidding.PROVIDERS} \
+        if hasattr(bidding, "PROVIDERS") else None
+    expect = {
+        "minimax": ("https://api.minimaxi.com/v1", "MiniMax-M2.7"),
+        "kimi": ("https://api.moonshot.cn/v1", "kimi-k2.6"),
+        "glm": ("https://open.bigmodel.cn/api/paas/v4", "glm-5.1"),
+        "qwen": ("https://dashscope.aliyuncs.com/compatible-mode/v1", "qwen3.7-plus"),
+        "deepseek": ("https://api.deepseek.com", "deepseek-v4-pro"),
+    }
+    for name, (base, model) in expect.items():
+        assert CN_PROVIDERS[name]["base"] == base
+        assert CN_PROVIDERS[name]["model"] == model
+        t = make_transport(name)
+        assert t.base == base and t.model == model
+        if by_base is not None:
+            assert by_base.get(base) == model, f"{name} 与竞标脚本配置漂移"
 
 
 def test_transport_requires_key(monkeypatch):

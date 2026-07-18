@@ -10,12 +10,19 @@ import os
 import urllib.request
 
 ANTHROPIC_BASE = "https://api.anthropic.com"
-DEEPSEEK_BASE = "https://api.deepseek.com"
 
 MODELS = {
     "sonnet": "claude-sonnet-5",
     "haiku": "claude-haiku-4-5-20251001",
-    "deepseek": "deepseek-chat",
+}
+
+# 国产五家注册表:与 run_cn_bidding.py(aiparty-cn-bidding-rerun-20260715)同源同配置
+CN_PROVIDERS = {
+    "minimax": {"base": "https://api.minimaxi.com/v1", "model": "MiniMax-M2.7", "key_env": "MINIMAX_API_KEY"},
+    "kimi": {"base": "https://api.moonshot.cn/v1", "model": "kimi-k2.6", "key_env": "MOONSHOT_API_KEY"},
+    "glm": {"base": "https://open.bigmodel.cn/api/paas/v4", "model": "glm-5.1", "key_env": "GLM_API_KEY"},
+    "qwen": {"base": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qwen3.7-plus", "key_env": "DASHSCOPE_API_KEY"},
+    "deepseek": {"base": "https://api.deepseek.com", "model": "deepseek-v4-pro", "key_env": "DEEPSEEK_API_KEY"},
 }
 
 
@@ -48,14 +55,14 @@ class AnthropicTransport:
 
 
 class OpenAICompatTransport:
-    """DeepSeek 等 OpenAI 兼容口:system 并入 messages 首条。"""
+    """OpenAI 兼容口(国产五家全走此口,/chat/completions):system 并入 messages 首条。"""
 
-    def __init__(self, model: str = MODELS["deepseek"], max_tokens: int = 800,
-                 base_url: str | None = None, key_env: str = "DEEPSEEK_API_KEY") -> None:
+    def __init__(self, model: str, base_url: str, key_env: str,
+                 max_tokens: int = 800) -> None:
         self.model = MODELS.get(model, model)
         self.max_tokens = max_tokens
         self.key_env = key_env
-        self.base = (base_url or os.environ.get("DEEPSEEK_BASE_URL") or DEEPSEEK_BASE).rstrip("/")
+        self.base = base_url.rstrip("/")
 
     def complete(self, system: str, messages: list[dict]) -> str:
         key = os.environ.get(self.key_env)
@@ -70,12 +77,13 @@ class OpenAICompatTransport:
 
 
 def make_transport(provider: str, model: str | None = None):
-    """provider: anthropic | deepseek | mock(测试)。model 可用别名 sonnet/haiku/deepseek。"""
+    """provider: anthropic | minimax|kimi|glm|qwen|deepseek(国产五家,竞标同配) | mock。"""
     if provider == "anthropic":
         return AnthropicTransport(model or "haiku")
-    if provider == "deepseek":
-        return OpenAICompatTransport(model or "deepseek")
+    if provider in CN_PROVIDERS:
+        cfg = CN_PROVIDERS[provider]
+        return OpenAICompatTransport(model or cfg["model"], cfg["base"], cfg["key_env"])
     if provider == "mock":
         from .driver_llm import MockTransport
         return MockTransport([])
-    raise ValueError(f"未知 provider: {provider}")
+    raise ValueError(f"未知 provider: {provider}(可用: anthropic/{'/'.join(CN_PROVIDERS)}/mock)")
