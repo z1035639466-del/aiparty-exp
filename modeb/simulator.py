@@ -173,6 +173,15 @@ class Handler(BaseHTTPRequestHandler):
                     s.engine.push_event(ev)
                 self._json(200, {"queued": ev})
                 return
+            if self.path == "/api/finish":
+                # 收局必须是一条不经过模型的硬路径:llm 驱动下 UI 的 tool_use 会被丢弃,
+                # 走 /api/turn 收局等于再花一次钱问主持人想干嘛,而且收不掉。
+                with s.lock:
+                    if not s.state.finished:
+                        s.state.finished = True
+                        s.recent.append(s.engine.run(max_turns=s.engine.marks["turns"]))
+                self._json(200, {"finished": True})
+                return
             if self.path == "/api/turn":
                 body = self._body()
                 with s.lock:

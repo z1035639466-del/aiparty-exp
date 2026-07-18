@@ -22,6 +22,8 @@
   .turnline { border-bottom: 1px dashed #333; padding: 3px 0; }
   .host-text { color: #9f9; }
   .clamp { color: #f66; }
+  .events { color: #8bd; font-size: 12px; padding-left: 10px; }
+  .ev { margin-right: 8px; white-space: nowrap; }
   small { color: #888; }
 </style>
 <div>
@@ -38,7 +40,7 @@
     <input id="objects" value="瓶子,冰块,纸巾,手机,杯子,打火机" title="现场实物(perceive 扫描占位)">
     <input id="bots" placeholder="bot 座位,如 阿伟:显眼包,琳琳:气氛组组长(留空=全真人)">
     <div style="display:flex;gap:6px;margin-top:4px">
-      <select id="provider"><option>anthropic</option><option>deepseek</option><option>kimi</option><option>glm</option><option>qwen</option><option>minimax</option></select>
+      <select id="provider" onchange="syncModels()"><option>anthropic</option><option>deepseek</option><option>kimi</option><option>glm</option><option>qwen</option><option>minimax</option></select>
       <input id="hostmodel" value="sonnet" title="主持模型">
       <input id="seatmodel" value="sonnet" title="桌友模型">
       <select id="scorestyle" title="结算风格(驾驶舱调试用;产品端零设置,AI读场匹配)"><option value="自动">自动(AI读场)</option>
@@ -49,6 +51,7 @@
     </div>
     <button onclick="start()">开局</button>
   </div>
+  <div class="card" id="askcard" style="display:none"><h3>🎤 主持在问</h3><div id="ask"></div></div>
   <div class="card"><h3>玩家机位</h3><div id="panes"></div></div>
   <div class="card"><h3>主持台(manual 驱动:填决策→执行回合)</h3>
     <input id="htext" placeholder="主持词 ≤3 句">
@@ -58,7 +61,7 @@
       <button onclick="quick('[{&quot;name&quot;:&quot;state.next_round&quot;,&quot;input&quot;:{}}]')">下一轮</button>
       <button onclick="quick('[{&quot;name&quot;:&quot;draw_atom&quot;,&quot;input&quot;:{&quot;野度&quot;:5}}]')">抽原子</button>
       <button onclick="quick('[{&quot;name&quot;:&quot;random.pick&quot;,&quot;input&quot;:{&quot;from&quot;:&quot;players&quot;}}]')">随机点人</button>
-      <button onclick="quick('[{&quot;name&quot;:&quot;state.finish&quot;,&quot;input&quot;:{}}]')">收局</button>
+      <button onclick="finishNow()">🛑 收局</button>
       <button style="background:#274" onclick="turn()">▶ 执行回合</button>
     </div>
   </div>
@@ -72,6 +75,19 @@ const $ = id => document.getElementById(id);
 async function api(path, body) {
   const r = await fetch(path, body ? {method:"POST", body: JSON.stringify(body)} : undefined);
   return r.json();
+}
+// 各家默认模型:换 provider 时同步两个模型框,免得把 sonnet/haiku 发给国产口。
+const PROVIDER_MODELS = {
+  anthropic: ["sonnet", "haiku"],
+  deepseek: ["deepseek-v4-pro", "deepseek-v4-flash"],
+  kimi: ["kimi-k2.6", "kimi-k2.6"],
+  glm: ["glm-5.1", "glm-5.1"],
+  qwen: ["qwen3.7-plus", "qwen3.7-plus"],
+  minimax: ["MiniMax-M2.7", "MiniMax-M2.7"],
+};
+function syncModels() {
+  const [host, seat] = PROVIDER_MODELS[$("provider").value] || [];
+  if (host) { $("hostmodel").value = host; $("seatmodel").value = seat; }
 }
 async function start() {
   const bots = {};
@@ -92,6 +108,12 @@ setInterval(async () => {  // 事件驱动心跳:有新事件/计时器到点才
     await api("/api/turn", {});
 }, 2000);
 function quick(js) { $("htools").value = js; }
+// 收局走专用口,不经过模型;顺手关掉自动回合,确保 4 秒心跳彻底停下。
+async function finishNow() {
+  $("auto").checked = false;
+  await api("/api/finish", {});
+  refresh();
+}
 async function turn() {
   let tools = [];
   try { tools = $("htools").value.trim() ? JSON.parse($("htools").value) : []; }
@@ -115,12 +137,48 @@ function paneHtml(p, s) {
     <button onclick="ev('vote','${p}',{value:'反对'})">🗳 反</button>
     <button onclick="ev('ritual_done','${p}')">🪄 仪式</button>
     <button onclick="ev('optout','${p}')" title="零代价安全退出(底线,罕用)">🚫</button>
-    <button onclick="ev('laugh','${p}')" title="观察员打点:替代纸笔笑声账本;产品端无此键,笑声走感知窗口+局后问卷">😂</button></div>`;
+    <button onclick="ev('laugh','${p}')" title="观察员打点:替代纸笔笑声账本;产品端无此键,笑声走感知窗口+局后问卷">😂</button>
+    ${bot ? "" : `<div style="display:flex;gap:4px;margin-top:4px">
+      <input id="say-${p}" placeholder="说点什么(回车发)" style="flex:1"
+             onkeydown="if(event.key==='Enter')sayAs('${p}')">
+      <button onclick="sayAs('${p}')">💬 发言</button></div>`}</div>`;
+}
+// 真人座位的发言口。bot 自己会 say,真人以前反而没处说话。
+async function sayAs(p) {
+  const el = $("say-" + p), text = el.value.trim();
+  if (!text) return;
+  el.value = "";
+  await ev("say", p, {text});
+}
+// 桌面反应(桌友 agent + 真人)。这些事件是本回合开始前收上来的,
+// 即对上一拍的回应——过去只喂给主持,驾驶舱里完全看不见。
+const EV_ICON = {laugh: "😂", pass: "🙅", tap: "👍", vote: "🗳", ritual_done: "🪄", say: "💬"};
+function eventsHtml(events) {
+  if (!events || !events.length) return "";
+  const parts = events.map(e => {
+    const body = e.text ? `「${e.text}」` : (e.value || "");
+    return `<span class="ev">${e.player} ${EV_ICON[e.type] || e.type} ${body}</span>`;
+  });
+  return `<div class="events">↩ ${parts.join(" ")}</div>`;
+}
+// 把主持最近一次 ask 顶到显眼处;有 options 就渲染成可点的按钮。
+function renderAsk(s) {
+  let ask = null;
+  for (const t of s.recent_turns) for (const r of (t.results || []))
+    if (r.tool === "ask" && r.ok) ask = r.result;
+  if (!ask) { $("askcard").style.display = "none"; return; }
+  $("askcard").style.display = "";
+  const seats = s.players.filter(p => !(s.bots || []).includes(p));
+  const opts = (ask.options || []).map(o =>
+    seats.map(p => `<button onclick="ev('say','${p}',{text:'${o}'})">${o}${seats.length > 1 ? ` (${p})` : ""}</button>`).join("")).join(" ");
+  $("ask").innerHTML = `<div><b>@${ask.asked}</b> ${ask.prompt}</div>${opts ? `<div style="margin-top:4px">${opts}</div>` : ""}`;
+>>>>>>> 98a63b8 (fix(modeb): 接 DeepSeek 实测暴露的六处——从"跑不起来"到"坐得下人")
 }
 async function refresh() {
   const s = await api("/api/state");
   if (s.no_session) { $("digest").textContent = "未开局"; return; }
   $("panes").innerHTML = s.players.map(p => paneHtml(p, s)).join("");
+  renderAsk(s);
   $("digest").textContent = JSON.stringify(s.digest, null, 1)
     + "\n埋点 " + JSON.stringify(s.marks) + (s.finished ? "\n【局已收】" : "");
   $("log").innerHTML = s.recent_turns.map(t => t.episode_summary
@@ -128,6 +186,7 @@ async function refresh() {
     : `<div class="turnline">#${t.turn} <span class="host-text">${t.text}</span> `
       + `${JSON.stringify(t.tool_use)}`
       + (t.results||[]).filter(r=>!r.ok).map(r=>` <span class="clamp">⛔${r.clamped}</span>`).join("")
+      + eventsHtml(t.events_in)
       + `</div>`).join("");
   $("log").scrollTop = $("log").scrollHeight;
 }

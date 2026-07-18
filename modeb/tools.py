@@ -57,7 +57,10 @@ class ToolExecutor:
 
     # —— 分发 ——
     def execute(self, call: dict[str, Any]) -> dict[str, Any]:
-        name, args = call["name"], call.get("input", {})
+        name, args = call["name"], call.get("input") or {}
+        # 模型爱把不填的参数显式写成 null,而 a.get(k, 默认值) 在「键在、值为 null」
+        # 时返回 None 而非默认值,下游 int()/for 就地爆炸。入口剥掉 null,让默认值生效。
+        args = {k: v for k, v in args.items() if v is not None}
         try:
             handler = getattr(self, "_t_" + name.split(".")[0])
         except AttributeError:
@@ -67,6 +70,9 @@ class ToolExecutor:
             return {"tool": name, "ok": True, "result": result}
         except ClampError as e:
             return self._clamp(name, args, str(e))
+        except (TypeError, ValueError, KeyError) as e:
+            # 参数形状不对不该掀桌:降级成钳制记录,局照转,证据留在 episode 里。
+            return self._clamp(name, args, f"参数不合法: {type(e).__name__}: {e}")
 
     def _clamp(self, name: str, args: dict, reason: str) -> dict:
         entry = {"tool": name, "ok": False, "clamped": reason, "args": args}

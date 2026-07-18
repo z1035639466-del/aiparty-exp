@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import os
+import urllib.error
 import urllib.request
 
 ANTHROPIC_BASE = "https://api.anthropic.com"
@@ -31,8 +32,15 @@ def _post_json(url: str, headers: dict, payload: dict, timeout: int = 60) -> dic
         url, method="POST",
         headers={"Content-Type": "application/json", **headers},
         data=json.dumps(payload).encode())
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return json.loads(r.read())
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        # 供应商把真正的原因(模型名不存在/参数不合法/余额不足)写在正文里,
+        # 光靠状态码没法定位。正文里不含密钥,可以安全带进异常。
+        detail = e.read().decode("utf-8", "replace")[:500]
+        raise RuntimeError(
+            f"{url} 返回 HTTP {e.code}:{detail}(model={payload.get('model')!r})") from None
 
 
 class AnthropicTransport:
@@ -59,7 +67,9 @@ class OpenAICompatTransport:
 
     def __init__(self, model: str, base_url: str, key_env: str,
                  max_tokens: int = 800) -> None:
-        self.model = MODELS.get(model, model)
+        # 注意:不套 MODELS——那是 Anthropic 的别名表,套上来会把 sonnet 翻成
+        # claude-sonnet-5 发给国产口,换来一个没头没脑的 400。
+        self.model = model
         self.max_tokens = max_tokens
         self.key_env = key_env
         self.base = base_url.rstrip("/")
@@ -82,7 +92,11 @@ def make_transport(provider: str, model: str | None = None):
         return AnthropicTransport(model or "haiku")
     if provider in CN_PROVIDERS:
         cfg = CN_PROVIDERS[provider]
-        return OpenAICompatTransport(model or cfg["model"], cfg["base"], cfg["key_env"])
+        # sonnet/haiku 是 Anthropic 档位别名,对国产口无意义(UI 与 CLI 的出厂默认值
+        # 恰好是它们)。此时回落到本家默认模型,而不是把别名原样发出去换 400。
+        if not model or model in MODELS:
+            model = cfg["model"]
+        return OpenAICompatTransport(model, cfg["base"], cfg["key_env"])
     if provider == "mock":
         from .driver_llm import MockTransport
         return MockTransport([])

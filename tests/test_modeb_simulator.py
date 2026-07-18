@@ -84,3 +84,53 @@ def test_scripted_driver_full_game_via_http(server):
             break
     snap, _ = call(server, "/api/state")
     assert snap["finished"], "scripted 驱动应在模拟台上跑完整局"
+
+
+class _CountingTransport:
+    """记账用假传输:每次模型调用 +1,返回一个合法的空决策。
+
+    用来证明某条路径「不烧 API」——断言必须配对照组,
+    否则一个从不调用任何东西的测试也能通过,等于没测。
+    """
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def complete(self, system, messages):
+        self.calls += 1
+        return json.dumps({"text": "继续。", "tool_use": []}, ensure_ascii=False)
+
+
+def _start_llm_table(base, monkeypatch):
+    """llm 主持 + 两个 bot 座位,全部挂同一个记账传输。"""
+    tr = _CountingTransport()
+    monkeypatch.setattr("modeb.simulator.make_transport", lambda *a, **k: tr)
+    call(base, "/api/start", {"players": ["我", "阿伟", "琳琳"],
+                              "bots": {"阿伟": "显眼包", "琳琳": "气氛组组长"},
+                              "minutes": 30, "wildness": 6, "objects": ["瓶子"],
+                              "driver": "llm", "provider": "deepseek"})
+    return tr
+
+
+def test_finish_costs_no_api_call(server, monkeypatch):
+    """收局必须是零模型调用:llm 驱动下 UI 的 tool_use 会被丢弃,
+    走 /api/turn 收局既收不掉、还白烧一次钱。"""
+    tr = _start_llm_table(server, monkeypatch)
+    assert tr.calls == 0, "开局本身不该调用模型"
+
+    body, status = call(server, "/api/finish", {})
+    assert status == 200 and body["finished"] is True
+    assert tr.calls == 0, f"收局烧了 {tr.calls} 次模型调用,应为 0"
+
+    snap, _ = call(server, "/api/state")
+    assert snap["finished"] is True, "收局后 finished 必须为真"
+
+    call(server, "/api/finish", {})          # 重复收局
+    assert tr.calls == 0, "重复收局仍不该调用模型"
+
+
+def test_turn_does_cost_api_calls(server, monkeypatch):
+    """对照组:证明上面那个计数器真的会动——否则零调用的断言毫无意义。"""
+    tr = _start_llm_table(server, monkeypatch)
+    call(server, "/api/turn", {})
+    assert tr.calls >= 3, f"一回合应有 1 次主持 + 2 次座位调用,实际 {tr.calls}"
