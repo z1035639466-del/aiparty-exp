@@ -1,0 +1,184 @@
+"""M2 · 多机模拟台(开发驾驶舱,非产品面)。
+
+一页 = N 个玩家 pane(2–10 任意,机位数不改机制)+ 主持台 + 账本/episode 实时窗。
+玩家事件 → engine.push_event;回合驱动:manual(主持台提交决策)或 scripted。
+纯标准库(http.server),零依赖;产品端另起炉灶,本台不为浏览器妥协任何设计
+(裁定纪要:浏览器损失逐件上报——本台非产品,无此问题)。
+
+用法:python -m modeb.simulator [--port 8747]  → 浏览器开 http://localhost:8747
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import threading
+from datetime import datetime
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+
+from .driver_scripted import ScriptedDriver
+from .engine import Engine
+from .state import GameState
+
+MIN_PLAYERS, MAX_PLAYERS = 2, 10  # 机位上限只是这一行常数,机制不感知机位数
+
+
+class ManualDriver:
+    """主持台驱动:/api/turn 随请求带入决策,decide 原样返回。"""
+
+    def __init__(self) -> None:
+        self.pending: dict | None = None
+
+    def decide(self, digest: dict, events: list[dict]) -> dict:
+        d = self.pending or {"text": "", "tool_use": []}
+        self.pending = None
+        return d
+
+
+class Session:
+    def __init__(self, players: list[str], minutes: int, wildness: int,
+                 objects: list[str], driver_kind: str, out_dir: Path) -> None:
+        if not MIN_PLAYERS <= len(players) <= MAX_PLAYERS:
+            raise ValueError(f"玩家数须在 {MIN_PLAYERS}–{MAX_PLAYERS}(收到 {len(players)})")
+        if driver_kind == "scripted" and len(players) < 3:
+            raise ValueError("scripted 演示驱动需要 ≥3 人;manual 不限")
+        self.state = GameState(players=players, wildness_cap=wildness,
+                               time_budget_min=minutes, scene_objects=objects)
+        self.driver_kind = driver_kind
+        self.driver = ScriptedDriver() if driver_kind == "scripted" else ManualDriver()
+        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        self.episode_path = out_dir / f"sim_{stamp}.jsonl"
+        self.engine = Engine(self.state, self.driver, self.episode_path)
+        self.recent: list[dict] = []  # 最近回合行,供前端轮询
+        self.lock = threading.Lock()
+
+    def snapshot(self) -> dict:
+        return {
+            "players": self.state.players,
+            "digest": self.state.digest(self.engine.time_left_min()),
+            "finished": self.state.finished,
+            "marks": dict(self.engine.marks),
+            "pending_events": list(self.engine.event_queue),
+            "recent_turns": self.recent[-12:],
+            "clamps": self.engine.tools.clamp_log[-5:],
+            "episode_path": str(self.episode_path),
+            "driver": self.driver_kind,
+        }
+
+
+class Hub:
+    def __init__(self, out_dir: Path) -> None:
+        self.session: Session | None = None
+        self.out_dir = out_dir
+
+    def start(self, cfg: dict) -> dict:
+        if self.session and not self.session.state.finished:
+            self.session.engine._ep.close()  # 旧局落盘关账
+        players = [p.strip() for p in cfg.get("players", []) if p.strip()]
+        self.session = Session(
+            players=players,
+            minutes=int(cfg.get("minutes", 30)),
+            wildness=int(cfg.get("wildness", 6)),
+            objects=[o.strip() for o in cfg.get("objects", []) if o.strip()],
+            driver_kind=cfg.get("driver", "manual"),
+            out_dir=self.out_dir,
+        )
+        return self.session.snapshot()
+
+
+HTML_PATH = Path(__file__).with_name("sim_ui.html")
+
+
+class Handler(BaseHTTPRequestHandler):
+    hub: Hub  # 类属性注入
+
+    def _json(self, code: int, obj: dict) -> None:
+        body = json.dumps(obj, ensure_ascii=False).encode()
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _body(self) -> dict:
+        n = int(self.headers.get("Content-Length", 0))
+        return json.loads(self.rfile.read(n) or b"{}")
+
+    def log_message(self, *a) -> None:  # 静默访问日志
+        pass
+
+    def do_GET(self) -> None:
+        if self.path in ("/", "/index.html"):
+            body = HTML_PATH.read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        if self.path == "/favicon.ico":
+            self.send_response(204)
+            self.end_headers()
+            return
+        if self.path == "/api/state":
+            s = self.hub.session
+            self._json(200, s.snapshot() if s else {"no_session": True,
+                       "limits": {"min_players": MIN_PLAYERS, "max_players": MAX_PLAYERS}})
+            return
+        self._json(404, {"error": "not found"})
+
+    def do_POST(self) -> None:
+        try:
+            if self.path == "/api/start":
+                self._json(200, self.hub.start(self._body()))
+                return
+            s = self.hub.session
+            if s is None:
+                self._json(409, {"error": "先 /api/start 开局"})
+                return
+            if self.path == "/api/event":
+                ev = self._body()
+                with s.lock:
+                    s.engine.push_event(ev)
+                self._json(200, {"queued": ev})
+                return
+            if self.path == "/api/turn":
+                body = self._body()
+                with s.lock:
+                    if s.state.finished:
+                        self._json(409, {"error": "局已收"})
+                        return
+                    if isinstance(s.driver, ManualDriver):
+                        s.driver.pending = {"text": body.get("text", ""),
+                                            "tool_use": body.get("tool_use", [])}
+                    line = s.engine.turn()
+                    s.recent.append(line)
+                    if s.state.finished:
+                        summary = s.engine.run(max_turns=s.engine.marks["turns"])
+                        s.recent.append(summary)
+                self._json(200, line)
+                return
+            self._json(404, {"error": "not found"})
+        except (ValueError, json.JSONDecodeError) as e:
+            self._json(400, {"error": str(e)})
+
+
+def make_server(port: int, out_dir: Path) -> ThreadingHTTPServer:
+    Handler.hub = Hub(out_dir)
+    return ThreadingHTTPServer(("127.0.0.1", port), Handler)
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--port", type=int, default=8747)
+    ap.add_argument("--out", default="outputs/episodes")
+    args = ap.parse_args()
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    srv = make_server(args.port, out)
+    print(f"模拟台 → http://localhost:{args.port}  (机位 {MIN_PLAYERS}–{MAX_PLAYERS},Ctrl-C 退出)")
+    srv.serve_forever()
+
+
+if __name__ == "__main__":
+    main()

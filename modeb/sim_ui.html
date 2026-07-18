@@ -1,0 +1,110 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Yappa 模拟台(开发驾驶舱)</title>
+<style>
+  :root { color-scheme: dark; font-family: system-ui, sans-serif; }
+  body { margin: 0; background: #111; color: #eee; display: grid;
+         grid-template-columns: 2fr 1fr; gap: 8px; padding: 8px; }
+  h3 { margin: 4px 0; font-size: 14px; color: #9cf; }
+  .card { background: #1b1b1f; border: 1px solid #333; border-radius: 8px; padding: 8px; }
+  #panes { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+  .pane { background: #202028; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+  .pane b { font-size: 15px; }
+  .score { float: right; color: #fc6; }
+  .focus { outline: 2px solid #fc6; }
+  button { margin: 2px; padding: 4px 8px; border-radius: 6px; border: 1px solid #555;
+           background: #2a2a33; color: #eee; cursor: pointer; }
+  button:hover { background: #39394a; }
+  textarea, input, select { width: 100%; box-sizing: border-box; background: #191920;
+           color: #eee; border: 1px solid #444; border-radius: 6px; padding: 4px; }
+  #log { height: 300px; overflow-y: auto; font-size: 12px; white-space: pre-wrap;
+         font-family: ui-monospace, monospace; }
+  .turnline { border-bottom: 1px dashed #333; padding: 3px 0; }
+  .host-text { color: #9f9; }
+  .clamp { color: #f66; }
+  small { color: #888; }
+</style>
+<div>
+  <div class="card" id="setup">
+    <h3>开局(机位 2–10 任意,机制不随机位变)</h3>
+    <input id="players" value="疯子明,小静,大鹏,阿伟,琳琳,老宋">
+    <div style="display:flex;gap:6px;margin-top:4px">
+      <input id="minutes" value="30" title="想玩多久(分钟)">
+      <input id="wildness" value="6" title="野度档">
+      <select id="driver"><option value="manual">manual 主持台驱动</option>
+        <option value="scripted">scripted 演示(≥3人)</option></select>
+    </div>
+    <input id="objects" value="瓶子,冰块,纸巾,手机,杯子,打火机" title="现场实物(perceive 扫描占位)">
+    <button onclick="start()">开局</button>
+  </div>
+  <div class="card"><h3>玩家机位</h3><div id="panes"></div></div>
+  <div class="card"><h3>主持台(manual 驱动:填决策→执行回合)</h3>
+    <input id="htext" placeholder="主持词 ≤3 句">
+    <textarea id="htools" rows="3" placeholder='tool_use JSON,如 [{"name":"draw_atom","input":{"野度":5}}]'></textarea>
+    <div>
+      快捷:
+      <button onclick="quick('[{&quot;name&quot;:&quot;state.next_round&quot;,&quot;input&quot;:{}}]')">下一轮</button>
+      <button onclick="quick('[{&quot;name&quot;:&quot;draw_atom&quot;,&quot;input&quot;:{&quot;野度&quot;:5}}]')">抽原子</button>
+      <button onclick="quick('[{&quot;name&quot;:&quot;random.pick&quot;,&quot;input&quot;:{&quot;from&quot;:&quot;players&quot;}}]')">随机点人</button>
+      <button onclick="quick('[{&quot;name&quot;:&quot;state.finish&quot;,&quot;input&quot;:{}}]')">收局</button>
+      <button style="background:#274" onclick="turn()">▶ 执行回合</button>
+    </div>
+  </div>
+</div>
+<div>
+  <div class="card"><h3>账本 / digest</h3><div id="digest" style="font-size:12px;font-family:ui-monospace,monospace"></div></div>
+  <div class="card"><h3>episode 实时窗</h3><div id="log"></div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+async function api(path, body) {
+  const r = await fetch(path, body ? {method:"POST", body: JSON.stringify(body)} : undefined);
+  return r.json();
+}
+async function start() {
+  await api("/api/start", {
+    players: $("players").value.split(","), minutes: +$("minutes").value,
+    wildness: +$("wildness").value, objects: $("objects").value.split(","),
+    driver: $("driver").value });
+  refresh();
+}
+function quick(js) { $("htools").value = js; }
+async function turn() {
+  let tools = [];
+  try { tools = $("htools").value.trim() ? JSON.parse($("htools").value) : []; }
+  catch (e) { alert("tool_use JSON 不合法: " + e); return; }
+  const line = await api("/api/turn", {text: $("htext").value, tool_use: tools});
+  if (line.error) alert(line.error);
+  $("htext").value = ""; $("htools").value = "";
+  refresh();
+}
+async function ev(type, player, extra) {
+  await api("/api/event", Object.assign({type, player}, extra || {}));
+  refresh();
+}
+function paneHtml(p, s) {
+  const focus = s.digest.focus === p ? "pane focus" : "pane";
+  return `<div class="${focus}"><b>${p}</b><span class="score">${s.digest.scores[p]}</span><br>
+    <button onclick="ev('laugh','${p}')">😂 笑</button>
+    <button onclick="ev('pass','${p}')">🙅 过</button>
+    <button onclick="ev('tap','${p}')">👍 确认</button>
+    <button onclick="ev('vote','${p}',{value:'赞成'})">🗳 赞</button>
+    <button onclick="ev('vote','${p}',{value:'反对'})">🗳 反</button>
+    <button onclick="ev('ritual_done','${p}')">🪄 仪式完成</button></div>`;
+}
+async function refresh() {
+  const s = await api("/api/state");
+  if (s.no_session) { $("digest").textContent = "未开局"; return; }
+  $("panes").innerHTML = s.players.map(p => paneHtml(p, s)).join("");
+  $("digest").textContent = JSON.stringify(s.digest, null, 1)
+    + "\n埋点 " + JSON.stringify(s.marks) + (s.finished ? "\n【局已收】" : "");
+  $("log").innerHTML = s.recent_turns.map(t => t.episode_summary
+    ? `<div class="turnline">🏁 ${JSON.stringify(t)}</div>`
+    : `<div class="turnline">#${t.turn} <span class="host-text">${t.text}</span> `
+      + `${JSON.stringify(t.tool_use)}`
+      + (t.results||[]).filter(r=>!r.ok).map(r=>` <span class="clamp">⛔${r.clamped}</span>`).join("")
+      + `</div>`).join("");
+  $("log").scrollTop = $("log").scrollHeight;
+}
+setInterval(refresh, 1000); refresh();
+</script>
