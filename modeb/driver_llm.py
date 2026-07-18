@@ -1,11 +1,19 @@
-"""LLM 驱动器接口件(M1 只定协议,不接线;接线属 M2)。
+"""LLM 驱动器(M2 第一单):消息组装/解析/容错实装,传输层可插拔。
 
-上行三段(协议 v0 §二):system(人格+铁律+野度+名册,每局固定吃缓存)/
-tools 声明 / 本回合消息(digest+events+佐料)。下行:text ≤3 句 + tool_use ≤2。
+协议 v0:上行三段(system 固定吃缓存 / tools 声明 / 本回合 digest+events+佐料);
+下行 text ≤3 句 + tool_use ≤2。模型只回意图,执行权在 ToolExecutor。
+真实接线:实现 Transport.complete(调 Anthropic API,流式可选)即通;
+本仓测试用 MockTransport,不依赖网络与密钥。
 """
 from __future__ import annotations
 
+import json
+import re
 from pathlib import Path
+from typing import Protocol
+
+MAX_TOOLS_PER_TURN = 2
+HISTORY_WINDOW = 6  # 保留最近 N 回合主持词,维持口风连续
 
 TOOLS_DECLARATION = [
     {"name": "show", "desc": "向玩家端展示内容", "args": {"content": "str", "visibility": "自己看|额头|全场公开"}},
@@ -22,6 +30,12 @@ TOOLS_DECLARATION = [
     {"name": "draw_atom", "desc": "从弹药库抽原子(分面过滤+排已用)", "args": {"atom_type": "str?", "野度": "int?", "exclude": "list?", "grant_to": "str?"}},
 ]
 
+OUTPUT_CONTRACT = (
+    "你每回合只输出一个 JSON 对象,格式:"
+    '{"text": "≤3句主持词", "tool_use": [{"name": "工具名", "input": {...}}]}'
+    ";tool_use 最多 2 个,只许用声明过的工具;JSON 之外不写任何字。"
+)
+
 
 def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: int) -> str:
     persona = Path("docs/records/狂野模式-活局长prompt-v0.md")
@@ -29,13 +43,82 @@ def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: 
     return (
         f"{persona_text}\n\n"
         f"【本桌】玩家:{'、'.join(players)};野度档:{wildness_cap};时长预算:{time_budget_min}分钟。\n"
-        "【铁律】每回合最多3句话+2个工具调用;分数只经 state 工具;任何人说「过」立刻短路当前环节;"
-        "你发出的只是意图,越界调用会被钳制层拒写并留痕。"
+        "【铁律】每回合最多3句话+2个工具调用;分数只经 state 工具;任何人说「过」立刻短路当前环节,"
+        "不追问不起哄;你发出的只是意图,越界调用会被钳制层拒写并留痕——被拒就换个漂亮的说法圆场。\n"
+        f"【输出契约】{OUTPUT_CONTRACT}\n"
+        f"【工具】{json.dumps(TOOLS_DECLARATION, ensure_ascii=False)}"
     )
 
 
-class LLMDriver:
-    """M2 接线:把 digest+events 组装为 messages,调用 API,解析 text+tool_use。"""
+class Transport(Protocol):
+    """传输层:接真实 API 时实现本方法(流式与否由实现决定)。"""
 
-    def __init__(self) -> None:
-        raise NotImplementedError("LLM 驱动器属 M2;M1 用 ScriptedDriver 验收引擎。")
+    def complete(self, system: str, messages: list[dict]) -> str: ...
+
+
+def parse_decision(raw: str) -> dict | None:
+    """从模型原文里抠出决策 JSON;抠不出返回 None(上层容错)。"""
+    m = re.search(r"\{.*\}", raw, re.DOTALL)
+    if not m:
+        return None
+    try:
+        obj = json.loads(m.group(0))
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(obj, dict):
+        return None
+    text = str(obj.get("text", ""))
+    calls = obj.get("tool_use", [])
+    if not isinstance(calls, list):
+        calls = []
+    cleaned = []
+    for c in calls[:MAX_TOOLS_PER_TURN]:
+        if isinstance(c, dict) and isinstance(c.get("name"), str):
+            cleaned.append({"name": c["name"], "input": c.get("input", {}) or {}})
+    return {"text": text, "tool_use": cleaned}
+
+
+FALLBACK = {"text": "局长走神了一秒——罚自己一口,咱们继续!", "tool_use": []}
+
+
+class LLMDriver:
+    """与 ScriptedDriver 同签名:decide(digest, events) -> {text, tool_use}。"""
+
+    def __init__(self, transport: Transport, players: list[str],
+                 wildness_cap: int, time_budget_min: int, max_retries: int = 1) -> None:
+        self.transport = transport
+        self.system = build_system_prompt(players, wildness_cap, time_budget_min)
+        self.history: list[dict] = []  # [{"role": "assistant"|"user", "content": str}]
+        self.max_retries = max_retries
+        self.malformed_count = 0
+
+    def _turn_message(self, digest: dict, events: list[dict]) -> str:
+        return json.dumps({"state_digest": digest, "events": events}, ensure_ascii=False)
+
+    def decide(self, digest: dict, events: list[dict]) -> dict:
+        user_msg = {"role": "user", "content": self._turn_message(digest, events)}
+        messages = self.history[-HISTORY_WINDOW * 2:] + [user_msg]
+        decision = None
+        for _ in range(1 + self.max_retries):
+            raw = self.transport.complete(self.system, messages)
+            decision = parse_decision(raw)
+            if decision is not None:
+                break
+            self.malformed_count += 1
+        if decision is None:
+            decision = dict(FALLBACK)
+        self.history.append(user_msg)
+        self.history.append({"role": "assistant", "content": json.dumps(decision, ensure_ascii=False)})
+        return decision
+
+
+class MockTransport:
+    """测试用:按预置剧本回原文(含坏格式样本),不碰网络。"""
+
+    def __init__(self, responses: list[str]) -> None:
+        self.responses = list(responses)
+        self.calls: list[dict] = []
+
+    def complete(self, system: str, messages: list[dict]) -> str:
+        self.calls.append({"system": system, "messages": messages})
+        return self.responses.pop(0) if self.responses else json.dumps(FALLBACK, ensure_ascii=False)
