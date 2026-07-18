@@ -16,9 +16,12 @@ from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+from .driver_llm import LLMDriver
 from .driver_scripted import ScriptedDriver
 from .engine import Engine
+from .player_agent import LLMPlayerAgent, ScriptedPlayerAgent
 from .state import GameState
+from .transports import make_transport
 
 MIN_PLAYERS, MAX_PLAYERS = 2, 10  # 机位上限只是这一行常数,机制不感知机位数
 
@@ -37,15 +40,34 @@ class ManualDriver:
 
 class Session:
     def __init__(self, players: list[str], minutes: int, wildness: int,
-                 objects: list[str], driver_kind: str, out_dir: Path) -> None:
+                 objects: list[str], driver_kind: str, out_dir: Path,
+                 bots: dict[str, str] | None = None, provider: str = "anthropic",
+                 host_model: str = "sonnet", seat_model: str = "haiku") -> None:
         if not MIN_PLAYERS <= len(players) <= MAX_PLAYERS:
             raise ValueError(f"玩家数须在 {MIN_PLAYERS}–{MAX_PLAYERS}(收到 {len(players)})")
         if driver_kind == "scripted" and len(players) < 3:
             raise ValueError("scripted 演示驱动需要 ≥3 人;manual 不限")
+        bots = bots or {}
+        unknown = set(bots) - set(players)
+        if unknown:
+            raise ValueError(f"bot 座位不在玩家名单里: {sorted(unknown)}")
         self.state = GameState(players=players, wildness_cap=wildness,
                                time_budget_min=minutes, scene_objects=objects)
         self.driver_kind = driver_kind
-        self.driver = ScriptedDriver() if driver_kind == "scripted" else ManualDriver()
+        if driver_kind == "scripted":
+            self.driver = ScriptedDriver()
+        elif driver_kind == "llm":
+            self.driver = LLMDriver(make_transport(provider, host_model),
+                                    players, wildness, minutes)
+        else:
+            self.driver = ManualDriver()
+        if provider == "mock":  # 测试:确定性假人
+            self.bots = [ScriptedPlayerAgent(n, [[{"type": "laugh"}]] * 3) for n in bots]
+        else:
+            self.bots = [LLMPlayerAgent(n, persona or "普通桌友",
+                                        make_transport(provider, seat_model))
+                         for n, persona in bots.items()]
+        self.bot_names = sorted(bots)
         stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         self.episode_path = out_dir / f"sim_{stamp}.jsonl"
         self.engine = Engine(self.state, self.driver, self.episode_path)
@@ -63,6 +85,7 @@ class Session:
             "clamps": self.engine.tools.clamp_log[-5:],
             "episode_path": str(self.episode_path),
             "driver": self.driver_kind,
+            "bots": self.bot_names,
         }
 
 
@@ -82,6 +105,10 @@ class Hub:
             objects=[o.strip() for o in cfg.get("objects", []) if o.strip()],
             driver_kind=cfg.get("driver", "manual"),
             out_dir=self.out_dir,
+            bots=cfg.get("bots") or {},
+            provider=cfg.get("provider", "anthropic"),
+            host_model=cfg.get("host_model", "sonnet"),
+            seat_model=cfg.get("seat_model", "haiku"),
         )
         return self.session.snapshot()
 
@@ -153,6 +180,10 @@ class Handler(BaseHTTPRequestHandler):
                                             "tool_use": body.get("tool_use", [])}
                     line = s.engine.turn()
                     s.recent.append(line)
+                    digest = s.state.digest(s.engine.time_left_min())
+                    for bot in s.bots:  # 桌友对本回合反应,入队待下回合聚合
+                        for ev in bot.react(line, digest):
+                            s.engine.push_event(ev)
                     if s.state.finished:
                         summary = s.engine.run(max_turns=s.engine.marks["turns"])
                         s.recent.append(summary)

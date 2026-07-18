@@ -32,9 +32,17 @@
       <input id="minutes" value="30" title="想玩多久(分钟)">
       <input id="wildness" value="6" title="野度档">
       <select id="driver"><option value="manual">manual 主持台驱动</option>
-        <option value="scripted">scripted 演示(≥3人)</option></select>
+        <option value="scripted">scripted 演示(≥3人)</option>
+        <option value="llm">llm 活局长(需 API key 环境变量)</option></select>
     </div>
     <input id="objects" value="瓶子,冰块,纸巾,手机,杯子,打火机" title="现场实物(perceive 扫描占位)">
+    <input id="bots" placeholder="bot 座位,如 阿伟:显眼包,琳琳:气氛组组长(留空=全真人)">
+    <div style="display:flex;gap:6px;margin-top:4px">
+      <select id="provider"><option>anthropic</option><option>deepseek</option></select>
+      <input id="hostmodel" value="sonnet" title="主持模型">
+      <input id="seatmodel" value="haiku" title="桌友模型">
+      <label style="white-space:nowrap"><input type="checkbox" id="auto" style="width:auto"> 自动回合</label>
+    </div>
     <button onclick="start()">开局</button>
   </div>
   <div class="card"><h3>玩家机位</h3><div id="panes"></div></div>
@@ -62,12 +70,23 @@ async function api(path, body) {
   return r.json();
 }
 async function start() {
-  await api("/api/start", {
+  const bots = {};
+  $("bots").value.split(",").map(x => x.trim()).filter(Boolean).forEach(x => {
+    const [n, p] = x.split(/[::]/); bots[n.trim()] = (p || "").trim(); });
+  const r = await api("/api/start", {
     players: $("players").value.split(","), minutes: +$("minutes").value,
     wildness: +$("wildness").value, objects: $("objects").value.split(","),
-    driver: $("driver").value });
+    driver: $("driver").value, bots,
+    provider: $("provider").value, host_model: $("hostmodel").value,
+    seat_model: $("seatmodel").value });
+  if (r.error) alert(r.error);
   refresh();
 }
+setInterval(async () => {  // 自动回合:llm/scripted 驱动下真人只管自己的 pane
+  const st = await api("/api/state");
+  if ($("auto").checked && !st.no_session && !st.finished && st.driver !== "manual")
+    await api("/api/turn", {});
+}, 4000);
 function quick(js) { $("htools").value = js; }
 async function turn() {
   let tools = [];
@@ -84,7 +103,8 @@ async function ev(type, player, extra) {
 }
 function paneHtml(p, s) {
   const focus = s.digest.focus === p ? "pane focus" : "pane";
-  return `<div class="${focus}"><b>${p}</b><span class="score">${s.digest.scores[p]}</span><br>
+  const bot = (s.bots || []).includes(p) ? " 🤖" : "";
+  return `<div class="${focus}"><b>${p}${bot}</b><span class="score">${s.digest.scores[p]}</span><br>
     <button onclick="ev('laugh','${p}')">😂 笑</button>
     <button onclick="ev('pass','${p}')">🙅 过</button>
     <button onclick="ev('tap','${p}')">👍 确认</button>
