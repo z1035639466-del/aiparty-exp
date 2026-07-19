@@ -41,6 +41,8 @@
       <select id="provider"><option>anthropic</option><option>deepseek</option><option>kimi</option><option>glm</option><option>qwen</option><option>minimax</option></select>
       <input id="hostmodel" value="sonnet" title="主持模型">
       <input id="seatmodel" value="haiku" title="桌友模型">
+      <select id="scorestyle" title="结算风格"><option value="清账">清账(即时结算)</option>
+        <option value="综艺">综艺(可攒分颁奖)</option></select>
       <label style="white-space:nowrap"><input type="checkbox" id="auto" style="width:auto"> 自动回合</label>
     </div>
     <button onclick="start()">开局</button>
@@ -78,7 +80,7 @@ async function start() {
     wildness: +$("wildness").value, objects: $("objects").value.split(","),
     driver: $("driver").value, bots,
     provider: $("provider").value, host_model: $("hostmodel").value,
-    seat_model: $("seatmodel").value });
+    seat_model: $("seatmodel").value, score_style: $("scorestyle").value });
   if (r.error) alert(r.error);
   refresh();
 }

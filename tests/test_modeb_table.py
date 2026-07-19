@@ -162,3 +162,35 @@ def test_simulator_rejects_unknown_bot_seat(server):
         "players": ["甲", "乙"], "minutes": 30, "wildness": 6, "objects": [],
         "driver": "manual", "provider": "mock", "bots": {"丙": ""}})
     assert code == 400 and "丙" in bad["error"]
+
+
+def test_atom_pool_merges_extracted_file(tmp_path):
+    """M-int-1 产物落盘即被引擎并入弹药库——小红书采集真正用上的通道。"""
+    import json
+    from modeb.tools import load_atom_pool
+    from modeb.atoms_seed import SEED_ATOMS
+    f = tmp_path / "atoms-v1.jsonl"
+    f.write_text("\n".join([
+        json.dumps({"atom_id": "xhs-00001", "name": "门口迎宾", "atom_type": "任务内容",
+                    "text_raw": "去厕所门口说欢迎光临", "wildness": 2, "props_explicit": [],
+                    "safety_flags": [], "currency": "表演", "confidence": "high",
+                    "source_ref": {}}, ensure_ascii=False),
+        json.dumps({"atom_id": "xhs-00002", "name": "低置信件", "atom_type": "任务内容",
+                    "text_raw": "?", "wildness": 3, "props_explicit": [], "safety_flags": [],
+                    "currency": "表演", "confidence": "low", "source_ref": {}}, ensure_ascii=False),
+    ]), encoding="utf-8")
+    pool = load_atom_pool(str(f))
+    ids = {a["id"] for a in pool}
+    assert "xhs-00001" in ids, "high 置信抽取件须入池"
+    assert "xhs-00002" not in ids, "low 置信不入主池"
+    assert len(pool) == len(SEED_ATOMS) + 1
+
+
+def test_score_style_switches_prompt():
+    from modeb.driver_llm import build_system_prompt
+    qing = build_system_prompt(["甲", "乙"], 6, 30, "清账")
+    zong = build_system_prompt(["甲", "乙"], 6, 30, "综艺")
+    assert "当场清账" in qing and "不要汇总排名" in qing
+    assert "可以攒分" in zong and "综艺也不围着总分第一转" in zong
+    for sp in (qing, zong):
+        assert "负向人身标签" in sp, "底线不随风格变"

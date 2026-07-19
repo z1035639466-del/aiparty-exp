@@ -42,7 +42,8 @@ class Session:
     def __init__(self, players: list[str], minutes: int, wildness: int,
                  objects: list[str], driver_kind: str, out_dir: Path,
                  bots: dict[str, str] | None = None, provider: str = "anthropic",
-                 host_model: str = "sonnet", seat_model: str = "haiku") -> None:
+                 host_model: str = "sonnet", seat_model: str = "haiku",
+                 score_style: str = "清账") -> None:
         if not MIN_PLAYERS <= len(players) <= MAX_PLAYERS:
             raise ValueError(f"玩家数须在 {MIN_PLAYERS}–{MAX_PLAYERS}(收到 {len(players)})")
         if driver_kind == "scripted" and len(players) < 3:
@@ -52,13 +53,14 @@ class Session:
         if unknown:
             raise ValueError(f"bot 座位不在玩家名单里: {sorted(unknown)}")
         self.state = GameState(players=players, wildness_cap=wildness,
-                               time_budget_min=minutes, scene_objects=objects)
+                               time_budget_min=minutes, scene_objects=objects,
+                               score_style=score_style)
         self.driver_kind = driver_kind
         if driver_kind == "scripted":
             self.driver = ScriptedDriver()
         elif driver_kind == "llm":
             self.driver = LLMDriver(make_transport(provider, host_model),
-                                    players, wildness, minutes)
+                                    players, wildness, minutes, score_style=score_style)
         else:
             self.driver = ManualDriver()
         if provider == "mock":  # 测试:确定性假人
@@ -110,6 +112,7 @@ class Hub:
             provider=cfg.get("provider", "anthropic"),
             host_model=cfg.get("host_model", "sonnet"),
             seat_model=cfg.get("seat_model", "haiku"),
+            score_style=cfg.get("score_style", "清账"),
         )
         return self.session.snapshot()
 

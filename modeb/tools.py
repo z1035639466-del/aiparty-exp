@@ -12,13 +12,41 @@ from .atoms_seed import SEED_ATOMS
 from .state import ClampError, GameState, SkillGrant
 
 MAX_SCORE_DELTA = 3  # 单次写分钳制
+ATOMS_FILE = "inputs/atoms/atoms-v1.jsonl"  # M-int-1 抽取产物;存在即自动并入弹药库
+
+
+def load_atom_pool(atoms_path: str | None = None) -> list[dict]:
+    """种子佐料 + 抽取库(confidence=high 且非涉嫌逼量者)合并;库文件缺席时纯种子。"""
+    import json
+    from pathlib import Path as _P
+    pool = list(SEED_ATOMS)
+    seen = {a["id"] for a in pool}
+    path = _P(atoms_path or ATOMS_FILE)
+    if path.exists():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                a = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if a.get("confidence") != "high" or a.get("atom_id") in seen:
+                continue
+            seen.add(a["atom_id"])
+            pool.append({
+                "id": a["atom_id"], "name": a.get("name", a["atom_id"]),
+                "type": a.get("atom_type", "任务内容"), "text": a.get("text_raw", ""),
+                "wildness": int(a.get("wildness", 3)), "props": a.get("props_explicit", []),
+                "safety": a.get("safety_flags", []), "currency": a.get("currency", "表演"),
+            })
+    return pool
 
 
 class ToolExecutor:
-    def __init__(self, state: GameState, rng_seed: int = 0) -> None:
+    def __init__(self, state: GameState, rng_seed: int = 0,
+                 atoms_path: str | None = None) -> None:
         self.state = state
         self.rng = _random.Random(rng_seed)
         self.clamp_log: list[dict] = []
+        self.atom_pool = load_atom_pool(atoms_path)
 
     # —— 分发 ——
     def execute(self, call: dict[str, Any]) -> dict[str, Any]:
@@ -113,7 +141,7 @@ class ToolExecutor:
     # —— draw_atom:接口先定库后换(M1=种子数组;M3 换 atoms.sqlite,签名不变) ——
     def _t_draw_atom(self, name: str, a: dict) -> dict:
         pool = []
-        for atom in SEED_ATOMS:
+        for atom in self.atom_pool:
             if atom["id"] in self.state.atoms_used or atom["id"] in a.get("exclude", []):
                 continue
             if atom["wildness"] > min(self.state.wildness_cap, int(a.get("野度", 10))):

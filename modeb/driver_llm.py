@@ -37,7 +37,22 @@ OUTPUT_CONTRACT = (
 )
 
 
-def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: int) -> str:
+SCORE_STYLES = {
+    "清账": "本桌结算风格=清账(现实酒桌默认):输一局罚一次、当场清账,分数只是当场的赌注。"
+            "单条增减可播报,不要汇总排名、不搞榜单和评价性称号;终局只做加冕礼:"
+            "按今晚笑声给一个正向封号+全场合影,不念名次。",
+    "综艺": "本桌结算风格=综艺:可以攒分、可以播报比分与排名、可以搞颁奖式称号与仪式,"
+            "冲突和悬念都可以做足;但记住综艺也不围着总分第一转——分数是节目效果的道具,"
+            "不是目的,过程好笑永远优先于结算。",
+}
+SCORE_BOTTOM_LINE = (
+    "【底线(不随风格变)】禁止任何负向人身标签与羞辱性称号(「怂货榜」「最没种」之类"
+    "想都别想)——惩罚当场消解,不留能活过今晚的评价。"
+)
+
+
+def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: int,
+                        score_style: str = "清账") -> str:
     persona = Path("docs/records/狂野模式-活局长prompt-v0.md")
     persona_text = persona.read_text(encoding="utf-8") if persona.exists() else ""
     return (
@@ -51,9 +66,8 @@ def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: 
         "【节拍】标准节拍:先用 draw_atom 抽一局通用小游戏(吹牛骰/十五二十/石头剪刀布,骰子与随机"
         "一律走 random 工具,公平由系统保证)赌出输家,输家再接惩罚/挑战——不要无来由直接点人下挑战。"
         "环节与惩罚内容优先 draw_atom 从弹药库抽,现挂为辅。\n"
-        "【记分观】分数是当场的赌注,不是一晚的成绩单:单条增减可以播报,"
-        "禁止汇总排名、榜单、评价性称号,尤其禁止任何负向标签(「怂货榜」之类想都别想)。"
-        "终局只做加冕礼:按今晚笑声给一个正向封号+全场合影,不念名次。\n"
+        f"【记分观】{SCORE_STYLES.get(score_style, SCORE_STYLES['清账'])}\n"
+        f"{SCORE_BOTTOM_LINE}\n"
         f"【输出契约】{OUTPUT_CONTRACT}\n"
         f"【工具】{json.dumps(TOOLS_DECLARATION, ensure_ascii=False)}"
     )
@@ -94,9 +108,10 @@ class LLMDriver:
     """与 ScriptedDriver 同签名:decide(digest, events) -> {text, tool_use}。"""
 
     def __init__(self, transport: Transport, players: list[str],
-                 wildness_cap: int, time_budget_min: int, max_retries: int = 1) -> None:
+                 wildness_cap: int, time_budget_min: int, max_retries: int = 1,
+                 score_style: str = "清账") -> None:
         self.transport = transport
-        self.system = build_system_prompt(players, wildness_cap, time_budget_min)
+        self.system = build_system_prompt(players, wildness_cap, time_budget_min, score_style)
         self.history: list[dict] = []  # [{"role": "assistant"|"user", "content": str}]
         self.max_retries = max_retries
         self.malformed_count = 0

@@ -26,6 +26,7 @@ class GameState:
     wildness_cap: int  # 野度档(开局口味钳制)
     time_budget_min: int  # 房主裁定:开局必问"想玩多久"
     scene_objects: list[str] = field(default_factory=list)  # perceive 扫描结果(M1 手填)
+    score_style: str = "清账"  # 结算风格口味:清账(即时结算)| 综艺(可攒分可颁奖);负向标签两档都禁
     scores: dict[str, int] = field(default_factory=dict)
     round_no: int = 0
     focus: str | None = None
