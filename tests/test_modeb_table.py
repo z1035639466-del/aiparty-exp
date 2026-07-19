@@ -191,6 +191,8 @@ def test_score_style_switches_prompt():
     qing = build_system_prompt(["甲", "乙"], 6, 30, "清账")
     zong = build_system_prompt(["甲", "乙"], 6, 30, "综艺")
     jing = build_system_prompt(["甲", "乙"], 6, 30, "竞技")
+    auto = build_system_prompt(["甲", "乙"], 6, 30, "自动")
+    assert "零设置原则" in auto and "房主一句话随时改" in auto
     assert "当场清账" in qing and "不要汇总排名" in qing
     assert "可以攒分" in zong and "综艺也不围着总分第一转" in zong
     assert "真正的冠军" in jing and "对局不对人" in jing
