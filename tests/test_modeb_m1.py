@@ -107,5 +107,6 @@ def test_opener_atoms_available(tmp_path):
 def test_host_prompt_carries_new_iron_rules():
     from modeb.driver_llm import build_system_prompt
     sp = build_system_prompt(["甲", "乙"], 6, 30)
-    for token in ["静静等", "一个字都不许", "吹牛骰", "不要汇总排名", "怂货榜", "加冕礼", "不念名次"]:
+    for token in ["静静等", "一个字都不许", "吹牛骰", "不要汇总排名", "怂货榜", "加冕礼", "不念名次",
+                  "保结构换槽位", "照搬原子打天下是偷懒"]:
         assert token in sp
