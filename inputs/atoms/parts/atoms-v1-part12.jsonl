@@ -1,0 +1,150 @@
+{"atom_id": "xhs-01624", "raw_record_index": 1624, "name": "比心点人", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝酒", "confidence": "high"}
+{"atom_id": "xhs-01625", "raw_record_index": 1625, "name": "亮饰罚酒", "atom_type": "条件点名", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01626", "raw_record_index": 1626, "name": "叠指夺杯", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01627", "raw_record_index": 1627, "name": "叠手点数", "atom_type": "完整玩法", "wildness": 4, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝/交杯酒", "confidence": "high"}
+{"atom_id": "xhs-01628", "raw_record_index": 1628, "name": "双杯抓指", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01629", "raw_record_index": 1629, "name": "扫码试探", "atom_type": "条件点名", "wildness": 3, "safety_flags": [], "currency": "喝", "settlement": "", "confidence": "low"}
+{"atom_id": "xhs-01630", "raw_record_index": 1630, "name": "建群抢包", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01631", "raw_record_index": 1631, "name": "传机罚酒", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01632", "raw_record_index": 1632, "name": "戳纸配对", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "low"}
+{"atom_id": "xhs-01633", "raw_record_index": 1633, "name": "钻领吐烟", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "low"}
+{"atom_id": "xhs-01634", "raw_record_index": 1634, "name": "科目问答", "atom_type": "问答题目", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01635", "raw_record_index": 1635, "name": "开火车抢座", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01636", "raw_record_index": 1636, "name": "比心点人", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝酒", "confidence": "high"}
+{"atom_id": "xhs-01637", "raw_record_index": 1637, "name": "交叉握手", "atom_type": "完整玩法", "wildness": 3, "safety_flags": [], "currency": "喝", "settlement": "", "confidence": "low"}
+{"atom_id": "xhs-01638", "raw_record_index": 1638, "name": "属性点喝", "atom_type": "条件点名", "wildness": 4, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01639", "raw_record_index": 1639, "name": "倒酒罚喝", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01640", "raw_record_index": 1640, "name": "雷达定喝", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01641", "raw_record_index": 1641, "name": "蒙眼点喝", "atom_type": "完整玩法", "wildness": 4, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "按要求喝", "confidence": "high"}
+{"atom_id": "xhs-01642", "raw_record_index": 1642, "name": "数枪点喝", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01643", "raw_record_index": 1643, "name": "捏机放手", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01644", "raw_record_index": 1644, "name": "穿戴点喝", "atom_type": "条件点名", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01645", "raw_record_index": 1645, "name": "咬发罚酒", "atom_type": "条件点名", "wildness": 4, "safety_flags": ["饮酒", "异性互动"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01646", "raw_record_index": 1646, "name": "计算题喝", "atom_type": "问答题目", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01647", "raw_record_index": 1647, "name": "藏物猜位", "atom_type": "问答题目", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01648", "raw_record_index": 1648, "name": "传机猜拳", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01649", "raw_record_index": 1649, "name": "反向反应", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01650", "raw_record_index": 1650, "name": "亮饰罚酒", "atom_type": "条件点名", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01651", "raw_record_index": 1651, "name": "叠指夺杯", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01652", "raw_record_index": 1652, "name": "叠手点喝", "atom_type": "完整玩法", "wildness": 4, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01653", "raw_record_index": 1653, "name": "扫码罚酒", "atom_type": "条件点名", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝酒", "confidence": "high"}
+{"atom_id": "xhs-01654", "raw_record_index": 1654, "name": "建群抢包", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01655", "raw_record_index": 1655, "name": "传机罚酒", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01656", "raw_record_index": 1656, "name": "拉弓点喝", "atom_type": "任务内容", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01657", "raw_record_index": 1657, "name": "戳纸游戏", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01658", "raw_record_index": 1658, "name": "钻领挑战", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01659", "raw_record_index": 1659, "name": "传烟测试", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01660", "raw_record_index": 1660, "name": "科目问答", "atom_type": "问答题目", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01661", "raw_record_index": 1661, "name": "开火车抢座", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01662", "raw_record_index": 1662, "name": "比心点人", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01663", "raw_record_index": 1663, "name": "舞蹈传递", "atom_type": "完整玩法", "wildness": 5, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01664", "raw_record_index": 1664, "name": "动作叠加", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01665", "raw_record_index": 1665, "name": "抱人抓指", "atom_type": "完整玩法", "wildness": 7, "safety_flags": ["饮酒", "身体接触", "异性互动"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01666", "raw_record_index": 1666, "name": "露吊带罚", "atom_type": "条件点名", "wildness": 5, "safety_flags": ["饮酒", "异性互动"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01667", "raw_record_index": 1667, "name": "露裤绳罚", "atom_type": "条件点名", "wildness": 5, "safety_flags": ["饮酒", "异性互动"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01668", "raw_record_index": 1668, "name": "黑丝检查", "atom_type": "条件点名", "wildness": 4, "safety_flags": ["饮酒", "异性互动"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01669", "raw_record_index": 1669, "name": "传冰挑战", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01670", "raw_record_index": 1670, "name": "嘴传纸巾", "atom_type": "道具挑战", "wildness": 8, "safety_flags": ["饮酒", "身体接触", "异性互动"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01671", "raw_record_index": 1671, "name": "摸腹肌罚", "atom_type": "任务内容", "wildness": 7, "safety_flags": ["饮酒", "身体接触", "异性互动"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01672", "raw_record_index": 1672, "name": "插杯挑战", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01673", "raw_record_index": 1673, "name": "记忆问答", "atom_type": "问答题目", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "接受一个小惩罚", "confidence": "high"}
+{"atom_id": "xhs-01674", "raw_record_index": 1674, "name": "猜字兑愿", "atom_type": "问答题目", "wildness": 4, "safety_flags": ["身体接触"], "currency": "服务", "settlement": "兑现心愿券", "confidence": "high"}
+{"atom_id": "xhs-01675", "raw_record_index": 1675, "name": "含水憋笑", "atom_type": "完整玩法", "wildness": 3, "safety_flags": [], "currency": "喝", "settlement": "", "confidence": "high"}
+{"atom_id": "xhs-01676", "raw_record_index": 1676, "name": "抽牌脱衣", "atom_type": "完整玩法", "wildness": 8, "safety_flags": ["异性互动"], "currency": "表演", "settlement": "脱掉一件物品", "confidence": "high"}
+{"atom_id": "xhs-01677", "raw_record_index": 1677, "name": "表情模仿", "atom_type": "完整玩法", "wildness": 3, "safety_flags": [], "currency": "表演", "settlement": "接受真心话或大冒险提问", "confidence": "high"}
+{"atom_id": "xhs-01678", "raw_record_index": 1678, "name": "心跳测试", "atom_type": "完整玩法", "wildness": 7, "safety_flags": ["饮酒", "身体接触", "异性互动"], "currency": "喝", "settlement": "喝一杯酒或索要一个吻", "confidence": "high"}
+{"atom_id": "xhs-01679", "raw_record_index": 1679, "name": "惩罚清单", "atom_type": "任务内容", "wildness": 8, "safety_flags": ["身体接触", "异性互动"], "currency": "服务", "settlement": "按摩/亲吻部位/涂口红/解纽扣等", "confidence": "low"}
+{"atom_id": "xhs-01680", "raw_record_index": 1680, "name": "告白电话", "atom_type": "任务内容", "wildness": 4, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01681", "raw_record_index": 1681, "name": "倒酒罚喝", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01682", "raw_record_index": 1682, "name": "传机罚酒", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01683", "raw_record_index": 1683, "name": "交叉握手", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01684", "raw_record_index": 1684, "name": "对视挑战", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01685", "raw_record_index": 1685, "name": "猜指身份", "atom_type": "问答题目", "wildness": 4, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01686", "raw_record_index": 1686, "name": "点屏挑战", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01687", "raw_record_index": 1687, "name": "蒙眼点喝", "atom_type": "完整玩法", "wildness": 4, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "按要求喝", "confidence": "high"}
+{"atom_id": "xhs-01688", "raw_record_index": 1688, "name": "套指挑战", "atom_type": "完整玩法", "wildness": 4, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01689", "raw_record_index": 1689, "name": "自拍羞喝", "atom_type": "条件点名", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01690", "raw_record_index": 1690, "name": "拥抱落单", "atom_type": "完整玩法", "wildness": 5, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝酒", "confidence": "high"}
+{"atom_id": "xhs-01691", "raw_record_index": 1691, "name": "扯纸挑战", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01692", "raw_record_index": 1692, "name": "转机点喝", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01693", "raw_record_index": 1693, "name": "勾指摇断", "atom_type": "完整玩法", "wildness": 4, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01694", "raw_record_index": 1694, "name": "跳舞罚喝", "atom_type": "条件点名", "wildness": 5, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01695", "raw_record_index": 1695, "name": "传冰挑战", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01696", "raw_record_index": 1696, "name": "叠手点喝", "atom_type": "完整玩法", "wildness": 4, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝交杯酒", "confidence": "high"}
+{"atom_id": "xhs-01697", "raw_record_index": 1697, "name": "顶额静止", "atom_type": "规则修饰", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01698", "raw_record_index": 1698, "name": "拉弓点喝", "atom_type": "任务内容", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01699", "raw_record_index": 1699, "name": "捏机放手", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01700", "raw_record_index": 1700, "name": "传烟挑战", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01701", "raw_record_index": 1701, "name": "学吻挑战", "atom_type": "任务内容", "wildness": 8, "safety_flags": ["饮酒", "身体接触", "异性互动"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01702", "raw_record_index": 1702, "name": "闭眼反应", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01703", "raw_record_index": 1703, "name": "开火车抢座", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01704", "raw_record_index": 1704, "name": "拉弓点喝", "atom_type": "任务内容", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01705", "raw_record_index": 1705, "name": "摇骰罚酒", "atom_type": "完整玩法", "wildness": 5, "safety_flags": ["饮酒", "逼量嫌疑"], "currency": "喝", "settlement": "喝完杯中酒/加酒继续摇", "confidence": "high"}
+{"atom_id": "xhs-01706", "raw_record_index": 1706, "name": "猜数罚喝", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01707", "raw_record_index": 1707, "name": "交叉握手", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01708", "raw_record_index": 1708, "name": "比高罚喝", "atom_type": "条件点名", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01709", "raw_record_index": 1709, "name": "学吻挑战", "atom_type": "任务内容", "wildness": 8, "safety_flags": ["饮酒", "身体接触", "异性互动"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01710", "raw_record_index": 1710, "name": "猜拳竖指", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01711", "raw_record_index": 1711, "name": "传冰递嘴", "atom_type": "任务内容", "wildness": 6, "safety_flags": ["饮酒", "身体接触", "异性互动"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01712", "raw_record_index": 1712, "name": "爱心抓指", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01713", "raw_record_index": 1713, "name": "闭眼摸杯", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01714", "raw_record_index": 1714, "name": "弹额反应", "atom_type": "任务内容", "wildness": 4, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01715", "raw_record_index": 1715, "name": "吹纸挑战", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01716", "raw_record_index": 1716, "name": "解锁竞速", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01717", "raw_record_index": 1717, "name": "戳泡挑战", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01718", "raw_record_index": 1718, "name": "指尖立币", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01719", "raw_record_index": 1719, "name": "会唱不唱", "atom_type": "条件点名", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01720", "raw_record_index": 1720, "name": "联想词汇", "atom_type": "问答题目", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01721", "raw_record_index": 1721, "name": "比字母喝", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01722", "raw_record_index": 1722, "name": "数三放指", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01723", "raw_record_index": 1723, "name": "猜歌节奏", "atom_type": "问答题目", "wildness": 4, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01724", "raw_record_index": 1724, "name": "翻相册喝", "atom_type": "条件点名", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01725", "raw_record_index": 1725, "name": "黑衣点数", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01726", "raw_record_index": 1726, "name": "敲杯猜音", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01727", "raw_record_index": 1727, "name": "写星座题", "atom_type": "问答题目", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01728", "raw_record_index": 1728, "name": "抓字反应", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01729", "raw_record_index": 1729, "name": "蘸酒画圈", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01730", "raw_record_index": 1730, "name": "天气问答", "atom_type": "问答题目", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01731", "raw_record_index": 1731, "name": "做鬼脸罚", "atom_type": "任务内容", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01732", "raw_record_index": 1732, "name": "比动物喝", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01733", "raw_record_index": 1733, "name": "扯纸最短", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01734", "raw_record_index": 1734, "name": "猜数字喝", "atom_type": "问答题目", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01735", "raw_record_index": 1735, "name": "碰肩反应", "atom_type": "任务内容", "wildness": 4, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01736", "raw_record_index": 1736, "name": "说城市名", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01737", "raw_record_index": 1737, "name": "挠痒憋笑", "atom_type": "任务内容", "wildness": 5, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01738", "raw_record_index": 1738, "name": "数拳最大", "atom_type": "条件点名", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01739", "raw_record_index": 1739, "name": "学奥特曼", "atom_type": "任务内容", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01740", "raw_record_index": 1740, "name": "学猪叫喝", "atom_type": "任务内容", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01741", "raw_record_index": 1741, "name": "模拟开车", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01742", "raw_record_index": 1742, "name": "枪指不动", "atom_type": "任务内容", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01743", "raw_record_index": 1743, "name": "画笑脸罚", "atom_type": "道具挑战", "wildness": 4, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01744", "raw_record_index": 1744, "name": "学机器人", "atom_type": "任务内容", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01745", "raw_record_index": 1745, "name": "爱心发射", "atom_type": "任务内容", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01746", "raw_record_index": 1746, "name": "咬断挑战", "atom_type": "道具挑战", "wildness": 5, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01747", "raw_record_index": 1747, "name": "画线挑战", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01748", "raw_record_index": 1748, "name": "学猫叫蹭", "atom_type": "任务内容", "wildness": 4, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01749", "raw_record_index": 1749, "name": "喊你最牛", "atom_type": "任务内容", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01750", "raw_record_index": 1750, "name": "捏耳转圈", "atom_type": "任务内容", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01751", "raw_record_index": 1751, "name": "写字挑战", "atom_type": "任务内容", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01752", "raw_record_index": 1752, "name": "跳耶比高", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01753", "raw_record_index": 1753, "name": "蘸酒写字", "atom_type": "道具挑战", "wildness": 4, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01754", "raw_record_index": 1754, "name": "学鸭子走", "atom_type": "任务内容", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01755", "raw_record_index": 1755, "name": "捏发观光", "atom_type": "条件点名", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01756", "raw_record_index": 1756, "name": "比手势喝", "atom_type": "任务内容", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01757", "raw_record_index": 1757, "name": "模拟游泳", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01758", "raw_record_index": 1758, "name": "交叉对峙", "atom_type": "完整玩法", "wildness": 4, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01759", "raw_record_index": 1759, "name": "猜成语喝", "atom_type": "问答题目", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01760", "raw_record_index": 1760, "name": "数字凑喝", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01761", "raw_record_index": 1761, "name": "弹手背喝", "atom_type": "任务内容", "wildness": 4, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01762", "raw_record_index": 1762, "name": "传冰接住", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01763", "raw_record_index": 1763, "name": "手心写名", "atom_type": "问答题目", "wildness": 4, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01764", "raw_record_index": 1764, "name": "比指大小", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01765", "raw_record_index": 1765, "name": "辣椒抹唇", "atom_type": "条件点名", "wildness": 4, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01766", "raw_record_index": 1766, "name": "嘴接纸巾", "atom_type": "道具挑战", "wildness": 5, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01767", "raw_record_index": 1767, "name": "快速滑屏", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01768", "raw_record_index": 1768, "name": "刮手心躲", "atom_type": "任务内容", "wildness": 4, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01769", "raw_record_index": 1769, "name": "传牙签接", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01770", "raw_record_index": 1770, "name": "共同指人", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01771", "raw_record_index": 1771, "name": "蘸酒写诗", "atom_type": "问答题目", "wildness": 4, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01772", "raw_record_index": 1772, "name": "手指互绕", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-01773", "raw_record_index": 1773, "name": "传递打火机", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
