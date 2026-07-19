@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import random as _random
+import re
 from typing import Any
 
 from .atoms_seed import SEED_ATOMS
@@ -33,10 +34,16 @@ def load_atom_pool(atoms_path: str | None = None) -> list[dict]:
             seen.add(a["atom_id"])
             pool.append({
                 "id": a["atom_id"], "name": a.get("name", a["atom_id"]),
-                "type": a.get("atom_type", "任务内容"), "text": a.get("text_raw", ""),
+                "type": a.get("atom_type", "任务内容"),
+                "text": a.get("text_clean") or a.get("text_raw", ""),
                 "wildness": int(a.get("wildness", 3)), "props": a.get("props_explicit", []),
                 "safety": a.get("safety_flags", []), "currency": a.get("currency", "表演"),
             })
+    for atom in pool:  # 价值分档:铺垫(敢不敢型微挑战/超短条件点名,垫场拍)|主打(副歌)
+        if "tier" not in atom:
+            t = atom.get("text", "")
+            atom["tier"] = "铺垫" if (re.search(r"不敢的|敢不敢", t)
+                                      or (atom.get("type") == "条件点名" and len(t) <= 18)) else "主打"
     return pool
 
 
@@ -148,6 +155,8 @@ class ToolExecutor:
                 continue
             if atom["wildness"] < int(a.get("野度min", 0)):
                 continue  # 加档下限:说到做到,嘴上加档必须参数加档
+            if a.get("tier") and atom.get("tier") != a["tier"]:
+                continue  # 价值分档过滤:铺垫拍/主打拍各取所需
             if atom["safety"] and a.get("exclude_safety", True) and set(atom["safety"]) & {"逼量嫌疑"}:
                 continue
             if a.get("atom_type") and atom["type"] != a["atom_type"]:
@@ -165,5 +174,5 @@ class ToolExecutor:
             self.state.grants.append(SkillGrant(
                 prop=atom["skill"]["prop"], holder=holder, bound_object=bound,
                 uses_left=atom["skill"]["uses"], ritual=atom["skill"]["ritual"]))
-        return {"atom": {k: atom[k] for k in ("id", "name", "type", "text", "wildness", "currency")},
+        return {"atom": {k: atom.get(k) for k in ("id", "name", "type", "text", "wildness", "currency", "tier")},
                 "bound_object": next((o for o in atom["props"] if o in self.state.scene_objects), None)}

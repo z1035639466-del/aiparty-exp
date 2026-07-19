@@ -200,3 +200,32 @@ def test_score_style_switches_prompt():
     for sp in (qing, zong, jing):
         assert "负向人身标签" in sp, "底线不随风格变"
         assert "老梗" in sp, "时效条不随风格变"
+
+
+def test_ocr_space_repair_and_tier(tmp_path):
+    """①中文断行空格修复优于隔离(text_raw铁则不动,text_clean供池用);②价值分档过滤。"""
+    import json
+    from modeb.tools import load_atom_pool
+    f = tmp_path / "atoms.jsonl"
+    f.write_text(json.dumps({
+        "atom_id": "xhs-t1", "name": "头发对灯", "atom_type": "任务内容",
+        "text_raw": "捏住一根头发,对着灯光看,不 敢的唱。",
+        "text_clean": "捏住一根头发,对着灯光看,不敢的唱。",
+        "wildness": 2, "props_explicit": [], "safety_flags": [], "currency": "表演",
+        "confidence": "high", "source_ref": {}}, ensure_ascii=False), encoding="utf-8")
+    pool = load_atom_pool(str(f))
+    atom = next(a for a in pool if a["id"] == "xhs-t1")
+    assert " " not in atom["text"], "池内文本须用修复版,主持照读不再断字"
+    assert atom["tier"] == "铺垫", "敢不敢型微挑战自动归铺垫档"
+    assert next(a for a in pool if a["name"] == "快枪手对决")["tier"] == "主打"
+
+
+def test_draw_atom_tier_filter(tmp_path):
+    from modeb.engine import Engine
+    from modeb.driver_scripted import ScriptedDriver
+    from modeb.state import GameState
+    state = GameState(players=["甲", "乙", "丙"], wildness_cap=6, time_budget_min=30,
+                      scene_objects=["瓶子", "手机"])
+    eng = Engine(state, ScriptedDriver(), tmp_path / "ep.jsonl", rng_seed=3)
+    r = eng.tools.execute({"name": "draw_atom", "input": {"tier": "主打", "野度": 6}})
+    assert r["ok"] and r["result"]["atom"]["tier"] == "主打"

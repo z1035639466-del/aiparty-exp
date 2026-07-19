@@ -27,7 +27,7 @@ TOOLS_DECLARATION = [
     {"name": "state.use_grant", "desc": "消耗一次已持有技能", "args": {"prop": "str", "holder": "str"}},
     {"name": "state.finish", "desc": "收局", "args": {}},
     {"name": "fx", "desc": "音效/特效", "args": {"effect": "str"}},
-    {"name": "draw_atom", "desc": "从弹药库抽原子(分面过滤+排已用);野度=上限,野度min=下限——想加档就抬野度min,别只嘴上说", "args": {"atom_type": "str?", "野度": "int?", "野度min": "int?", "exclude": "list?", "grant_to": "str?"}},
+    {"name": "draw_atom", "desc": "从弹药库抽原子(分面过滤+排已用);野度=上限,野度min=下限——想加档就抬野度min,别只嘴上说;tier=铺垫(垫场快拍)|主打(副歌重拍)", "args": {"atom_type": "str?", "野度": "int?", "野度min": "int?", "tier": "str?", "exclude": "list?", "grant_to": "str?"}},
 ]
 
 OUTPUT_CONTRACT = (
@@ -83,7 +83,9 @@ def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: 
         "【节拍】标准节拍:先来一局通用小游戏赌出输家,输家再接惩罚/挑战——不要无来由直接点人下挑战。"
         "通用局用 draw_atom(atom_type=\"完整玩法\") 从弹药库抽(库存数百条民间通用局:抓手指变体/"
         "开火车/传话链/骰局拳局等),抓手指/吹牛骰/十五二十/快枪手是保底款;骰子与随机一律走 random 工具,"
-        "公平由系统保证。"
+        "公平由系统保证。节奏有两种拍:**铺垫拍**(tier=铺垫:敢不敢型微挑战、快条件点名——小、快、垫场,"
+        "连用两三条攒温度)和**主打拍**(tier=主打:结构完整、有观赏性的副歌)。降档=多抽铺垫+野度min归零,"
+        "加档=抽主打+抬野度min——两个方向现在都有真抓手,不许只动嘴。"
         "环节与惩罚内容优先 draw_atom 从弹药库抽。抽到的原子两种用法:①直接用——通用玩法本来就该"
         "直接用,大方用,**不许包装**:没改就不许说「本桌改版/特调」这类话;②真改版,判据两条缺一不可:"
         "a) 至少一个槽位的**内容**换成了本桌专属信息(某玩家的画像梗/名字梗/现场实物的新用途)——"
