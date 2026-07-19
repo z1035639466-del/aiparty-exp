@@ -100,13 +100,14 @@ def test_turn_ready_event_driven(tmp_path):
 def test_opener_atoms_available(tmp_path):
     from modeb.atoms_seed import SEED_ATOMS
     openers = [a for a in SEED_ATOMS if a.get("opener")]
-    assert {a["name"] for a in openers} == {"吹牛骰", "十五二十", "石头剪刀布擂台", "抓手指", "分队车轮战"}
-    assert all(not a["props"] for a in openers), "通用局须零道具随时可开"
+    assert {a["name"] for a in openers} == {"吹牛骰", "十五二十", "石头剪刀布擂台", "抓手指", "分队车轮战", "快枪手对决"}
+    assert all(not a["props"] or a["props"] == ["手机"] for a in openers), \
+        "通用局须零道具或仅手机(手机人手一台视同零道具)"
 
 
 def test_host_prompt_carries_new_iron_rules():
     from modeb.driver_llm import build_system_prompt
     sp = build_system_prompt(["甲", "乙"], 6, 30)
-    for token in ["静静等", "一个字都不许", "吹牛骰", "不要汇总排名", "怂货榜", "加冕礼", "不念名次",
+    for token in ["静静等", "一个字都不许", "吹牛骰", "不要汇总排名", "怂货榜", "加冕礼", "不念名次", "快枪手",
                   "保结构换槽位", "照搬原子打天下是偷懒"]:
         assert token in sp

@@ -121,7 +121,8 @@ def test_table_runner_bot_events_next_turn(tmp_path):
     runner = TableRunner(eng, bots)
     runner.run_turn()
     line2 = runner.run_turn()
-    assert {"type": "laugh", "player": "小静"} in line2["events_in"], "bot 事件须在下一回合聚合"
+    assert any(e.get("type") == "laugh" and e.get("player") == "小静"
+               for e in line2["events_in"]), "bot 事件须在下一回合聚合"
     summary = runner.run_to_finish()
     assert state.finished and summary["laugh_events"] >= 9
 
@@ -153,8 +154,8 @@ def test_simulator_bot_seats(server):
     assert code == 200 and snap["bots"] == ["波特", "琳琳"]
     call(server, "/api/turn", {"text": "开场", "tool_use": [{"name": "state.next_round", "input": {}}]})
     snap, _ = call(server, "/api/state")
-    assert {"type": "laugh", "player": "波特"} in snap["pending_events"]
-    assert {"type": "laugh", "player": "琳琳"} in snap["pending_events"]
+    pend = [(e.get("type"), e.get("player")) for e in snap["pending_events"]]
+    assert ("laugh", "波特") in pend and ("laugh", "琳琳") in pend
 
 
 def test_simulator_rejects_unknown_bot_seat(server):

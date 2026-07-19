@@ -23,6 +23,7 @@ SEED_ATOMS: list[dict] = [
     {"id": "open-03", "name": "石头剪刀布擂台", "type": "完整玩法", "text": "全员两两对拳打擂台,连败到底的为输家接惩罚", "wildness": 2, "props": [], "safety": [], "currency": "表演", "opener": True},
     {"id": "open-05", "name": "分队车轮战", "type": "完整玩法", "text": "两人石头剪刀布争队长,赢家先挑人轮流组队;两队轮流派人1v1对决(划拳/比拼皆可),败方受惩罚——合作结构,队友共担", "wildness": 3, "props": [], "safety": [], "currency": "喝", "opener": True},
     {"id": "open-04", "name": "抓手指", "type": "完整玩法", "text": "一人摊开手掌,其余人把食指放掌下;摊掌者报数或喊关键词后突然抓,被抓住的为输家接惩罚(xhs 语料本家玩法,房主口述规则)", "wildness": 2, "props": [], "safety": [], "currency": "表演", "opener": True},
+    {"id": "open-06", "name": "快枪手对决", "type": "完整玩法", "text": "两人各持手机对峙:西部BGM响起,系统在随机鼓点亮出「拔!」,先拍屏者胜(系统按毫秒判先后,抢跑判负),慢者受罚(房主设计,手机原生通用游戏旗舰件)", "wildness": 2, "props": ["手机"], "safety": [], "currency": "表演", "opener": True},
     # —— 权力型(扩编批照准件,skill 授予) ——
     {"id": "prop-01", "name": "时间暂停器", "type": "技能授予", "text": "喊「时间停止!」全场定格十秒,动者受罚;发动者窗口内可自由行动一次", "wildness": 4, "props": ["遥控器", "打火机"], "safety": [], "currency": "怪造型", "skill": {"prop": "时间暂停器", "uses": 2, "ritual": "双手交叉猛地展开+高喊台词,缺一发动失败反罚自己"}},
     {"id": "prop-09", "name": "甩锅大法", "type": "技能授予", "text": "受罚时做华丽甩锅动作把惩罚转给邻座,每局限用", "wildness": 3, "props": [], "safety": [], "currency": "喝", "skill": {"prop": "甩锅大法", "uses": 1, "ritual": "双手作抛物线状甩向目标并喊「锅——飞——」"}},

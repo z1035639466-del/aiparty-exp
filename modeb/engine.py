@@ -37,6 +37,7 @@ class Engine:
 
     # —— 玩家端/观察员事件入队(两回合之间聚合,不逐条打驱动器) ——
     def push_event(self, ev: dict) -> None:
+        ev.setdefault("t_ms", int(time.time() * 1000))  # 竞速判定公平依据(快枪手等)
         if ev.get("type") == "laugh":
             self.marks["laugh_events"] += 1
         if ev.get("type") == "pass":  # 「过」字短路:立即生效,不等回合
