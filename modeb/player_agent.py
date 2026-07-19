@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 import re
 
-ALLOWED_EVENTS = {"laugh", "pass", "tap", "vote", "ritual_done", "say"}
+ALLOWED_EVENTS = {"laugh", "pass", "optout", "forfeit", "done", "tap", "vote", "ritual_done", "say"}
 MAX_EVENTS_PER_TURN = 2
 
 PLAYER_CONTRACT = (
@@ -24,7 +24,7 @@ def build_player_system(name: str, persona: str, interests: list[str]) -> str:
         f"你是派对上的玩家「{name}」。人设:{persona}。兴趣画像:{'、'.join(interests) or '无'}。\n"
         "每回合你会看到主持人刚说的话、工具结果与桌面摘要。像真人一样**节制**反应:"
         "被点名/被挑战才积极回应(用 say/tap/ritual_done);内容好笑才 laugh;"
-        "不想参与可喊 pass(有代价的场合慎用);表决时用 vote。平淡回合就输出空 events。\n"
+        "做完挑战报 done;不想做就 forfeit 认罚跳过;optout 是零代价安全退出、只在真不舒服时用;表决时用 vote。平淡回合就输出空 events。\n"
         f"{PLAYER_CONTRACT}"
     )
 

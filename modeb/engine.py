@@ -30,7 +30,7 @@ class Engine:
         self.tools = ToolExecutor(state, rng_seed)
         self.episode_path = episode_path
         self.event_queue: list[dict] = []
-        self.marks = {"laugh_events": 0, "skips": 0, "turns": 0}
+        self.marks = {"laugh_events": 0, "skips": 0, "forfeits": 0, "turns": 0}
         self._t0 = time.time()
         episode_path.parent.mkdir(parents=True, exist_ok=True)
         self._ep = episode_path.open("w", encoding="utf-8")
@@ -40,8 +40,10 @@ class Engine:
         ev.setdefault("t_ms", int(time.time() * 1000))  # 竞速判定公平依据(快枪手等)
         if ev.get("type") == "laugh":
             self.marks["laugh_events"] += 1
-        if ev.get("type") == "pass":  # 「过」字短路:立即生效,不等回合
+        if ev.get("type") in ("pass", "optout"):  # 安全退出(零代价底线,罕用):立即生效
             self.marks["skips"] += 1
+        if ev.get("type") == "forfeit":  # 认罚跳过(日常的「过」):正常游戏动作,按赌注结算
+            self.marks["forfeits"] += 1
         self.event_queue.append(ev)
 
     def time_left_min(self) -> float:

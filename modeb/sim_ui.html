@@ -109,12 +109,13 @@ function paneHtml(p, s) {
   const focus = s.digest.focus === p ? "pane focus" : "pane";
   const bot = (s.bots || []).includes(p) ? " 🤖" : "";
   return `<div class="${focus}"><b>${p}${bot}</b><span class="score">${s.digest.scores[p]}</span><br>
-    <button onclick="ev('laugh','${p}')">😂 笑</button>
-    <button onclick="ev('pass','${p}')">🙅 过</button>
-    <button onclick="ev('tap','${p}')">👍 确认</button>
+    <button onclick="ev('done','${p}')">✅ 完成</button>
+    <button onclick="ev('forfeit','${p}')">🍺 认罚跳过</button>
     <button onclick="ev('vote','${p}',{value:'赞成'})">🗳 赞</button>
     <button onclick="ev('vote','${p}',{value:'反对'})">🗳 反</button>
-    <button onclick="ev('ritual_done','${p}')">🪄 仪式完成</button></div>`;
+    <button onclick="ev('ritual_done','${p}')">🪄 仪式</button>
+    <button onclick="ev('optout','${p}')" title="零代价安全退出(底线,罕用)">🚫</button>
+    <button onclick="ev('laugh','${p}')" title="观察员打点:替代纸笔笑声账本;产品端无此键,笑声走感知窗口+局后问卷">😂</button></div>`;
 }
 async function refresh() {
   const s = await api("/api/state");

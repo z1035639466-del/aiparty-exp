@@ -75,6 +75,17 @@ def test_marks_recorded(tmp_path):
     _, _, summary = _run_game(tmp_path)
     assert summary["laugh_events"] == 4
     assert summary["skips"] == 1
+
+
+def test_three_signals_counted(tmp_path):
+    state = GameState(players=["甲", "乙", "丙"], wildness_cap=6, time_budget_min=30,
+                      scene_objects=["瓶子"])
+    eng = Engine(state, ScriptedDriver(), tmp_path / "ep.jsonl", rng_seed=1)
+    eng.push_event({"type": "done", "player": "甲"})
+    eng.push_event({"type": "forfeit", "player": "乙"})
+    eng.push_event({"type": "optout", "player": "丙"})
+    assert eng.marks["forfeits"] == 1, "认罚跳过单独计数(正常游戏动作)"
+    assert eng.marks["skips"] == 1, "安全退出计入skips(底线信号,迭代要盯)"
     assert summary["would_replay_yes"] is None, "复玩问卷局后填,不得预填"
 
 
@@ -109,5 +120,5 @@ def test_host_prompt_carries_new_iron_rules():
     from modeb.driver_llm import build_system_prompt
     sp = build_system_prompt(["甲", "乙"], 6, 30)
     for token in ["静静等", "一个字都不许", "吹牛骰", "不要汇总排名", "怂货榜", "加冕礼", "不念名次", "快枪手",
-                  "保结构换槽位", "照搬原子打天下是偷懒"]:
+                  "保结构换槽位", "照搬原子打天下是偷懒", "认罚跳过", "安全退出", "不追问不起哄不渲染"]:
         assert token in sp
