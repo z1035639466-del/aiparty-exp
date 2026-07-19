@@ -75,6 +75,7 @@ def test_marks_recorded(tmp_path):
     _, _, summary = _run_game(tmp_path)
     assert summary["laugh_events"] == 4
     assert summary["skips"] == 1
+    assert summary["would_replay_yes"] is None, "复玩问卷局后填,不得预填"
 
 
 def test_three_signals_counted(tmp_path):
@@ -86,7 +87,6 @@ def test_three_signals_counted(tmp_path):
     eng.push_event({"type": "optout", "player": "丙"})
     assert eng.marks["forfeits"] == 1, "认罚跳过单独计数(正常游戏动作)"
     assert eng.marks["skips"] == 1, "安全退出计入skips(底线信号,迭代要盯)"
-    assert summary["would_replay_yes"] is None, "复玩问卷局后填,不得预填"
 
 
 def test_turn_ready_event_driven(tmp_path):
