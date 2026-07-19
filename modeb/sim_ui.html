@@ -82,11 +82,11 @@ async function start() {
   if (r.error) alert(r.error);
   refresh();
 }
-setInterval(async () => {  // 自动回合:llm/scripted 驱动下真人只管自己的 pane
+setInterval(async () => {  // 事件驱动心跳:有新事件/计时器到点才叫醒主持——没动静就让它等
   const st = await api("/api/state");
-  if ($("auto").checked && !st.no_session && !st.finished && st.driver !== "manual")
+  if ($("auto").checked && !st.no_session && !st.finished && st.driver !== "manual" && st.turn_ready)
     await api("/api/turn", {});
-}, 4000);
+}, 2000);
 function quick(js) { $("htools").value = js; }
 async function turn() {
   let tools = [];

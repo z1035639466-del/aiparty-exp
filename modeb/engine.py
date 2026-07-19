@@ -46,10 +46,22 @@ class Engine:
     def time_left_min(self) -> float:
         return self.state.time_budget_min - (time.time() - self._t0) / 60.0
 
+    def turn_ready(self) -> bool:
+        """事件驱动心跳:开局首拍 / 有新事件 / 有计时器到点,才该叫醒主持。
+        房主裁定(2026-07-18):没回应就等——桌上没动静不打扰,主持不必编进展。"""
+        if self.marks["turns"] == 0 or self.event_queue:
+            return True
+        now = time.time()
+        return any(t <= now for t in self.state.timers)
+
     # —— 一个决策回合 ——
     def turn(self) -> dict:
+        now = time.time()
+        fired = [t for t in self.state.timers if t <= now]
+        self.state.timers = [t for t in self.state.timers if t > now]
         digest = self.state.digest(self.time_left_min())
         events, self.event_queue = self.event_queue, []
+        events += [{"type": "timer_expired"} for _ in fired]
         decision = self.driver.decide(digest, events)
         text = decision.get("text", "")
         calls = decision.get("tool_use", [])[:MAX_TOOLS_PER_TURN]

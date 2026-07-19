@@ -86,6 +86,7 @@ class Session:
             "episode_path": str(self.episode_path),
             "driver": self.driver_kind,
             "bots": self.bot_names,
+            "turn_ready": self.engine.turn_ready(),
         }
 
 

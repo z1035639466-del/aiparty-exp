@@ -76,3 +76,36 @@ def test_marks_recorded(tmp_path):
     assert summary["laugh_events"] == 4
     assert summary["skips"] == 1
     assert summary["would_replay_yes"] is None, "复玩问卷局后填,不得预填"
+
+
+def test_turn_ready_event_driven(tmp_path):
+    """房主裁定「没回应就等」:无事件无到点计时器则不叫醒主持。"""
+    import time as _time
+    state = GameState(players=["甲", "乙", "丙"], wildness_cap=6, time_budget_min=30,
+                      scene_objects=["瓶子"])
+    eng = Engine(state, ScriptedDriver(), tmp_path / "ep.jsonl", rng_seed=1)
+    assert eng.turn_ready(), "开局首拍必 ready"
+    eng.turn()
+    assert not eng.turn_ready(), "桌上没动静就不该打扰主持"
+    eng.push_event({"type": "laugh"})
+    assert eng.turn_ready(), "有新事件即 ready"
+    eng.turn()
+    state.timers.append(_time.time() - 0.1)
+    assert eng.turn_ready(), "计时器到点即 ready"
+    line = eng.turn()
+    assert {"type": "timer_expired"} in line["events_in"], "到点计时器须作为事件进回合"
+    assert all(t > _time.time() for t in state.timers), "到点的被消费,未到点的保留"
+
+
+def test_opener_atoms_available(tmp_path):
+    from modeb.atoms_seed import SEED_ATOMS
+    openers = [a for a in SEED_ATOMS if a.get("opener")]
+    assert {a["name"] for a in openers} == {"吹牛骰", "十五二十", "石头剪刀布擂台"}
+    assert all(not a["props"] for a in openers), "通用局须零道具随时可开"
+
+
+def test_host_prompt_carries_new_iron_rules():
+    from modeb.driver_llm import build_system_prompt
+    sp = build_system_prompt(["甲", "乙"], 6, 30)
+    for token in ["静静等", "一个字都不许", "吹牛骰", "禁止汇总排名", "怂货榜", "加冕礼", "不念名次"]:
+        assert token in sp

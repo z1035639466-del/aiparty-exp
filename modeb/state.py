@@ -32,6 +32,7 @@ class GameState:
     atoms_used: list[str] = field(default_factory=list)
     grants: list[SkillGrant] = field(default_factory=list)
     notes: dict[str, Any] = field(default_factory=dict)
+    timers: list[float] = field(default_factory=list)  # 活动计时器到期时刻(epoch)
     finished: bool = False
 
     def __post_init__(self) -> None:
@@ -51,6 +52,7 @@ class GameState:
             ],
             "scene_objects": list(self.scene_objects),
             "time_left_min": round(time_left_min, 1),
+            "timer_running": bool(self.timers),
             "野度档": self.wildness_cap,
         }
 

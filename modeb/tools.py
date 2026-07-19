@@ -46,9 +46,11 @@ class ToolExecutor:
         return {"fx": a.get("effect", "")}
 
     def _t_timer(self, name: str, a: dict) -> dict:
+        import time as _time
         secs = int(a.get("seconds", 10))
         if not 1 <= secs <= 600:
             raise ClampError(f"timer 秒数越界: {secs}")
+        self.state.timers.append(_time.time() + secs)
         return {"timer_started": secs, "label": a.get("label", "")}
 
     def _t_ask(self, name: str, a: dict) -> dict:
