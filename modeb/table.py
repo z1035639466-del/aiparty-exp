@@ -43,7 +43,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="全 bot burn-in(真人加入请用 simulator)")
     ap.add_argument("--provider", default="anthropic", choices=["anthropic", "deepseek"])
     ap.add_argument("--host-model", default="sonnet")
-    ap.add_argument("--seat-model", default="haiku")
+    ap.add_argument("--seat-model", default="sonnet")
     ap.add_argument("--players", default="疯子明,小静,大鹏")
     ap.add_argument("--minutes", type=int, default=15)
     ap.add_argument("--wildness", type=int, default=6)

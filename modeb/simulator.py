@@ -42,7 +42,7 @@ class Session:
     def __init__(self, players: list[str], minutes: int, wildness: int,
                  objects: list[str], driver_kind: str, out_dir: Path,
                  bots: dict[str, str] | None = None, provider: str = "anthropic",
-                 host_model: str = "sonnet", seat_model: str = "haiku",
+                 host_model: str = "sonnet", seat_model: str = "sonnet",
                  score_style: str = "自动") -> None:
         if not MIN_PLAYERS <= len(players) <= MAX_PLAYERS:
             raise ValueError(f"玩家数须在 {MIN_PLAYERS}–{MAX_PLAYERS}(收到 {len(players)})")
@@ -111,7 +111,7 @@ class Hub:
             bots=cfg.get("bots") or {},
             provider=cfg.get("provider", "anthropic"),
             host_model=cfg.get("host_model", "sonnet"),
-            seat_model=cfg.get("seat_model", "haiku"),
+            seat_model=cfg.get("seat_model", "sonnet"),
             score_style=cfg.get("score_style", "自动"),
         )
         return self.session.snapshot()
