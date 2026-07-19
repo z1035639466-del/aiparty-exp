@@ -190,7 +190,10 @@ def test_score_style_switches_prompt():
     from modeb.driver_llm import build_system_prompt
     qing = build_system_prompt(["甲", "乙"], 6, 30, "清账")
     zong = build_system_prompt(["甲", "乙"], 6, 30, "综艺")
+    jing = build_system_prompt(["甲", "乙"], 6, 30, "竞技")
     assert "当场清账" in qing and "不要汇总排名" in qing
     assert "可以攒分" in zong and "综艺也不围着总分第一转" in zong
-    for sp in (qing, zong):
+    assert "真正的冠军" in jing and "对局不对人" in jing
+    for sp in (qing, zong, jing):
         assert "负向人身标签" in sp, "底线不随风格变"
+        assert "老梗" in sp, "时效条不随风格变"

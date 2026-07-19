@@ -100,7 +100,7 @@ def test_turn_ready_event_driven(tmp_path):
 def test_opener_atoms_available(tmp_path):
     from modeb.atoms_seed import SEED_ATOMS
     openers = [a for a in SEED_ATOMS if a.get("opener")]
-    assert {a["name"] for a in openers} == {"吹牛骰", "十五二十", "石头剪刀布擂台"}
+    assert {a["name"] for a in openers} == {"吹牛骰", "十五二十", "石头剪刀布擂台", "抓手指"}
     assert all(not a["props"] for a in openers), "通用局须零道具随时可开"
 
 
