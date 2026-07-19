@@ -146,6 +146,8 @@ class ToolExecutor:
                 continue
             if atom["wildness"] > min(self.state.wildness_cap, int(a.get("野度", 10))):
                 continue
+            if atom["wildness"] < int(a.get("野度min", 0)):
+                continue  # 加档下限:说到做到,嘴上加档必须参数加档
             if atom["safety"] and a.get("exclude_safety", True) and set(atom["safety"]) & {"逼量嫌疑"}:
                 continue
             if a.get("atom_type") and atom["type"] != a["atom_type"]:

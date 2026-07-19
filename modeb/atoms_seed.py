@@ -29,5 +29,4 @@ SEED_ATOMS: list[dict] = [
     {"id": "prop-09", "name": "甩锅大法", "type": "技能授予", "text": "受罚时做华丽甩锅动作把惩罚转给邻座,每局限用", "wildness": 3, "props": [], "safety": [], "currency": "喝", "skill": {"prop": "甩锅大法", "uses": 1, "ritual": "双手作抛物线状甩向目标并喊「锅——飞——」"}},
     {"id": "prop-38", "name": "决斗手套", "type": "技能授予", "text": "掷「手套」向任意人宣战,对方必须应战划拳,输者受罚", "wildness": 3, "props": ["纸巾", "外套"], "safety": [], "currency": "喝", "skill": {"prop": "决斗手套", "uses": 3, "ritual": "将绑定实物郑重掷于对方面前并宣告「我要求决斗」"}},
     {"id": "prop-42", "name": "变身药水", "type": "技能授予", "text": "指定一人用现场实物完成一次扮相变身(发胶造型/丝袜劫匪),AI 验收", "wildness": 5, "props": ["发胶", "丝袜"], "safety": [], "currency": "怪造型", "skill": {"prop": "变身药水", "uses": 1, "ritual": "递上绑定实物并念「变!」"}},
-    {"id": "prop-50", "name": "加冕礼", "type": "规则修饰", "text": "终局仪式:按今晚笑声账本加冕「今夜最靓」,全场摆合影梗", "wildness": 1, "props": [], "safety": [], "currency": "表演"},
 ]

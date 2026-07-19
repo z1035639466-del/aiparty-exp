@@ -119,6 +119,9 @@ def test_opener_atoms_available(tmp_path):
 def test_host_prompt_carries_new_iron_rules():
     from modeb.driver_llm import build_system_prompt
     sp = build_system_prompt(["甲", "乙"], 6, 30)
-    for token in ["静静等", "一个字都不许", "吹牛骰", "不要汇总排名", "怂货榜", "加冕礼", "不念名次", "快枪手",
-                  "保结构换槽位", "照搬原子打天下是偷懒", "认罚跳过", "安全退出", "不追问不起哄不渲染"]:
+    for token in ["静静等", "一个字都不许", "吹牛骰", "不要汇总排名", "怂货榜", "不念名次", "快枪手",
+                  "认罚跳过", "安全退出", "不追问不起哄不渲染",
+                  "不许包装", "只换措辞、换个说法指同一件事,不是改版", "骨架**原样保留**",
+                  "野度min 真加档", "不搞固定仪式、不搞合影环节"]:
         assert token in sp
+    assert "加冕礼" not in sp, "固定终局仪式已废除(房主裁定:合影很扯)"

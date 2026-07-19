@@ -51,11 +51,11 @@ class ScriptedDriver:
             {"text": "来个温柔的。",
              "tool_use": [{"name": "draw_atom", "input": {"野度": 3}}]},
             # 8 写分并收尾进终局
-            {"text": "好,时间差不多,进入今晚的加冕礼。",
+            {"text": "好,时间差不多,准备收尾。",
              "tool_use": [{"name": "state.add_score", "input": {"player": p3, "delta": 1, "reason": "温柔轮"}},
-                          {"name": "show", "input": {"content": "加冕礼:今夜最靓", "visibility": "全场公开"}}]},
+                          {"name": "show", "input": {"content": "收尾:今晚名场面回放", "visibility": "全场公开"}}]},
             # 9 终局:仪式不竞技(过程>结果),收局
-            {"text": "冠军不重要,合影才重要——全体,摆好!",
+            {"text": "今晚各位都很灵——收工!",
              "tool_use": [{"name": "fx", "input": {"effect": "彩带+闪光"}},
                           {"name": "state.finish", "input": {}}]},
         ]
