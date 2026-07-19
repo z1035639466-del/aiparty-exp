@@ -27,6 +27,8 @@
   small { color: #888; }
 </style>
 <div>
+  <div id="err" style="display:none;background:#511;color:#fbb;border:1px solid #944;
+       padding:6px 8px;margin-bottom:6px;border-radius:4px;font-size:13px"></div>
   <div class="card" id="setup">
     <h3>开局(机位 2–10 任意,机制不随机位变)</h3>
     <input id="players" value="疯子明,小静,大鹏,阿伟,琳琳,老宋">
@@ -72,10 +74,30 @@
 </div>
 <script>
 const $ = id => document.getElementById(id);
+// 一律返回对象;失败也走 {error} 而不是抛出去。抛出去会变成无人接管的
+// promise rejection,页面纹丝不动,房主只看到「点了没反应」。
 async function api(path, body) {
-  const r = await fetch(path, body ? {method:"POST", body: JSON.stringify(body)} : undefined);
-  return r.json();
+  try {
+    const r = await fetch(path, body ? {method:"POST", body: JSON.stringify(body)} : undefined);
+    const raw = await r.text();
+    if (!raw) return {error: `服务端无响应(HTTP ${r.status})——多半是回合里抛了异常,看终端`};
+    try { return JSON.parse(raw); }
+    catch (e) { return {error: `服务端返回的不是 JSON:${raw.slice(0, 200)}`}; }
+  } catch (e) {
+    return {error: `连不上模拟台(${e.message})——simulator 还在跑吗?`};
+  }
 }
+// 出错时同时停掉自动回合:否则 4 秒心跳会永远重试,每次都可能先烧一次 API。
+// 用常驻状态条而非 alert():4 秒轮询下的 alert 会变成阻塞式模态框风暴,
+// 把整个浏览器堵死——比"点了没反应"还糟。
+function bail(r) {
+  if (!r || !r.error) return false;
+  $("auto").checked = false;
+  $("err").textContent = "⚠️ " + r.error;
+  $("err").style.display = "";
+  return true;
+}
+function clearErr() { $("err").style.display = "none"; }
 // 各家默认模型:换 provider 时同步两个模型框,免得把 sonnet/haiku 发给国产口。
 const PROVIDER_MODELS = {
   anthropic: ["sonnet", "haiku"],
@@ -99,19 +121,23 @@ async function start() {
     driver: $("driver").value, bots,
     provider: $("provider").value, host_model: $("hostmodel").value,
     seat_model: $("seatmodel").value, score_style: $("scorestyle").value });
-  if (r.error) alert(r.error);
+  if (bail(r)) return;
   refresh();
 }
 setInterval(async () => {  // 事件驱动心跳:有新事件/计时器到点才叫醒主持——没动静就让它等
   const st = await api("/api/state");
-  if ($("auto").checked && !st.no_session && !st.finished && st.driver !== "manual" && st.turn_ready)
-    await api("/api/turn", {});
+  if (bail(st)) return;
+  if ($("auto").checked && !st.no_session && !st.finished && st.driver !== "manual" && st.turn_ready) {
+    const line = await api("/api/turn", {});
+    if (bail(line)) return;   // 一次失败即停自动回合,不做无声重试
+    refresh();
+  }
 }, 2000);
 function quick(js) { $("htools").value = js; }
 // 收局走专用口,不经过模型;顺手关掉自动回合,确保 4 秒心跳彻底停下。
 async function finishNow() {
   $("auto").checked = false;
-  await api("/api/finish", {});
+  if (bail(await api("/api/finish", {}))) return;
   refresh();
 }
 async function turn() {
@@ -119,12 +145,12 @@ async function turn() {
   try { tools = $("htools").value.trim() ? JSON.parse($("htools").value) : []; }
   catch (e) { alert("tool_use JSON 不合法: " + e); return; }
   const line = await api("/api/turn", {text: $("htext").value, tool_use: tools});
-  if (line.error) alert(line.error);
+  if (bail(line)) return;
   $("htext").value = ""; $("htools").value = "";
   refresh();
 }
 async function ev(type, player, extra) {
-  await api("/api/event", Object.assign({type, player}, extra || {}));
+  if (bail(await api("/api/event", Object.assign({type, player}, extra || {})))) return;
   refresh();
 }
 function paneHtml(p, s) {
@@ -178,6 +204,8 @@ function renderAsk(s) {
 }
 async function refresh() {
   const s = await api("/api/state");
+  if (bail(s)) return;                 // 静默失败到此为止
+  clearErr();                          // 这次通了,把上次的错误条撤掉
   if (s.no_session) { $("digest").textContent = "未开局"; return; }
   $("panes").innerHTML = s.players.map(p => paneHtml(p, s)).join("");
   renderAsk(s);

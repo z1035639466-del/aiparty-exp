@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import threading
+import traceback
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -208,6 +209,12 @@ class Handler(BaseHTTPRequestHandler):
             self._json(404, {"error": "not found"})
         except (ValueError, json.JSONDecodeError) as e:
             self._json(400, {"error": str(e)})
+        except Exception as e:
+            # 任何异常逃逸出去,处理线程当场死掉、一个字节都不回,浏览器那头
+            # 表现为「点了没反应」——真原因只在终端的 traceback 里。必须转成
+            # 一条 JSON 错误送回前端,让房主在页面上就能看见。
+            traceback.print_exc()
+            self._json(500, {"error": f"{type(e).__name__}: {e}"})
 
 
 def make_server(port: int, out_dir: Path) -> ThreadingHTTPServer:

@@ -134,3 +134,23 @@ def test_turn_does_cost_api_calls(server, monkeypatch):
     tr = _start_llm_table(server, monkeypatch)
     call(server, "/api/turn", {})
     assert tr.calls >= 3, f"一回合应有 1 次主持 + 2 次座位调用,实际 {tr.calls}"
+
+
+def test_turn_exception_returns_json_500_and_server_survives(server, monkeypatch):
+    """异常逃逸会让处理线程当场死掉、一个字节都不回,浏览器那头表现为
+    「点了没反应」——真原因只在终端。必须转成 JSON 错误送回前端。"""
+    class _Exploding:
+        def complete(self, system, messages):
+            raise RuntimeError("模拟 429 限流")
+
+    monkeypatch.setattr("modeb.simulator.make_transport", lambda *a, **k: _Exploding())
+    call(server, "/api/start", {"players": ["我", "阿伟"], "bots": {"阿伟": "显眼包"},
+                                "minutes": 30, "wildness": 6, "objects": ["瓶子"],
+                                "driver": "llm", "provider": "deepseek"})
+
+    body, status = call(server, "/api/turn", {})
+    assert status == 500, f"异常应返回 500,实际 {status}"
+    assert "429" in body["error"], f"错误正文要带原因,实际 {body}"
+
+    snap, code = call(server, "/api/state")     # 服务必须还活着
+    assert code == 200 and snap["finished"] is False
