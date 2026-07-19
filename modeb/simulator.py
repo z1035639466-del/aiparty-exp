@@ -89,6 +89,9 @@ class Session:
             "driver": self.driver_kind,
             "bots": self.bot_names,
             "turn_ready": self.engine.turn_ready(),
+            # 桌友调用失败数:静默降级会让 key 错表现成「bot 好闷」,得摆到台面上
+            "bot_errors": {b.name: {"count": b.errors, "last": b.last_error}
+                           for b in self.bots if getattr(b, "errors", 0)},
         }
 
 

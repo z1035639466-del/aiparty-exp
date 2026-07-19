@@ -229,3 +229,29 @@ def test_draw_atom_tier_filter(tmp_path):
     eng = Engine(state, ScriptedDriver(), tmp_path / "ep.jsonl", rng_seed=3)
     r = eng.tools.execute({"name": "draw_atom", "input": {"tier": "主打", "野度": 6}})
     assert r["ok"] and r["result"]["atom"]["tier"] == "主打"
+
+class _BrokenTransport:
+    """永远 401 的传输——模拟 key 错/模型串过期。"""
+
+    def complete(self, system, messages):
+        raise RuntimeError("HTTP 401:{\"error\":{\"message\":\"Authentication Fails\"}}")
+
+
+def test_seat_failure_is_loud_but_not_fatal(capsys):
+    """桌友掉线不许卡局,但必须留下痕迹——静默降级会把查错方向带偏。"""
+    from modeb.player_agent import LLMPlayerAgent
+
+    bot = LLMPlayerAgent("阿伟", "显眼包", _BrokenTransport())
+    line, digest = {"text": "来吧", "results": []}, {"round": 1, "scores": {}}
+
+    assert bot.react(line, digest) == [], "失败时应返回空事件,不抛给上层"
+    assert bot.errors == 1
+    assert "401" in bot.last_error
+
+    err = capsys.readouterr().err
+    assert "阿伟" in err and "401" in err, f"首次失败必须吼到 stderr,实际:{err!r}"
+
+    for _ in range(5):                       # 后续失败静默累计,不刷屏
+        bot.react(line, digest)
+    assert bot.errors == 6
+    assert capsys.readouterr().err == "", "重复同类错误不该继续播报"

@@ -129,7 +129,9 @@ async function ev(type, player, extra) {
 }
 function paneHtml(p, s) {
   const focus = s.digest.focus === p ? "pane focus" : "pane";
-  const bot = (s.bots || []).includes(p) ? " 🤖" : "";
+  const err = (s.bot_errors || {})[p];
+  const bot = (s.bots || []).includes(p)
+    ? (err ? ` <span class="clamp" title="${err.last}">🤖⚠️×${err.count}</span>` : " 🤖") : "";
   return `<div class="${focus}"><b>${p}${bot}</b><span class="score">${s.digest.scores[p]}</span><br>
     <button onclick="ev('done','${p}')">✅ 完成</button>
     <button onclick="ev('forfeit','${p}')">🍺 认罚跳过</button>

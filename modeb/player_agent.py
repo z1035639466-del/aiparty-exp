@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 
 ALLOWED_EVENTS = {"laugh", "pass", "optout", "forfeit", "done", "tap", "vote", "ritual_done", "say"}
 MAX_EVENTS_PER_TURN = 2
@@ -52,6 +53,8 @@ class LLMPlayerAgent:
         self.name = name
         self.transport = transport
         self.system = build_player_system(name, persona, interests or [])
+        self.errors = 0          # 累计失败次数,供模拟台在座位上打 ⚠️
+        self.last_error = ""     # 最近一次失败原因,首次即打到 stderr
 
     def react(self, turn_line: dict, digest: dict) -> list[dict]:
         msg = json.dumps({
@@ -63,8 +66,15 @@ class LLMPlayerAgent:
         }, ensure_ascii=False)
         try:
             raw = self.transport.complete(self.system, [{"role": "user", "content": msg}])
-        except Exception:
-            return []  # 桌友掉线不卡局
+        except Exception as e:
+            # 掉线不卡局——但"不卡局"不等于"不告诉任何人"。静默降级会让
+            # key 错/模型串过期表现为「这帮 bot 怎么这么闷」,查错方向全跑偏。
+            self.errors += 1
+            self.last_error = f"{type(e).__name__}: {e}"
+            if self.errors == 1:  # 只吼第一次,免得每 4 秒刷屏
+                print(f"⚠️ 桌友「{self.name}」调用失败(后续同类错误不再重复播报):"
+                      f"{self.last_error}", file=sys.stderr, flush=True)
+            return []
         return parse_player_events(raw, self.name)
 
 
