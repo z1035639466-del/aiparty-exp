@@ -1,0 +1,150 @@
+{"atom_id": "xhs-02223", "raw_record_index": 2223, "name": "传杯接力", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02224", "raw_record_index": 2224, "name": "公主抱人", "atom_type": "任务内容", "wildness": 6, "safety_flags": ["饮酒", "身体接触", "异性互动"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02225", "raw_record_index": 2225, "name": "合照接力", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02226", "raw_record_index": 2226, "name": "对指游戏", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02227", "raw_record_index": 2227, "name": "比身高", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02228", "raw_record_index": 2228, "name": "跳碰手掌", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02229", "raw_record_index": 2229, "name": "出拳伸指", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02230", "raw_record_index": 2230, "name": "弓箭射人", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02231", "raw_record_index": 2231, "name": "抱人抓指", "atom_type": "完整玩法", "wildness": 6, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02232", "raw_record_index": 2232, "name": "闭指点人", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "low"}
+{"atom_id": "xhs-02233", "raw_record_index": 2233, "name": "口红印纸", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02234", "raw_record_index": 2234, "name": "打火推骰", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02235", "raw_record_index": 2235, "name": "抽签罚酒", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02236", "raw_record_index": 2236, "name": "蒙眼猜数", "atom_type": "问答题目", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02237", "raw_record_index": 2237, "name": "举杯传递", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02238", "raw_record_index": 2238, "name": "藏纸寻物", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02239", "raw_record_index": 2239, "name": "叠指选数", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02240", "raw_record_index": 2240, "name": "猜指数字", "atom_type": "问答题目", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02241", "raw_record_index": 2241, "name": "闪光拍照", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02242", "raw_record_index": 2242, "name": "动作接龙", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02243", "raw_record_index": 2243, "name": "蒙眼亲吻", "atom_type": "任务内容", "wildness": 8, "safety_flags": ["饮酒", "身体接触", "异性互动"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02244", "raw_record_index": 2244, "name": "肚脐吹火", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02245", "raw_record_index": 2245, "name": "指南针点", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02246", "raw_record_index": 2246, "name": "指错方向", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02247", "raw_record_index": 2247, "name": "数学答题", "atom_type": "问答题目", "wildness": 1, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02248", "raw_record_index": 2248, "name": "指位接人", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02249", "raw_record_index": 2249, "name": "传烟揣灰", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02250", "raw_record_index": 2250, "name": "拍肩转圈", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02251", "raw_record_index": 2251, "name": "捧虚水", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02252", "raw_record_index": 2252, "name": "按键穿裤", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "low"}
+{"atom_id": "xhs-02253", "raw_record_index": 2253, "name": "拍手失误", "atom_type": "完整玩法", "wildness": 1, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02254", "raw_record_index": 2254, "name": "含酒不吞", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02255", "raw_record_index": 2255, "name": "倒酒溢出", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02256", "raw_record_index": 2256, "name": "拉铃圈物", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "low"}
+{"atom_id": "xhs-02257", "raw_record_index": 2257, "name": "比心抓人", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02258", "raw_record_index": 2258, "name": "吐烟传杯", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02259", "raw_record_index": 2259, "name": "交叉点指", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02260", "raw_record_index": 2260, "name": "摇骰清空", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "", "confidence": "high"}
+{"atom_id": "xhs-02261", "raw_record_index": 2261, "name": "拔牙骰子", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "不中喝一杯,最后没中喝两杯", "confidence": "high"}
+{"atom_id": "xhs-02262", "raw_record_index": 2262, "name": "转盘倒酒", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "", "confidence": "high"}
+{"atom_id": "xhs-02263", "raw_record_index": 2263, "name": "方位骰子", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02264", "raw_record_index": 2264, "name": "名字炸弹", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "罚酒", "confidence": "high"}
+{"atom_id": "xhs-02265", "raw_record_index": 2265, "name": "端水大师", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "把一杯喝完", "confidence": "high"}
+{"atom_id": "xhs-02266", "raw_record_index": 2266, "name": "抓一样", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "罚酒", "confidence": "high"}
+{"atom_id": "xhs-02267", "raw_record_index": 2267, "name": "手机炸弹", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "受罚", "confidence": "high"}
+{"atom_id": "xhs-02268", "raw_record_index": 2268, "name": "比七猜牌", "atom_type": "问答题目", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝酒,抽到7喝两杯", "confidence": "high"}
+{"atom_id": "xhs-02269", "raw_record_index": 2269, "name": "吹瓶扑克", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝掉整瓶酒", "confidence": "high"}
+{"atom_id": "xhs-02270", "raw_record_index": 2270, "name": "猜牌决斗", "atom_type": "问答题目", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "罚酒", "confidence": "high"}
+{"atom_id": "xhs-02271", "raw_record_index": 2271, "name": "摸牌配对", "atom_type": "问答题目", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝一杯,完全相同喝两杯", "confidence": "high"}
+{"atom_id": "xhs-02275", "raw_record_index": 2275, "name": "指南针指", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02276", "raw_record_index": 2276, "name": "闹钟炸弹", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02277", "raw_record_index": 2277, "name": "查裙受罚", "atom_type": "条件点名", "wildness": 4, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02278", "raw_record_index": 2278, "name": "指哪抓谁", "atom_type": "完整玩法", "wildness": 5, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝酒", "confidence": "high"}
+{"atom_id": "xhs-02279", "raw_record_index": 2279, "name": "手指穿杯", "atom_type": "道具挑战", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02280", "raw_record_index": 2280, "name": "猜骰数量", "atom_type": "问答题目", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02281", "raw_record_index": 2281, "name": "接力倒酒", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02282", "raw_record_index": 2282, "name": "打手背罚", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02283", "raw_record_index": 2283, "name": "戳纸洞", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02284", "raw_record_index": 2284, "name": "雷达点人", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02285", "raw_record_index": 2285, "name": "猜拳配对", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02286", "raw_record_index": 2286, "name": "扫码抉择", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02287", "raw_record_index": 2287, "name": "抱团作战", "atom_type": "完整玩法", "wildness": 5, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02288", "raw_record_index": 2288, "name": "纸巾对折", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02289", "raw_record_index": 2289, "name": "微信查户", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02290", "raw_record_index": 2290, "name": "群聊落后", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02291", "raw_record_index": 2291, "name": "纸张拔河", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02292", "raw_record_index": 2292, "name": "蒙眼指人", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02293", "raw_record_index": 2293, "name": "性感跳舞", "atom_type": "任务内容", "wildness": 7, "safety_flags": ["饮酒"], "currency": "表演", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02294", "raw_record_index": 2294, "name": "十指互抓", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02295", "raw_record_index": 2295, "name": "指心抓人", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02296", "raw_record_index": 2296, "name": "叠指罗汉", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02297", "raw_record_index": 2297, "name": "手机低电", "atom_type": "条件点名", "wildness": 1, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02298", "raw_record_index": 2298, "name": "好友最少", "atom_type": "条件点名", "wildness": 1, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02299", "raw_record_index": 2299, "name": "反手摸脐", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02300", "raw_record_index": 2300, "name": "公主抱人", "atom_type": "任务内容", "wildness": 6, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02301", "raw_record_index": 2301, "name": "手口不一", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "", "confidence": "high"}
+{"atom_id": "xhs-02302", "raw_record_index": 2302, "name": "抓一样", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒", "身体接触"], "currency": "喝", "settlement": "罚酒", "confidence": "high"}
+{"atom_id": "xhs-02303", "raw_record_index": 2303, "name": "逛三园词", "atom_type": "问答题目", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "自罚一杯", "confidence": "high"}
+{"atom_id": "xhs-02304", "raw_record_index": 2304, "name": "无限废话", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02305", "raw_record_index": 2305, "name": "胆小鬼牌", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "", "confidence": "low"}
+{"atom_id": "xhs-02306", "raw_record_index": 2306, "name": "胆小鬼酒", "atom_type": "完整玩法", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝完", "confidence": "high"}
+{"atom_id": "xhs-02307", "raw_record_index": 2307, "name": "你有我无", "atom_type": "问答题目", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝酒", "confidence": "high"}
+{"atom_id": "xhs-02308", "raw_record_index": 2308, "name": "答非所问", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "罚酒", "confidence": "high"}
+{"atom_id": "xhs-02309", "raw_record_index": 2309, "name": "逢七必过", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝酒", "confidence": "high"}
+{"atom_id": "xhs-02310", "raw_record_index": 2310, "name": "数字炸弹", "atom_type": "问答题目", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝酒", "confidence": "high"}
+{"atom_id": "xhs-02311", "raw_record_index": 2311, "name": "纸杯传水", "atom_type": "道具挑战", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝酒", "confidence": "high"}
+{"atom_id": "xhs-02312", "raw_record_index": 2312, "name": "逛三园令", "atom_type": "问答题目", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "", "confidence": "low"}
+{"atom_id": "xhs-02314", "raw_record_index": 2314, "name": "游戏汇总", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "", "confidence": "low", "quarantine": "非玩法文本"}
+{"atom_id": "xhs-02316", "raw_record_index": 2316, "name": "游戏汇总", "atom_type": "完整玩法", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "", "confidence": "low", "quarantine": "非玩法文本"}
+{"atom_id": "xhs-02317", "raw_record_index": 2317, "name": "前任花钱", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02318", "raw_record_index": 2318, "name": "前任弃机", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02319", "raw_record_index": 2319, "name": "前任放鸽", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02320", "raw_record_index": 2320, "name": "写小作文", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02321", "raw_record_index": 2321, "name": "醉打前任", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02322", "raw_record_index": 2322, "name": "视奸前任", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02323", "raw_record_index": 2323, "name": "原谅出轨", "atom_type": "条件点名", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02324", "raw_record_index": 2324, "name": "留前任号", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02325", "raw_record_index": 2325, "name": "前任复合", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02326", "raw_record_index": 2326, "name": "前任骗钱", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02327", "raw_record_index": 2327, "name": "恋爱脑", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02328", "raw_record_index": 2328, "name": "护前任", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02329", "raw_record_index": 2329, "name": "存前任照", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02330", "raw_record_index": 2330, "name": "又回头", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02331", "raw_record_index": 2331, "name": "失宠物权", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02332", "raw_record_index": 2332, "name": "倒贴过", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02333", "raw_record_index": 2333, "name": "被前任操控", "atom_type": "条件点名", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02334", "raw_record_index": 2334, "name": "明知不合适", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02335", "raw_record_index": 2335, "name": "购物留地址", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02336", "raw_record_index": 2336, "name": "梦到前任", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02337", "raw_record_index": 2337, "name": "托人和好", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02338", "raw_record_index": 2338, "name": "分手买东西", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02339", "raw_record_index": 2339, "name": "舍不得分手", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02340", "raw_record_index": 2340, "name": "前任欠钱", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02341", "raw_record_index": 2341, "name": "前任友追", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02342", "raw_record_index": 2342, "name": "分组发圈", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02343", "raw_record_index": 2343, "name": "为前任付租", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02344", "raw_record_index": 2344, "name": "测塔罗牌", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02345", "raw_record_index": 2345, "name": "查星座合", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02346", "raw_record_index": 2346, "name": "记前任生日", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02347", "raw_record_index": 2347, "name": "买贴身衣物", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02348", "raw_record_index": 2348, "name": "为前任牺牲", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02349", "raw_record_index": 2349, "name": "忍冷暴力", "atom_type": "条件点名", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02350", "raw_record_index": 2350, "name": "多任同店", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02351", "raw_record_index": 2351, "name": "藏前任歌单", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02352", "raw_record_index": 2352, "name": "现任加微信", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02353", "raw_record_index": 2353, "name": "放不下前任", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02354", "raw_record_index": 2354, "name": "删异性好友", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02355", "raw_record_index": 2355, "name": "降低底线", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02356", "raw_record_index": 2356, "name": "记不清前任", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02357", "raw_record_index": 2357, "name": "染坏习惯", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02358", "raw_record_index": 2358, "name": "没规划未来", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02359", "raw_record_index": 2359, "name": "未被公开", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02360", "raw_record_index": 2360, "name": "小号关注", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02361", "raw_record_index": 2361, "name": "后悔分手", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02362", "raw_record_index": 2362, "name": "为前任纹身", "atom_type": "条件点名", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02363", "raw_record_index": 2363, "name": "前任最多", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02364", "raw_record_index": 2364, "name": "怕失去妥协", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02365", "raw_record_index": 2365, "name": "为前任吵架", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02366", "raw_record_index": 2366, "name": "打听近况", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02367", "raw_record_index": 2367, "name": "被前任画饼", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02368", "raw_record_index": 2368, "name": "求前任别走", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02369", "raw_record_index": 2369, "name": "劝分不听", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02370", "raw_record_index": 2370, "name": "与前任友暧昧", "atom_type": "条件点名", "wildness": 3, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02371", "raw_record_index": 2371, "name": "想联系前任", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02372", "raw_record_index": 2372, "name": "死缠前任", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02373", "raw_record_index": 2373, "name": "婚礼邀前任", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02374", "raw_record_index": 2374, "name": "断社交圈", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02375", "raw_record_index": 2375, "name": "前任太多", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02376", "raw_record_index": 2376, "name": "断崖式分手", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
+{"atom_id": "xhs-02377", "raw_record_index": 2377, "name": "收前任假货", "atom_type": "条件点名", "wildness": 2, "safety_flags": ["饮酒"], "currency": "喝", "settlement": "喝", "confidence": "high"}
