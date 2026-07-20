@@ -96,12 +96,16 @@ class Session:
             if field is None:
                 continue
             secret = res[field]
-            if vis == "自己看" and target:
+            batch = res.get("players")
+            if vis == "自己看" and batch:
+                for pl in batch:
+                    self.inbox[pl].append(f"🔒 {secret}")
+                # 只遮内容不遮收件人:/api/state 是驾驶舱(非产品面),房主调试时
+                # 本来就该看见谁拿到了什么;真实玩家走 /api/view,看不到这个端点。
+                res[field] = f"🔒批量私发(已投递 {len(batch)} 人,内容仅目标可见)"
+            elif vis == "自己看" and target:
                 self.inbox[target].append(f"🔒 {secret}")
                 res[field] = "🔒私发(已投递,内容仅目标可见)"
-                # 收件人不遮:/api/state 是驾驶舱(非产品面),房主调试时本来就该
-                # 看见谁拿到了什么。实测里"元数据泄漏"是 agent 轮询调试口造成的,
-                # 真实玩家看不到这个端点——遮了反而把调试工具弄瞎。
             elif vis == "额头" and target:
                 for pl in self.state.players:
                     if pl != target:

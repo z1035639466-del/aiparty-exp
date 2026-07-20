@@ -94,9 +94,13 @@ class Engine:
         for v in ask["answers"].values():
             tally[v] = tally.get(v, 0) + 1
         winner = max(tally, key=lambda k: tally[k])
+        # 被问未答名单:主持曾把"被窗口挤掉"读成"安静得可疑"并据此下判——
+        # 它不是不想管,是数据里没有这个信息。挤掉≠沉默,必须可分辨。
+        audience = self.state.players if ask.get("asked") in (None, "全场") else [ask["asked"]]
+        silent = [p for p in audience if p not in ask["answers"]]
         return {"type": "ask_result", "prompt": ask["prompt"], "tally": tally,
-                "winner": winner, "answers": dict(ask["answers"]),
-                "note": "按多数认,一票也认"}
+                "winner": winner, "answers": dict(ask["answers"]), "silent": silent,
+                "note": "按多数认,一票也认;silent=被问未答(可能是没赶上窗口,不是故意不说)"}
 
     def time_left_min(self) -> float:
         return self.state.time_budget_min - (time.time() - self._t0) / 60.0

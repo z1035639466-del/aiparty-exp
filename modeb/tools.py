@@ -46,12 +46,54 @@ def load_atom_pool(atoms_path: str | None = None) -> list[dict]:
                 "wildness": int(a.get("wildness", 3)), "props": a.get("props_explicit", []),
                 "safety": a.get("safety_flags", []), "currency": a.get("currency", "表演"),
             })
-    for atom in pool:  # 价值分档:铺垫(敢不敢型微挑战/超短条件点名,垫场拍)|主打(副歌)
+    for atom in pool:
         if "tier" not in atom:
-            t = atom.get("text", "")
-            atom["tier"] = "铺垫" if (re.search(r"不敢的|敢不敢", t)
-                                      or (atom.get("type") == "条件点名" and len(t) <= 18)) else "主打"
+            atom["tier"] = _tier_of(atom)
+        if "min_players" not in atom:
+            atom["min_players"] = _min_players_of(atom)
     return pool
+
+
+# —— 价值分档:铺垫(小快垫场)|主打(副歌)。判据按类型各自定义——
+# 三桌实测战损:旧判据(敢不敢|短条件点名)让 完整玩法 整类拿不到铺垫标,
+# 而 prompt 同时教「通用局抽完整玩法」和「垫场用铺垫」,组合必空返,
+# 2331 条弹药三桌只抽出 2 条。分档和类型是正交维度,不许实现成强相关。
+_TIER_LEN = {"条件点名": 18, "完整玩法": 20, "任务内容": 13, "道具挑战": 14, "问答题目": 14}
+
+
+def _tier_of(atom: dict) -> str:
+    t, typ = atom.get("text", ""), atom.get("type", "")
+    if typ == "技能授予":
+        return "主打"   # 授技能是重器,没有垫场形态
+    if typ == "规则修饰":
+        return "铺垫"   # 规则佐料天然是垫场
+    if re.search(r"不敢的|敢不敢", t) or atom.get("opener"):
+        return "铺垫"   # 敢不敢微挑战 / 种子开局款:快拍
+    return "铺垫" if len(t) <= _TIER_LEN.get(typ, 15) else "主打"
+
+
+# —— 机制三型 → 人数下限(DM-skill v2.1.1【适配参考】判据落码;三桌实测三向验证)——
+# 候选池型:谜底跨轮持久且从在场玩家中锁定 → N≤5 禁作核心循环(信息坍缩)
+# 分队/传递链:结构性下限;对抗型(叫价/竞速/对决)N≥3;
+# 广播型是默认:群体动作要 3 人起,二十问/猜码/额头/个人挑战 2 人亦成立。
+_POOL_TYPE = re.compile(r"卧底|内鬼|狼人|杀手|隐藏身份|谁是|间谍|平民票|真凶")
+_TEAM = re.compile(r"分队|组队|两队|车轮战|团战")
+_CHAIN = re.compile(r"传话|依次传|接力|轮流传|传给下一")
+_VERSUS = re.compile(r"对决|擂台|1v1|诈唬|叫价|比大小|划拳|对拳|两人一组|竞速|抢答")
+_CROWD = re.compile(r"所有人|全场|大家|围圈|每个人|全员|集体|其余人|在场")
+
+
+def _min_players_of(atom: dict) -> int:
+    t = atom.get("text", "") + atom.get("name", "")
+    if _POOL_TYPE.search(t):
+        return 6            # 候选池型:N≤5 信息坍缩(4 人卧底两三句被交叉验证穿)
+    if _TEAM.search(t):
+        return 4
+    if _CHAIN.search(t) or _VERSUS.search(t):
+        return 3
+    if _CROWD.search(t):
+        return 3            # 群体广播:2 人桌没有"全场"
+    return 2                # 二十问/猜码/额头/个人挑战类:2 人亦成立
 
 
 def load_pattern_cards(path: str | None = None) -> list[dict]:
@@ -118,11 +160,19 @@ class ToolExecutor:
     # —— show / fx / timer / ask:M1 CLI 仅落 episode,UI 指令由客户端消费 ——
     def _t_show(self, name: str, a: dict) -> dict:
         vis = a.get("visibility", "全场公开")
-        player = a.get("player")
-        if vis in ("自己看", "额头"):
+        player, players = a.get("player"), a.get("players")
+        if vis == "自己看" and players:
+            # 批量私发(8 人桌发牌 4 个回合的死气,根因就是一次只能发一张):
+            # 平民词一批发 N 人、卧底词单发,两次调用收工。
+            bad = [p for p in players if p not in self.state.players]
+            if bad:
+                raise ClampError(f"show(自己看) players 含非在座玩家: {bad}")
+        elif vis in ("自己看", "额头"):
             if player not in self.state.players:
                 raise ClampError(f"show({vis}) 必须指定在座玩家,收到: {player}")
         out = {"display": a.get("content", ""), "visibility": vis, "player": player}
+        if vis == "自己看" and players:
+            out["players"] = list(players)
         demo = a.get("demo")
         if demo:  # 只透传资产册里登记过的 ref——模型编的引用一律降级文字,局不断
             if demo in self.known_demo_refs:
@@ -262,11 +312,17 @@ class ToolExecutor:
         if want_type and want_type not in ATOM_TYPES:
             raise ClampError(f"atom_type 不合法: {want_type!r};可用值: {'/'.join(sorted(ATOM_TYPES))}")
         why = {"已用过": 0, "野度超档": 0, "野度不够": 0, "分档不符": 0,
-               "类型不符": 0, "道具不在场": 0}
+               "类型不符": 0, "道具不在场": 0, "人数不够": 0}
+        n_players = len(self.state.players)
         pool = []
         for atom in self.atom_pool:
             if atom["id"] in self.state.atoms_used or atom["id"] in a.get("exclude", []):
                 why["已用过"] += 1
+                continue
+            if atom.get("min_players", 2) > n_players:
+                # 机制下限自动过滤,不靠模型自觉:2 人桌抽不到抓手指,
+                # 5 人以下抽不到卧底核心循环(候选池型信息坍缩)。
+                why["人数不够"] += 1
                 continue
             if atom["wildness"] > min(self.state.wildness_cap, int(a.get("野度", 10))):
                 why["野度超档"] += 1

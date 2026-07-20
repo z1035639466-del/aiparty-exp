@@ -217,7 +217,11 @@ def test_ocr_space_repair_and_tier(tmp_path):
     atom = next(a for a in pool if a["id"] == "xhs-t1")
     assert " " not in atom["text"], "池内文本须用修复版,主持照读不再断字"
     assert atom["tier"] == "铺垫", "敢不敢型微挑战自动归铺垫档"
-    assert next(a for a in pool if a["name"] == "快枪手对决")["tier"] == "主打"
+    # 分档解耦后:开局款通用局(opener)= 铺垫拍;旧规则把完整玩法整类判成主打,
+    # 导致「通用局+铺垫」组合必空返(三桌 2331 条只抽出 2 条的根因),不许回退。
+    assert next(a for a in pool if a["name"] == "快枪手对决")["tier"] == "铺垫"
+    assert next(a for a in pool if a["name"] == "三刀流")["tier"] == "主打", \
+        "长流程完整玩法仍是主打——解耦不等于全变铺垫"
 
 
 def test_draw_atom_tier_filter(tmp_path):

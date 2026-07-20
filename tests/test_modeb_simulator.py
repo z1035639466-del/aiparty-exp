@@ -172,6 +172,22 @@ def test_private_show_routes_only_to_target(server):
         "episode 文件须保留全文(审计线)"
 
 
+def test_batch_private_show_routes_to_each_target(server):
+    """批量私发(发牌):同一内容一次投 N 人,各自入箱;轮询面遮内容不遮收件人。"""
+    _start(server, 4)
+    line, code = call(server, "/api/turn", {"text": "发平民词", "tool_use": [
+        {"name": "show", "input": {"content": "词:西瓜", "visibility": "自己看",
+                                   "players": ["玩家2", "玩家3", "玩家4"]}}]})
+    assert code == 200
+    disp = line["results"][0]["result"]["display"]
+    assert "西瓜" not in disp and "3 人" in disp
+    for p in ("玩家2", "玩家3", "玩家4"):
+        box, _ = _inbox(server, p)
+        assert any("西瓜" in x for x in box["inbox"]), f"{p} 应收到批量私发"
+    box, _ = _inbox(server, "玩家1")
+    assert not box["inbox"], "不在名单里的人不得收到"
+
+
 def test_forehead_show_routes_to_everyone_but_target(server):
     """额头牌:目标本人看不见,其余所有人收件箱都有。"""
     _start(server, 4)

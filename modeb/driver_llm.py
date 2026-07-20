@@ -17,8 +17,8 @@ MAX_TOOLS_PER_TURN = 2
 HISTORY_WINDOW = 6  # 保留最近 N 回合主持词,维持口风连续
 
 TOOLS_DECLARATION = [
-    {"name": "show", "desc": "向玩家端展示内容;自己看=只投给 player 本人,额头=只有 player 本人看不见、其余人都收到——两档都必须带 player(在座目标),收件人用 GET /api/inbox 取信;draw_atom 若回了 demo.ref,讲解玩法时把它原样填进 demo 即播放演示件(自己编的引用会被降级)", "args": {"content": "str", "visibility": "自己看|额头|全场公开", "player": "str(自己看/额头必填)", "demo": "str?"}},
-    {"name": "ask", "desc": "限时问一嘴:发问后安静等,没人应声就一直等(不催);第一个人应声起算窗口,到点按多数认、一票也认。点名问某人时只认那个人的应答", "args": {"player": "str|全场", "prompt": "str", "options": "list?", "window": "int?秒,默认5"}},
+    {"name": "show", "desc": "向玩家端展示内容;自己看=只投给 player 本人(同一内容发多人用 players 列表:发牌先一批发平民词、再单发卧底词,两次调用收工),额头=只有 player 本人看不见、其余人都收到——私密档必须带 player 或 players(在座目标),收件人用 GET /api/inbox 取信;draw_atom 若回了 demo.ref,讲解玩法时把它原样填进 demo 即播放演示件(自己编的引用会被降级)", "args": {"content": "str", "visibility": "自己看|额头|全场公开", "player": "str?", "players": "list?(仅自己看,批量私发)", "demo": "str?"}},
+    {"name": "ask", "desc": "限时问一嘴:发问后安静等,没人应声就一直等(不催);第一个人应声起算窗口,到点按多数认、一票也认。点名问某人时只认那个人的应答。ask_result 里 silent=被问未答名单——那是没赶上窗口,不是故意沉默,不许当'安静得可疑'下判;顺序性玩法(一人一句)别用抢答窗,逐人点名问", "args": {"player": "str|全场", "prompt": "str", "options": "list?", "window": "int?秒,默认5"}},
     {"name": "random.pick", "desc": "公平随机选择;决定隐藏身份时务必带 visibility=自己看+player,否则结果会广播到公开回合行,身份当场穿帮", "args": {"from": "players|list", "exclude": "list?", "visibility": "自己看?", "player": "str?"}},
     {"name": "random.int", "desc": "公平随机整数;藏数字(毒杯号等)同样用 visibility=自己看+player 私密摇", "args": {"min": "int", "max": "int", "visibility": "自己看?", "player": "str?"}},
     {"name": "timer", "desc": "计时", "args": {"seconds": "int", "label": "str"}},
@@ -28,13 +28,16 @@ TOOLS_DECLARATION = [
     {"name": "state.use_grant", "desc": "消耗一次已持有技能", "args": {"prop": "str", "holder": "str"}},
     {"name": "state.finish", "desc": "收局", "args": {}},
     {"name": "fx", "desc": "音效/特效", "args": {"effect": "str"}},
-    {"name": "draw_atom", "desc": "从弹药库抽原子(分面过滤+排已用);野度=上限,野度min=下限——想加档就抬野度min,别只嘴上说;tier=铺垫(垫场快拍)|主打(副歌重拍)", "args": {"atom_type": "str?", "野度": "int?", "野度min": "int?", "tier": "str?", "exclude": "list?", "grant_to": "str?"}},
+    {"name": "draw_atom", "desc": "从弹药库抽原子(分面过滤+排已用);野度=上限,野度min=下限——想加档就抬野度min,别只嘴上说;tier=铺垫(小快垫场:通用局开局款/敢不敢微挑战都在这档)|主打(副歌重拍:摆阵重器/大流程);人数下限系统按本桌自动过滤(2人桌抽不到全场类,5人及以下抽不到卧底类核心循环),空返报错会告诉你被哪关挡了多少条", "args": {"atom_type": "str?", "野度": "int?", "野度min": "int?", "tier": "str?", "exclude": "list?", "grant_to": "str?"}},
 ]
 
 OUTPUT_CONTRACT = (
     "你每回合只输出一个 JSON 对象,格式:"
     '{"text": "≤3句主持词", "tool_use": [{"name": "工具名", "input": {...}}]}'
     ";tool_use 最多 2 个,只许用声明过的工具;JSON 之外不写任何字。"
+    "上一拍工具若被钳制(ok:false),这一拍主持词必须与钳制后的现实一致——"
+    "不许宣布未生效的授予/加分,要么改口要么补一次正确调用(实测有主持嘴上"
+    "给了撒谎权、账本上没有,玩家人肉对账才发现)。"
 )
 
 
