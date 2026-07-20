@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>aiparty · 视觉风格提案</title>
+<style>
+  :root{
+    --bg:#09090C;
+    --bg-2:#0F0F14;
+    --panel:#141419;
+    --panel-2:#1A1A22;
+    --line:#26262F;
+    --line-soft:#1D1D25;
+    --ink:#F4F3F8;
+    --muted:#9E9CAD;
+    --faint:#66647A;
+    --accent:#6E7BFF;
+    --sans:'PingFang SC','Hiragino Sans GB','Source Han Sans SC','Noto Sans SC','Microsoft YaHei',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    --serif:'Songti SC','STSong','Source Han Serif SC',Georgia,serif;
+    --mono:ui-monospace,'SF Mono','JetBrains Mono','Menlo','Cascadia Code',monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:var(--sans);line-height:1.6;letter-spacing:-.005em;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  }
+  .bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(760px 420px at 82% -6%,rgba(110,123,255,.16),transparent 62%),
+      radial-gradient(680px 400px at 6% 8%,rgba(244,114,182,.08),transparent 60%),
+      radial-gradient(900px 500px at 50% 108%,rgba(34,211,238,.06),transparent 60%);}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 26px;position:relative;z-index:1}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
+  ::selection{background:var(--accent);color:#fff}
+  a{color:inherit}
+
+  /* ---------- Masthead ---------- */
+  header.mast{padding:76px 0 34px}
+  .kicker{display:inline-flex;align-items:center;gap:9px;padding:6px 12px 6px 8px;border:1px solid var(--line);
+    border-radius:100px;background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);margin-bottom:30px}
+  .kicker .live{width:7px;height:7px;border-radius:50%;background:#5EE6A8;box-shadow:0 0 0 3px rgba(94,230,168,.16)}
+  .mast h1{font-size:clamp(38px,6.6vw,74px);line-height:1.0;margin:0;font-weight:800;letter-spacing:-.035em;text-wrap:balance}
+  .mast h1 .grad{background:linear-gradient(96deg,#A78BFA,#F472B6 46%,#38BDF8);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .mast .lede{max-width:60ch;margin:26px 0 0;color:var(--muted);font-size:clamp(15px,1.55vw,18.5px);letter-spacing:-.01em}
+  .mast .lede strong{color:var(--ink);font-weight:600}
+  .brief{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:40px}
+  .brief div{border:1px solid var(--line-soft);border-radius:15px;padding:15px 17px;
+    background:linear-gradient(180deg,rgba(255,255,255,.022),transparent)}
+  .brief dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);margin:0 0 7px}
+  .brief dd{margin:0;font-size:14.5px;color:var(--ink);font-weight:650;letter-spacing:-.01em}
+  .brief dd span{color:var(--muted);font-weight:400}
+
+  /* ---------- Boards grid ---------- */
+  .boards{display:grid;grid-template-columns:1fr 1fr;gap:22px;padding:46px 0 8px}
+  .board{border:1px solid var(--line);border-radius:24px;overflow:hidden;background:var(--panel);
+    display:flex;flex-direction:column;min-width:0;transition:transform .3s cubic-bezier(.2,.8,.2,1),border-color .3s}
+  .board:hover{transform:translateY(-3px);border-color:#33333F}
+  .board .head{padding:24px 24px 18px;display:flex;flex-direction:column;gap:14px}
+  .tagline{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .letter{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--faint);border:1px solid var(--line);padding:3px 8px;border-radius:7px}
+  .board h2{margin:0;font-size:24px;font-weight:750;letter-spacing:-.025em}
+  .board h2 small{font-family:var(--mono);font-weight:500;font-size:11.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-left:3px}
+  .thesis{margin:0;color:var(--muted);font-size:14px;max-width:48ch;letter-spacing:-.008em}
+  .refs{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.02em;color:var(--faint)}
+  .refs b{color:var(--muted);font-weight:500}
+  .swatches{display:flex;gap:0;border-radius:10px;overflow:hidden;border:1px solid var(--line);height:32px}
+  .swatches i{flex:1;display:block}
+  .meta{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;color:var(--muted);border:1px solid var(--line);padding:3px 9px;border-radius:100px;background:var(--panel-2)}
+  .stage{padding:22px 24px 10px;display:flex;justify-content:center}
+  .fit{padding:16px 24px 24px;border-top:1px solid var(--line-soft);margin-top:auto;display:flex;gap:11px;align-items:flex-start}
+  .fit b{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--faint);white-space:nowrap;padding-top:2px}
+  .fit p{margin:0;font-size:13.5px;color:var(--ink);letter-spacing:-.008em}
+
+  /* ---------- Phone frame ---------- */
+  .phone{width:290px;max-width:100%;border-radius:40px;padding:10px;background:linear-gradient(160deg,#2A2A32,#0C0C10);
+    box-shadow:0 30px 60px -22px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.05) inset;position:relative}
+  .screen{border-radius:31px;overflow:hidden;position:relative;height:544px;background:#000}
+  .statusbar{position:absolute;top:0;left:0;right:0;height:40px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 20px 0 22px;font-size:12px;font-weight:650;z-index:5;font-variant-numeric:tabular-nums}
+  .pill{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:78px;height:20px;border-radius:12px;background:#000;z-index:6}
+  .scr{position:absolute;inset:0;padding:48px 18px 20px;display:flex;flex-direction:column}
+  .navbar{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:600}
+
+  /* =========================================================
+     A · AURORA — flagship / consumer joy (Arc · Family · Apple Music)
+     ========================================================= */
+  .b-aurora .swatches,.b-aurora .stage{background:#0A0A12}
+  .a-scr{background:radial-gradient(130% 80% at 50% -8%,#1E1640,#0A0912 60%);color:#F3F1FB;font-family:var(--sans)}
+  .a-scr:before{content:"";position:absolute;top:-30%;left:-10%;width:120%;height:70%;pointer-events:none;
+    background:radial-gradient(closest-side,rgba(167,139,250,.5),transparent 70%),radial-gradient(closest-side,rgba(244,114,182,.4),transparent 70%);
+    background-position:20% 30%,80% 10%;background-size:60% 60%,55% 55%;background-repeat:no-repeat;filter:blur(6px);opacity:.55}
+  .a-scr .statusbar{color:#D6CCFF}
+  .a-nav{position:relative;z-index:2;color:#C9BEF5}
+  .a-hero{position:relative;z-index:2;margin-top:20px}
+  .a-hero .k{font-family:var(--mono);font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#38BDF8}
+  .a-hero h3{margin:8px 0 0;font-size:29px;font-weight:800;line-height:1.05;letter-spacing:-.03em}
+  .a-hero h3 em{font-style:normal;background:linear-gradient(92deg,#C4B5FD,#F0ABFC);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .a-glass{position:relative;z-index:2;margin-top:18px;border-radius:22px;padding:18px;
+    background:linear-gradient(165deg,rgba(255,255,255,.14),rgba(255,255,255,.04));
+    border:1px solid rgba(255,255,255,.16);box-shadow:0 18px 40px -18px rgba(120,80,255,.5),inset 0 1px 0 rgba(255,255,255,.22);
+    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+  .a-glass .row1{display:flex;align-items:center;gap:9px;font-size:11px;color:#D6CCFF;font-family:var(--mono);letter-spacing:.04em}
+  .a-glass .row1 .d{width:6px;height:6px;border-radius:50%;background:#5EE6A8}
+  .a-glass .name{font-size:21px;font-weight:750;margin:9px 0 5px;letter-spacing:-.02em}
+  .a-glass .desc{font-size:12.5px;color:#CFC6EE;line-height:1.5}
+  .a-tags{display:flex;gap:7px;margin-top:13px;flex-wrap:wrap}
+  .a-tags span{font-size:10.5px;font-family:var(--mono);padding:4px 9px;border-radius:100px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#E7E0FF}
+  .a-cta{position:relative;z-index:2;margin-top:auto;display:flex;gap:10px}
+  .a-cta button{flex:1;border:0;border-radius:15px;padding:14px 0;font-family:var(--sans);font-size:14px;font-weight:750;cursor:default;letter-spacing:-.01em}
+  .a-cta .go{background:linear-gradient(180deg,#8B7BFF,#6E5BF0);color:#fff;box-shadow:0 12px 26px -10px rgba(110,91,240,.9)}
+  .a-cta .alt{flex:0 0 52px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);color:#E7E0FF;font-size:17px}
+
+  /* =========================================================
+     B · GRAPHITE — engineered dark (Linear · Vercel · Raycast)
+     ========================================================= */
+  .b-graphite .swatches,.b-graphite .stage{background:#0A0B0D}
+  .g-scr{background:#0B0C0E;color:#E7E8EB;font-family:var(--sans)}
+  .g-scr .statusbar{color:#C8CACE}
+  .g-nav{color:#8A8F98;border-bottom:1px solid #18191C;padding-bottom:12px}
+  .g-nav b{color:#E7E8EB;font-weight:600}
+  .g-lab{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#5E636B;margin-top:22px}
+  .g-turn{font-size:25px;font-weight:750;letter-spacing:-.03em;margin:9px 0 0}
+  .g-turn .ac{color:#C6F24B}
+  .g-timer{margin-top:20px;display:flex;align-items:center;gap:14px}
+  .g-ring{position:relative;width:62px;height:62px;flex:none}
+  .g-ring svg{transform:rotate(-90deg)}
+  .g-ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+  .g-timer .meta{display:flex;flex-direction:column;gap:3px}
+  .g-timer .meta .t{font-size:13px;font-weight:600}
+  .g-timer .meta .s{font-family:var(--mono);font-size:11px;color:#8A8F98}
+  .g-card{margin-top:20px;border:1px solid #1E2024;border-radius:14px;background:linear-gradient(180deg,#121317,#0E0F12);overflow:hidden}
+  .g-card .top{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #18191C}
+  .g-card .top .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6B707A}
+  .g-card .top .v{font-family:var(--mono);font-size:10px;color:#C6F24B;background:rgba(198,242,75,.1);border:1px solid rgba(198,242,75,.22);padding:2px 7px;border-radius:5px}
+  .g-card .body{padding:14px}
+  .g-card .role{font-size:18px;font-weight:700;letter-spacing:-.02em}
+  .g-card .whisper{font-size:12px;color:#9298A1;line-height:1.5;margin-top:5px}
+  .g-acts{margin-top:auto;display:flex;gap:9px;padding-top:16px}
+  .g-acts button{flex:1;border-radius:11px;padding:12px 0;font-family:var(--sans);font-size:13px;font-weight:650;cursor:default;letter-spacing:-.01em}
+  .g-acts .p{background:#C6F24B;color:#12160A;border:0}
+  .g-acts .s{background:transparent;border:1px solid #2A2C31;color:#C8CACE}
+
+  /* =========================================================
+     C · DAYLIGHT — humane light (Stripe · Notion · Linear light)
+     ========================================================= */
+  .b-daylight{background:#FAFAF8;border-color:#EAEAE5}
+  .b-daylight h2,.b-daylight .letter{color:#17181B}
+  .b-daylight h2 small,.b-daylight .thesis,.b-daylight .refs b{color:#5A5C63}
+  .b-daylight .letter{border-color:#E4E4DE}
+  .b-daylight .refs{color:#9A9A93}
+  .b-daylight .chip{color:#5A5C63;border-color:#E4E4DE;background:#F1F1EC}
+  .b-daylight .swatches{border-color:#E4E4DE}
+  .b-daylight .stage{background:#F1F1EC;background-image:linear-gradient(180deg,rgba(0,0,0,.03),transparent)}
+  .b-daylight .fit{border-color:#EAEAE5}
+  .b-daylight .fit b{color:#9A9A93}.b-daylight .fit p{color:#17181B}
+  .d-scr{background:#FCFCFA;color:#17181B;font-family:var(--sans)}
+  .d-scr .statusbar{color:#17181B}
+  .d-nav{color:#8A8C90}
+  .d-nav b{color:#17181B;font-weight:650}
+  .d-h{font-size:24px;font-weight:750;letter-spacing:-.03em;margin:18px 0 4px;line-height:1.1}
+  .d-sub{font-size:12.5px;color:#77797E;margin:0}
+  .d-lab{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#A7A9A3;margin:22px 0 12px}
+  .d-slider{display:flex;flex-direction:column;gap:15px}
+  .d-row{display:grid;grid-template-columns:44px 1fr 30px;align-items:center;gap:11px}
+  .d-row .n{font-size:12.5px;font-weight:600}
+  .d-track{position:relative;height:6px;border-radius:6px;background:#ECECE6}
+  .d-track i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:linear-gradient(90deg,#7C6CF5,#6355FF)}
+  .d-track b{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 2px 6px rgba(99,85,255,.4),0 0 0 1.5px #6355FF}
+  .d-row .val{font-family:var(--mono);font-size:11px;color:#6355FF;text-align:right;font-variant-numeric:tabular-nums}
+  .d-mats{display:flex;flex-wrap:wrap;gap:8px}
+  .d-mats span{font-size:12px;font-weight:550;padding:6px 12px;border-radius:100px;border:1px solid #E4E4DE;background:#fff;color:#3A3C40}
+  .d-mats .on{background:#EEECFF;border-color:#D6D0FF;color:#4B3FE0}
+  .d-mats .add{border-style:dashed;color:#A7A9A3}
+  .d-go{margin-top:auto;width:100%;border:0;border-radius:14px;padding:14px;background:#6355FF;color:#fff;
+    font-size:14.5px;font-weight:700;cursor:default;letter-spacing:-.01em;box-shadow:0 10px 22px -10px rgba(99,85,255,.6)}
+
+  /* =========================================================
+     D · POP — expressive Gen-Z (Cash App · Duolingo · Gumroad)
+     ========================================================= */
+  .b-pop .swatches,.b-pop .stage{background:#12100E}
+  .p-scr{background:#FF5747;color:#1A0E0C;font-family:var(--sans);overflow:hidden}
+  .p-scr:before{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:#FFD15C;top:-70px;right:-70px}
+  .p-scr:after{content:"";position:absolute;width:150px;height:150px;border-radius:50%;background:#2B2BEE;bottom:-40px;left:-50px;opacity:.9}
+  .p-scr .statusbar{color:#1A0E0C;z-index:3}
+  .p-scr .scr{z-index:2}
+  .p-nav{color:#7A2018;font-weight:700;font-size:12.5px}
+  .p-badge{align-self:flex-start;margin-top:14px;background:#1A0E0C;color:#FFD15C;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;padding:5px 11px;border-radius:100px}
+  .p-h{font-size:40px;font-weight:900;line-height:.95;letter-spacing:-.045em;margin:14px 0 0;color:#1A0E0C}
+  .p-card{margin-top:18px;background:#FFF6E9;border:2.5px solid #1A0E0C;border-radius:20px;padding:16px;box-shadow:7px 7px 0 #1A0E0C;position:relative;z-index:2}
+  .p-card .t{font-size:12px;font-weight:750;color:#7A2018;letter-spacing:.02em}
+  .p-card .num{font-size:46px;font-weight:900;letter-spacing:-.04em;color:#1A0E0C;line-height:1;margin:4px 0 2px;font-variant-numeric:tabular-nums}
+  .p-card .cap{font-size:12px;color:#5A3A34;font-weight:550}
+  .p-card .who{display:flex;gap:-8px;margin-top:12px}
+  .p-card .who i{width:26px;height:26px;border-radius:50%;border:2px solid #FFF6E9;margin-left:-7px;display:block}
+  .p-card .who i:first-child{margin-left:0}
+  .p-share{margin-top:auto;display:flex;gap:10px;position:relative;z-index:2}
+  .p-share button{border:2.5px solid #1A0E0C;border-radius:100px;padding:13px 0;font-family:var(--sans);font-size:14px;font-weight:800;cursor:default;letter-spacing:-.01em}
+  .p-share .main{flex:1;background:#1A0E0C;color:#FFD15C}
+  .p-share .ic{flex:0 0 52px;background:#FFF6E9;color:#1A0E0C;font-size:17px}
+
+  /* ---------- Footer / decision ---------- */
+  footer.pick{margin-top:52px;padding:44px 0 84px;border-top:1px solid var(--line-soft)}
+  footer.pick h4{font-size:12px;font-family:var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:0 0 22px;font-weight:600}
+  .matrix{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .matrix .m{border:1px solid var(--line);border-radius:16px;padding:17px;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent)}
+  .matrix .m .h{display:flex;align-items:center;gap:9px;font-weight:700;font-size:14px;margin-bottom:9px;letter-spacing:-.01em}
+  .matrix .m .s{width:11px;height:11px;border-radius:4px;flex:none}
+  .matrix .m p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.55}
+  .rec{margin-top:26px;padding:20px 22px;border:1px solid var(--line);border-radius:16px;
+    background:linear-gradient(120deg,rgba(110,123,255,.09),rgba(244,114,182,.04));font-size:14.5px;color:var(--ink);letter-spacing:-.008em}
+  .rec b{background:linear-gradient(92deg,#A78BFA,#F472B6);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:750}
+  .signoff{margin-top:22px;color:var(--faint);font-size:12px;font-family:var(--mono);letter-spacing:.02em}
+
+  @media (max-width:880px){
+    .boards{grid-template-columns:1fr}
+    .brief{grid-template-columns:1fr 1fr}
+    .matrix{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:520px){
+    .brief,.matrix{grid-template-columns:1fr}
+    header.mast{padding-top:48px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bg-fx"></div>
+
+<header class="mast">
+  <div class="wrap">
+    <span class="kicker"><span class="live"></span><span class="eyebrow">aiparty · 视觉风格提案 · 4 个方向</span></span>
+    <h1>给一桌人，<span class="grad">现制一局</span><br>为今晚量身的派对游戏。</h1>
+    <p class="lede">
+      aiparty 是线下派对游戏的「局长」：读一桌人的<strong>口味</strong>（偏好滑块）和<strong>素材</strong>（他们给的梗），
+      当场编出只属于这群人的一局。四版视觉都按<strong>大厂产品级</strong>的做工来——Linear 的精工、Arc 的表现力、Stripe 的克制——
+      各占一种气质，同一套机制词汇，皮不同、骨相通。
+    </p>
+    <dl class="brief">
+      <div><dt>产品</dt><dd>线下派对游戏 <span>· 现制</span></dd></div>
+      <div><dt>核心动作</dt><dd>口味 + 素材 <span>→ 一局</span></dd></div>
+      <div><dt>做工标尺</dt><dd>硅谷产品级 <span>· Z 世代</span></dd></div>
+      <div><dt>要传达</dt><dd>「这局是<span>为我们编的」</span></dd></div>
+    </dl>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="boards">
+
+    <!-- ============ A · AURORA ============ -->
+    <article class="board b-aurora">
+      <div class="head">
+        <div class="tagline"><span class="letter">A</span><h2>极光 <small>Aurora</small></h2></div>
+        <p class="thesis">旗舰消费级主视觉：暗色底 + 极光渐变 + 玻璃拟态。把 AI「现制一局」那一刻做成会发光的惊喜。</p>
+        <div class="refs"><b>气质参照</b> · Arc · Family · Apple Music</div>
+        <div class="swatches"><i style="background:#0A0912"></i><i style="background:#A78BFA"></i><i style="background:#F472B6"></i><i style="background:#38BDF8"></i><i style="background:#F3F1FB"></i></div>
+        <div class="meta"><span class="chip">Glassmorphism</span><span class="chip">极光渐变</span><span class="chip">大圆角 · 发光</span></div>
+      </div>
+      <div class="stage">
+        <div class="phone"><div class="pill"></div><div class="screen">
+          <div class="scr a-scr">
+            <div class="statusbar"><span>22:41</span><span>●●●</span></div>
+            <div class="navbar a-nav"><span>← 这一桌</span><span>5 人 · 就位</span></div>
+            <div class="a-hero">
+              <div class="k">Freshly generated</div>
+              <h3>为你们<em>现制</em>好了</h3>
+            </div>
+            <div class="a-glass">
+              <div class="row1"><span class="d"></span>为「你们这桌」编 · 12s 前</div>
+              <div class="name">《谁在装外宾》</div>
+              <div class="desc">用你们的部门黑话当暗号，桌上有个卧底只会点头——把他找出来。</div>
+              <div class="a-tags"><span>身份牌 · 自己看</span><span>声明质疑</span><span>≈15 分钟</span></div>
+            </div>
+            <div class="a-cta">
+              <button class="go">开局 →</button>
+              <button class="alt">↻</button>
+            </div>
+          </div>
+        </div></div>
+      </div>
+      <div class="fit"><b>适合</b><p>C 端主 App 首选。想要「潮、有惊喜、朋友圈会截图」，又要长期耐看的高级感。</p></div>
+    </article>
+
+    <!-- ============ B · GRAPHITE ============ -->
+    <article class="board b-graphite">
+      <div class="head">
+        <div class="tagline"><span class="letter">B</span><h2>石墨 <small>Graphite</small></h2></div>
+        <p class="thesis">精工深色：近黑底、单一荧光重点色、发丝分割线、等宽标签。把对局做得像一件被精密调校的仪器。</p>
+        <div class="refs"><b>气质参照</b> · Linear · Vercel · Raycast</div>
+        <div class="swatches"><i style="background:#0B0C0E"></i><i style="background:#1E2024"></i><i style="background:#8A8F98"></i><i style="background:#C6F24B"></i><i style="background:#E7E8EB"></i></div>
+        <div class="meta"><span class="chip">Mono 标签</span><span class="chip">发丝线</span><span class="chip">单点荧光</span></div>
+      </div>
+      <div class="stage">
+        <div class="phone"><div class="pill"></div><div class="screen">
+          <div class="scr g-scr">
+            <div class="statusbar"><span>22:41</span><span>◐</span></div>
+            <div class="navbar g-nav"><span>第 3 局 · <b>谁在装外宾</b></span><span>4 / 5</span></div>
+            <div class="g-lab">Your turn · 声明质疑</div>
+            <div class="g-turn">轮到你<span class="ac">摊牌</span></div>
+            <div class="g-timer">
+              <div class="g-ring">
+                <svg width="62" height="62" viewBox="0 0 62 62">
+                  <circle cx="31" cy="31" r="26" fill="none" stroke="#1E2024" stroke-width="5"/>
+                  <circle cx="31" cy="31" r="26" fill="none" stroke="#C6F24B" stroke-width="5" stroke-linecap="round" stroke-dasharray="163" stroke-dashoffset="52"/>
+                </svg>
+                <b>09</b>
+              </div>
+              <div class="meta"><span class="t">出示或质疑</span><span class="s">to_top 强制摊牌</span></div>
+            </div>
+            <div class="g-card">
+              <div class="top"><span class="k">身份牌</span><span class="v">visibility: self</span></div>
+              <div class="body">
+                <div class="role">你是「卧底股东」</div>
+                <div class="whisper">让分歧悄悄扩大。被抓到，罚一杯气泡水。</div>
+              </div>
+            </div>
+            <div class="g-acts">
+              <button class="p">说真话</button>
+              <button class="s">诈一手</button>
+            </div>
+          </div>
+        </div></div>
+      </div>
+      <div class="fit"><b>适合</b><p>要凸显「可信、精准、专业」。硬核玩家、发布会主视觉，或与后台/引擎共用的一致语言。</p></div>
+    </article>
+
+    <!-- ============ C · DAYLIGHT ============ -->
+    <article class="board b-daylight">
+      <div class="head">
+        <div class="tagline"><span class="letter">C</span><h2>白日 <small>Daylight</small></h2></div>
+        <p class="thesis">柔光极简：暖白底、一个笃定的靛紫重点色、大量留白。把「配一桌的口味」做得温和、清爽、零门槛。</p>
+        <div class="refs"><b>气质参照</b> · Stripe · Notion · Linear Light</div>
+        <div class="swatches"><i style="background:#FCFCFA;border-right:1px solid #E4E4DE"></i><i style="background:#ECECE6"></i><i style="background:#6355FF"></i><i style="background:#4B3FE0"></i><i style="background:#17181B"></i></div>
+        <div class="meta"><span class="chip">柔光留白</span><span class="chip">单靛紫</span><span class="chip">humane · 零门槛</span></div>
+      </div>
+      <div class="stage">
+        <div class="phone"><div class="pill"></div><div class="screen">
+          <div class="scr d-scr">
+            <div class="statusbar"><span>20:08</span><span>◐</span></div>
+            <div class="navbar d-nav"><span>← 返回</span><span><b>配局</b> · 步骤 1/2</span></div>
+            <h3 class="d-h">今晚这桌，什么味？</h3>
+            <p class="d-sub">拖一拖，局长照着你们的口味编。</p>
+            <div class="d-lab">口味 · 偏好滑块</div>
+            <div class="d-slider">
+              <div class="d-row"><span class="n">推理</span><div class="d-track"><i style="width:78%"></i><b style="left:78%"></b></div><span class="val">78</span></div>
+              <div class="d-row"><span class="n">表演</span><div class="d-track"><i style="width:55%"></i><b style="left:55%"></b></div><span class="val">55</span></div>
+              <div class="d-row"><span class="n">黄暴</span><div class="d-track"><i style="width:30%"></i><b style="left:30%"></b></div><span class="val">30</span></div>
+            </div>
+            <div class="d-lab">素材 · 你们的梗</div>
+            <div class="d-mats"><span class="on">部门黑话 ✓</span><span class="on">老板语录 ✓</span><span>团建黑历史</span><span class="add">+ 添加</span></div>
+            <button class="d-go">现制一局</button>
+          </div>
+        </div></div>
+      </div>
+      <div class="fit"><b>适合</b><p>要「亲和、可信、谁都会用」。全年龄、家庭与职场团建、破圈到非游戏玩家。</p></div>
+    </article>
+
+    <!-- ============ D · POP ============ -->
+    <article class="board b-pop">
+      <div class="head">
+        <div class="tagline"><span class="letter">D</span><h2>糖果 <small>Pop</small></h2></div>
+        <p class="thesis">高饱和表现主义：撞色块、超粗黑体、硬投影。把「结算/战报」做成一张 Z 世代忍不住转发的分享卡。</p>
+        <div class="refs"><b>气质参照</b> · Cash App · Duolingo · Gumroad</div>
+        <div class="swatches"><i style="background:#FF5747"></i><i style="background:#FFD15C"></i><i style="background:#2B2BEE"></i><i style="background:#FFF6E9"></i><i style="background:#1A0E0C"></i></div>
+        <div class="meta"><span class="chip">撞色 / 900 黑体</span><span class="chip">硬投影</span><span class="chip">可分享 · UGC</span></div>
+      </div>
+      <div class="stage">
+        <div class="phone"><div class="pill"></div><div class="screen">
+          <div class="scr p-scr">
+            <div class="statusbar"><span>23:12</span><span>●●●</span></div>
+            <div class="navbar p-nav"><span>× 收工</span><span>今晚战报</span></div>
+            <span class="p-badge">MVP · 卧底股东</span>
+            <h3 class="p-h">你把<br>全桌<br>都骗了</h3>
+            <div class="p-card">
+              <div class="t">连蒙对 · 场次</div>
+              <div class="num">3×</div>
+              <div class="cap">全场只有你一个卧底笑到最后</div>
+              <div class="who"><i style="background:#FF5747"></i><i style="background:#2B2BEE"></i><i style="background:#FFD15C"></i><i style="background:#1A0E0C"></i><i style="background:#6355FF"></i></div>
+            </div>
+            <div class="p-share">
+              <button class="main">晒战报</button>
+              <button class="ic">↻</button>
+            </div>
+          </div>
+        </div></div>
+      </div>
+      <div class="fit"><b>适合</b><p>做「传播、长草、上头」。结算/战报/邀请分享的爆点皮肤，Z 世代社群裂变。可作 A 的搭档。</p></div>
+    </article>
+
+  </section>
+
+  <footer class="pick">
+    <h4>怎么选 · 一句话对照</h4>
+    <div class="matrix">
+      <div class="m"><div class="h"><span class="s" style="background:#A78BFA"></span>A 极光</div><p>要「潮 + 高级」。C 端旗舰。风险：玻璃拟态要克制，别糊。</p></div>
+      <div class="m"><div class="h"><span class="s" style="background:#C6F24B"></span>B 石墨</div><p>要「精准可信」。硬核 / B 端 / 引擎。风险：派对暖度偏冷。</p></div>
+      <div class="m"><div class="h"><span class="s" style="background:#6355FF"></span>C 白日</div><p>要「亲和零门槛」。破圈。风险：个性偏淡，需靠内容出彩。</p></div>
+      <div class="m"><div class="h"><span class="s" style="background:#FF5747"></span>D 糖果</div><p>要「传播上头」。战报分享。风险：长时间看会累，宜做点缀。</p></div>
+    </div>
+    <div class="rec">
+      推荐组合：主视觉走 <b>A 极光</b>——最贴「为我们现制一局」的惊喜内核，又是四版里最耐看的高级感；
+      结算/分享环节切到 <b>D 糖果</b> 制造传播爆点；<b>B 石墨</b> 沉淀为后台与生成引擎的一致语言。三皮一骨，共用同一套机制词汇。
+    </div>
+    <div class="signoff">下一步 · 选定 1 版 → 铺全流程（配局 → 现制 → 开局 → 结算）高保真 → 出 design tokens / 组件库</div>
+  </footer>
+</main>
+
+</body>
+</html>
