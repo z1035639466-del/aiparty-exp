@@ -39,12 +39,15 @@ STYLE_SUFFIX = (
 )
 
 # 万相 2.5–2.7 全系(含 wan2.7-image-pro)统一走 image2image 口,文生图也是它;
-# 老 text2image 口对新模型回 "url error"。IMAGE_API_URL 可整条覆盖(比如业务空间
-# 专属域名 https://<空间ID>.cn-<region>.maas.aliyuncs.com/api/v1/services/...)。
+# 老 text2image 口对新模型回 "url error"。新版百炼业务空间账号可能连通用域名都不认
+# (聊天口就必须走空间专属域名),此时 IMAGE_API_URL 整条覆盖:
+#   https://<空间ID>.cn-<region>.maas.aliyuncs.com/api/v1/services/aigc/image2image/image-synthesis
 DASHSCOPE_SUBMIT_URL = os.environ.get(
     "IMAGE_API_URL",
     "https://dashscope.aliyuncs.com/api/v1/services/aigc/image2image/image-synthesis")
-DASHSCOPE_TASK_URL = "https://dashscope.aliyuncs.com/api/v1/tasks/{task_id}"
+# 轮询跟随提交域名——空间专属域名下任务查询也在同一域,写死官方域会查不到任务
+_SUBMIT_HOST = DASHSCOPE_SUBMIT_URL.split("/api/")[0]
+DASHSCOPE_TASK_URL = _SUBMIT_HOST + "/api/v1/tasks/{task_id}"
 DASHSCOPE_POLL_INTERVAL = 3  # 秒
 DASHSCOPE_POLL_MAX_ROUNDS = 40
 
