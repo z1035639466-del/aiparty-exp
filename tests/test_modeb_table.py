@@ -34,7 +34,8 @@ def test_anthropic_payload_shape(monkeypatch):
     assert out == "ok"
     assert captured["url"].endswith("/v1/messages")
     assert captured["headers"]["x-api-key"] == "k-test"
-    assert captured["payload"]["system"] == "SYS"
+    assert captured["payload"]["system"] == [
+        {"type": "text", "text": "SYS", "cache_control": {"type": "ephemeral"}}]  # 缓存块:每拍省一遍全量预填
     assert captured["payload"]["model"].startswith("claude-haiku")
 
 

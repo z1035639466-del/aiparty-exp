@@ -231,9 +231,10 @@ async function refresh() {
   await pullInboxes();
   $("panes").innerHTML = s.players.map(p => paneHtml(p, s)).join("");
   renderAsk(s);
-  const he = s.host_errors;
+  const he = s.host_errors, tm = s.last_timing;
   $("digest").textContent = JSON.stringify(s.digest, null, 1)
     + "\n埋点 " + JSON.stringify(s.marks) + (s.finished ? "\n【局已收】" : "")
+    + (tm && tm.host_ms != null ? `\n⏱ 上拍耗时 主持${(tm.host_ms/1000).toFixed(1)}s + 桌友${(tm.bots_ms/1000).toFixed(1)}s` : "")
     + (he ? `\n${he.streak >= 5 ? "⛔ 主持掉线" : "⚠️ 主持沉默拍"}×${he.streak}(累计${he.count}): ${he.last}` : "");
   $("log").innerHTML = s.recent_turns.map(t => t.episode_summary
     ? `<div class="turnline">🏁 ${JSON.stringify(t)}</div>`

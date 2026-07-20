@@ -82,6 +82,7 @@ class Session:
         self.engine = Engine(self.state, self.driver, self.episode_path)
         self.recent: list[dict] = []  # 最近回合行,供前端轮询
         self.inbox: dict[str, list[str]] = {n: [] for n in players}  # 私发收件箱(可见性引擎落地)
+        self.last_timing: dict = {}  # 上一拍耗时拆帐:host_ms / bots_ms(慢要先量再修)
         self.lock = threading.Lock()
 
     def route_private(self, line: dict) -> dict:
@@ -195,6 +196,7 @@ class Session:
             "bots": self.bot_names,
             "host_perception": self.state.host_perception,
             "turn_ready": self.engine.turn_ready(),
+            "last_timing": self.last_timing,
             # 桌友调用失败数:静默降级会让 key 错表现成「bot 好闷」,得摆到台面上
             "bot_errors": {b.name: {"count": b.errors, "last": b.last_error}
                            for b in self.bots if getattr(b, "errors", 0)},
@@ -356,6 +358,7 @@ class Handler(BaseHTTPRequestHandler):
                     digest = s.state.digest(s.engine.time_left_min())
                     # 主持沉默拍(调用失败):桌上没发生任何事,桌友无从反应,不烧调用
                     bots = [] if line.get("host_silent") else s.bots
+                    t_bots = datetime.now().timestamp()
                     if bots:
                         # 桌友并行反应:串行时 7 座 × 每座数秒 = 一拍半分钟,真人
                         # 入座直接坐牢。现实里大家本来就是同时起哄的。收齐再统一
@@ -372,6 +375,8 @@ class Handler(BaseHTTPRequestHandler):
                         for evs in reactions:
                             for ev in evs:
                                 s.engine.push_event(ev)
+                    s.last_timing = {"host_ms": getattr(s.engine, "last_host_ms", 0),
+                                     "bots_ms": int((datetime.now().timestamp() - t_bots) * 1000)}
                     if s.state.finished:
                         summary = s.engine.run(max_turns=s.engine.marks["turns"])
                         s.recent.append(summary)

@@ -98,8 +98,12 @@ class AnthropicTransport:
         resp = _post_json(
             f"{self.base}/v1/messages",
             {**auth, "anthropic-version": "2023-06-01"},
-            {"model": self.model, "system": system, "messages": messages,
-             "max_tokens": self.max_tokens})
+            # system 每局静态(主持几千字人设+铁律,桌友人设同理),打上缓存标:
+            # 每拍省一遍全量预填,TTFT 与成本同降——慢的第一刀砍在这里
+            {"model": self.model,
+             "system": [{"type": "text", "text": system,
+                         "cache_control": {"type": "ephemeral"}}],
+             "messages": messages, "max_tokens": self.max_tokens})
         return "".join(b.get("text", "") for b in resp.get("content", []))
 
 

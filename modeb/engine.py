@@ -39,6 +39,7 @@ class Engine:
         # 荷官回执:主持上一拍工具的真实结果,只走 driver 专用信道回给它本人。
         # 遮蔽按观看者定,不按出口定——玩家面/驾驶舱照旧遮,发牌人看自己发的牌。
         self._last_results: list[dict] = []
+        self.last_host_ms = 0  # 上一拍主持调用耗时(慢要先量再修)
         # 没有冷场闹钟(房主撤,2026-07-20):时限的唯一机制是主持显式调 timer,
         # 没设时限=选择了开放式等待,一直等是正确行为("没回应就等,就这么简单")。
         # agent 桌冻死是 harness 座位掉线,归座位保活/产品在线心跳,不归引擎。
@@ -175,6 +176,7 @@ class Engine:
             upstream = [{"type": "tool_receipts",
                          "note": "你上一拍工具的真实回执(仅你可见,别念出来;被钳制的必须圆场)",
                          "results": self._last_results}] + upstream
+        t_decide = time.time()
         try:
             decision = self.driver.decide(digest, upstream)
         except Exception as e:
@@ -191,6 +193,7 @@ class Engine:
             self._ep.flush()
             return line
         self.host_error_streak = 0
+        self.last_host_ms = int((time.time() - t_decide) * 1000)  # 慢要先量再修
         text = decision.get("text", "")
         calls = decision.get("tool_use", [])[:MAX_TOOLS_PER_TURN]
         overflow = len(decision.get("tool_use", [])) - len(calls)
