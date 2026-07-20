@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>aiparty · 道具三件 · 骰盅 / 骰子 / 左轮</title>
+<style>
+  :root{
+    --bg:#09090C;--panel:#141419;--panel-2:#1A1A22;
+    --line:#26262F;--line-soft:#1D1D25;--ink:#F4F3F8;--muted:#9E9CAD;--faint:#66647A;
+    --sans:'PingFang SC','Hiragino Sans GB','Source Han Sans SC','Noto Sans SC','Microsoft YaHei',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono','JetBrains Mono','Menlo','Cascadia Code',monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;letter-spacing:-.005em;-webkit-font-smoothing:antialiased}
+  .bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(760px 420px at 82% -6%,rgba(110,123,255,.14),transparent 62%),
+      radial-gradient(680px 400px at 4% 8%,rgba(244,114,182,.07),transparent 60%)}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 26px;position:relative;z-index:1}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
+  ::selection{background:#6E7BFF;color:#fff}
+
+  header.mast{padding:72px 0 26px}
+  .kicker{display:inline-flex;align-items:center;gap:9px;padding:6px 13px 6px 9px;border:1px solid var(--line);border-radius:100px;
+    background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);margin-bottom:28px}
+  .kicker .live{width:7px;height:7px;border-radius:50%;background:#5EE6A8;box-shadow:0 0 0 3px rgba(94,230,168,.16)}
+  .mast h1{font-size:clamp(34px,5.6vw,60px);line-height:1.02;margin:0;font-weight:800;letter-spacing:-.035em;text-wrap:balance}
+  .mast h1 .grad{background:linear-gradient(96deg,#A78BFA,#F472B6 55%,#38BDF8);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .mast .lede{max-width:62ch;margin:22px 0 0;color:var(--muted);font-size:clamp(15px,1.5vw,18px)}
+  .mast .lede strong{color:var(--ink);font-weight:600}
+
+  .ribbon{display:flex;align-items:center;gap:12px;margin:46px 0 20px}
+  .ribbon .tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:100px;padding:6px 13px}
+  .ribbon .tag .s{width:9px;height:9px;border-radius:50%;background:#A78BFA}
+  .ribbon .line{flex:1;height:1px;background:var(--line-soft)}
+  .ribbon .cap{font-size:12.5px;color:var(--muted)}
+
+  /* prop section shell */
+  .prop{display:grid;grid-template-columns:minmax(0,300px) 1fr;gap:24px;align-items:stretch}
+  .demo{border:1px solid var(--line);border-radius:24px;background:#0A0A12;display:flex;align-items:center;justify-content:center;padding:26px 20px}
+  .panel{border:1px solid var(--line);border-radius:24px;background:var(--panel);overflow:hidden;display:flex;flex-direction:column}
+  .panel .ph{padding:20px 24px 16px;border-bottom:1px solid var(--line-soft)}
+  .panel .ph .tt{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .panel .ph h2{margin:0;font-size:22px;font-weight:750;letter-spacing:-.02em}
+  .panel .ph .en{font-family:var(--mono);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.12em}
+  .panel .ph p{margin:7px 0 0;font-size:13.5px;color:var(--muted);max-width:60ch}
+  .panel .ph p b{color:var(--ink);font-weight:600}
+  .vis{display:flex;gap:6px;margin-top:11px;flex-wrap:wrap}
+  .vis span{font-family:var(--mono);font-size:10.5px;padding:3px 9px;border-radius:100px;border:1px solid var(--line);color:var(--muted);background:var(--panel-2)}
+  .vis .on{color:#C4B5FD;border-color:rgba(167,139,250,.45);background:rgba(139,123,255,.12)}
+
+  /* states row */
+  .states{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-soft);border-top:1px solid var(--line-soft);margin-top:auto}
+  .states.three{grid-template-columns:repeat(3,1fr)}
+  .st{background:var(--panel);padding:18px 14px 16px;display:flex;flex-direction:column;align-items:center;gap:11px;text-align:center}
+  .st .cnv{height:96px;display:flex;align-items:center;justify-content:center}
+  .st .nm{font-size:13px;font-weight:700}
+  .st .nm small{display:block;font-family:var(--mono);font-weight:500;font-size:9.5px;letter-spacing:.12em;color:var(--faint);text-transform:uppercase;margin-top:2px}
+  .st .d{font-size:11.5px;color:var(--muted);line-height:1.5;max-width:22ch}
+
+  /* phone */
+  .phone{width:258px;max-width:100%;border-radius:36px;padding:9px;background:linear-gradient(160deg,#2A2A32,#0C0C10);
+    box-shadow:0 26px 52px -22px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.05) inset;position:relative}
+  .screen{border-radius:28px;overflow:hidden;position:relative;height:496px;background:#000}
+  .statusbar{position:absolute;top:0;left:0;right:0;height:36px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 18px 0 20px;font-size:11.5px;font-weight:650;z-index:5;font-variant-numeric:tabular-nums;color:#D6CCFF}
+  .pillcam{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:68px;height:17px;border-radius:10px;background:#000;z-index:6}
+  .scr{position:absolute;inset:0;padding:42px 16px 18px;display:flex;flex-direction:column;
+    background:radial-gradient(130% 80% at 50% -8%,#1E1640,#0A0912 60%);color:#F3F1FB}
+  .navbar{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;color:#C9BEF5}
+  .a-k{font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:#38BDF8}
+  .glass{border-radius:18px;padding:14px;background:linear-gradient(165deg,rgba(255,255,255,.13),rgba(255,255,255,.035));
+    border:1px solid rgba(255,255,255,.15);box-shadow:0 14px 32px -18px rgba(120,80,255,.5),inset 0 1px 0 rgba(255,255,255,.2)}
+  .cta{margin-top:auto;display:flex;gap:9px}
+  .cta button{flex:1;border:0;border-radius:13px;padding:12px 0;font-family:var(--sans);font-size:13px;font-weight:750;cursor:default;letter-spacing:-.01em}
+  .cta .go{background:linear-gradient(180deg,#8B7BFF,#6E5BF0);color:#fff;box-shadow:0 10px 24px -10px rgba(110,91,240,.9)}
+  .cta .alt{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);color:#E7E0FF}
+
+  /* ============ DICE ============ */
+  .die{position:relative;border-radius:22%;
+    background:linear-gradient(150deg,rgba(255,255,255,.22),rgba(139,123,255,.16) 40%,rgba(70,40,180,.3));
+    border:1px solid rgba(200,180,255,.45);
+    box-shadow:0 14px 30px -12px rgba(120,80,255,.6),inset 0 2px 6px rgba(255,255,255,.35),inset 0 -8px 16px rgba(40,15,110,.5)}
+  .die .pip{position:absolute;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#C4B5FD 60%,#8B7BFF);
+    box-shadow:0 0 8px rgba(196,181,253,.9)}
+  .die.d64{width:64px;height:64px}
+  .die.d64 .pip{width:11px;height:11px}
+  /* pip positions (percent anchors, translated) */
+  .pip.cc{top:50%;left:50%;transform:translate(-50%,-50%)}
+  .pip.tl{top:19%;left:19%;transform:translate(-50%,-50%)}
+  .pip.tr{top:19%;left:81%;transform:translate(-50%,-50%)}
+  .pip.bl{top:81%;left:19%;transform:translate(-50%,-50%)}
+  .pip.br{top:81%;left:81%;transform:translate(-50%,-50%)}
+  .pip.ml{top:50%;left:19%;transform:translate(-50%,-50%)}
+  .pip.mr{top:50%;left:81%;transform:translate(-50%,-50%)}
+  .facegrid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;padding:22px 24px;align-items:center;justify-items:center}
+  .facegrid .f{display:flex;flex-direction:column;align-items:center;gap:9px}
+  .facegrid .f code{font-family:var(--mono);font-size:9.5px;color:var(--faint)}
+  .die.red .pip{background:radial-gradient(circle at 35% 30%,#fff,#FBCFE8 55%,#F472B6);box-shadow:0 0 9px rgba(244,114,182,.95)}
+
+  /* ============ CUP ============ */
+  .cupwrap{position:relative;width:150px;height:170px}
+  .cup{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:118px;height:132px;
+    clip-path:polygon(24% 0,76% 0,92% 100%,8% 100%);
+    background:linear-gradient(160deg,#3A2A6E 8%,#241650 45%,#170D38 90%);
+    border-radius:10px}
+  .cup:before{content:"";position:absolute;inset:0;
+    background:linear-gradient(105deg,transparent 18%,rgba(255,255,255,.22) 26%,transparent 38%),
+               linear-gradient(180deg,rgba(255,255,255,.16),transparent 30%)}
+  .cup:after{content:"";position:absolute;left:8%;right:8%;bottom:0;height:14px;border-radius:50%;
+    background:linear-gradient(180deg,#5A46A8,#2B1B60);box-shadow:0 0 18px rgba(139,123,255,.5)}
+  .cup .band{position:absolute;left:14%;right:14%;top:34%;height:9px;border-radius:6px;
+    background:linear-gradient(90deg,rgba(167,139,250,.9),rgba(244,114,182,.8));filter:blur(.4px);opacity:.85}
+  .cupshadow{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);width:130px;height:16px;border-radius:50%;
+    background:radial-gradient(closest-side,rgba(139,123,255,.35),transparent)}
+  /* shake arcs */
+  .arcs i{position:absolute;border:3px solid rgba(196,181,253,.7);border-radius:50%;clip-path:polygon(0 0,60% 0,60% 45%,0 45%)}
+  .arcs i:nth-child(1){width:40px;height:40px;left:-16px;top:26px;transform:rotate(-24deg)}
+  .arcs i:nth-child(2){width:40px;height:40px;right:-16px;top:26px;transform:rotate(120deg)}
+  .cup.tilt{transform:translateX(-50%) rotate(-22deg) translateY(-26px);transform-origin:10% 100%}
+  .peek-dice{position:absolute;bottom:10px;left:52%;display:flex;gap:6px}
+  .mini-die{width:26px;height:26px;border-radius:7px;position:relative;
+    background:linear-gradient(150deg,rgba(255,255,255,.25),rgba(139,123,255,.2) 40%,rgba(70,40,180,.4));
+    border:1px solid rgba(200,180,255,.5);box-shadow:0 0 12px rgba(139,123,255,.55)}
+  .mini-die .pip{width:5px;height:5px}
+
+  /* ============ REVOLVER ============ */
+  .cylwrap{position:relative;width:170px;height:170px}
+  .cyl{position:absolute;inset:6px;border-radius:50%;
+    background:radial-gradient(circle at 34% 28%,#4A3B85,#241A52 55%,#140C33 92%);
+    border:1px solid rgba(196,181,253,.35);
+    box-shadow:0 16px 36px -14px rgba(80,50,200,.65),inset 0 3px 8px rgba(255,255,255,.18),inset 0 -12px 24px rgba(10,5,40,.7)}
+  .cyl .axis{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:8px;
+    background:linear-gradient(150deg,#6B58B8,#2E2066);border:1px solid rgba(200,180,255,.4);
+    box-shadow:inset 0 2px 4px rgba(255,255,255,.3)}
+  .cyl .ch{position:absolute;top:50%;left:50%;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;
+    background:radial-gradient(circle at 40% 32%,#1A1140,#0A0620 70%);
+    box-shadow:inset 0 3px 7px rgba(0,0,0,.85),inset 0 -1px 2px rgba(200,180,255,.2)}
+  .cyl .ch.c1{transform:translate(0,-52px)}
+  .cyl .ch.c2{transform:translate(45px,-26px)}
+  .cyl .ch.c3{transform:translate(45px,26px)}
+  .cyl .ch.c4{transform:translate(0,52px)}
+  .cyl .ch.c5{transform:translate(-45px,26px)}
+  .cyl .ch.c6{transform:translate(-45px,-26px)}
+  .cyl .ch.hot{background:radial-gradient(circle at 45% 35%,#FF9AC8,#F472B6 45%,#9D1D5E 85%);
+    box-shadow:0 0 22px rgba(244,114,182,.95),inset 0 -2px 6px rgba(120,10,70,.8)}
+  .cyl.small{transform:scale(.62);transform-origin:center}
+  .pointer{position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:0;height:0;z-index:3;
+    border-left:9px solid transparent;border-right:9px solid transparent;border-top:14px solid #38BDF8;
+    filter:drop-shadow(0 0 8px rgba(56,189,248,.8))}
+  .spin-arc{position:absolute;inset:-4px;border-radius:50%;border:2.5px dashed rgba(56,189,248,.5);
+    clip-path:polygon(50% 0,100% 0,100% 60%,50% 60%)}
+  .flash{position:absolute;inset:-14px;border-radius:50%;background:radial-gradient(closest-side,rgba(244,114,182,.4),transparent 70%)}
+
+  /* pop sticker strip */
+  .popstrip{border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-top:0}
+  .popstrip .bd{background:#FF5747;display:flex;align-items:center;justify-content:center;gap:44px;padding:34px 20px;position:relative;overflow:hidden}
+  .popstrip .bd:before{content:"";position:absolute;width:170px;height:170px;border-radius:50%;background:#FFD15C;top:-70px;right:-50px}
+  .popstrip .bd:after{content:"";position:absolute;width:120px;height:120px;border-radius:50%;background:#2B2BEE;bottom:-46px;left:-36px;opacity:.92}
+  .popstrip .bd>*{position:relative;z-index:2}
+  .pop-die{width:66px;height:66px;border-radius:16px;background:#FFF6E9;border:3px solid #1A0E0C;box-shadow:6px 6px 0 #1A0E0C;position:relative}
+  .pop-die .pip{position:absolute;width:12px;height:12px;border-radius:50%;background:#1A0E0C;box-shadow:none}
+  .pop-cup{width:86px;height:96px;clip-path:polygon(24% 0,76% 0,92% 100%,8% 100%);background:#2B2BEE;border-radius:8px;position:relative}
+  .pop-cup:before{content:"";position:absolute;left:14%;right:14%;top:36%;height:9px;background:#FFD15C}
+  .pop-cup:after{content:"";position:absolute;left:6%;right:6%;bottom:0;height:12px;border-radius:50%;background:#1A0E0C}
+  .pop-cyl{width:92px;height:92px;border-radius:50%;background:#FFF6E9;border:3px solid #1A0E0C;box-shadow:6px 6px 0 #1A0E0C;position:relative}
+  .pop-cyl .ch{position:absolute;top:50%;left:50%;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:#1A0E0C}
+  .pop-cyl .ch.c1{transform:translate(0,-26px)}
+  .pop-cyl .ch.c2{transform:translate(23px,-13px)}
+  .pop-cyl .ch.c3{transform:translate(23px,13px)}
+  .pop-cyl .ch.c4{transform:translate(0,26px)}
+  .pop-cyl .ch.c5{transform:translate(-23px,13px)}
+  .pop-cyl .ch.c6{transform:translate(-23px,-13px)}
+  .pop-cyl .ch.hot{background:#F43F5E;border:2.5px solid #1A0E0C}
+  .popstrip .note{padding:13px 20px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line-soft);background:var(--panel)}
+
+  /* haptics table */
+  .haptic{border:1px solid var(--line);border-radius:20px;background:var(--panel);overflow:hidden}
+  .ht{width:100%;border-collapse:collapse;font-size:13px}
+  .ht th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);text-align:left;padding:13px 20px;border-bottom:1px solid var(--line-soft);font-weight:500}
+  .ht td{padding:12px 20px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+  .ht tr:last-child td{border-bottom:0}
+  .ht .mo{font-family:var(--mono);font-size:11.5px;color:#C4B5FD;white-space:nowrap}
+  .ht .desc{color:var(--muted);font-size:12.5px}
+  .ht .prp{font-weight:650;white-space:nowrap}
+
+  .rec{margin-top:24px;padding:18px 22px;border:1px solid var(--line);border-radius:16px;
+    background:linear-gradient(120deg,rgba(167,139,250,.09),rgba(255,87,71,.05));font-size:14px;color:var(--ink)}
+  .rec b{background:linear-gradient(92deg,#A78BFA,#F472B6);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:750}
+  .signoff{margin:30px 0 80px;color:var(--faint);font-size:12px;font-family:var(--mono)}
+
+  @media (max-width:920px){.prop{grid-template-columns:1fr}.facegrid{grid-template-columns:repeat(3,1fr);row-gap:20px}.states{grid-template-columns:repeat(2,1fr)}.states.three{grid-template-columns:1fr 1fr}}
+  @media (max-width:560px){header.mast{padding-top:46px}.states,.states.three{grid-template-columns:1fr}.popstrip .bd{flex-direction:column;gap:28px}}
+</style>
+</head>
+<body>
+<div class="bg-fx"></div>
+
+<header class="mast">
+  <div class="wrap">
+    <span class="kicker"><span class="live"></span><span class="eyebrow">aiparty · 道具设计 · 固定库三件</span></span>
+    <h1>三件道具的<span class="grad">手感</span>：<br>骰盅 · 骰子 · 左轮</h1>
+    <p class="lede">
+      道具是这个产品里玩家<strong>真正摸到</strong>的东西——生成层可以千变万化，但手上这三件必须像实体一样可信。
+      设计原则：<strong>数字道具补三样</strong>（隐藏信息、公平随机、记忆裁判），可见性是引擎——同一件道具换个「信息朝向」就是另一种玩法。
+      主皮为极光 Aurora，底部附糖果 Pop 贴纸形态。
+    </p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ================= DICE ================= -->
+  <div class="ribbon"><span class="tag"><span class="s"></span>道具 01 · 骰子</span><span class="line"></span><span class="cap">发光玻璃骰 · 点数即光源</span></div>
+
+  <section class="panel">
+    <div class="ph">
+      <div class="tt"><h2>极光骰</h2><span class="en">die · glass + glow pips</span></div>
+      <p>玻璃质感 + 发光点数：暗场里一眼可读，翻滚时像一颗小灯。<b>点数是唯一光源</b>——面越大点越亮，远距离（对面递过来看）也不误读。
+      投掷动效：抛起 → 三轴翻滚 0.9s → 落定回弹一次 → 定格面点数脉冲一下。</p>
+      <div class="vis"><span class="on">自己看（盅内）</span><span class="on">全场公开（明骰）</span><span>额头 —— 不适用</span></div>
+    </div>
+    <div class="facegrid">
+      <div class="f"><div class="die d64"><span class="pip cc"></span></div><code>face_1</code></div>
+      <div class="f"><div class="die d64"><span class="pip tl"></span><span class="pip br"></span></div><code>face_2</code></div>
+      <div class="f"><div class="die d64"><span class="pip tl"></span><span class="pip cc"></span><span class="pip br"></span></div><code>face_3</code></div>
+      <div class="f"><div class="die d64"><span class="pip tl"></span><span class="pip tr"></span><span class="pip bl"></span><span class="pip br"></span></div><code>face_4</code></div>
+      <div class="f"><div class="die d64"><span class="pip tl"></span><span class="pip tr"></span><span class="pip cc"></span><span class="pip bl"></span><span class="pip br"></span></div><code>face_5</code></div>
+      <div class="f"><div class="die d64 red"><span class="pip tl"></span><span class="pip tr"></span><span class="pip ml"></span><span class="pip mr"></span><span class="pip bl"></span><span class="pip br"></span></div><code>face_6 · 曝点</code></div>
+    </div>
+    <div class="states three">
+      <div class="st"><div class="cnv"><div class="die d64" style="transform:rotate(-14deg)"><span class="pip tl"></span><span class="pip cc"></span><span class="pip br"></span></div></div>
+        <div class="nm">翻滚<small>rolling</small></div><div class="d">三轴翻滚，拖尾辉光；结果未定，点数半透明。</div></div>
+      <div class="st"><div class="cnv"><div class="die d64"><span class="pip tl"></span><span class="pip tr"></span><span class="pip cc"></span><span class="pip bl"></span><span class="pip br"></span></div></div>
+        <div class="nm">落定<small>settled</small></div><div class="d">回弹一次，定格面点数脉冲；结果同步落账。</div></div>
+      <div class="st"><div class="cnv"><div class="die d64 red"><span class="pip tl"></span><span class="pip tr"></span><span class="pip ml"></span><span class="pip mr"></span><span class="pip bl"></span><span class="pip br"></span></div></div>
+        <div class="nm">曝点<small>critical</small></div><div class="d">触发规则的关键面（如豹子/顶点）切粉红光，全场闪一帧。</div></div>
+    </div>
+  </section>
+
+  <!-- ================= CUP ================= -->
+  <div class="ribbon"><span class="tag"><span class="s"></span>道具 02 · 骰盅</span><span class="line"></span><span class="cap">摇 / 偷看 / 开盅 —— 可见性引擎的招牌</span></div>
+
+  <section class="prop">
+    <div class="demo">
+      <div class="phone"><div class="pillcam"></div><div class="screen"><div class="scr">
+        <div class="statusbar"><span>21:07</span><span>●●●</span></div>
+        <div class="navbar"><span>第 5 局 · 吹盅</span><span>轮到你</span></div>
+        <div class="a-k" style="margin-top:16px;text-align:center">Shake to roll · 摇一摇</div>
+        <div style="margin:14px auto 0" class="cupwrap">
+          <div class="arcs"><i></i><i></i></div>
+          <div class="cup"><span class="band"></span></div>
+          <div class="cupshadow"></div>
+        </div>
+        <div class="glass" style="margin-top:12px">
+          <div class="a-k" style="margin-bottom:7px">盅内 · 只有你看得见</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="mini-die"><span class="pip cc"></span></div>
+            <div class="mini-die"><span class="pip tl"></span><span class="pip br"></span></div>
+            <div class="mini-die"><span class="pip tl"></span><span class="pip cc"></span><span class="pip br"></span></div>
+            <span style="font-size:12px;color:#CFC6EE;margin-left:4px">1 · 2 · 3 —— 顺子</span>
+          </div>
+        </div>
+        <div class="cta">
+          <button class="go">按住偷看</button>
+          <button class="alt">喊「开盅」</button>
+        </div>
+      </div></div></div>
+    </div>
+    <div class="panel">
+      <div class="ph">
+        <div class="tt"><h2>骰盅</h2><span class="en">dice cup · shake / peek / reveal</span></div>
+        <p>整个产品「信息朝向」哲学的招牌道具：同一盅骰子，<b>盖着=秘密，按住=只给你看，开盅=全场公开</b>。
+        摇盅用真实陀螺仪+颗粒音效；「按住偷看」是防偷窥交互——手指离开立即盖回，截屏时盅内自动打码。</p>
+        <div class="vis"><span class="on">自己看 · 偷看</span><span class="on">全场公开 · 开盅</span><span>可见性切换 = 玩法切换</span></div>
+      </div>
+      <div class="states three">
+        <div class="st"><div class="cnv"><div class="cupwrap" style="transform:scale(.62);width:150px;height:150px">
+            <div class="arcs"><i></i><i></i></div><div class="cup"><span class="band"></span></div><div class="cupshadow"></div></div></div>
+          <div class="nm">摇<small>shake</small></div><div class="d">陀螺仪驱动，骰子碰撞声随手劲变化；停手 1s 后落定。</div></div>
+        <div class="st"><div class="cnv"><div class="cupwrap" style="transform:scale(.62);width:150px;height:150px">
+            <div class="cup tilt"><span class="band"></span></div>
+            <div class="peek-dice"><div class="mini-die"><span class="pip cc"></span></div><div class="mini-die"><span class="pip tl"></span><span class="pip br"></span></div></div>
+            <div class="cupshadow"></div></div></div>
+          <div class="nm">偷看<small>peek · 自己看</small></div><div class="d">按住掀一条缝，只渲染给持有者；松手即盖。</div></div>
+        <div class="st"><div class="cnv" style="gap:7px;display:flex">
+            <div class="die d64" style="width:44px;height:44px"><span class="pip cc" style="width:9px;height:9px"></span></div>
+            <div class="die d64" style="width:44px;height:44px"><span class="pip tl" style="width:9px;height:9px"></span><span class="pip br" style="width:9px;height:9px"></span></div>
+            <div class="die d64" style="width:44px;height:44px"><span class="pip tl" style="width:9px;height:9px"></span><span class="pip cc" style="width:9px;height:9px"></span><span class="pip br" style="width:9px;height:9px"></span></div></div>
+          <div class="nm">开盅<small>reveal · 全场公开</small></div><div class="d">盅体上飞消失，骰子亮场；结果写进账本，全员同屏。</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= REVOLVER ================= -->
+  <div class="ribbon"><span class="tag"><span class="s"></span>道具 03 · 左轮</span><span class="line"></span><span class="cap">六膛一响 · 惩罚转轮（玩具化，只留弹巢不留枪）</span></div>
+
+  <section class="prop">
+    <div class="demo">
+      <div class="phone"><div class="pillcam"></div><div class="screen"><div class="scr">
+        <div class="statusbar"><span>22:40</span><span>●●●</span></div>
+        <div class="navbar"><span>惩罚环节</span><span>老陈 · 受审</span></div>
+        <div class="a-k" style="margin-top:14px;text-align:center">Six chambers · one loaded</div>
+        <div style="text-align:center;font-size:21px;font-weight:850;letter-spacing:-.02em;margin-top:5px;
+          background:linear-gradient(92deg,#C4B5FD,#F0ABFC);-webkit-background-clip:text;background-clip:text;color:transparent">六膛一响，转吧</div>
+        <div style="margin:16px auto 0" class="cylwrap">
+          <div class="pointer"></div>
+          <div class="spin-arc"></div>
+          <div class="cyl">
+            <span class="ch c1"></span><span class="ch c2 hot"></span><span class="ch c3"></span>
+            <span class="ch c4"></span><span class="ch c5"></span><span class="ch c6"></span>
+            <span class="axis"></span>
+          </div>
+        </div>
+        <div class="glass" style="margin-top:14px">
+          <div class="a-k" style="margin-bottom:6px">这一膛装的是</div>
+          <div style="font-size:13px;color:#F3F1FB;font-weight:650">「用老板的语气念下一条规则」</div>
+          <div style="font-size:11px;color:#9A8FD0;margin-top:3px">非饮酒替代 · 可跳过换一个</div>
+        </div>
+        <div class="cta">
+          <button class="go">转它</button>
+          <button class="alt">换温和的</button>
+        </div>
+      </div></div></div>
+    </div>
+    <div class="panel">
+      <div class="ph">
+        <div class="tt"><h2>左轮</h2><span class="en">roulette cylinder · fair random</span></div>
+        <p>俄轮盘的心跳，去掉枪的形。<b>只保留弹巢</b>——一个六膛转轮，顶部指针，一膛发光装着惩罚。
+        紧张感全靠节奏：转速衰减 → 逐膛「咔哒」→ 停在哪膛全场屏息。公平随机由系统出，结果落账，谁也赖不掉。
+        铁律内建：惩罚永远给非饮酒替代项，<b>「换温和的」按钮常驻</b>，拒绝的代价只能温和。</p>
+        <div class="vis"><span class="on">全场公开 · 转轮上桌</span><span>公平随机 · 系统裁定</span><span>拒绝权 · 常驻</span></div>
+      </div>
+      <div class="states">
+        <div class="st"><div class="cnv"><div class="cylwrap" style="transform:scale(.56);width:170px;height:170px">
+            <div class="cyl"><span class="ch c1"></span><span class="ch c2 hot"></span><span class="ch c3"></span><span class="ch c4"></span><span class="ch c5"></span><span class="ch c6"></span><span class="axis"></span></div></div></div>
+          <div class="nm">装填<small>load</small></div><div class="d">局长把一条惩罚放进随机一膛，装填动画全场可见、位置不可见。</div></div>
+        <div class="st"><div class="cnv"><div class="cylwrap" style="transform:scale(.56);width:170px;height:170px">
+            <div class="spin-arc"></div>
+            <div class="cyl" style="transform:rotate(24deg)"><span class="ch c1"></span><span class="ch c2"></span><span class="ch c3 hot"></span><span class="ch c4"></span><span class="ch c5"></span><span class="ch c6"></span><span class="axis"></span></div></div></div>
+          <div class="nm">旋转<small>spin</small></div><div class="d">甩动手势起转，转速指数衰减；每过一膛「咔哒」一声 + 短震。</div></div>
+        <div class="st"><div class="cnv"><div class="cylwrap" style="transform:scale(.56);width:170px;height:170px">
+            <div class="pointer"></div>
+            <div class="cyl"><span class="ch c1"></span><span class="ch c2"></span><span class="ch c3"></span><span class="ch c4"></span><span class="ch c5"></span><span class="ch c6 hot" style="background:radial-gradient(circle at 40% 32%,#1A1140,#0A0620 70%);box-shadow:inset 0 3px 7px rgba(0,0,0,.85)"></span><span class="axis"></span></div></div></div>
+          <div class="nm">空膛<small>click · 安全</small></div><div class="d">指针停在空膛：一声闷「咔」，全桌松一口气，转轮传给下一人。</div></div>
+        <div class="st"><div class="cnv"><div class="cylwrap" style="transform:scale(.56);width:170px;height:170px">
+            <div class="flash"></div><div class="pointer"></div>
+            <div class="cyl"><span class="ch c1 hot"></span><span class="ch c2"></span><span class="ch c3"></span><span class="ch c4"></span><span class="ch c5"></span><span class="ch c6"></span><span class="axis"></span></div></div></div>
+          <div class="nm">中了<small>hit</small></div><div class="d">粉光炸开 + 长震；惩罚卡弹出，完成确认后进结算。</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= POP VARIANTS ================= -->
+  <div class="ribbon"><span class="tag"><span class="s"></span>糖果皮形态</span><span class="line"></span><span class="cap">同三件道具，压扁成贴纸 —— 战报 / 分享卡 / 表情包用</span></div>
+
+  <section class="popstrip">
+    <div class="bd">
+      <div class="pop-die"><span class="pip tl" style="top:13px;left:13px"></span><span class="pip cc" style="top:50%;left:50%;transform:translate(-50%,-50%)"></span><span class="pip br" style="bottom:13px;right:13px;top:auto;left:auto"></span></div>
+      <div class="pop-cup"></div>
+      <div class="pop-cyl"><span class="ch c1"></span><span class="ch c2"></span><span class="ch c3"></span><span class="ch c4 hot"></span><span class="ch c5"></span><span class="ch c6"></span></div>
+    </div>
+    <div class="note">规则：去光效、加 3px 描边与硬投影、色板换撞色。骨架（比例/点数布局/膛位）与极光形态完全一致——玩家在战报里认得出「就是刚才那颗骰子」。</div>
+  </section>
+
+  <!-- ================= HAPTICS ================= -->
+  <div class="ribbon"><span class="tag"><span class="s"></span>感官规格</span><span class="line"></span><span class="cap">音效 / 震动 / 闪光 —— 客户端从素材库播放</span></div>
+
+  <section class="haptic">
+    <table class="ht">
+      <thead><tr><th>道具 · 时刻</th><th>音效</th><th>震动</th><th>视觉</th></tr></thead>
+      <tbody>
+        <tr><td class="prp">骰子 · 翻滚→落定</td><td class="desc">滚动颗粒声 → 单声脆响</td><td class="mo">连续微震 → 一次中震</td><td class="desc">拖尾辉光 → 点数脉冲</td></tr>
+        <tr><td class="prp">骰盅 · 摇</td><td class="desc">盅内碰撞，音量随手劲</td><td class="mo">跟手颗粒震</td><td class="desc">盅体微晃 + 弧线</td></tr>
+        <tr><td class="prp">骰盅 · 偷看</td><td class="desc">静音（保密时刻）</td><td class="mo">按住时一次轻震</td><td class="desc">缝隙光，只渲染给持有者</td></tr>
+        <tr><td class="prp">骰盅 · 开盅</td><td class="desc">重击 + 揭晓和弦</td><td class="mo">重震一次</td><td class="desc">盅体上飞，骰子亮场闪一帧</td></tr>
+        <tr><td class="prp">左轮 · 旋转</td><td class="desc">逐膛咔哒，间隔渐长</td><td class="mo">每膛短震</td><td class="desc">转速衰减，膛位扫光</td></tr>
+        <tr><td class="prp">左轮 · 空膛</td><td class="desc">闷「咔」一声</td><td class="mo">单次轻震</td><td class="desc">指针弹一下，无光</td></tr>
+        <tr><td class="prp">左轮 · 中了</td><td class="desc">爆点 + 起哄音</td><td class="mo">长震 800ms</td><td class="desc">粉光炸开，惩罚卡弹出</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="rec">
+    三件道具共守一条底线：<b>判定永远走系统</b>——摇出什么、停在哪膛，都是公平随机 + 自动落账，道具只是给这份公正一个<b>有手感的身体</b>。
+    左轮刻意「只留弹巢不留枪」：紧张感来自节奏（咔哒渐慢），不来自枪形——上架审核与家庭场合都安全。
+  </div>
+
+  <div class="signoff">下一步 · 三件套动效规格细化（Lottie/Rive）→ 偷看防截屏方案 → 更多库内道具（身份牌 / 转盘 / 密语卡）同语言铺开</div>
+</main>
+
+</body>
+</html>
