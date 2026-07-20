@@ -56,6 +56,7 @@
     </div>
     <button onclick="start()">开局</button>
   </div>
+  <div class="card" id="joincard" style="display:none"><h3>📱 入座链接(发群里)</h3><div id="join"></div></div>
   <div class="card" id="askcard" style="display:none"><h3>🎤 主持在问</h3><div id="ask"></div></div>
   <div class="card"><h3>玩家机位</h3><div id="panes"></div></div>
   <div class="card"><h3>主持台(manual 驱动:填决策→执行回合)</h3>
@@ -200,6 +201,34 @@ function eventsHtml(events) {
   return `<div class="events">↩ ${parts.join(" ")}</div>`;
 }
 // 把主持最近一次 ask 顶到显眼处;有 options 就渲染成可点的按钮。
+// 入座链接:每人一条 /play?player=X。必须用局域网地址——手机上的 localhost
+// 指向手机自己,不是房主的机器。服务端 lan_host() 已挑过网段(避开 TUN/VPN)。
+function renderJoin(s) {
+  const base = s.join_base || "";
+  const seats = (s.players || []).filter(p => !(s.bots || []).includes(p));
+  if (!base || !seats.length) { $("joincard").style.display = "none"; return; }
+  $("joincard").style.display = "";
+  const url = p => `${base}/play?player=${encodeURIComponent(p)}`;
+  const local = base.includes("localhost");
+  $("join").innerHTML =
+    (local ? `<div style="color:#fc6;font-size:12px;margin-bottom:6px">
+       ⚠️ 现在只有本机能开。手机入座请用 <code>python3 -m modeb.simulator --lan</code> 重启</div>` : "")
+    + seats.map(p => `<div style="display:flex;gap:6px;align-items:center;margin:3px 0">
+         <b style="min-width:56px">${p}</b>
+         <input readonly value="${url(p)}" style="flex:1;font-size:12px"
+                onclick="this.select()">
+         <button onclick="copyText('${url(p)}', this)">复制</button></div>`).join("")
+    + `<div style="margin-top:6px">
+         <button onclick="copyText(${JSON.stringify(
+             seats.map(p => `${p}:${url(p)}`).join("\n")).replace(/"/g, "&quot;")}, this)">
+           📋 全部复制(一条一行,直接粘群里)</button></div>`;
+}
+function copyText(t, btn) {
+  navigator.clipboard.writeText(t).then(() => {
+    const old = btn.textContent; btn.textContent = "✓ 已复制";
+    setTimeout(() => btn.textContent = old, 1200);
+  }, () => alert(t));
+}
 function renderAsk(s) {
   let ask = null;
   for (const t of s.recent_turns) for (const r of (t.results || []))
@@ -231,6 +260,7 @@ async function refresh() {
   await pullInboxes();
   $("panes").innerHTML = s.players.map(p => paneHtml(p, s)).join("");
   renderAsk(s);
+  renderJoin(s);
   const he = s.host_errors, tm = s.last_timing;
   $("digest").textContent = JSON.stringify(s.digest, null, 1)
     + "\n埋点 " + JSON.stringify(s.marks) + (s.finished ? "\n【局已收】" : "")

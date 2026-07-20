@@ -84,6 +84,7 @@ class Session:
         self.inbox: dict[str, list[str]] = {n: [] for n in players}  # 私发收件箱(可见性引擎落地)
         self.last_timing: dict = {}  # 上一拍耗时拆帐:host_ms / bots_ms(慢要先量再修)
         self.lock = threading.Lock()
+        self.join_base = ""   # 由 Hub 注入:http://<局域网IP>:<端口>
 
     def route_private(self, line: dict) -> dict:
         """show(自己看/额头) 路由进收件箱;返回轮询面用的遮蔽版回合行。
@@ -194,6 +195,7 @@ class Session:
             "episode_path": str(self.episode_path),
             "driver": self.driver_kind,
             "bots": self.bot_names,
+            "join_base": self.join_base,   # 入座链接前缀(局域网地址,手机能打开的那个)
             "host_perception": self.state.host_perception,
             "turn_ready": self.engine.turn_ready(),
             "last_timing": self.last_timing,
@@ -209,9 +211,10 @@ class Session:
 
 
 class Hub:
-    def __init__(self, out_dir: Path) -> None:
+    def __init__(self, out_dir: Path, join_base: str = "") -> None:
         self.session: Session | None = None
         self.out_dir = out_dir
+        self.join_base = join_base
 
     def start(self, cfg: dict) -> dict:
         if self.session and not self.session.state.finished:
@@ -237,7 +240,34 @@ class Hub:
             host_perception=cfg.get("host_perception", "转写"),
             playlist=cfg.get("playlist") or [],
         )
+        self.session.join_base = self.join_base
         return self.session.snapshot()
+
+
+def lan_host() -> str:
+    """本机在局域网里的地址。手机连的是 Wi-Fi,localhost 打不开房主的机器——
+    入座链接必须带这个 IP 才有意义。取不到就退回 localhost(单机自测仍可用)。"""
+    import socket
+    cands = []
+    try:  # 先枚举本机所有 IPv4:出口路由那招在有 TUN/VPN 的机器上会返回隧道地址
+        for info in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET):
+            cands.append(info[4][0])
+    except OSError:
+        pass
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("10.255.255.255", 1))   # 不发包,只让内核选出出口网卡
+        cands.append(s.getsockname()[0])
+    except OSError:
+        pass
+    finally:
+        s.close()
+    # 家用 Wi-Fi 绝大多数是 192.168.*,优先;其次 10.*;172.16-31.* 常是 VPN/容器,放最后
+    for pref in ("192.168.", "10."):
+        for ip in cands:
+            if ip.startswith(pref):
+                return ip
+    return next((ip for ip in cands if not ip.startswith("127.")), "localhost")
 
 
 HTML_PATH = Path(__file__).with_name("sim_ui.html")
@@ -393,20 +423,30 @@ class Handler(BaseHTTPRequestHandler):
             self._json(500, {"error": f"{type(e).__name__}: {e}"})
 
 
-def make_server(port: int, out_dir: Path) -> ThreadingHTTPServer:
-    Handler.hub = Hub(out_dir)
-    return ThreadingHTTPServer(("127.0.0.1", port), Handler)
+def make_server(port: int, out_dir: Path, bind: str = "127.0.0.1") -> ThreadingHTTPServer:
+    srv = ThreadingHTTPServer((bind, port), Handler)
+    actual = srv.server_address[1]
+    # 入座链接必须用局域网地址:手机连的是 Wi-Fi,localhost 指向手机自己。
+    host = lan_host() if bind not in ("127.0.0.1", "localhost") else "localhost"
+    Handler.hub = Hub(out_dir, join_base=f"http://{host}:{actual}")
+    return srv
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8747)
     ap.add_argument("--out", default="outputs/episodes")
+    ap.add_argument("--lan", action="store_true",
+                    help="绑 0.0.0.0,让同一 Wi-Fi 下的手机能连进来(入座链接自动用局域网 IP)")
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    srv = make_server(args.port, out)
-    print(f"模拟台 → http://localhost:{args.port}  (机位 {MIN_PLAYERS}–{MAX_PLAYERS},Ctrl-C 退出)")
+    srv = make_server(args.port, out, bind="0.0.0.0" if args.lan else "127.0.0.1")
+    base = Handler.hub.join_base
+    print(f"模拟台(驾驶舱) → {base}  (机位 {MIN_PLAYERS}–{MAX_PLAYERS},Ctrl-C 退出)")
+    print(f"玩家入座        → {base}/play")
+    if not args.lan:
+        print("  ↑ 只有本机能开。手机要入座请加 --lan(同一 Wi-Fi)")
     srv.serve_forever()
 
 

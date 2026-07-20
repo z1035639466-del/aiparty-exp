@@ -329,3 +329,16 @@ def test_play_page_served_and_view_has_phone_fields(server):
     assert code == 200
     assert v["now_playing"] and "七里香" in v["now_playing"], "手机上要看得见正在放的歌"
     assert "timer_running" in v
+
+
+def test_join_base_uses_reachable_host(server):
+    """入座链接必须是手机打得开的地址。默认绑 127.0.0.1 时给 localhost 并由前端
+    提示要加 --lan;绑 0.0.0.0 时给局域网 IP(lan_host 已避开 TUN/VPN 网段)。"""
+    from modeb.simulator import lan_host
+    call(server, "/api/start", {"players": ["甲", "乙"], "minutes": 30, "wildness": 6,
+                                "objects": ["纸杯"], "driver": "manual", "provider": "mock"})
+    snap, _ = call(server, "/api/state")
+    assert snap["join_base"].startswith("http://"), "驾驶舱要拿得到入座前缀"
+    assert ":" in snap["join_base"].split("//", 1)[1], "入座前缀要带端口"
+    ip = lan_host()
+    assert not ip.startswith("127."), f"lan_host 不该返回回环地址,拿到 {ip}"
