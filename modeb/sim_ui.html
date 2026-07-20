@@ -60,6 +60,12 @@
   </div>
   <div class="card" id="roomcard" style="display:none"><h3>🎫 房间码(手机入座填这个)</h3>
     <div id="roomcode" style="font-size:34px;letter-spacing:8px;color:#fc6;font-weight:800;text-align:center"></div></div>
+  <div class="card" style="display:flex;gap:6px;align-items:center">
+    <span style="white-space:nowrap;font-size:13px;color:#9cf">🔀 房间</span>
+    <input id="roominput" placeholder="房间码(留空=单房默认)" style="flex:1;text-transform:uppercase"
+           onkeydown="if(event.key==='Enter')switchRoom()">
+    <button onclick="switchRoom()">切换</button>
+  </div>
   <div class="card" id="joincard" style="display:none"><h3>📱 入座链接(发群里)</h3><div id="join"></div></div>
   <div class="card" id="askcard" style="display:none"><h3>🎤 主持在问</h3><div id="ask"></div></div>
   <div class="card"><h3>玩家机位</h3><div id="panes"></div></div>
@@ -85,6 +91,26 @@ const $ = id => document.getElementById(id);
 // 多局并发:开局拿到房间码后,所有 /api/* 轮询/操作都带上 room(除 /api/start 本身)——
 // query 与 body 都带,服务端两处都认。留空 ROOM 时行为不变(单房默认命中,向后兼容)。
 let ROOM = "";
+// 房间码持久化在 URL hash(#A7QK):刷新页面不丢局,链接可直接发给另一台机器的驾驶舱。
+// 唯一入口 setRoom():改 ROOM、同步 hash/头部大字/切换框,并清掉上一桌的收件箱缓存。
+function setRoom(code) {
+  ROOM = (code || "").trim().toUpperCase();
+  if (location.hash.slice(1) !== ROOM) {
+    // 留空 = 切回单房默认:摘掉 hash(不带 room 请求,行为与单局时代一致)
+    ROOM ? location.hash = ROOM : history.replaceState(null, "", location.pathname);
+  }
+  $("roomcard").style.display = ROOM ? "" : "none";
+  $("roomcode").textContent = ROOM;
+  $("roominput").value = ROOM;
+  peeked.clear();                                  // 别把上一桌偷看的收件箱带进新桌
+  for (const k in inboxCache) delete inboxCache[k];
+  clearErr();
+  refresh();
+}
+// 极简切房(单机房主用):填码→切换;顺手关自动回合,免得心跳替新桌乱代打。
+function switchRoom() { $("auto").checked = false; setRoom($("roominput").value); }
+// 手改地址栏 hash / 浏览器前进后退,同样走切房。
+window.addEventListener("hashchange", () => setRoom(decodeURIComponent(location.hash.slice(1))));
 // 一律返回对象;失败也走 {error} 而不是抛出去。抛出去会变成无人接管的
 // promise rejection,页面纹丝不动,房主只看到「点了没反应」。
 async function api(path, body) {
@@ -140,9 +166,8 @@ async function start() {
     provider: $("provider").value, host_model: $("hostmodel").value,
     seat_model: $("seatmodel").value, score_style: $("scorestyle").value });
   if (bail(r)) return;
-  ROOM = r.room_code || "";   // 此后所有请求带这个房间码,轮询/操作只认这一桌
-  if (ROOM) { $("roomcard").style.display = ""; $("roomcode").textContent = ROOM; }
-  refresh();
+  // 此后所有请求带这个房间码,轮询/操作只认这一桌;进 URL hash,刷新不丢局
+  setRoom(r.room_code || "");
 }
 setInterval(async () => {  // 事件驱动心跳:有新事件/计时器到点才叫醒主持——没动静就让它等
   const st = await api("/api/state");
@@ -292,5 +317,7 @@ async function refresh() {
       + `</div>`).join("");
   $("log").scrollTop = $("log").scrollHeight;
 }
+// 断线重连:刷新/重开页面时从 URL hash 恢复房间码,不丢局;无 hash 走单房默认。
+if (location.hash.length > 1) setRoom(decodeURIComponent(location.hash.slice(1)));
 setInterval(refresh, 1000); refresh();
 </script>
