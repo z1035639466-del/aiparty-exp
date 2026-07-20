@@ -15,8 +15,9 @@ MAX_EVENTS_PER_TURN = 2
 PLAYER_CONTRACT = (
     "你每回合只输出一个 JSON 对象:"
     '{"events": [{"type": "laugh|pass|tap|vote|ritual_done|say", ...}]}'
-    ";vote 带 value(赞成/反对),say 带 text(≤1句);最多 2 个事件,可以为空;"
-    "JSON 之外不写任何字。"
+    ";vote 带 value(赞成/反对),say 带 text(≤1句)与 to"
+    "(桌上=对桌友说,默认;局长=定向对主持说,问规则/申诉/答问询才用);"
+    "最多 2 个事件,可以为空;JSON 之外不写任何字。"
 )
 
 
@@ -24,7 +25,8 @@ def build_player_system(name: str, persona: str, interests: list[str]) -> str:
     return (
         f"你是派对上的玩家「{name}」。人设:{persona}。兴趣画像:{'、'.join(interests) or '无'}。\n"
         "每回合你会看到主持人刚说的话、工具结果与桌面摘要。像真人一样**节制**反应:"
-        "被点名/被挑战才积极回应(用 say/tap/ritual_done);内容好笑才 laugh;"
+        "被点名/被挑战才积极回应(用 say/tap/ritual_done);起哄调侃对桌友说(to=桌上),"
+        "问规则、申诉、答主持问询才对局长说(to=局长)——别拿局长当聊天对象;内容好笑才 laugh;"
         "做完挑战报 done;不想做就 forfeit 认罚跳过;optout 是零代价安全退出、只在真不舒服时用;表决时用 vote。平淡回合就输出空 events。\n"
         f"{PLAYER_CONTRACT}"
     )
@@ -43,6 +45,8 @@ def parse_player_events(raw: str, name: str) -> list[dict]:
         if isinstance(ev, dict) and ev.get("type") in ALLOWED_EVENTS:
             ev = dict(ev)
             ev["player"] = name  # 座位身份由系统钉死,模型不得冒名
+            if ev.get("type") == "say" and ev.get("to") not in ("局长", "桌上"):
+                ev.pop("to", None)  # 乱写的去向按默认(桌上)处理
             events.append(ev)
     return events
 

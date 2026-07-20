@@ -173,16 +173,17 @@ function paneHtml(p, s) {
     <button onclick="ev('optout','${p}')" title="零代价安全退出(底线,罕用)">🚫</button>
     <button onclick="ev('laugh','${p}')" title="观察员打点:替代纸笔笑声账本;产品端无此键,笑声走感知窗口+局后问卷">😂</button>
     ${bot ? "" : `<div style="display:flex;gap:4px;margin-top:4px">
-      <input id="say-${p}" placeholder="说点什么(回车发)" style="flex:1"
-             onkeydown="if(event.key==='Enter')sayAs('${p}')">
-      <button onclick="sayAs('${p}')">💬 发言</button></div>`}</div>`;
+      <input id="say-${p}" placeholder="说点什么(回车=桌上)" style="flex:1"
+             onkeydown="if(event.key==='Enter')sayAs('${p}','桌上')">
+      <button onclick="sayAs('${p}','桌上')" title="对桌友说;按钮档下主持听不见内容">💬 桌上</button>
+      <button onclick="sayAs('${p}','局长')" title="定向对主持说(问规则/申诉/答问询),任何档全文送达">🎙 局长</button></div>`}</div>`;
 }
-// 真人座位的发言口。bot 自己会 say,真人以前反而没处说话。
-async function sayAs(p) {
+// 真人座位的发言口,两路:桌上互说 vs 对局长说(现实里天然分开,只有 agent 桌混着)。
+async function sayAs(p, to) {
   const el = $("say-" + p), text = el.value.trim();
   if (!text) return;
   el.value = "";
-  await ev("say", p, {text});
+  await ev("say", p, {text, to: to || "桌上"});
 }
 // 桌面反应(桌友 agent + 真人)。这些事件是本回合开始前收上来的,
 // 即对上一拍的回应——过去只喂给主持,驾驶舱里完全看不见。
@@ -191,7 +192,8 @@ function eventsHtml(events) {
   if (!events || !events.length) return "";
   const parts = events.map(e => {
     const body = e.text ? `「${e.text}」` : (e.value || "");
-    return `<span class="ev">${e.player} ${EV_ICON[e.type] || e.type} ${body}</span>`;
+    const icon = e.type === "say" && e.to === "局长" ? "🎙" : (EV_ICON[e.type] || e.type);
+    return `<span class="ev">${e.player} ${icon} ${body}</span>`;
   });
   return `<div class="events">↩ ${parts.join(" ")}</div>`;
 }
@@ -204,7 +206,7 @@ function renderAsk(s) {
   $("askcard").style.display = "";
   const seats = s.players.filter(p => !(s.bots || []).includes(p));
   const opts = (ask.options || []).map(o =>
-    seats.map(p => `<button onclick="ev('say','${p}',{text:'${o}'})">${o}${seats.length > 1 ? ` (${p})` : ""}</button>`).join("")).join(" ");
+    seats.map(p => `<button onclick="ev('say','${p}',{text:'${o}',to:'局长'})">${o}${seats.length > 1 ? ` (${p})` : ""}</button>`).join("")).join(" ");
   $("ask").innerHTML = `<div><b>@${ask.asked}</b> ${ask.prompt}</div>${opts ? `<div style="margin-top:4px">${opts}</div>` : ""}`;
 }
 // 私密收件箱:📬 只在有件时亮;演示台是上帝视角,真机上各看各的。

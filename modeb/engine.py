@@ -78,15 +78,17 @@ class Engine:
     def _perceive(self, events: list[dict]) -> list[dict]:
         """按感知档裁剪送给主持的事件——决定这局在多接近真机的条件下被测。
 
-        转写档:全文送达(需要 ASR 落地才成立,当前模拟台默认)。
-        按钮档:只送结构化按压,say 降级成「有人说话」,内容听不见。
+        发言分两路(M2 实测改进项:现实里天然分开,只有 agent 桌混着):
+        - to=局长:定向频道(真机=打字/按住说话),不走耳朵,任何档全文送达;
+        - to=桌上(默认):自由交谈。转写档全文(需 ASR 成立);按钮档降级成
+          「有人说话」,内容听不见——过去这路在按钮档也全文送,等于漏音。
         """
         mode = getattr(self.state, "host_perception", "转写")
         if mode != "按钮":
             return events
         out = []
         for e in events:
-            if e.get("type") == "say":
+            if e.get("type") == "say" and e.get("to") != "局长":
                 out.append({"type": "say", "player": e.get("player"), "inaudible": True})
             else:
                 out.append(e)
@@ -96,7 +98,18 @@ class Engine:
         """事件驱动心跳:开局首拍 / 有新事件 / 有计时器到点,才该叫醒主持。
         房主裁定(2026-07-18):没回应就等——桌上没动静不打扰,主持不必编进展。"""
         # 被问询吸收的应答不单独叫醒主持——等窗口收完一起给它,免得它半途插话。
-        if self.marks["turns"] == 0 or any(not e.get("_absorbed") for e in self.event_queue):
+        # 按钮档下桌上互说也不叫醒:聋主持面前的闲聊是背景噪音,为一句
+        # 「有人说了你听不见的话」烧一个回合,只会逼它对着空气编话(反虚构)。
+        deaf = getattr(self.state, "host_perception", "转写") == "按钮"
+
+        def wakes(e: dict) -> bool:
+            if e.get("_absorbed"):
+                return False
+            if deaf and e.get("type") == "say" and e.get("to") != "局长":
+                return False
+            return True
+
+        if self.marks["turns"] == 0 or any(wakes(e) for e in self.event_queue):
             return True
         now = time.time()
         return any(t <= now for t in self.state.timers)
