@@ -16,7 +16,6 @@ from .tools import ToolExecutor
 MAX_TOOLS_PER_TURN = 2
 MAX_SENTENCES = 3
 HOST_COOLDOWN_S = 8  # 主持调用失败后的冷却拍:期间 turn_ready=False,事件在队列里等
-SILENCE_WAKE_S = 90  # 冷场闹钟:主持行动后场上静默这么久,叫醒它一次(且仅一次)
 
 
 class Driver(Protocol):
@@ -40,10 +39,9 @@ class Engine:
         # 荷官回执:主持上一拍工具的真实结果,只走 driver 专用信道回给它本人。
         # 遮蔽按观看者定,不按出口定——玩家面/驾驶舱照旧遮,发牌人看自己发的牌。
         self._last_results: list[dict] = []
-        # 冷场闹钟:等待权做到了「不催」,但没有「发现没人了」。主持行动后场上
-        # 静默超时,注入一次 table_silent 叫醒——催不催、催几次由铁律管(≤1次)。
-        self._silence_deadline: float | None = None
-        self._silence_reported = False
+        # 没有冷场闹钟(房主撤,2026-07-20):时限的唯一机制是主持显式调 timer,
+        # 没设时限=选择了开放式等待,一直等是正确行为("没回应就等,就这么简单")。
+        # agent 桌冻死是 harness 座位掉线,归座位保活/产品在线心跳,不归引擎。
         self._t0 = time.time()
         episode_path.parent.mkdir(parents=True, exist_ok=True)
         self._ep = episode_path.open("w", encoding="utf-8")
@@ -68,9 +66,6 @@ class Engine:
                 self.state.timers.append(ask["deadline"])
             ev = dict(ev, _absorbed=True)  # 已被问询吸收,不单独叫醒主持
         self.event_queue.append(ev)
-        # 任何桌面动静都说明场子活着:解除冷场闹钟
-        self._silence_deadline = None
-        self._silence_reported = False
 
     def _is_answer_to_open_ask(self, ev: dict) -> bool:
         """哪些事件算这次问询的应答——不设门槛就会被无关闲聊截胡。
@@ -158,9 +153,6 @@ class Engine:
         if self.marks["turns"] == 0 or any(wakes(e) for e in self.event_queue):
             return True
         now = time.time()
-        if (self._silence_deadline is not None and now >= self._silence_deadline
-                and not self._silence_reported):
-            return True  # 冷场到点:一次性叫醒(在线状态与沉默,主持自己去分辨)
         return any(t <= now for t in self.state.timers)
 
     # —— 一个决策回合 ——
@@ -174,12 +166,6 @@ class Engine:
         closed = self._close_ask()
         if closed:
             events.append(closed)
-        if (self._silence_deadline is not None and now >= self._silence_deadline
-                and not self._silence_reported and not events):
-            # 冷场事件只报事实(静默秒数),催不催是主持按铁律的决定
-            events.append({"type": "table_silent",
-                           "quiet_s": int(now - self._silence_deadline + SILENCE_WAKE_S)})
-            self._silence_reported = True  # 一段静默只叫醒一次,不无限骚扰
         # 现场的局长是半瞎半聋的:听不见桌上的自由交谈,只知道谁按了什么。
         # 模拟台默认给全文,会把主持的本桌化改造能力测得虚高——真机上它拿不到这些。
         upstream = self._perceive(events)
@@ -223,10 +209,6 @@ class Engine:
         self._ep.flush()  # 审计线逐行落地:进程中途死掉,流水不能跟着蒸发
         self.marks["turns"] += 1
         self._last_results = results  # 荷官回执:下一拍随 driver 信道回给主持本人
-        if text or calls:
-            # 主持行动了 → 挂冷场闹钟;空拍(静等)不续挂,免得闹钟被空转推着走
-            self._silence_deadline = time.time() + SILENCE_WAKE_S
-            self._silence_reported = False
         return line
 
     # —— 跑完一局 ——

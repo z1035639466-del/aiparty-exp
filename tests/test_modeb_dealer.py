@@ -1,9 +1,9 @@
-"""荷官回执 + 冷场闹钟(六桌实测三裁定中归引擎的两条)。
+"""荷官回执(六桌实测裁定):遮蔽按观看者定,不按出口定。
 
-回执:遮蔽按观看者定,不按出口定——玩家面/驾驶舱照旧遮,发牌人看自己发的牌。
-只走 driver 专用信道,不进 line/events_in/任何 HTTP 面。
-冷场:等待权做到了「不催」,但没有「发现没人了」(2 人桌冻在第 7 拍)。
-主持行动后静默超时,叫醒一次;催不催由铁律管。
+玩家面/驾驶舱照旧遮,发牌人看自己发的牌——回执只走 driver 专用信道,
+不进 line/events_in/任何 HTTP 面。
+(冷场闹钟已撤,房主裁定:时限唯一机制是显式 timer,没设=开放式等待,
+一直等是正确行为;agent 桌冻死归 harness 座位保活,不归引擎。)
 """
 from __future__ import annotations
 
@@ -68,37 +68,10 @@ def test_dealer_sees_clamp_in_receipts(tmp_path):
         "钳制记录也要回执——否则主持嘴上说了、系统没生效还不自知"
 
 
-# —— 冷场闹钟 ——
+# —— 开放式等待(冷场闹钟已撤的回归钉子)——
 
-def test_silence_alarm_wakes_host_exactly_once(tmp_path):
+def test_host_waits_forever_without_timer(tmp_path):
+    """没设 timer 的静默桌永远不叫醒主持——"没回应就等,就这么简单"。"""
     eng = _engine(tmp_path, [{"text": "下一位,做个鬼脸!", "tool_use": []}])
-    eng.turn()  # 主持行动 → 挂闹钟
-    assert eng._silence_deadline is not None
-    assert not eng.turn_ready(), "没到点不叫醒"
-
-    eng._silence_deadline = time.time() - 1  # 冷场到点
-    assert eng.turn_ready(), "静默超时该叫醒一次"
-    line = eng.turn()
-    silent_evs = [e for e in line["events_in"] if e.get("type") == "table_silent"]
-    assert silent_evs and silent_evs[0]["quiet_s"] >= 0
-    assert not eng.turn_ready(), "一段静默只叫醒一次,不无限骚扰"
-
-
-def test_any_table_activity_disarms_alarm(tmp_path):
-    eng = _engine(tmp_path, [{"text": "开始!", "tool_use": []}])
     eng.turn()
-    eng.push_event({"type": "laugh", "player": "丙"})
-    assert eng._silence_deadline is None, "桌面有动静 = 场子活着,闹钟解除"
-
-
-def test_host_empty_beat_does_not_rearm(tmp_path):
-    eng = _engine(tmp_path, [
-        {"text": "挑战开始!", "tool_use": []},
-        {"text": "", "tool_use": []},          # 主持静等(空拍)
-    ])
-    eng.turn()
-    d1 = eng._silence_deadline
-    eng.push_event({"type": "tap", "player": "甲"})
-    eng.turn()  # 空拍
-    assert eng._silence_deadline is None or eng._silence_deadline == d1, \
-        "空拍(静等)不重挂闹钟——闹钟跟着主持的行动走,不跟空转走"
+    assert not eng.turn_ready(), "无事件无计时器 = 一直等,不存在隐式冷场唤醒"
