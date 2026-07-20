@@ -236,6 +236,7 @@ async function refresh() {
     : `<div class="turnline">#${t.turn} <span class="host-text">${t.text}</span> `
       + `${JSON.stringify(t.tool_use)}`
       + (t.results||[]).filter(r=>!r.ok).map(r=>` <span class="clamp">⛔${r.clamped}</span>`).join("")
+      + (t.results||[]).filter(r=>r.ok&&r.result&&r.result.demo_ref).map(r=>` <span class="ev">🎬 ${r.result.demo_ref}(资产未上线,降级文字)</span>`).join("")
       + eventsHtml(t.events_in)
       + `</div>`).join("");
   $("log").scrollTop = $("log").scrollHeight;

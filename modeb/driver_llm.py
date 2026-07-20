@@ -17,7 +17,7 @@ MAX_TOOLS_PER_TURN = 2
 HISTORY_WINDOW = 6  # 保留最近 N 回合主持词,维持口风连续
 
 TOOLS_DECLARATION = [
-    {"name": "show", "desc": "向玩家端展示内容", "args": {"content": "str", "visibility": "自己看|额头|全场公开"}},
+    {"name": "show", "desc": "向玩家端展示内容;自己看/额头必须带 player(在座目标);draw_atom 若回了 demo.ref,讲解玩法时把它原样填进 demo 即播放演示件(自己编的引用会被降级)", "args": {"content": "str", "visibility": "自己看|额头|全场公开", "player": "str?", "demo": "str?"}},
     {"name": "ask", "desc": "向玩家提问/发起确认", "args": {"player": "str|全场", "prompt": "str", "options": "list?"}},
     {"name": "random.pick", "desc": "公平随机选择", "args": {"from": "players|list", "exclude": "list?"}},
     {"name": "random.int", "desc": "公平随机整数", "args": {"min": "int", "max": "int"}},
