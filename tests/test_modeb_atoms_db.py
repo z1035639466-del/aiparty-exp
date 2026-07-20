@@ -51,7 +51,7 @@ def test_db_carries_pattern_id():
     assert pat == "pat-t1-01", "模式挂载点要落成索引列(交叉握手对峙)"
     (n,) = db.execute("SELECT COUNT(*) FROM patterns").fetchone()
     db.close()
-    assert n == 8
+    assert n >= 60, f"T1 8 + 蒸馏 v1 53,实际 {n}"
 
 
 def test_draw_atom_works_on_db_backed_pool():

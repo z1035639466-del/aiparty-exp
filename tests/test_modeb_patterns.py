@@ -20,10 +20,11 @@ def _executor(**kw):
 
 def test_pattern_cards_load_and_are_wellformed():
     cards = load_pattern_cards()
-    assert len(cards) == 8, "T1 首批 8 张"
+    assert len(cards) >= 60, f"T1 首批 8 + 蒸馏 v1 批 53,实际 {len(cards)}"
     ids = [c["pattern_id"] for c in cards]
-    refs = [c["demo_ref"] for c in cards]
-    assert len(set(ids)) == 8 and len(set(refs)) == 8, "pattern_id 与 demo_ref 均不得撞车"
+    assert len(set(ids)) == len(ids), "pattern_id 不得撞车"
+    refs = [c["demo_ref"] for c in cards if c.get("demo_ref")]
+    assert len(set(refs)) == len(refs), "已挂资产的 demo_ref 不得撞车"
     assert all(c["variants"] for c in cards)
 
 
