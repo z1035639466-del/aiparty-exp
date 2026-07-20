@@ -52,16 +52,29 @@ DASHSCOPE_POLL_INTERVAL = 3  # 秒
 DASHSCOPE_POLL_MAX_ROUNDS = 40
 
 
+def _openai_payload(model: str, prompt: str) -> dict:
+    # OpenAI 官方尺寸用 x(1536x1024);DashScope compatible-mode 用 *(1536*1024),
+    # IMAGE_API_SIZE 覆盖;置空串 = 不传,交给模型默认
+    payload = {"model": model, "prompt": prompt, "n": 1}
+    size = os.environ.get("IMAGE_API_SIZE", "1536x1024")
+    if size:
+        payload["size"] = size
+    return payload
+
+
 def _render_openai(prompt: str, base: str, key: str) -> bytes:
     """走现有 OpenAI 兼容 images 口(同步取图)。"""
     model = os.environ.get("IMAGE_API_MODEL", "gpt-image-2")
     req = urllib.request.Request(
         base.rstrip("/") + "/images/generations", method="POST",
         headers={"Content-Type": "application/json", "Authorization": f"Bearer {key}"},
-        data=json.dumps({"model": model, "prompt": prompt,
-                         "size": "1536x1024", "n": 1}).encode())
-    with urllib.request.urlopen(req, timeout=180) as r:
-        resp = json.loads(r.read())
+        data=json.dumps(_openai_payload(model, prompt)).encode())
+    try:
+        with urllib.request.urlopen(req, timeout=180) as r:
+            resp = json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        detail = e.read().decode("utf-8", "replace")[:300]
+        raise RuntimeError(f"images 口被拒 HTTP {e.code}:{detail}(model={model!r})") from None
     b64 = resp["data"][0].get("b64_json")
     if not b64:  # 有的口回 url
         url = resp["data"][0]["url"]
