@@ -315,3 +315,17 @@ def test_player_view_rejects_unknown_seat(server):
                                 "objects": ["扑克牌"], "driver": "manual", "provider": "mock"})
     _, code = _view(server, "路人")
     assert code == 400
+
+
+def test_play_page_served_and_view_has_phone_fields(server):
+    """玩家页 /play 与它依赖的视图字段:手机上要显示正在放的歌与计时状态。"""
+    from urllib.parse import quote
+    call(server, "/api/start", {"players": ["甲", "乙"], "minutes": 30, "wildness": 6,
+                                "objects": ["纸杯"], "driver": "manual", "provider": "mock",
+                                "playlist": ["七里香 周杰伦"]})
+    call(server, "/api/turn", {"text": "开场", "tool_use": [
+        {"name": "music.play", "input": {"track": "七里香"}}]})
+    v, code = call(server, f"/api/view?player={quote('甲')}")
+    assert code == 200
+    assert v["now_playing"] and "七里香" in v["now_playing"], "手机上要看得见正在放的歌"
+    assert "timer_running" in v

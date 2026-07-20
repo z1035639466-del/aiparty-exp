@@ -1,0 +1,176 @@
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>入座</title>
+<style>
+  :root{color-scheme:dark;--bg:#111116;--card:#1c1c23;--line:#2e2e38;--dim:#8a8a99;--go:#2f7d4f}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:#f0f0f4;
+       font:17px/1.6 -apple-system,'PingFang SC',system-ui,sans-serif;
+       padding:12px 12px calc(env(safe-area-inset-bottom) + 96px)}
+  .bar{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--dim);margin-bottom:10px}
+  .bar b{color:#9cf;font-size:15px}
+  .dj{margin-left:auto;color:#6d8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46%}
+  /* 主持词:整页最大的东西,喝了酒也看得清 */
+  .host{background:var(--card);border-radius:16px;padding:18px 16px;margin-bottom:10px;
+        font-size:23px;line-height:1.5;color:#b7f5c4;min-height:64px}
+  .host.quiet{color:#6a6a78;font-size:16px;font-style:italic}
+  .shown{background:#20202a;border-left:3px solid #7a7;border-radius:8px;
+         padding:10px 12px;margin:8px 0;font-size:15px;color:#cfe}
+  /* 主持在问:有选项就是大按钮 */
+  .ask{background:#241f14;border:1px solid #5a4a22;border-radius:16px;padding:14px;margin-bottom:10px}
+  .ask h4{margin:0 0 4px;font-size:13px;color:#e8b64c;font-weight:600}
+  .ask .q{font-size:19px;color:#ffd98a;margin-bottom:10px}
+  .opts{display:grid;gap:8px}
+  .opts button{font-size:18px;padding:14px;border-radius:12px;border:1px solid #6a5a2a;
+               background:#2f2718;color:#ffe6ad}
+  /* 私件 */
+  .mail{background:#1b1830;border:1px solid #443a6e;border-radius:14px;padding:12px 14px;margin-bottom:10px}
+  .mail h4{margin:0 0 6px;font-size:13px;color:#b3a2ff}
+  .mail div{font-size:17px;color:#e4dcff;padding:3px 0}
+  .table{margin-bottom:10px}
+  .ev{font-size:14px;color:#9a9aab;padding:2px 0}
+  .ev b{color:#ccd}
+  .scores{display:flex;flex-wrap:wrap;gap:6px;font-size:13px;color:var(--dim);margin-bottom:8px}
+  .scores span{background:#1a1a22;border-radius:20px;padding:3px 10px}
+  .me{outline:1px solid #4a7;color:#cfe}
+  /* 底部常驻操作区:拇指够得着 */
+  .dock{position:fixed;left:0;right:0;bottom:0;background:#15151c;border-top:1px solid var(--line);
+        padding:8px 10px calc(env(safe-area-inset-bottom) + 8px);display:grid;gap:6px}
+  .row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+  .row button{font-size:16px;padding:15px 4px;border-radius:14px;border:1px solid var(--line);
+              background:#23232c;color:#eee;font-weight:600}
+  .row button.big{font-size:22px}
+  .row button:active{background:#33333f}
+  .say{display:flex;gap:6px}
+  .say input{flex:1;font-size:17px;padding:13px;border-radius:12px;border:1px solid var(--line);
+             background:#1a1a22;color:#eee}
+  .say button{padding:0 16px;border-radius:12px;border:none;background:var(--go);color:#fff;font-size:16px}
+  .toggle{font-size:12px;color:var(--dim);text-align:center}
+  .toggle span{padding:2px 8px;border-radius:10px}
+  .toggle span.on{background:#2a3a4a;color:#9cf}
+  /* 选座 */
+  .pick{padding:24px 8px}
+  .pick h2{font-size:20px;color:#9cf}
+  .pick button{display:block;width:100%;font-size:22px;padding:18px;margin:10px 0;
+               border-radius:14px;border:1px solid var(--line);background:var(--card);color:#eee}
+  .end{background:#16241c;border-radius:14px;padding:16px;font-size:18px;color:#9d9;text-align:center}
+  .toast{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 108px);
+         background:#333a44;color:#fff;padding:11px 14px;border-radius:12px;font-size:15px;
+         opacity:0;transition:opacity .2s;pointer-events:none;text-align:center}
+  .toast.on{opacity:.96}
+</style>
+<div id="app"></div>
+<div id="toast" class="toast"></div>
+<script>
+const $=i=>document.getElementById(i);
+const q=new URLSearchParams(location.search);
+let ME=q.get('player')||'';
+let SAYTO='桌上', last=null, seen=new Set();
+
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');
+  clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1600);}
+
+async function api(path,body){
+  try{
+    const r=await fetch(path,body?{method:'POST',headers:{'Content-Type':'application/json'},
+                                   body:JSON.stringify(body)}:undefined);
+    const t=await r.text(); return t?JSON.parse(t):{error:'服务端无响应'};
+  }catch(e){return {error:'连不上('+e.message+')'};}
+}
+async function send(type,extra){
+  if(!ME) return;
+  const r=await api('/api/event',Object.assign({type,player:ME},extra||{}));
+  if(r.error) toast('⚠️ '+r.error);
+  else toast({laugh:'😂 笑声已记',done:'✅ 已报完成',forfeit:'🍺 认罚跳过',
+              optout:'🚫 本环节退出',vote:'🗳 已投',say:'💬 已发出'}[type]||'已发出');
+  tick();
+}
+function sayNow(){
+  const el=$('sayin'); const text=(el.value||'').trim();
+  if(!text) return; el.value=''; send('say',{text,to:SAYTO});
+}
+function toggleTo(){SAYTO=SAYTO==='桌上'?'局长':'桌上';render(last);}
+
+async function tick(){
+  if(!ME) return;
+  const v=await api('/api/view?player='+encodeURIComponent(ME));
+  if(v.error){toast('⚠️ '+v.error);return;}
+  last=v; render(v);
+}
+
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+function render(v){
+  if(!ME){
+    $('app').innerHTML="<div class='pick'><h2>选一个座位</h2><div id='seats'>正在读取…</div></div>";
+    api('/api/state').then(s=>{
+      $('seats').innerHTML=(s.players||[]).map(p=>
+        `<button onclick="location.search='?player='+encodeURIComponent('${p}')">${esc(p)}</button>`).join('')
+        ||'<p>还没开局</p>';
+    });
+    return;
+  }
+  if(!v) return;
+  const r=(v.recent||[]).filter(t=>t.host||((t.table||[]).length));
+  const cur=r[r.length-1]||{};
+  const ask=v.open_ask, mine=ask&&(ask.asked===ME||ask.asked==='全场');
+
+  let h=`<div class="bar"><b>${esc(ME)}</b>`
+       +`<span>第${v.round??0}轮 · ${Math.max(0,Math.round(v.time_left_min||0))}分钟</span>`
+       +(v.focus?`<span>· 焦点 ${esc(v.focus)}</span>`:'')
+       +(v.now_playing?`<span class="dj">🎵 ${esc(v.now_playing)}</span>`:'')+`</div>`;
+
+  if(v.finished){
+    h+=`<div class="end">🏁 收局了<br><span style="font-size:15px">${esc(JSON.stringify(v.scores))}</span></div>`;
+    $('app').innerHTML=h; return;
+  }
+
+  h+= cur.host ? `<div class="host">${esc(cur.host)}</div>`
+               : `<div class="host quiet">局长在等桌上的动静……</div>`;
+  (cur.shown||[]).forEach(s=>h+=`<div class="shown">${esc(s)}</div>`);
+
+  if(ask){
+    h+=`<div class="ask"><h4>🎤 局长在问${mine?'（点你了）':'（问 '+esc(ask.asked)+'）'}</h4>`
+      +`<div class="q">${esc(ask.prompt)}</div>`;
+    if((ask.options||[]).length)
+      h+=`<div class="opts">`+ask.options.map(o=>
+        `<button onclick="send('vote',{value:'${esc(o).replace(/'/g,"\\'")}'})">${esc(o)}</button>`).join('')+`</div>`;
+    h+=`</div>`;
+  }
+
+  if((v.inbox||[]).length){
+    h+=`<div class="mail"><h4>🔒 只有你能看到</h4>`
+      +v.inbox.slice(-4).map(m=>`<div>${esc(m)}</div>`).join('')+`</div>`;
+  }
+
+  const evs=(cur.table||[]).map(e=>{
+    const icon={laugh:'😂',done:'✅',forfeit:'🍺',optout:'🚫',vote:'🗳',tap:'👍',say:'💬',ritual_done:'🪄'}[e.type]||e.type;
+    const body=e.note?`<i>${esc(e.note)}</i>`:esc(e.text||e.value||'');
+    return `<div class="ev"><b>${esc(e.player)}</b> ${icon} ${body}</div>`;
+  }).join('');
+  if(evs) h+=`<div class="table">${evs}</div>`;
+
+  h+=`<div class="scores">`+Object.entries(v.scores||{}).map(([p,s])=>
+      `<span class="${p===ME?'me':''}">${esc(p)} ${s}</span>`).join('')+`</div>`;
+
+  h+=`<div class="dock">
+        <div class="row">
+          <button class="big" onclick="send('laugh')">😂</button>
+          <button onclick="send('done')">✅ 做完了</button>
+          <button onclick="send('forfeit')">🍺 认罚</button>
+        </div>
+        <div class="say">
+          <input id="sayin" placeholder="${SAYTO==='局长'?'问局长…':'跟桌上说…'}"
+                 onkeydown="if(event.key==='Enter')sayNow()">
+          <button onclick="sayNow()">发</button>
+        </div>
+        <div class="toggle" onclick="toggleTo()">
+          说给 <span class="${SAYTO==='桌上'?'on':''}">桌上</span>
+          <span class="${SAYTO==='局长'?'on':''}">局长</span> · 点这里切换
+          <span style="float:right" onclick="event.stopPropagation();send('optout')">🚫 退出本环节</span>
+        </div>
+      </div>`;
+  $('app').innerHTML=h;
+}
+
+render(null); tick(); setInterval(tick,2500);
+</script>

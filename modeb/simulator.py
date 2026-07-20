@@ -170,6 +170,8 @@ class Session:
             "time_left_min": digest.get("time_left_min"),
             "now_playing": digest.get("now_playing"),  # 音乐是全场公开的:现实里人人听得见
             "scores": digest.get("scores"), "scene_objects": digest.get("scene_objects"),
+            "now_playing": digest.get("now_playing"),   # 手机上要显示正在放的歌
+            "timer_running": digest.get("timer_running"),
             "inbox": self.inbox.get(me, [])[-8:],          # 只有自己的
             "open_ask": ({"prompt": ask["prompt"], "asked": ask["asked"],
                           "options": ask["options"]} if ask else None),  # 不含 answers
@@ -237,6 +239,7 @@ class Hub:
 
 
 HTML_PATH = Path(__file__).with_name("sim_ui.html")
+PLAY_PATH = Path(__file__).with_name("play_ui.html")   # 玩家手机页
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -276,8 +279,10 @@ class Handler(BaseHTTPRequestHandler):
         return player
 
     def do_GET(self) -> None:
-        if self.path in ("/", "/index.html"):
-            body = HTML_PATH.read_bytes()
+        if self.path in ("/", "/index.html") or self.path.startswith("/play"):
+            # /play[?player=X] = 玩家页(手机);/ = 驾驶舱(房主)。两页两套视角,
+            # 玩家页只吃 /api/view,拿不到 tool_use/results/inbox_counts。
+            body = (PLAY_PATH if self.path.startswith("/play") else HTML_PATH).read_bytes()
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
