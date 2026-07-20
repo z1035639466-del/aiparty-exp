@@ -156,19 +156,25 @@ class Session:
                     calls[i]["input"]["content"] = res[field]
         return red
 
-    def judge_photo(self, player: str, image_b64: str, media_type: str | None) -> dict:
+    def judge_photo(self, player: str, image_b64: str | None, media_type: str | None,
+                     frames: list[str] | None = None) -> dict:
         """视觉裁判(锁外调用,慢):返回 judge_result 事件体。判不了不装懂——
-        「无法判定」明说,主持按声明走 ask 共识兜底(spec §1.4)。"""
+        「无法判定」明说,主持按声明走 ask 共识兜底(spec §1.4)。
+        frames:视频判定走的通道——客户端已把短视频抽成几张连续帧(仍是图片),
+        这里原样多 image block 一起送审,裁判口径与单张照片判定不变。"""
         pend = self.state.pending_photo or {}
         if self._judge is None:
             self._judge = make_transport(self._judge_provider, self._judge_model)
         sys_p = ("你是聚会游戏的视觉裁判:只按给定标准判,宽松判、气氛优先、拿不准给过。"
                  '只输出 JSON:{"verdict":"过|不过|无法判定","reason":"一句话,现场能念"}')
-        msgs = [{"role": "user", "content": [
-            {"type": "image", "source": {"type": "base64",
-                                         "media_type": media_type or "image/jpeg",
-                                         "data": image_b64}},
-            {"type": "text", "text": f"判定标准:{pend.get('prompt', '')}"}]}]
+        images = frames if frames else [image_b64]
+        content = [{"type": "image", "source": {"type": "base64",
+                                                 "media_type": media_type or "image/jpeg",
+                                                 "data": b64}} for b64 in images]
+        text = (f"这是同一段动作视频的连续抽帧(共{len(images)}帧,按时间顺序):判定标准:{pend.get('prompt', '')}"
+                if frames else f"判定标准:{pend.get('prompt', '')}")
+        content.append({"type": "text", "text": text})
+        msgs = [{"role": "user", "content": content}]
         try:
             import re as _re
             raw = self._judge.complete(sys_p, msgs)
@@ -545,11 +551,22 @@ class Handler(BaseHTTPRequestHandler):
                 if pend["player"] != player:
                     self._json(403, {"error": f"这单判定点的是 {pend['player']},不是 {player}"})
                     return
-                if not body.get("image_b64"):
+                image_b64, frames = body.get("image_b64"), body.get("frames")
+                if image_b64 and frames:
+                    self._json(400, {"error": "image_b64 与 frames 二选一(照片判定/视频抽帧判定不能同时交)"})
+                    return
+                if frames is not None:
+                    if not isinstance(frames, list) or not frames or not all(frames):
+                        self._json(400, {"error": "frames 需是非空 base64 字符串列表"})
+                        return
+                    if len(frames) > 5:
+                        self._json(400, {"error": "frames 至多 5 帧"})
+                        return
+                elif not image_b64:
                     self._json(400, {"error": "缺 image_b64"})
                     return
                 # 视觉调用在锁外(慢);回来若判定单还是同一单才结案入队
-                result = s.judge_photo(player, body["image_b64"], body.get("media_type"))
+                result = s.judge_photo(player, image_b64, body.get("media_type"), frames=frames)
                 with s.lock:
                     if s.state.pending_photo == pend:
                         s.state.pending_photo = None

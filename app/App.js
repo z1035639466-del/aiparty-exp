@@ -2,15 +2,19 @@
 // 服务端 = 现有引擎 HTTP API(Mac 上 python -m modeb.simulator --lan)。
 // 本客户端只消费 /api/view(自己那台手机该看的)与 /api/event(自己的动作)——
 // 防偷看在服务端成立,客户端天然拿不到别人的底牌。
+// 手机开局页(开工单欠账补):/api/start 也从手机发,不必回电脑驾驶舱;
+// 判定=抽帧走照片通道:视频先在本机抽帧转 base64,仍是 /api/photo 那条口子。
 import { useEffect, useRef, useState } from "react";
 import {
   Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView,
   StyleSheet, Text, TextInput, View,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import * as FileSystem from "expo-file-system";
 import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
 import { useKeepAwake } from "expo-keep-awake";
+import * as VideoThumbnails from "expo-video-thumbnails";
 
 const POLL_MS = 900;
 
@@ -24,6 +28,16 @@ export default function App() {
   const [say, setSay] = useState("");
   const [dueled, setDueled] = useState(false); // 本次对决我开过枪了
   const prevRef = useRef({ inbox: 0, drawn: false });
+
+  // —— 手机开局页(v0 欠账补):此前开局只能在电脑驾驶舱,手机只能入座 ——
+  const [creating, setCreating] = useState(false);
+  const [starting, setStarting] = useState(false);
+  const [seats, setSeats] = useState("");
+  const [minutes, setMinutes] = useState("30");
+  const [wildness, setWildness] = useState("6");
+  const [occasion, setOccasion] = useState("");
+  const [playlist, setPlaylist] = useState("");
+  const [botsText, setBotsText] = useState("");
 
   const api = async (path, body) => {
     const r = await fetch(base.replace(/\/$/, "") + path, body ? {
@@ -63,25 +77,92 @@ export default function App() {
 
   if (!joined) {
     return (
-      <View style={[s.page, s.center]}>
+      <KeyboardAvoidingView style={s.page} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <StatusBar style="light" />
-        <Text style={s.logo}>Yappa</Text>
-        <Text style={s.dim}>局长在等你入座</Text>
-        <TextInput style={s.input} placeholder="服务器,如 http://192.168.1.5:8747"
-          placeholderTextColor="#667" autoCapitalize="none" autoCorrect={false}
-          value={base} onChangeText={setBase} />
-        <TextInput style={s.input} placeholder="你的座位名(开局时定的)"
-          placeholderTextColor="#667" value={me} onChangeText={setMe} />
-        <Pressable style={s.bigBtn} onPress={async () => {
-          try {
-            const v = await api("/api/view?player=" + encodeURIComponent(me.trim()));
-            if (v.error) { Alert.alert("入座失败", v.error); return; }
-            setMe(me.trim()); setJoined(true);
-          } catch (e) { Alert.alert("连不上", String(e.message)); }
-        }}>
-          <Text style={s.bigBtnText}>入座</Text>
-        </Pressable>
-      </View>
+        <ScrollView contentContainerStyle={[s.center, { flexGrow: 1, paddingVertical: 44 }]}
+          keyboardShouldPersistTaps="handled">
+          <Text style={s.logo}>Yappa</Text>
+          <Text style={s.dim}>{creating ? "开一局新的" : "局长在等你入座"}</Text>
+          <TextInput style={s.input} placeholder="服务器,如 http://192.168.1.5:8747"
+            placeholderTextColor="#667" autoCapitalize="none" autoCorrect={false}
+            value={base} onChangeText={setBase} />
+
+          {creating ? (
+            <>
+              <TextInput style={s.input} placeholder="座位名(逗号分隔,至少2个,如 疯子明,小静)"
+                placeholderTextColor="#667" value={seats} onChangeText={setSeats} />
+              <View style={s.row}>
+                <TextInput style={[s.input, { flex: 1 }]} placeholder="时长(分钟)"
+                  placeholderTextColor="#667" keyboardType="number-pad"
+                  value={minutes} onChangeText={setMinutes} />
+                <TextInput style={[s.input, { flex: 1 }]} placeholder="野度(1-10)"
+                  placeholderTextColor="#667" keyboardType="number-pad"
+                  value={wildness} onChangeText={setWildness} />
+              </View>
+              <TextInput style={s.input} placeholder="场合一句话(如 老友重聚/生日局,可选)"
+                placeholderTextColor="#667" value={occasion} onChangeText={setOccasion} />
+              <TextInput style={s.input} placeholder="🎵 歌单(逗号分隔,可选)"
+                placeholderTextColor="#667" value={playlist} onChangeText={setPlaylist} />
+              <TextInput style={s.input} placeholder="🤖 bot 座位(可选,名:人设,逗号分隔)"
+                placeholderTextColor="#667" value={botsText} onChangeText={setBotsText} />
+              <Pressable style={s.bigBtn} disabled={starting} onPress={async () => {
+                const seatList = seats.split(",").map((x) => x.trim()).filter(Boolean);
+                if (seatList.length < 2) {
+                  Alert.alert("座位不够", "至少填两个座位名(逗号分隔)"); return;
+                }
+                const bots = {};
+                botsText.split(",").map((x) => x.trim()).filter(Boolean).forEach((x) => {
+                  const [n, p] = x.split(/[:：]/);
+                  if (n && n.trim()) bots[n.trim()] = (p || "").trim();
+                });
+                setStarting(true);
+                try {
+                  const res = await api("/api/start", {
+                    players: seatList,
+                    minutes: +minutes || 30,
+                    wildness: +wildness || 6,
+                    objects: [],
+                    driver: "llm",
+                    autoplay: true,   // 服务器自驱回合,手机可退到后台/锁屏也不停局
+                    occasion: occasion.trim(),
+                    playlist: playlist.split(",").map((t) => t.trim()).filter(Boolean),
+                    bots,
+                    // 主持模型/provider 不填:沿用服务端默认(Hub.start 的 anthropic/sonnet)
+                  });
+                  if (res.error) { Alert.alert("开局失败", res.error); return; }
+                  setMe(seatList[0]); setJoined(true); setCreating(false);
+                } catch (e) {
+                  Alert.alert("连不上", String(e.message));
+                } finally {
+                  setStarting(false);
+                }
+              }}>
+                <Text style={s.bigBtnText}>{starting ? "开局中…" : "开新局"}</Text>
+              </Pressable>
+              <Pressable onPress={() => setCreating(false)}>
+                <Text style={s.optout}>← 返回入座</Text>
+              </Pressable>
+            </>
+          ) : (
+            <>
+              <TextInput style={s.input} placeholder="你的座位名(开局时定的)"
+                placeholderTextColor="#667" value={me} onChangeText={setMe} />
+              <Pressable style={s.bigBtn} onPress={async () => {
+                try {
+                  const v = await api("/api/view?player=" + encodeURIComponent(me.trim()));
+                  if (v.error) { Alert.alert("入座失败", v.error); return; }
+                  setMe(me.trim()); setJoined(true);
+                } catch (e) { Alert.alert("连不上", String(e.message)); }
+              }}>
+                <Text style={s.bigBtnText}>入座</Text>
+              </Pressable>
+              <Pressable style={[s.bigBtn, s.bigBtnAlt]} onPress={() => setCreating(true)}>
+                <Text style={s.bigBtnAltText}>开新局</Text>
+              </Pressable>
+            </>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
     );
   }
 
@@ -98,6 +179,30 @@ export default function App() {
         player: me, image_b64: r.assets[0].base64, media_type: "image/jpeg" });
       Alert.alert("裁判", res.error || `${res.verdict}${res.reason ? ":" + res.reason : ""}`);
     } catch (e) { Alert.alert("上传失败", String(e.message)); }
+  };
+
+  // 视频判定=抽帧走照片通道:显式判定时刻录段短视频,客户端抽 3 帧(开头/中段/尾段)
+  // 转 base64,服务端 judge_photo 当"同一段动作的连续抽帧"多图送审,其余流程不变。
+  const takeVideo = async () => {
+    const perm = await ImagePicker.requestCameraPermissionsAsync();
+    if (!perm.granted) { Alert.alert("需要相机权限", "拍视频判定要用相机"); return; }
+    const r = await ImagePicker.launchCameraAsync({ mediaTypes: ["videos"], videoMaxDuration: 8 });
+    if (r.canceled) return;
+    try {
+      const asset = r.assets[0];
+      const durMs = asset.duration || 8000;
+      // 0%/50%/95% 时点;起点用 1ms 而非 0——部分机型 time:0 抽不出帧
+      const points = [1, Math.round(durMs * 0.5), Math.max(1, Math.round(durMs * 0.95))];
+      const frames = [];
+      for (const t of points) {
+        const thumb = await VideoThumbnails.getThumbnailAsync(asset.uri, { time: t, quality: 0.4 });
+        const b64 = await FileSystem.readAsStringAsync(thumb.uri,
+          { encoding: FileSystem.EncodingType.Base64 });
+        frames.push(b64);
+      }
+      const res = await api("/api/photo", { player: me, frames, media_type: "image/jpeg" });
+      Alert.alert("裁判", res.error || `${res.verdict}${res.reason ? ":" + res.reason : ""}`);
+    } catch (e) { Alert.alert("抽帧/上传失败", String(e.message)); }
   };
 
   // —— 快枪手全屏对峙 ——
@@ -152,10 +257,18 @@ export default function App() {
       </ScrollView>
 
       {v.photo_request && (
-        <Pressable style={s.photoBtn} onPress={takePhoto}>
+        <View style={s.photoBtn}>
           <Text style={s.photoText}>📸 {v.photo_request}</Text>
-          <Text style={s.photoSub}>点我拍照,视觉裁判来判</Text>
-        </Pressable>
+          <Text style={s.photoSub}>拍张照,或拍段≤8秒短视频,视觉裁判来判</Text>
+          <View style={s.row}>
+            <Pressable style={s.photoActionBtn} onPress={takePhoto}>
+              <Text style={s.photoActionText}>📸 拍照</Text>
+            </Pressable>
+            <Pressable style={s.photoActionBtn} onPress={takeVideo}>
+              <Text style={s.photoActionText}>🎥 拍视频</Text>
+            </Pressable>
+          </View>
+        </View>
       )}
 
       {v.finished && (
@@ -245,6 +358,8 @@ const s = StyleSheet.create({
   bigBtn: { backgroundColor: "#ffd54a", borderRadius: 14, paddingVertical: 14,
     paddingHorizontal: 60, marginTop: 16 },
   bigBtnText: { fontSize: 20, fontWeight: "800", color: "#222" },
+  bigBtnAlt: { backgroundColor: "#31506e", marginTop: 10 },
+  bigBtnAltText: { fontSize: 18, fontWeight: "800", color: "#fff" },
   topbar: { flexDirection: "row", justifyContent: "space-between", marginBottom: 6 },
   topText: { color: "#aab", fontSize: 13 },
   topMusic: { color: "#8fb", fontSize: 13 },
@@ -272,6 +387,9 @@ const s = StyleSheet.create({
     borderRadius: 12, padding: 12, marginVertical: 6 },
   photoText: { color: "#ffd54a", fontSize: 16, fontWeight: "700" },
   photoSub: { color: "#bb9", fontSize: 12, marginTop: 2 },
+  photoActionBtn: { flex: 1, backgroundColor: "#ffd54a", borderRadius: 10,
+    paddingVertical: 10, alignItems: "center" },
+  photoActionText: { color: "#222", fontSize: 15, fontWeight: "700" },
   settleBox: { backgroundColor: "#20242c", borderRadius: 12, padding: 10, marginVertical: 6,
     borderWidth: 1, borderColor: "#ffd54a" },
   duelVs: { color: "#fff", fontSize: 26, fontWeight: "800", marginBottom: 30 },
