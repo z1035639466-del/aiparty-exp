@@ -116,6 +116,15 @@ def scene_dice():
     build_die((2.6, 1.8), math.radians(64), ivory, blk, red)
     lights_and_cam(cam_loc=(0.4, -14.5, 9.5), cam_target=(0.2, 0.4, 0.8), fstop=3.2)
 
+def scene_dice_gold():
+    felt_ground()
+    body = mat('piano', **{'Base Color':(0.015,0.015,0.016,1),'Roughness':0.18,'Coat Weight':0.6})
+    gold = mat('gold', **{'Base Color':(0.88,0.64,0.18,1),'Metallic':1.0,'Roughness':0.26})
+    build_die((-2.3, 1.2), math.radians(18), body, gold, gold)
+    build_die((0.4, -0.6), math.radians(-31), body, gold, gold)
+    build_die((2.6, 1.8), math.radians(64), body, gold, gold)
+    lights_and_cam(cam_loc=(0.4, -14.5, 9.5), cam_target=(0.2, 0.4, 0.8), fstop=3.2, key_power=3200)
+
 def scene_cup():
     felt_ground()
     body = obj_add(bpy.ops.mesh.primitive_cone_add, 'cup',
@@ -229,7 +238,7 @@ def scene_revolver():
     lights_and_cam(cam_loc=(-0.9, -3.5, 23.5), cam_target=(-1.5, -0.3, 0.4),
                    fstop=7.0, key_power=3600, lens=45)
 
-{'dice': scene_dice, 'cup': scene_cup, 'revolver': scene_revolver}[SCENE]()
+{'dice': scene_dice, 'dice_gold': scene_dice_gold, 'cup': scene_cup, 'revolver': scene_revolver}[SCENE]()
 sc.render.filepath = OUT
 bpy.ops.render.render(write_still=True)
 print('rendered', SCENE, '->', OUT)
