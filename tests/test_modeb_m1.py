@@ -62,12 +62,13 @@ def test_ledger_only_via_state_tool(tmp_path):
 
 
 def test_skill_grant_and_use(tmp_path):
-    from modeb.atoms_seed import SEED_ATOMS
+    from modeb.tools import load_atom_pool  # 技能已单独开库,查全池不只查种子
     state, _, _ = _run_game(tmp_path)
     assert state.grants, "第 4 步必须完成一次技能授予"
     g = state.grants[-1]
     assert g.holder == "小静", "grant_to 指定给了小静"
-    original = next(a["skill"]["uses"] for a in SEED_ATOMS if "skill" in a and a["skill"]["prop"] == g.prop)
+    original = next(a["skill"]["uses"] for a in load_atom_pool()
+                    if a.get("skill") and a["skill"]["prop"] == g.prop)
     assert g.uses_left == original - 1, "第 5 步发动一次后次数应减一"
 
 

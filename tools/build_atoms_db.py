@@ -72,6 +72,7 @@ def build(db_path: Path | str = DB_FILE, atoms_path: str | None = None,
         "schema_version": "1",
         "atoms_jsonl_sha1": _sha1(ROOT / (atoms_path or ATOMS_FILE)),
         "seeds_sha1": _sha1(ROOT / "modeb/atoms_seed.py"),
+        "skills_sha1": _sha1(ROOT / "inputs/skills/skills-v1.jsonl"),
         "patterns_jsonl_sha1": _sha1(ROOT / (patterns_path or PATTERNS_FILE)),
         "n_atoms": str(len(pool)), "n_patterns": str(len(cards)),
     }

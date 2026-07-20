@@ -76,7 +76,7 @@ def test_skill_atoms_supply_and_teaching():
     from modeb.driver_llm import build_system_prompt
     from modeb.tools import load_atom_pool
     skills = [a for a in load_atom_pool() if a["type"] == "技能授予"]
-    assert len(skills) >= 8, f"技能牌存量至少 8 张(旧存量 4 张=抽中率 0.14%,等于没有),实际 {len(skills)}"
+    assert len(skills) >= 50, f"扩编批 50+ 是正典目标(v1),实际 {len(skills)}"
     assert all(a.get("skill", {}).get("ritual") for a in skills), "技能必须带使用条件仪式(正典)"
     p = build_system_prompt(["甲", "乙"], 6, 30)
     assert "【技能牌】" in p and "skill.deal" in p, "prompt 不教发技能,主持就永远不发"

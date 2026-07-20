@@ -185,7 +185,8 @@ def test_atom_pool_merges_extracted_file(tmp_path):
     ids = {a["id"] for a in pool}
     assert "xhs-00001" in ids, "high 置信抽取件须入池"
     assert "xhs-00002" not in ids, "low 置信不入主池"
-    assert len(pool) == len(SEED_ATOMS) + 1
+    n_skill_lib = sum(1 for _ in open("inputs/skills/skills-v1.jsonl", encoding="utf-8"))
+    assert len(pool) == len(SEED_ATOMS) + 1 + n_skill_lib  # 种子 + 抽取件 + 技能单独库
 
 
 def test_score_style_switches_prompt():
