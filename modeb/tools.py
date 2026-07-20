@@ -180,7 +180,11 @@ class ToolExecutor:
         self.state = state
         self.rng = _random.Random(rng_seed)
         self.clamp_log: list[dict] = []
-        self.atom_pool = load_atom_pool(atoms_path)
+        # 技能池与内容池分离(房主裁定 2026-07-21):8 张权力卡混在近三千条
+        # 惩罚/挑战里"根本抽不到,而且不是一个体量"。技能走 skill.deal 专用信道。
+        _all = load_atom_pool(atoms_path)
+        self.skill_pool = [a for a in _all if a.get("type") == "技能授予"]
+        self.atom_pool = [a for a in _all if a.get("type") != "技能授予"]
         self.pattern_cards = load_pattern_cards(patterns_path)
         # 原子 → 模式卡(变体清单是唯一挂载点,不在原子文件上加字段——text_raw 层不动)
         self.pattern_by_atom = {aid: c for c in self.pattern_cards for aid in c["variants"]}
@@ -461,6 +465,8 @@ class ToolExecutor:
         want_type = a.get("atom_type")
         if want_type and want_type not in ATOM_TYPES:
             raise ClampError(f"atom_type 不合法: {want_type!r};可用值: {'/'.join(sorted(ATOM_TYPES))}")
+        if want_type == "技能授予":
+            return self._t_skill("skill.deal", a)  # 技能单独开库:老调法委托专用信道
         why = {"已用过": 0, "野度超档": 0, "野度不够": 0, "分档不符": 0,
                "类型不符": 0, "道具不在场": 0, "人数不够": 0}
         n_players = len(self.state.players)
@@ -507,15 +513,37 @@ class ToolExecutor:
                 pool = hits[:12]
         atom = self.rng.choice(pool)
         self.state.atoms_used.append(atom["id"])
-        if "skill" in atom:  # 技能授予型:自动登记权力(绑实物取现场匹配第一件)
-            bound = next((o for o in atom["props"] if o in self.state.scene_objects), "")
-            holder = a.get("grant_to") or self.state.focus or self.state.players[0]
-            self.state.grants.append(SkillGrant(
-                prop=atom["skill"]["prop"], holder=holder, bound_object=bound,
-                uses_left=atom["skill"]["uses"], ritual=atom["skill"]["ritual"]))
         out = {"atom": {k: atom.get(k) for k in ("id", "name", "type", "text", "wildness", "currency", "tier")},
                "bound_object": next((o for o in atom["props"] if o in self.state.scene_objects), None)}
         card = self.pattern_by_atom.get(atom["id"])
         if card and card.get("demo_ref"):  # 演示件随骨架来:show 时带上 demo 字段即可播放
             out["demo"] = {"ref": card["demo_ref"], "pattern": card["name"]}
         return out
+
+    # —— skill:技能牌专用信道(单独开库,2026-07-21 房主裁定)——
+    # 权力卡与内容不是一个体量,混池等于抽不到。道具原语双态在此兑现:
+    # 现场有匹配实物就绑定(换皮不改机制),没有就虚拟态照发(系统仪式补皮)
+    # ——"道具不在场"永远不拦技能,那道闸只管实体门槛玩法。
+    def _t_skill(self, name: str, a: dict) -> dict:
+        holder = a.get("grant_to") or self.state.focus or self.state.players[0]
+        if holder not in self.state.players:
+            raise ClampError(f"skill.deal 授予对象必须在座,收到: {holder}")
+        cands = [s for s in self.skill_pool
+                 if s["id"] not in self.state.atoms_used
+                 and s["id"] not in a.get("exclude", [])
+                 and s["wildness"] <= self.state.wildness_cap]
+        held = {g.prop for g in self.state.grants if g.uses_left > 0}
+        cands = [s for s in cands if s["skill"]["prop"] not in held]  # 同名技能不重发
+        if not cands:
+            raise ClampError("技能库发完了(或全被野度档拦住)——本局别再发,已发的用起来")
+        atom = self.rng.choice(cands)
+        self.state.atoms_used.append(atom["id"])
+        bound = next((o for o in atom["props"] if o in self.state.scene_objects), "")
+        self.state.grants.append(SkillGrant(
+            prop=atom["skill"]["prop"], holder=holder, bound_object=bound,
+            uses_left=atom["skill"]["uses"], ritual=atom["skill"]["ritual"]))
+        return {"atom": {k: atom.get(k) for k in ("id", "name", "type", "text", "wildness", "currency")},
+                "granted_to": holder, "uses": atom["skill"]["uses"],
+                "ritual": atom["skill"]["ritual"],
+                "bound_object": bound or None,
+                "form": "实物绑定" if bound else "虚拟态(系统仪式补皮,照常发动)"}

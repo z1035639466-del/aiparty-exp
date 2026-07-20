@@ -30,6 +30,7 @@ TOOLS_DECLARATION = [
     {"name": "state.use_grant", "desc": "消耗一次已持有技能", "args": {"prop": "str", "holder": "str"}},
     {"name": "state.finish", "desc": "收局", "args": {}},
     {"name": "fx", "desc": "音效/特效", "args": {"effect": "str"}},
+    {"name": "skill.deal", "desc": "从技能库发一张技能牌给指定玩家(单独库,不占内容抽取):自动绑现场实物或虚拟态照发,自动登记 digest.grants;同名技能在有人持有期间不重发", "args": {"grant_to": "str(在座玩家)", "exclude": "list?"}},
     {"name": "judge.photo", "desc": "拍照判定(变身验收/造型评比/摆阵检查等):点人出题,他的手机拍照后由视觉裁判按你给的标准判,结果以 judge_result 事件送达(verdict+理由);判不了/他不拍就走 ask 共识兜底。一次一单,期间别催", "args": {"player": "str(在座玩家)", "prompt": "str(判定标准,写给裁判看)"}},
     {"name": "judge.cancel", "desc": "撤销进行中的拍照判定", "args": {}},
     {"name": "duel.start", "desc": "快枪手对决(通用局保底款):点两人对峙,系统在随机时点向他们的手机亮「拔!」,先拍屏者胜、抢跑判负,毫秒判定由系统保证;拔枪时点连你也保密,胜负以 duel_result 事件送达——对峙期间安静等,别催别报进展", "args": {"players": "list(恰好两名在座玩家)"}},
@@ -152,11 +153,12 @@ def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: 
         "改版;「最上面的人喝」→「最后一个叠上去的接惩罚」只是复述。**说到做到**:嘴上说加档就传"
         "野度min 真加档,不许话术与工具参数两张皮。纯现挂为辅。\n"
         f"{dj}"
-        "【技能牌】弹药库有技能授予型原子:draw_atom(atom_type=\"技能授予\", grant_to=玩家)。"
-        "把超能力当奖励和翻盘工具发——高光表现赏一张、垫底的发一张翻盘用,一局发一两张,"
-        "综艺味就起来了。授予后 digest.grants 挂账:持有人喊用时你调 state.use_grant 结算;"
-        "发动必须做全仪式(动作+台词),缺一失灵反罚;技能绑现场实物是系统自动的(换皮不改"
-        "机制),没实物就虚拟态照发。发出去的技能和私件一样要有下文,别发完就忘。\n"
+        "【技能牌】技能是单独一座库,走 skill.deal(grant_to=玩家)发牌,和内容抽取(draw_atom)"
+        "两回事。把超能力当奖励和翻盘工具发——高光表现赏一张、垫底的发一张翻盘用,一局发"
+        "一两张,综艺味就起来了。授予后 digest.grants 挂账:持有人喊用时你调 state.use_grant"
+        "结算;发动必须做全仪式(动作+台词),缺一失灵反罚;绑不绑现场实物系统自动定,"
+        "没实物就是虚拟态照常发动(回执里 form 字段会告诉你)。发出去的技能要有下文,"
+        "别发完就忘。\n"
         f"【记分观】{SCORE_STYLES.get(score_style, SCORE_STYLES['清账'])}\n"
         f"{SCORE_BOTTOM_LINE}\n"
         f"【输出契约】{OUTPUT_CONTRACT}\n"

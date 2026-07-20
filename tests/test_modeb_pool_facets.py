@@ -78,9 +78,43 @@ def test_skill_atoms_supply_and_teaching():
     skills = [a for a in load_atom_pool() if a["type"] == "技能授予"]
     assert len(skills) >= 8, f"技能牌存量至少 8 张(旧存量 4 张=抽中率 0.14%,等于没有),实际 {len(skills)}"
     assert all(a.get("skill", {}).get("ritual") for a in skills), "技能必须带使用条件仪式(正典)"
-    assert sum(1 for a in skills if not a["props"]) >= 2, "至少两张零实体技能,免被'道具不在场'拦光"
     p = build_system_prompt(["甲", "乙"], 6, 30)
-    assert "【技能牌】" in p and "grant_to" in p, "prompt 不教发技能,主持就永远不发"
+    assert "【技能牌】" in p and "skill.deal" in p, "prompt 不教发技能,主持就永远不发"
+
+
+def test_skill_pool_is_separate_and_virtual_form_works():
+    """技能单独开库(权力卡与内容不是一个体量):
+    ①无类型 draw_atom 永远抽不到技能;②道具不在场时虚拟态照发(双态正典兑现)。"""
+    ex = _executor(4)
+    assert ex.skill_pool and all(s["type"] == "技能授予" for s in ex.skill_pool)
+    assert not any(a["type"] == "技能授予" for a in ex.atom_pool), "技能不得混进内容池稀释"
+    for _ in range(30):
+        r = ex.execute({"name": "draw_atom", "input": {}})
+        if not r["ok"]:
+            break
+        assert r["result"]["atom"]["type"] != "技能授予"
+
+    # 场上零实物:时间暂停器(要遥控器/打火机)也必须发得出——虚拟态
+    ex2 = _executor(3)
+    ex2.state.scene_objects = []
+    dealt = []
+    while True:
+        r = ex2.execute({"name": "skill.deal", "input": {"grant_to": "甲"}})
+        if not r["ok"]:
+            assert "发完" in r["clamped"]
+            break
+        dealt.append(r["result"])
+        ex2.state.grants[-1].uses_left = 0  # 用尽,允许继续发下一张
+    assert len(dealt) >= 6, f"零实物场景技能库应整库可发(虚拟态),实际只发出 {len(dealt)}"
+    assert all(d["bound_object"] is None and "虚拟态" in d["form"] for d in dealt)
+    assert any(d["atom"]["name"] == "时间暂停器" for d in dealt), "时间暂停器不许再被'道具不在场'拦"
+
+
+def test_draw_atom_skill_type_delegates_to_skill_channel():
+    ex = _executor(4)
+    r = ex.execute({"name": "draw_atom", "input": {"atom_type": "技能授予", "grant_to": "乙"}})
+    assert r["ok"] and r["result"]["granted_to"] == "乙", "老调法委托专用信道,不许断"
+    assert ex.state.grants and ex.state.grants[-1].holder == "乙"
 
 
 # —— ③ show 批量私发(8 人桌发牌 4 回合死气的解药)——
