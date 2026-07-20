@@ -225,6 +225,29 @@ class ToolExecutor:
     def _t_fx(self, name: str, a: dict) -> dict:
         return {"fx": a.get("effect", "")}
 
+    # —— duel:快枪手对决(手机原生旗舰件,设计单:手机原生通用游戏 v0)——
+    # 系统在随机时点亮「拔!」,先拍屏者胜、抢跑判负,毫秒判定公平由系统保证。
+    # 拔枪时点连主持都保密(返回值不含 draw_at,荷官回执因此也拿不到)。
+    def _t_duel(self, name: str, a: dict) -> dict:
+        op = name.split(".", 1)[1] if "." in name else "start"
+        if op == "cancel":
+            prev, self.state.duel = self.state.duel, None
+            return {"cancelled": bool(prev)}
+        if op != "start":
+            raise ClampError(f"duel 未知子操作: {op}")
+        ps = list(a.get("players") or [])
+        if len(ps) != 2 or len(set(ps)) != 2:
+            raise ClampError(f"duel 需要两名不同玩家,收到: {ps}")
+        bad = [p for p in ps if p not in self.state.players]
+        if bad:
+            raise ClampError(f"duel 含非在座玩家: {bad}")
+        if self.state.duel:
+            raise ClampError("已有对决进行中(可先 duel.cancel)")
+        import time as _t
+        self.state.duel = {"players": ps, "taps": {},
+                           "draw_at": _t.time() + self.rng.uniform(2.0, 8.0)}
+        return {"duel": ps, "note": "对峙开始;拔枪时点系统保密,结果以 duel_result 事件送达,期间别催"}
+
     # —— music:AI 局头当 DJ。歌单是房主上传的资产(真人可写、AI 只读只调),
     # 模型只发「放这首」的意图,播放由运行时执行;点歌单外的歌 = 钳制,
     # 与 demo_ref 资产册同一姿势——防的是主持幻觉出一首不存在的歌。 ——

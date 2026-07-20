@@ -171,6 +171,8 @@ class Session:
             "finished": self.state.finished,
             "time_left_min": digest.get("time_left_min"),
             "now_playing": digest.get("now_playing"),  # 音乐是全场公开的:现实里人人听得见
+            # 对决状态:玩家端只看到 vs 与 drawn 布尔(枪响了没),拔枪时点不出服务端
+            "duel": digest.get("duel"),
             "scores": digest.get("scores"), "scene_objects": digest.get("scene_objects"),
             "now_playing": digest.get("now_playing"),   # 手机上要显示正在放的歌
             "timer_running": digest.get("timer_running"),

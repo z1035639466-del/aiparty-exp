@@ -30,6 +30,8 @@ TOOLS_DECLARATION = [
     {"name": "state.use_grant", "desc": "消耗一次已持有技能", "args": {"prop": "str", "holder": "str"}},
     {"name": "state.finish", "desc": "收局", "args": {}},
     {"name": "fx", "desc": "音效/特效", "args": {"effect": "str"}},
+    {"name": "duel.start", "desc": "快枪手对决(通用局保底款):点两人对峙,系统在随机时点向他们的手机亮「拔!」,先拍屏者胜、抢跑判负,毫秒判定由系统保证;拔枪时点连你也保密,胜负以 duel_result 事件送达——对峙期间安静等,别催别报进展", "args": {"players": "list(恰好两名在座玩家)"}},
+    {"name": "duel.cancel", "desc": "撤销进行中的对决(卡住/点错人时用)", "args": {}},
     {"name": "music.play", "desc": "DJ 换歌:只许点房主上传歌单里的曲目(歌单在系统提示的 DJ 台一节;无歌单则本工具不可用);音乐是背景,换歌不必播报", "args": {"track": "str(歌单内曲目,可只写歌名)", "mood": "str?"}},
     {"name": "music.stop", "desc": "停止播放", "args": {}},
     {"name": "draw_atom", "desc": "从弹药库抽原子(分面过滤+排已用);野度=上限,野度min=下限——想加档就抬野度min,别只嘴上说;tier=铺垫(小快垫场:通用局开局款/敢不敢微挑战都在这档)|主打(副歌重拍:摆阵重器/大流程);人数下限系统按本桌自动过滤(2人桌抽不到全场类,5人及以下抽不到卧底类核心循环),空返报错会告诉你被哪关挡了多少条。库不懂你正在铺什么局(分面无语境):抽出题不对文就 state.discard(带理由)留痕再抽一次或改现挂,别硬用", "args": {"atom_type": "|".join(sorted(ATOM_TYPES)), "野度": "int?", "野度min": "int?", "tier": "str?", "exclude": "list?", "grant_to": "str?"}},

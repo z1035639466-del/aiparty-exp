@@ -56,7 +56,14 @@ class Engine:
             self.marks["skips"] += 1
         if ev.get("type") == "forfeit":  # 认罚跳过(日常的「过」):正常游戏动作,按赌注结算
             self.marks["forfeits"] += 1
-        if self._is_answer_to_open_ask(ev):
+        duel = self.state.duel
+        if (duel and ev.get("type") == "tap" and ev.get("player") in duel["players"]):
+            # 快枪手抢拍:第一下 tap 立即定胜负——枪响前抢跑判负,枪响后先到者胜。
+            # 对决中的 tap 优先归对决(先于 ask 吸收),被吸收不单独叫醒主持,
+            # duel_result 会叫。
+            self._resolve_duel_tap(ev)
+            ev = dict(ev, _absorbed=True)
+        elif self._is_answer_to_open_ask(ev):
             ask = self.state.open_ask
             # 应答归到这次问询名下,一人一票、后答覆盖先答。
             ask["answers"][ev["player"]] = ev.get("value") or ev.get("text") or "确认"
@@ -67,6 +74,24 @@ class Engine:
                 self.state.timers.append(ask["deadline"])
             ev = dict(ev, _absorbed=True)  # 已被问询吸收,不单独叫醒主持
         self.event_queue.append(ev)
+
+    def _resolve_duel_tap(self, ev: dict) -> None:
+        """快枪手判定:毫秒级、单发定胜负,公平由系统而非任何人的眼睛保证。"""
+        duel = self.state.duel
+        p = ev["player"]
+        other = next(x for x in duel["players"] if x != p)
+        draw_ms = int(duel["draw_at"] * 1000)
+        lead = ev["t_ms"] - draw_ms
+        duel["taps"][p] = ev["t_ms"]
+        self.state.duel = None
+        if lead < 0:
+            result = {"winner": other, "loser": p,
+                      "reason": f"{p} 抢跑(枪响前 {-lead}ms)判负"}
+        else:
+            result = {"winner": p, "loser": other,
+                      "reason": f"{p} 枪响后 {lead}ms 先拔"}
+        self.event_queue.append({"type": "duel_result", **result,
+                                 "vs": list(duel["players"]), "taps": dict(duel["taps"])})
 
     def _is_answer_to_open_ask(self, ev: dict) -> bool:
         """哪些事件算这次问询的应答——不设门槛就会被无关闲聊截胡。

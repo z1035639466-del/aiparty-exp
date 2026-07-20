@@ -5,6 +5,7 @@
 """
 from __future__ import annotations
 
+import time as _time
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -38,6 +39,9 @@ class GameState:
     open_ask: dict | None = None  # 进行中的限时问询:{prompt, options, deadline, answers}
     playlist: list[str] = field(default_factory=list)  # 房主上传歌单(真人可写、AI 只读只调)
     now_playing: str | None = None  # 当前曲目(music 工具唯一写入口)
+    # 快枪手对决(手机原生旗舰件):{players, draw_at, taps}。拔枪时点系统保密——
+    # 主持不知道(回执也不给),玩家端只看到 drawn 布尔翻面,公平由系统毫秒判定。
+    duel: dict | None = None
     settled: dict[str, int] = field(default_factory=dict)  # 已清账累计口数(清账制的另一半)
     discards: list[dict] = field(default_factory=list)  # 主动弃牌留痕:弃牌≠用牌
     finished: bool = False
@@ -62,6 +66,9 @@ class GameState:
             "timer_running": bool(self.timers),
             "野度档": self.wildness_cap,
             "now_playing": self.now_playing,
+            "duel": ({"vs": list(self.duel["players"]),
+                      "drawn": _time.time() >= self.duel["draw_at"]}
+                     if self.duel else None),
         }
 
 
