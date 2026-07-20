@@ -70,6 +70,19 @@ def test_two_player_table_never_draws_crowd_games():
         assert atom["min_players"] <= 2, f"2 人桌抽到了 {atom['name']}(需 {atom['min_players']} 人)"
 
 
+# —— ②½ 技能牌供给与教学(实测:agent 局从没见过局长发客制化技能)——
+
+def test_skill_atoms_supply_and_teaching():
+    from modeb.driver_llm import build_system_prompt
+    from modeb.tools import load_atom_pool
+    skills = [a for a in load_atom_pool() if a["type"] == "技能授予"]
+    assert len(skills) >= 8, f"技能牌存量至少 8 张(旧存量 4 张=抽中率 0.14%,等于没有),实际 {len(skills)}"
+    assert all(a.get("skill", {}).get("ritual") for a in skills), "技能必须带使用条件仪式(正典)"
+    assert sum(1 for a in skills if not a["props"]) >= 2, "至少两张零实体技能,免被'道具不在场'拦光"
+    p = build_system_prompt(["甲", "乙"], 6, 30)
+    assert "【技能牌】" in p and "grant_to" in p, "prompt 不教发技能,主持就永远不发"
+
+
 # —— ③ show 批量私发(8 人桌发牌 4 回合死气的解药)——
 
 def test_show_batch_private():

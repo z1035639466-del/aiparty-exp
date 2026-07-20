@@ -46,7 +46,8 @@ def _sha1(path: Path) -> str:
 
 def build(db_path: Path | str = DB_FILE, atoms_path: str | None = None,
           patterns_path: str | None = None) -> dict:
-    pool = load_atom_pool(atoms_path)
+    # 显式传 jsonl 路径强制走源,绝不许从旧库读池再写回库(库自己喂自己=死循环)
+    pool = load_atom_pool(atoms_path or ATOMS_FILE)
     cards = load_pattern_cards(patterns_path)
     pat_by_atom = {aid: c["pattern_id"] for c in cards for aid in c["variants"]}
     db = sqlite3.connect(str(db_path))
@@ -70,6 +71,7 @@ def build(db_path: Path | str = DB_FILE, atoms_path: str | None = None,
     meta = {
         "schema_version": "1",
         "atoms_jsonl_sha1": _sha1(ROOT / (atoms_path or ATOMS_FILE)),
+        "seeds_sha1": _sha1(ROOT / "modeb/atoms_seed.py"),
         "patterns_jsonl_sha1": _sha1(ROOT / (patterns_path or PATTERNS_FILE)),
         "n_atoms": str(len(pool)), "n_patterns": str(len(cards)),
     }

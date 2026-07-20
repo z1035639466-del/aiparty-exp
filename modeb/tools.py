@@ -38,6 +38,10 @@ def _load_pool_from_db(db_path) -> list[dict] | None:
         if meta.get("atoms_jsonl_sha1") != src_sha:
             db.close()
             return None
+        seeds = _P(__file__).parent / "atoms_seed.py"
+        if "seeds_sha1" in meta and meta["seeds_sha1"] != hashlib.sha1(seeds.read_bytes()).hexdigest():
+            db.close()
+            return None  # 种子也是源:种子改了没重建,同样跌回 jsonl
         import json
         pool = []
         for (aid, name, typ, text, wild, tier, minp, currency,
