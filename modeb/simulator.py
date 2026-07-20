@@ -22,7 +22,7 @@ from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from . import persist
+from . import persist, tts
 from .driver_llm import LLMDriver
 from .driver_scripted import ScriptedDriver
 from .engine import Engine
@@ -156,6 +156,9 @@ class Session:
         self.state_path = persist.state_path_for(episode_path)
         self.engine = Engine(self.state, self.driver, self.episode_path, episode_mode=episode_mode)
         self.recent: list[dict] = []  # 最近回合行,供前端轮询
+        # 局长开口缓存:{(turn, voice): 音频字节}。Session 即房间,天然按 (room,line)
+        # 隔离;同一句只烧一次 TTS 钱,进程内存活、不落盘(音频可重合成,不值得持久化)
+        self.tts_cache: dict[tuple, bytes] = {}
         self.inbox: dict[str, list[str]] = {n: [] for n in players}  # 私发收件箱(可见性引擎落地)
         self.last_timing: dict = {}  # 上一拍耗时拆帐:host_ms / bots_ms(慢要先量再修)
         self.lock = threading.Lock()
@@ -626,6 +629,59 @@ class Handler(BaseHTTPRequestHandler):
             return None
         return s
 
+    def _tts(self) -> None:
+        """GET /api/tts?room=X&line=N[&voice=V]:把主持第 N 拍的话合成为音频返回。
+
+        · 按需合成:不自动合成每一拍——只有 App/驾驶舱来拉这条才烧钱;
+        · 不带 line 默认最新一条有词的主持拍(App 轮询"念最新那句"最顺手);
+        · (room, line) 内存缓存(Session 即房间),同一句不重复烧钱;
+        · TTS 未配置(无 key)回 404+说明 JSON,不报错不崩——ready-to-plug,
+          房主接上 key 这条口子自动活;合成失败回 502,绝不拖垮主持拍。
+        TTS 是出口:只念主持已说出口的字,不含任何 ASR/录音。"""
+        from urllib.parse import parse_qs, urlparse
+        s = self._pick()
+        if s is None:
+            return
+        if not tts.configured():
+            self._json(404, {"error": "TTS 未接入(设 TTS_API_KEY 或 DASHSCOPE_API_KEY 即通)"})
+            return
+        q = parse_qs(urlparse(self.path).query)
+        line_q = (q.get("line") or [""])[0]
+        voice = (q.get("voice") or [""])[0] or None
+        with s.lock:
+            # 只念主持的话(text);episode_summary 是收局账单,不是台词
+            spoken = [ln for ln in s.recent
+                      if (ln.get("text") or "").strip() and not ln.get("episode_summary")]
+        if line_q:
+            try:
+                n = int(line_q)
+            except ValueError:
+                self._json(400, {"error": f"line 需是回合号整数(收到 {line_q!r})"})
+                return
+            line = next((ln for ln in spoken if ln.get("turn") == n), None)
+        else:
+            line = spoken[-1] if spoken else None
+        if line is None:
+            self._json(404, {"error": f"没有可念的主持拍(line={line_q or '最新'})"})
+            return
+        key = (line.get("turn"), voice or "")
+        audio = s.tts_cache.get(key)
+        if audio is None:
+            try:
+                audio = tts.synthesize(line["text"], voice)   # 锁外合成(慢),局照跑
+            except tts.TTSError as e:
+                self._json(502, {"error": str(e)})
+                return
+            s.tts_cache[key] = audio
+        try:
+            self.send_response(200)
+            self.send_header("Content-Type", tts.TTS_MIME)
+            self.send_header("Content-Length", str(len(audio)))
+            self.end_headers()
+            self.wfile.write(audio)
+        except (BrokenPipeError, ConnectionResetError):
+            pass  # 拉音频的那头关页面了,正常,不是错误
+
     def do_GET(self) -> None:
         if self.path in ("/", "/index.html") or self.path.startswith("/play"):
             # /play[?player=X] = 玩家页(手机);/ = 驾驶舱(房主)。两页两套视角,
@@ -654,6 +710,9 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(200, s0.player_view(player))
             else:
                 self._json(200, {"player": player, "inbox": s0.inbox[player][-8:]})
+            return
+        if self.path.startswith("/api/tts"):
+            self._tts()
             return
         if self.path.startswith("/api/state"):
             s, _code, err = self.hub.pick(self._room_param())
