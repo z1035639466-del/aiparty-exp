@@ -248,6 +248,27 @@ class ToolExecutor:
                            "draw_at": _t.time() + self.rng.uniform(2.0, 8.0)}
         return {"duel": ps, "note": "对峙开始;拔枪时点系统保密,结果以 duel_result 事件送达,期间别催"}
 
+    # —— judge:拍照判定(多模态判定通道 v0)——主持显式发起的判定时刻,
+    # 非常驻监听(感知线收束裁定)。流程:主持点人出题 → 目标手机拍照上传 →
+    # 视觉模型判定 → judge_result 事件回主持。判不了走共识兜底(§1.4)。 ——
+    def _t_judge(self, name: str, a: dict) -> dict:
+        op = name.split(".", 1)[1] if "." in name else "photo"
+        if op == "cancel":
+            prev, self.state.pending_photo = self.state.pending_photo, None
+            return {"cancelled": bool(prev)}
+        if op != "photo":
+            raise ClampError(f"judge 未知子操作: {op}")
+        player = a.get("player")
+        if player not in self.state.players:
+            raise ClampError(f"judge.photo 必须指定在座玩家,收到: {player}")
+        if self.state.pending_photo:
+            raise ClampError("已有拍照判定进行中(可 judge.cancel)")
+        prompt = (a.get("prompt") or "").strip()
+        if not prompt:
+            raise ClampError("judge.photo 需要 prompt(判什么,给视觉裁判看的标准)")
+        self.state.pending_photo = {"player": player, "prompt": prompt}
+        return {"requested": player, "note": "等他拍照;结果以 judge_result 事件送达,期间别催"}
+
     # —— music:AI 局头当 DJ。歌单是房主上传的资产(真人可写、AI 只读只调),
     # 模型只发「放这首」的意图,播放由运行时执行;点歌单外的歌 = 钳制,
     # 与 demo_ref 资产册同一姿势——防的是主持幻觉出一首不存在的歌。 ——

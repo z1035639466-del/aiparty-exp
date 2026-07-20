@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import * as Haptics from "expo-haptics";
+import * as ImagePicker from "expo-image-picker";
 import { useKeepAwake } from "expo-keep-awake";
 
 const POLL_MS = 900;
@@ -87,6 +88,18 @@ export default function App() {
   const v = view || {};
   const inDuel = v.duel && v.duel.vs && v.duel.vs.includes(me);
 
+  const takePhoto = async () => {
+    const perm = await ImagePicker.requestCameraPermissionsAsync();
+    if (!perm.granted) { Alert.alert("需要相机权限", "拍照判定要用相机"); return; }
+    const r = await ImagePicker.launchCameraAsync({ quality: 0.4, base64: true });
+    if (r.canceled) return;
+    try {
+      const res = await api("/api/photo", {
+        player: me, image_b64: r.assets[0].base64, media_type: "image/jpeg" });
+      Alert.alert("裁判", res.error || `${res.verdict}${res.reason ? ":" + res.reason : ""}`);
+    } catch (e) { Alert.alert("上传失败", String(e.message)); }
+  };
+
   // —— 快枪手全屏对峙 ——
   if (inDuel) {
     const drawn = v.duel.drawn;
@@ -138,6 +151,22 @@ export default function App() {
         ))}
       </ScrollView>
 
+      {v.photo_request && (
+        <Pressable style={s.photoBtn} onPress={takePhoto}>
+          <Text style={s.photoText}>📸 {v.photo_request}</Text>
+          <Text style={s.photoSub}>点我拍照,视觉裁判来判</Text>
+        </Pressable>
+      )}
+
+      {v.finished && (
+        <View style={s.settleBox}>
+          <Text style={s.inboxTitle}>🏁 终局战报</Text>
+          {Object.entries(v.scores || {}).sort((a, b) => b[1] - a[1]).map(([p, sc]) => (
+            <Text key={p} style={s.inboxItem}>{p}:{sc}</Text>
+          ))}
+        </View>
+      )}
+
       {(v.inbox || []).length > 0 && (
         <View style={s.inboxBox}>
           <Text style={s.inboxTitle}>📬 只有你能看到</Text>
@@ -167,6 +196,10 @@ export default function App() {
         <Pressable style={[s.sigBtn, { backgroundColor: "#6b4a2b" }]}
           onPress={() => sendEvent({ type: "forfeit" })}>
           <Text style={s.sigText}>🍺 认罚跳过</Text>
+        </Pressable>
+        <Pressable style={[s.sigBtn, { backgroundColor: "#31506e", flex: 0.6 }]}
+          onPress={() => { Haptics.selectionAsync(); sendEvent({ type: "tap" }); }}>
+          <Text style={s.sigText}>👏 抢答</Text>
         </Pressable>
       </View>
       <View style={s.row}>
@@ -222,6 +255,12 @@ const s = StyleSheet.create({
   sigText: { color: "#fff", fontSize: 16, fontWeight: "700" },
   sayBtn: { backgroundColor: "#31506e", borderRadius: 10, padding: 12 },
   optout: { color: "#556", fontSize: 12, textAlign: "center", marginVertical: 8 },
+  photoBtn: { backgroundColor: "#4a3a10", borderColor: "#ffd54a", borderWidth: 1,
+    borderRadius: 12, padding: 12, marginVertical: 6 },
+  photoText: { color: "#ffd54a", fontSize: 16, fontWeight: "700" },
+  photoSub: { color: "#bb9", fontSize: 12, marginTop: 2 },
+  settleBox: { backgroundColor: "#20242c", borderRadius: 12, padding: 10, marginVertical: 6,
+    borderWidth: 1, borderColor: "#ffd54a" },
   duelVs: { color: "#fff", fontSize: 26, fontWeight: "800", marginBottom: 30 },
   duelWait: { color: "#eee", fontSize: 20, marginBottom: 8 },
   drawBtn: { backgroundColor: "#ffd54a", width: 260, height: 260, borderRadius: 130,

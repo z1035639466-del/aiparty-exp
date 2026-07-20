@@ -42,6 +42,12 @@ class GameState:
     # 快枪手对决(手机原生旗舰件):{players, draw_at, taps}。拔枪时点系统保密——
     # 主持不知道(回执也不给),玩家端只看到 drawn 布尔翻面,公平由系统毫秒判定。
     duel: dict | None = None
+    # 读场输入(房主开局一句话+可选场景速写):没有它,"自动读场"无场可读,
+    # 局局跑成通用娱乐局。进 system prompt(每局静态),不进逐拍 digest。
+    occasion: str = ""      # 局型/场合:生日/团建/情侣/陌生人破冰/老友重聚……
+    scene_brief: str = ""   # 场景速写(手填或将来开局一拍照的视觉摘要)
+    # 拍照判定(多模态判定通道 v0):主持显式发起的判定时刻,非常驻监听。
+    pending_photo: dict | None = None  # {player, prompt}
     settled: dict[str, int] = field(default_factory=dict)  # 已清账累计口数(清账制的另一半)
     discards: list[dict] = field(default_factory=list)  # 主动弃牌留痕:弃牌≠用牌
     finished: bool = False
@@ -69,6 +75,7 @@ class GameState:
             "duel": ({"vs": list(self.duel["players"]),
                       "drawn": _time.time() >= self.duel["draw_at"]}
                      if self.duel else None),
+            "photo_wait": self.pending_photo["player"] if self.pending_photo else None,
         }
 
 

@@ -30,6 +30,8 @@ TOOLS_DECLARATION = [
     {"name": "state.use_grant", "desc": "消耗一次已持有技能", "args": {"prop": "str", "holder": "str"}},
     {"name": "state.finish", "desc": "收局", "args": {}},
     {"name": "fx", "desc": "音效/特效", "args": {"effect": "str"}},
+    {"name": "judge.photo", "desc": "拍照判定(变身验收/造型评比/摆阵检查等):点人出题,他的手机拍照后由视觉裁判按你给的标准判,结果以 judge_result 事件送达(verdict+理由);判不了/他不拍就走 ask 共识兜底。一次一单,期间别催", "args": {"player": "str(在座玩家)", "prompt": "str(判定标准,写给裁判看)"}},
+    {"name": "judge.cancel", "desc": "撤销进行中的拍照判定", "args": {}},
     {"name": "duel.start", "desc": "快枪手对决(通用局保底款):点两人对峙,系统在随机时点向他们的手机亮「拔!」,先拍屏者胜、抢跑判负,毫秒判定由系统保证;拔枪时点连你也保密,胜负以 duel_result 事件送达——对峙期间安静等,别催别报进展", "args": {"players": "list(恰好两名在座玩家)"}},
     {"name": "duel.cancel", "desc": "撤销进行中的对决(卡住/点错人时用)", "args": {}},
     {"name": "music.play", "desc": "DJ 换歌:只许点房主上传歌单里的曲目(歌单在系统提示的 DJ 台一节;无歌单则本工具不可用);音乐是背景,换歌不必播报", "args": {"track": "str(歌单内曲目,可只写歌名)", "mood": "str?"}},
@@ -74,7 +76,8 @@ SCORE_BOTTOM_LINE = (
 
 
 def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: int,
-                        score_style: str = "清账", playlist: list[str] | None = None) -> str:
+                        score_style: str = "清账", playlist: list[str] | None = None,
+                        occasion: str = "", scene_brief: str = "") -> str:
     persona = Path("docs/records/狂野模式-活局长prompt-v0.md")
     persona_text = persona.read_text(encoding="utf-8") if persona.exists() else ""
     dj = ""
@@ -90,9 +93,24 @@ def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: 
             "digest.now_playing 是正在放的。**音乐是背景不是主持词**:换歌不必播报,顶多顺口"
             "带半句;没有合适的歌就不放,安静也是一种氛围。\n"
         )
+    scene = ""
+    if occasion or scene_brief:
+        scene = (
+            f"【读场】本局场合:{occasion or '未说明'}"
+            + (f";场景速写:{scene_brief}" if scene_brief else "") + "。\n"
+            "场合决定整局的骨相,不是背景板——按场合调这四个旋钮:\n"
+            "· 生日/庆祝:寿星(主角)是常设焦点,仪式感环节给他,结算偏综艺;\n"
+            "· 团建/同事:偏竞技与分队合作,野度收着走,少点名个人隐私类;\n"
+            "· 情侣/暧昧:双向对称秘密任务是主菜,节奏慢热,punish 走互动不走豁出去;\n"
+            "· 陌生人破冰:先铺垫拍连发混熟(条件点名/二十问类),中段才上主打;\n"
+            "· 老友重聚:直接高野度,内梗现挂优先级高于弹药库;\n"
+            "· 未列出的场合,按同样思路自己推。**开场第一拍必须播报你读到的场**"
+            "(「今晚是XX局,所以规矩是……」)——读了不说,房主感觉不到你在调。\n"
+        )
     return (
         f"{persona_text}\n\n"
         f"【本桌】玩家:{'、'.join(players)};野度档:{wildness_cap};时长预算:{time_budget_min}分钟。\n"
+        f"{scene}"
         "【铁律】每回合最多3句话+2个工具调用;分数只经 state 工具;你发出的只是意图,越界调用会被"
         "钳制层拒写并留痕——被拒就换个漂亮的说法圆场。\n"
         "【玩家三信号】done=完成宣告(继续推进,需验收时走共识/感知);forfeit=认罚跳过(日常的"
@@ -174,10 +192,11 @@ class LLMDriver:
 
     def __init__(self, transport: Transport, players: list[str],
                  wildness_cap: int, time_budget_min: int, max_retries: int = 1,
-                 score_style: str = "清账", playlist: list[str] | None = None) -> None:
+                 score_style: str = "清账", playlist: list[str] | None = None,
+                 occasion: str = "", scene_brief: str = "") -> None:
         self.transport = transport
         self.system = build_system_prompt(players, wildness_cap, time_budget_min,
-                                          score_style, playlist)
+                                          score_style, playlist, occasion, scene_brief)
         self.history: list[dict] = []  # [{"role": "assistant"|"user", "content": str}]
         self.max_retries = max_retries
         self.malformed_count = 0

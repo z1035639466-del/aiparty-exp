@@ -48,7 +48,8 @@ class Session:
                  bots: dict[str, str] | None = None, provider: str = "anthropic",
                  host_model: str = "sonnet", seat_model: str = "sonnet",
                  score_style: str = "自动", host_perception: str = "转写",
-                 playlist: list[str] | None = None) -> None:
+                 playlist: list[str] | None = None,
+                 occasion: str = "", scene_brief: str = "") -> None:
         if not MIN_PLAYERS <= len(players) <= MAX_PLAYERS:
             raise ValueError(f"玩家数须在 {MIN_PLAYERS}–{MAX_PLAYERS}(收到 {len(players)})")
         if driver_kind == "scripted" and len(players) < 3:
@@ -60,7 +61,8 @@ class Session:
         self.state = GameState(players=players, wildness_cap=wildness,
                                time_budget_min=minutes, scene_objects=objects,
                                score_style=score_style, host_perception=host_perception,
-                               playlist=[t.strip() for t in (playlist or []) if t.strip()])
+                               playlist=[t.strip() for t in (playlist or []) if t.strip()],
+                               occasion=occasion.strip(), scene_brief=scene_brief.strip())
         self.driver_kind = driver_kind
         if driver_kind == "scripted":
             self.driver = ScriptedDriver()
@@ -68,9 +70,15 @@ class Session:
             # 主持包重试外套(瞬时错误等 2 秒再试一次);桌友不包,已有响亮降级
             self.driver = LLMDriver(Resilient(make_transport(provider, host_model)),
                                     players, wildness, minutes, score_style=score_style,
-                                    playlist=self.state.playlist)
+                                    playlist=self.state.playlist,
+                                    occasion=self.state.occasion,
+                                    scene_brief=self.state.scene_brief)
         else:
             self.driver = ManualDriver()
+        # 视觉裁判(judge.photo):懒加载,anthropic 口(国产口视觉各家不齐,v0 不接)
+        self._judge_provider = provider if provider in ("anthropic", "mock") else "anthropic"
+        self._judge_model = host_model
+        self._judge = None
         if provider == "mock":  # 测试:确定性假人
             self.bots = [ScriptedPlayerAgent(n, [[{"type": "laugh"}]] * 3) for n in bots]
         else:
@@ -125,6 +133,32 @@ class Session:
                 if "content" in calls[i]["input"]:
                     calls[i]["input"]["content"] = res[field]
         return red
+
+    def judge_photo(self, player: str, image_b64: str, media_type: str | None) -> dict:
+        """视觉裁判(锁外调用,慢):返回 judge_result 事件体。判不了不装懂——
+        「无法判定」明说,主持按声明走 ask 共识兜底(spec §1.4)。"""
+        pend = self.state.pending_photo or {}
+        if self._judge is None:
+            self._judge = make_transport(self._judge_provider, self._judge_model)
+        sys_p = ("你是聚会游戏的视觉裁判:只按给定标准判,宽松判、气氛优先、拿不准给过。"
+                 '只输出 JSON:{"verdict":"过|不过|无法判定","reason":"一句话,现场能念"}')
+        msgs = [{"role": "user", "content": [
+            {"type": "image", "source": {"type": "base64",
+                                         "media_type": media_type or "image/jpeg",
+                                         "data": image_b64}},
+            {"type": "text", "text": f"判定标准:{pend.get('prompt', '')}"}]}]
+        try:
+            import re as _re
+            raw = self._judge.complete(sys_p, msgs)
+            m = _re.search(r"\{.*\}", raw, _re.DOTALL)
+            out = json.loads(m.group(0)) if m else {}
+        except Exception as e:
+            out = {"verdict": "无法判定", "reason": f"裁判失联({type(e).__name__})"}
+        verdict = out.get("verdict")
+        if verdict not in ("过", "不过", "无法判定"):
+            verdict = "无法判定"
+        return {"type": "judge_result", "player": player, "verdict": verdict,
+                "reason": str(out.get("reason") or "")[:100]}
 
     def run_turn(self, body: dict | None = None) -> dict:
         """执行一拍(须在持有 self.lock 下调用):HTTP 手动驱动与服务端自驱共用。
@@ -230,6 +264,10 @@ class Session:
             "now_playing": digest.get("now_playing"),  # 音乐是全场公开的:现实里人人听得见
             # 对决状态:玩家端只看到 vs 与 drawn 布尔(枪响了没),拔枪时点不出服务端
             "duel": digest.get("duel"),
+            # 拍照判定:只有被点名的人看到出题(别人只从主持嘴里听到)
+            "photo_request": (self.state.pending_photo["prompt"]
+                              if self.state.pending_photo
+                              and self.state.pending_photo["player"] == me else None),
             "scores": digest.get("scores"), "scene_objects": digest.get("scene_objects"),
             "now_playing": digest.get("now_playing"),   # 手机上要显示正在放的歌
             "timer_running": digest.get("timer_running"),
@@ -298,6 +336,7 @@ class Hub:
             score_style=cfg.get("score_style", "自动"),
             host_perception=cfg.get("host_perception", "转写"),
             playlist=cfg.get("playlist") or [],
+            occasion=cfg.get("occasion", ""), scene_brief=cfg.get("scene_brief", ""),
         )
         self.session.join_base = self.join_base
         if cfg.get("autoplay") and cfg.get("driver") == "llm":
@@ -422,6 +461,28 @@ class Handler(BaseHTTPRequestHandler):
                 with s.lock:
                     s.engine.push_event(ev)
                 self._json(200, {"queued": ev})
+                return
+            if self.path == "/api/photo":
+                body = self._body()
+                player = body.get("player")
+                with s.lock:
+                    pend = s.state.pending_photo
+                if not pend:
+                    self._json(409, {"error": "没有进行中的拍照判定"})
+                    return
+                if pend["player"] != player:
+                    self._json(403, {"error": f"这单判定点的是 {pend['player']},不是 {player}"})
+                    return
+                if not body.get("image_b64"):
+                    self._json(400, {"error": "缺 image_b64"})
+                    return
+                # 视觉调用在锁外(慢);回来若判定单还是同一单才结案入队
+                result = s.judge_photo(player, body["image_b64"], body.get("media_type"))
+                with s.lock:
+                    if s.state.pending_photo == pend:
+                        s.state.pending_photo = None
+                        s.engine.push_event(dict(result))
+                self._json(200, {"verdict": result["verdict"], "reason": result["reason"]})
                 return
             if self.path == "/api/finish":
                 # 收局必须是一条不经过模型的硬路径:llm 驱动下 UI 的 tool_use 会被丢弃,
