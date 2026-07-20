@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',sans-serif">
+  <rect width="800" height="500" fill="#fdfbf6"/>
+  <text x="40" y="52" font-size="30" font-weight="bold" fill="#22303f">十五二十 · 手势</text>
+  <text x="40" y="80" font-size="14" fill="#8a94a0">pat-t1-05 · 单手只有两种:拳=0,掌=5;喊的是两人四手之和</text>
+
+  <!-- 图例:拳 / 掌 -->
+  <g>
+    <circle cx="120" cy="170" r="38" fill="#4a7fb5"/>
+    <circle cx="98" cy="140" r="9" fill="#4a7fb5"/><circle cx="120" cy="134" r="9" fill="#4a7fb5"/><circle cx="142" cy="140" r="9" fill="#4a7fb5"/>
+    <text x="120" y="240" font-size="19" font-weight="bold" fill="#4a7fb5" text-anchor="middle">拳 = 0</text>
+  </g>
+  <g>
+    <rect x="240" y="150" width="76" height="60" rx="24" fill="#d98943"/>
+    <g stroke="#d98943" stroke-width="15" stroke-linecap="round">
+      <line x1="250" y1="152" x2="242" y2="106"/><line x1="268" y1="148" x2="264" y2="96"/>
+      <line x1="286" y1="147" x2="286" y2="92"/><line x1="304" y1="148" x2="308" y2="96"/>
+      <line x1="322" y1="160" x2="344" y2="128"/>
+    </g>
+    <text x="278" y="240" font-size="19" font-weight="bold" fill="#d98943" text-anchor="middle">掌 = 5</text>
+  </g>
+  <text x="420" y="150" font-size="17" fill="#22303f">每人出两只手:</text>
+  <text x="420" y="180" font-size="17" fill="#22303f">拳拳 = 0　拳掌 = 5　掌掌 = 10</text>
+  <text x="420" y="216" font-size="17" fill="#22303f">出手同时喊两人之和:</text>
+  <text x="420" y="246" font-size="17" fill="#22303f">0 / 5 / 10 / 15 / 20</text>
+
+  <!-- 示例局 -->
+  <rect x="40" y="290" width="720" height="130" rx="14" fill="#eef2f6"/>
+  <text x="64" y="325" font-size="16" fill="#22303f">示例:甲出 掌+掌(10),乙出 拳+掌(5),甲喊「十五!」</text>
+  <text x="64" y="356" font-size="16" fill="#22303f">合计 10+5=15 → 甲喊中,乙输一局;两人同时喊中则重来</text>
+  <text x="64" y="396" font-size="15" fill="#c0392b">⚠ 喊的是「总和」不是自己出的数——新手最常犯的就是这个</text>
+
+  <text x="40" y="470" font-size="16" fill="#22303f">① 同时出手 + 喊和　② 喊中者胜、对方输　③ 输者进结算(主持宣布)</text>
+</svg>

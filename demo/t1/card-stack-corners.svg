@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',sans-serif">
+  <rect width="800" height="500" fill="#fdfbf6"/>
+  <text x="40" y="52" font-size="30" font-weight="bold" fill="#22303f">叠牌 · 只露两个角</text>
+  <text x="40" y="80" font-size="14" fill="#8a94a0">pat-t1-07 · 几何判准一图讲清;弄塌者进结算(主持宣布)</text>
+
+  <!-- ✓ 正确:下牌只露两个对角 -->
+  <g>
+    <rect x="110" y="160" width="150" height="210" rx="10" fill="#dde4ea" stroke="#8a94a0" stroke-width="2"/>
+    <rect x="88" y="196" width="150" height="210" rx="10" fill="#eef7ee" stroke="#3f8f4f" stroke-width="3" transform="rotate(-14 163 301)"/>
+    <circle cx="252" cy="172" r="15" fill="none" stroke="#3f8f4f" stroke-width="4"/>
+    <circle cx="248" cy="360" r="15" fill="none" stroke="#3f8f4f" stroke-width="4"/>
+    <text x="185" y="440" font-size="20" font-weight="bold" fill="#3f8f4f" text-anchor="middle">✓ 下牌只露两个角</text>
+  </g>
+
+  <!-- ✗ 错误:露出三个角 -->
+  <g>
+    <rect x="520" y="160" width="150" height="210" rx="10" fill="#dde4ea" stroke="#8a94a0" stroke-width="2"/>
+    <rect x="588" y="230" width="150" height="210" rx="10" fill="#fdeeed" stroke="#c0392b" stroke-width="3" transform="rotate(-10 663 335)"/>
+    <circle cx="532" cy="172" r="15" fill="none" stroke="#c0392b" stroke-width="4"/>
+    <circle cx="660" cy="172" r="15" fill="none" stroke="#c0392b" stroke-width="4"/>
+    <circle cx="532" cy="358" r="15" fill="none" stroke="#c0392b" stroke-width="4"/>
+    <text x="628" y="130" font-size="20" font-weight="bold" fill="#c0392b" text-anchor="middle">✗ 露了三个角 = 违规</text>
+  </g>
+
+  <text x="40" y="470" font-size="16" fill="#22303f">① 桌面放第一张　② 轮流往上叠,盖到下牌只剩两个角可见　③ 谁弄塌牌堆谁输 → 进结算</text>
+</svg>

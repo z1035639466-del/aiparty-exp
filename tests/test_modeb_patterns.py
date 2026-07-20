@@ -41,7 +41,7 @@ def test_draw_atom_carries_demo_from_pattern():
     r = ex.execute({"name": "draw_atom", "input": {}})
     assert r["ok"], r
     demo = r["result"].get("demo")
-    assert demo and demo["ref"] == "demo/t1/cross-grip-standoff.png"
+    assert demo and demo["ref"] == "demo/t1/cross-grip-standoff.svg"
     assert demo["pattern"] == "交叉握手对峙"
 
 
@@ -55,8 +55,8 @@ def test_draw_atom_without_pattern_has_no_demo():
 def test_show_passes_registered_demo_ref():
     ex = _executor()
     r = ex.execute({"name": "show", "input": {
-        "content": "交叉握手,先松手的输", "demo": "demo/t1/cross-grip-standoff.png"}})
-    assert r["ok"] and r["result"]["demo_ref"] == "demo/t1/cross-grip-standoff.png"
+        "content": "交叉握手,先松手的输", "demo": "demo/t1/cross-grip-standoff.svg"}})
+    assert r["ok"] and r["result"]["demo_ref"] == "demo/t1/cross-grip-standoff.svg"
 
 
 def test_show_drops_invented_demo_ref():

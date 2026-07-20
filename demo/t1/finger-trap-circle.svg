@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',sans-serif">
+  <rect width="800" height="500" fill="#fdfbf6"/>
+  <text x="40" y="52" font-size="30" font-weight="bold" fill="#22303f">围圈抓手指</text>
+  <text x="40" y="80" font-size="14" fill="#8a94a0">pat-t1-02 · 俯视图 · 触发词由主持现挂,结算由主持宣布</text>
+
+  <!-- 庄家手掌(掌心朝下,俯视):掌 + 五指扇形 -->
+  <ellipse cx="400" cy="265" rx="115" ry="88" fill="#4a7fb5" opacity="0.92"/>
+  <line x1="400" y1="185" x2="400" y2="120" stroke="#4a7fb5" stroke-width="24" stroke-linecap="round"/>
+  <line x1="350" y1="192" x2="322" y2="130" stroke="#4a7fb5" stroke-width="24" stroke-linecap="round"/>
+  <line x1="450" y1="192" x2="478" y2="130" stroke="#4a7fb5" stroke-width="24" stroke-linecap="round"/>
+  <line x1="305" y1="222" x2="252" y2="180" stroke="#4a7fb5" stroke-width="24" stroke-linecap="round"/>
+  <line x1="495" y1="222" x2="548" y2="180" stroke="#4a7fb5" stroke-width="24" stroke-linecap="round"/>
+  <text x="400" y="272" font-size="17" fill="#fff" text-anchor="middle">庄家摊掌·掌心朝下</text>
+
+  <!-- 众人食指(指尖顶在掌下沿) -->
+  <g stroke="#d98943" stroke-width="18" stroke-linecap="round">
+    <line x1="285" y1="315" x2="205" y2="368"/>
+    <line x1="360" y1="345" x2="320" y2="425"/>
+    <line x1="445" y1="345" x2="485" y2="425"/>
+    <line x1="515" y1="312" x2="595" y2="365"/>
+  </g>
+  <circle cx="285" cy="315" r="12" fill="#d98943"/>
+  <circle cx="360" cy="345" r="12" fill="#d98943"/>
+  <circle cx="445" cy="345" r="12" fill="#d98943"/>
+  <circle cx="515" cy="312" r="12" fill="#d98943"/>
+  <text x="180" y="395" font-size="15" fill="#d98943">玩家食指</text>
+  <text x="620" y="392" font-size="15" fill="#d98943">顶在掌心正下方</text>
+
+  <!-- 抓/逃箭头 -->
+  <path d="M 660 240 l 0 -55 m -12 14 l 12 -14 l 12 14" stroke="#c0392b" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <text x="688" y="215" font-size="15" fill="#c0392b">喊到关键词:</text>
+  <text x="688" y="236" font-size="15" fill="#c0392b">抓!/ 逃!</text>
+
+  <text x="40" y="470" font-size="16" fill="#22303f">① 庄家摊掌,众人食指顶掌下　② 庄家报数/讲话,埋一个关键词　③ 词一出口瞬间抓——被攥住的人输</text>
+</svg>
