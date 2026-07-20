@@ -3,6 +3,8 @@
 裁定形态:错误不进游戏,只进台面。桌上永远只有「主持在说话」和
 「主持在等」两种状态,第三种(主持报错)只存在于驾驶舱仪表盘。
 """
+from __future__ import annotations   # int | None 写在运行时求值的注解里,3.9 会 TypeError
+
 import sys
 from pathlib import Path
 
