@@ -41,9 +41,10 @@ def _make_audio_judge():
     if base and model and os.environ.get("AUDIO_JUDGE_KEY"):
         return OpenAICompatTransport(model, base, "AUDIO_JUDGE_KEY")
     if os.environ.get("DASHSCOPE_API_KEY"):  # 千问一家:同一把 key 直接调全模态
+        from .transports import base_for
         return OpenAICompatTransport(
-            os.environ.get("AUDIO_JUDGE_MODEL", "qwen-omni-turbo"),
-            CN_PROVIDERS["qwen"]["base"], "DASHSCOPE_API_KEY")
+            os.environ.get("AUDIO_JUDGE_MODEL", "qwen3.5-omni-plus"),
+            base_for("qwen"), "DASHSCOPE_API_KEY")
     return None
 
 

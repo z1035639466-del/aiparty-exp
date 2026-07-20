@@ -75,6 +75,14 @@ def vision_model_for(provider: str, host_model: str) -> str:
     return os.environ.get("VISION_MODEL") or VISION_MODELS.get(provider) or host_model
 
 
+def base_for(provider: str) -> str:
+    """国产口 base_url:环境变量 {PROVIDER}_BASE_URL 优先——百炼新账号是业务空间
+    专属地址(https://<空间ID>.cn-<region>.maas.aliyuncs.com/compatible-mode/v1),
+    与硬编码的通用地址不同,必须可配。"""
+    import os
+    return os.environ.get(f"{provider.upper()}_BASE_URL") or CN_PROVIDERS[provider]["base"]
+
+
 def _post_json(url: str, headers: dict, payload: dict, timeout: int = 60) -> dict:
     req = urllib.request.Request(
         url, method="POST",
@@ -189,7 +197,7 @@ def make_transport(provider: str, model: str | None = None):
         # 恰好是它们)。此时回落到本家默认模型,而不是把别名原样发出去换 400。
         if not model or model in MODELS:
             model = cfg["model"]
-        return OpenAICompatTransport(model, cfg["base"], cfg["key_env"])
+        return OpenAICompatTransport(model, base_for(provider), cfg["key_env"])
     if provider == "mock":
         from .driver_llm import MockTransport
         return MockTransport([])
