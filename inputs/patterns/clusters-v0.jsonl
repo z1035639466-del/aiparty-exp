@@ -1,0 +1,190 @@
+{"cluster_id": "clu-001", "size": 7, "atom_type": "完整玩法", "rep_name": "蒙眼点将", "rep_text": "蒙住一个人的眼睛,指着一个人问喝不喝,喝多少。", "wildness_range": [2, 4], "variants": ["xhs-00711", "xhs-01269", "xhs-01554", "xhs-01641", "xhs-02292", "xhs-02705", "xhs-03189"]}
+{"cluster_id": "clu-002", "size": 6, "atom_type": "完整玩法", "rep_name": "叠手速抓", "rep_text": "所有人一只手叠起来,用一只手抓住摇,另一只手突然最上面的", "wildness_range": [1, 7], "variants": ["xhs-00147", "xhs-00399", "xhs-01163", "xhs-02189", "xhs-02199", "xhs-03192"]}
+{"cluster_id": "clu-003", "size": 6, "atom_type": "完整玩法", "rep_name": "叠手点喝", "rep_text": "手掌朝上伸出去,大家都把手摞上去,闭眼说第几个喝。", "wildness_range": [4, 5], "variants": ["xhs-00597", "xhs-00708", "xhs-01627", "xhs-01652", "xhs-02715", "xhs-02892"]}
+{"cluster_id": "clu-004", "size": 6, "atom_type": "完整玩法", "rep_name": "交叉握手", "rep_text": "依次交叉手臂,快速握住对方的手,不能打开的喝。", "wildness_range": [3, 5], "variants": ["xhs-00721", "xhs-01291", "xhs-01683", "xhs-01707", "xhs-02091", "xhs-03110"]}
+{"cluster_id": "clu-005", "size": 6, "atom_type": "完整玩法", "rep_name": "开火车抢座", "rep_text": "开火车,大家双手招在旁边人的肩榜上国看卡座转图,开火车一样,然后突然坐沙发上,最后一个坐沙发上的喝", "wildness_range": [2, 6], "variants": ["xhs-01536", "xhs-01635", "xhs-01661", "xhs-01961", "xhs-02727", "xhs-03134"]}
+{"cluster_id": "clu-006", "size": 5, "atom_type": "条件点名", "rep_name": "亮出你的首饰", "rep_text": "亮出你的首饰,没有带戒指/耳环", "wildness_range": [1, 4], "variants": ["xhs-00263", "xhs-00592", "xhs-01625", "xhs-01650", "xhs-02061"]}
+{"cluster_id": "clu-007", "size": 5, "atom_type": "任务内容", "rep_name": "跳性感舞蹈", "rep_text": "跳一些很Sexy的舞蹈动作,不会跳或者跳不好喝", "wildness_range": [1, 7], "variants": ["xhs-00265", "xhs-00593", "xhs-00700", "xhs-01560", "xhs-02062"]}
+{"cluster_id": "clu-008", "size": 5, "atom_type": "任务内容", "rep_name": "掀衣摸腹肌", "rep_text": "掀喜欢的男士衣服摸腹肌,不想摸的人喝", "wildness_range": [6, 8], "variants": ["xhs-00295", "xhs-00716", "xhs-01287", "xhs-01671", "xhs-02087"]}
+{"cluster_id": "clu-009", "size": 5, "atom_type": "完整玩法", "rep_name": "叠指夺杯", "rep_text": "做一个空中举杯的动作,所有人学完后,拿两杯酒放一个人的手上,然后伸出大拇指叠罗汉,拿到酒杯的人喝。", "wildness_range": [2, 3], "variants": ["xhs-00595", "xhs-00707", "xhs-01626", "xhs-01651", "xhs-02714"]}
+{"cluster_id": "clu-010", "size": 5, "atom_type": "完整玩法", "rep_name": "持杯抓手指必输", "rep_text": "两个酒杯放在一人的左右手上,立刻玩抓手指,他肯定最后一个", "wildness_range": [2, 4], "variants": ["xhs-00714", "xhs-01276", "xhs-01527", "xhs-01566", "xhs-02078"]}
+{"cluster_id": "clu-011", "size": 5, "atom_type": "完整玩法", "rep_name": "猜拳配对", "rep_text": "石头剪刀布,出一样的凑成一对,没凑成对的喝", "wildness_range": [2, 4], "variants": ["xhs-00718", "xhs-01326", "xhs-01542", "xhs-01800", "xhs-02285"]}
+{"cluster_id": "clu-012", "size": 5, "atom_type": "完整玩法", "rep_name": "传话藏拇指", "rep_text": "想一句话依次传话,趁大家传话时把大拇指举高叠罗汉,最后抓到的人喝酒。", "wildness_range": [2, 5], "variants": ["xhs-00724", "xhs-01589", "xhs-01782", "xhs-01983", "xhs-02733"]}
+{"cluster_id": "clu-013", "size": 5, "atom_type": "问答题目", "rep_name": "驾考科目一答题", "rep_text": "打开驾考宝典考科目一,没答对的喝", "wildness_range": [1, 4], "variants": ["xhs-01304", "xhs-01587", "xhs-01779", "xhs-01980", "xhs-03133"]}
+{"cluster_id": "clu-014", "size": 4, "atom_type": "任务内容", "rep_name": "手穿过一只腿", "rep_text": "手穿过一只腿去摸自己的耳朵,", "wildness_range": [3, 7], "variants": ["xhs-00027", "xhs-00230", "xhs-01251", "xhs-01497"]}
+{"cluster_id": "clu-015", "size": 4, "atom_type": "条件点名", "rep_name": "掏物品罚酒", "rep_text": "掏出身上的物品(钥匙、口红、钱包等),没有的喝。", "wildness_range": [1, 4], "variants": ["xhs-00033", "xhs-00699", "xhs-01599", "xhs-02710"]}
+{"cluster_id": "clu-016", "size": 4, "atom_type": "任务内容", "rep_name": "随机亲亲", "rep_text": "随机找一个人亲亲,不敢亲的喝酒", "wildness_range": [6, 8], "variants": ["xhs-00039", "xhs-00262", "xhs-00547", "xhs-00704"]}
+{"cluster_id": "clu-017", "size": 4, "atom_type": "任务内容", "rep_name": "公主抱人", "rep_text": "公主抱旁边女生,不敢抱的喝", "wildness_range": [6, 7], "variants": ["xhs-00237", "xhs-00552", "xhs-00596", "xhs-02224"]}
+{"cluster_id": "clu-018", "size": 4, "atom_type": "问答题目", "rep_name": "把小物件藏于", "rep_text": "把小物件藏于手心,让大家猜在哪只手,", "wildness_range": [1, 3], "variants": ["xhs-00245", "xhs-00598", "xhs-01264", "xhs-01647"]}
+{"cluster_id": "clu-019", "size": 4, "atom_type": "道具挑战", "rep_name": "算式测试", "rep_text": "打开手机计算器,0-0显示的是错误,做不到", "wildness_range": [1, 6], "variants": ["xhs-00259", "xhs-01256", "xhs-01516", "xhs-01557"]}
+{"cluster_id": "clu-020", "size": 4, "atom_type": "问答题目", "rep_name": "猜瓜子单双", "rep_text": "抓一把瓜子,让大家猜单双数,没猜对的喝。", "wildness_range": [1, 4], "variants": ["xhs-00266", "xhs-00705", "xhs-02063", "xhs-02712"]}
+{"cluster_id": "clu-021", "size": 4, "atom_type": "道具挑战", "rep_name": "传冰块罚酒", "rep_text": "传冰块,用手心的温度化冰块,传到班手里冰块全部融化了,谁局。", "wildness_range": [2, 4], "variants": ["xhs-00577", "xhs-01669", "xhs-02070", "xhs-03144"]}
+{"cluster_id": "clu-022", "size": 4, "atom_type": "完整玩法", "rep_name": "拥抱掩护抓指", "rep_text": "抱住身边的人,另一只手从她后面让大家抓手指,抱住的人没注意而喝", "wildness_range": [5, 6], "variants": ["xhs-00591", "xhs-01257", "xhs-01558", "xhs-02711"]}
+{"cluster_id": "clu-023", "size": 4, "atom_type": "完整玩法", "rep_name": "分组猜拳", "rep_text": "分成两拨,剪刀石头布,最后赢得两个人喝", "wildness_range": [2, 5], "variants": ["xhs-00599", "xhs-01265", "xhs-02068", "xhs-02716"]}
+{"cluster_id": "clu-024", "size": 4, "atom_type": "完整玩法", "rep_name": "抢抱落单罚", "rep_text": "抱左右两边的人,落单的人竭。", "wildness_range": [5, 7], "variants": ["xhs-00626", "xhs-01690", "xhs-02709", "xhs-03136"]}
+{"cluster_id": "clu-025", "size": 4, "atom_type": "道具挑战", "rep_name": "嘴撕纸巾二", "rep_text": "撕纸巾,嘴对嘴传纸巾,每次传都要用嘴撕下一块,传不下去的人喝酒。", "wildness_range": [4, 8], "variants": ["xhs-00697", "xhs-01568", "xhs-01670", "xhs-02079"]}
+{"cluster_id": "clu-026", "size": 4, "atom_type": "任务内容", "rep_name": "咬发梢挑战", "rep_text": "女生把发尾一小撮头发放嘴里咬着,男生做不来喝酒。", "wildness_range": [3, 6], "variants": ["xhs-00701", "xhs-01306", "xhs-01781", "xhs-01982"]}
+{"cluster_id": "clu-027", "size": 4, "atom_type": "完整玩法", "rep_name": "爱心抓手指", "rep_text": "双手比一个爱心,每个人伸一根手指尽量抓住一个人,抓到谁谁喝。", "wildness_range": [3, 6], "variants": ["xhs-00723", "xhs-01584", "xhs-01712", "xhs-01976"]}
+{"cluster_id": "clu-028", "size": 4, "atom_type": "任务内容", "rep_name": "亲吻心仪对象", "rep_text": "亲自己的Crush或同性好友,没亲的喝酒", "wildness_range": [7, 9], "variants": ["xhs-01280", "xhs-01570", "xhs-02723", "xhs-03146"]}
+{"cluster_id": "clu-029", "size": 4, "atom_type": "条件点名", "rep_name": "查微信喝", "rep_text": "打开微信头像,示意没有你微信的喝", "wildness_range": [1, 4], "variants": ["xhs-01329", "xhs-01601", "xhs-02289", "xhs-02744"]}
+{"cluster_id": "clu-030", "size": 3, "atom_type": "道具挑战", "rep_name": "行开王者荣耀", "rep_text": "行开王者荣耀,没有或者最晚进", "wildness_range": [1, 4], "variants": ["xhs-00023", "xhs-00226", "xhs-01248"]}
+{"cluster_id": "clu-031", "size": 3, "atom_type": "道具挑战", "rep_name": "纸巾对折", "rep_text": "纸巾对折,折不下去的喝", "wildness_range": [1, 4], "variants": ["xhs-00029", "xhs-00234", "xhs-02843"]}
+{"cluster_id": "clu-032", "size": 3, "atom_type": "道具挑战", "rep_name": "倒计时传手机", "rep_text": "手机倒计时,传到谁那里结束谁喝", "wildness_range": [1, 4], "variants": ["xhs-00035", "xhs-01255", "xhs-02895"]}
+{"cluster_id": "clu-033", "size": 3, "atom_type": "道具挑战", "rep_name": "所有人轮流往", "rep_text": "所有人轮流往同一个杯子倒酒,", "wildness_range": [2, 4], "variants": ["xhs-00253", "xhs-01553", "xhs-02281"]}
+{"cluster_id": "clu-034", "size": 3, "atom_type": "道具挑战", "rep_name": "转笔技巧挑战", "rep_text": "学生时代的转笔,不会的喝酒", "wildness_range": [1, 1], "variants": ["xhs-00286", "xhs-01282", "xhs-01571"]}
+{"cluster_id": "clu-035", "size": 3, "atom_type": "完整玩法", "rep_name": "拉圈手断", "rep_text": "所有人单手拉着圈摇,拉断", "wildness_range": [3, 7], "variants": ["xhs-00400", "xhs-02200", "xhs-03193"]}
+{"cluster_id": "clu-036", "size": 3, "atom_type": "道具挑战", "rep_name": "扔纸团选人", "rep_text": "大家做捧水状围在一起扔纸团扔到谁", "wildness_range": [2, 4], "variants": ["xhs-00410", "xhs-01174", "xhs-03197"]}
+{"cluster_id": "clu-037", "size": 3, "atom_type": "道具挑战", "rep_name": "传冰块比融化", "rep_text": "手心温度传冰块,化完了", "wildness_range": [3, 4], "variants": ["xhs-00411", "xhs-01175", "xhs-03198"]}
+{"cluster_id": "clu-038", "size": 3, "atom_type": "任务内容", "rep_name": "找异性喝交杯", "rep_text": "找异性喝交杯没找到吗", "wildness_range": [4, 6], "variants": ["xhs-00419", "xhs-01180", "xhs-02197"]}
+{"cluster_id": "clu-039", "size": 3, "atom_type": "完整玩法", "rep_name": "拍掌突停罚", "rep_text": "带动大家一起拍掌突停没停的", "wildness_range": [2, 4], "variants": ["xhs-00433", "xhs-01095", "xhs-01114"]}
+{"cluster_id": "clu-040", "size": 3, "atom_type": "道具挑战", "rep_name": "转酒瓶指人", "rep_text": "转酒瓶转到谁谁", "wildness_range": [1, 4], "variants": ["xhs-00496", "xhs-01228", "xhs-01301"]}
+{"cluster_id": "clu-041", "size": 3, "atom_type": "完整玩法", "rep_name": "轮流倒酒挑战", "rep_text": "轮流往同一个杯子倒酒,谁让酒流出来谁喝", "wildness_range": [2, 3], "variants": ["xhs-00570", "xhs-00710", "xhs-01268"]}
+{"cluster_id": "clu-042", "size": 3, "atom_type": "道具挑战", "rep_name": "传冰挑战", "rep_text": "传冰块,用手心温度融化冰块,传到谁那里化了的喝。", "wildness_range": [2, 3], "variants": ["xhs-00609", "xhs-01695", "xhs-01952"]}
+{"cluster_id": "clu-043", "size": 3, "atom_type": "任务内容", "rep_name": "拉弓点喝", "rep_text": "拉弓箭,让旁边的朋友配合你射击他,他就喝。", "wildness_range": [2, 3], "variants": ["xhs-00720", "xhs-01576", "xhs-01656"]}
+{"cluster_id": "clu-044", "size": 3, "atom_type": "完整玩法", "rep_name": "无限废话", "rep_text": "无限废话:第一个人说一个简单句子,顺时针或逆时针轮流在前一句话基础上加一个字,丢字喝,五秒内说不出喝。", "wildness_range": [1, 4], "variants": ["xhs-01030", "xhs-01399", "xhs-02304"]}
+{"cluster_id": "clu-045", "size": 3, "atom_type": "道具挑战", "rep_name": "戳纸破洞喝", "rep_text": "拿纸轮流戳洞,谁把纸戳分开谁喝", "wildness_range": [2, 4], "variants": ["xhs-01323", "xhs-01597", "xhs-01796"]}
+{"cluster_id": "clu-046", "size": 3, "atom_type": "完整玩法", "rep_name": "倒抓手指", "rep_text": "大拇指朝下,看往下抓,玩就是出其不意", "wildness_range": [2, 3], "variants": ["xhs-01546", "xhs-01602", "xhs-02745"]}
+{"cluster_id": "clu-047", "size": 3, "atom_type": "条件点名", "rep_name": "比身高罚", "rep_text": "比身高,比你高的喝,也可以比谁矮。", "wildness_range": [1, 4], "variants": ["xhs-01577", "xhs-01708", "xhs-01968"]}
+{"cluster_id": "clu-048", "size": 3, "atom_type": "任务内容", "rep_name": "挖鼻舔指", "rep_text": "用自己的食指挖一下鼻子,迅速舔一下中指,敢的喝酒。", "wildness_range": [4, 5], "variants": ["xhs-01580", "xhs-01971", "xhs-02095"]}
+{"cluster_id": "clu-049", "size": 3, "atom_type": "任务内容", "rep_name": "仿接吻秀", "rep_text": "两个女的kiss让对面两男的学,不敢的喝。", "wildness_range": [8, 9], "variants": ["xhs-01581", "xhs-01972", "xhs-02096"]}
+{"cluster_id": "clu-050", "size": 3, "atom_type": "任务内容", "rep_name": "传冰口递", "rep_text": "拿起冰块放嘴里,然后递给旁边的女孩,不敢的喝酒。", "wildness_range": [6, 7], "variants": ["xhs-01583", "xhs-01711", "xhs-02732"]}
+{"cluster_id": "clu-051", "size": 3, "atom_type": "完整玩法", "rep_name": "指向定喝", "rep_text": "让所有人看着你的手指,随便一指,跟着方向指的人喝酒。", "wildness_range": [2, 4], "variants": ["xhs-01598", "xhs-01997", "xhs-02742"]}
+{"cluster_id": "clu-052", "size": 3, "atom_type": "完整玩法", "rep_name": "假猜拳竖指", "rep_text": "倒计时321,之后假装猜拳,当别人快出拳的时候马上竖拇指。", "wildness_range": [2, 4], "variants": ["xhs-01710", "xhs-01973", "xhs-02731"]}
+{"cluster_id": "clu-053", "size": 3, "atom_type": "完整玩法", "rep_name": "传花定喝者", "rep_text": "拿出一杯酒递给任意一个人,击鼓传花,闭眼背过去大家拍手,喊停时酒在谁手里谁喝。", "wildness_range": [2, 4], "variants": ["xhs-01784", "xhs-01985", "xhs-02735"]}
+{"cluster_id": "clu-054", "size": 3, "atom_type": "道具挑战", "rep_name": "烧纸骰落", "rep_text": "放一张纸巾在烟灰缸上面,纸巾中间放一个子,每个人拿打火机烧边缘,烧到股子掉下去的人吗。", "wildness_range": [4, 5], "variants": ["xhs-01789", "xhs-01989", "xhs-02738"]}
+{"cluster_id": "clu-055", "size": 3, "atom_type": "完整玩法", "rep_name": "喊闭眼判负", "rep_text": "大城一声“都闭眼”,谁先睁眼谁喝 00种玩法游戏从轻度试探到近距离互动,每款都戳中小心思,喝着酒玩着游近喜欢的人吗?评论区大胆说出你的小心思~", "wildness_range": [4, 4], "variants": ["xhs-01937", "xhs-01949", "xhs-01988"]}
+{"cluster_id": "clu-056", "size": 2, "atom_type": "道具挑战", "rep_name": "开视力检测图", "rep_text": "开视力检测图,看不清的喝", "wildness_range": [4, 4], "variants": ["xhs-00021", "xhs-00225"]}
+{"cluster_id": "clu-057", "size": 2, "atom_type": "道具挑战", "rep_name": "拿出一张纸,", "rep_text": "拿出一张纸,一起扯,扯最少的喝", "wildness_range": [2, 3], "variants": ["xhs-00022", "xhs-02291"]}
+{"cluster_id": "clu-058", "size": 2, "atom_type": "道具挑战", "rep_name": "拿出手机给大", "rep_text": "拿出手机给大家拍照,打开闪光灯,拍完照闭眼睛的喝。", "wildness_range": [2, 3], "variants": ["xhs-00024", "xhs-01548"]}
+{"cluster_id": "clu-059", "size": 2, "atom_type": "完整玩法", "rep_name": "依次打手背,", "rep_text": "依次打手背,没躲开的喝", "wildness_range": [3, 3], "variants": ["xhs-00026", "xhs-02282"]}
+{"cluster_id": "clu-060", "size": 2, "atom_type": "道具挑战", "rep_name": "拿一个不要的", "rep_text": "拿一个不要的杯子(杯口大的),大概倒1/3的水把整个食指全部放进去,手沾到水的喝", "wildness_range": [2, 3], "variants": ["xhs-00028", "xhs-02708"]}
+{"cluster_id": "clu-061", "size": 2, "atom_type": "道具挑战", "rep_name": "所有人拿着手", "rep_text": "所有人拿着手机,最后一个放手机的喝", "wildness_range": [3, 4], "variants": ["xhs-00032", "xhs-00235"]}
+{"cluster_id": "clu-062", "size": 2, "atom_type": "任务内容", "rep_name": "反手摸自己的", "rep_text": "反手摸自己的肚脐,没摸到的喝", "wildness_range": [3, 4], "variants": ["xhs-00036", "xhs-00703"]}
+{"cluster_id": "clu-063", "size": 2, "atom_type": "任务内容", "rep_name": "抱住你身边的", "rep_text": "抱住你身边的人,另一只手从她后面让大家抓手指,", "wildness_range": [6, 7], "variants": ["xhs-00038", "xhs-00260"]}
+{"cluster_id": "clu-064", "size": 2, "atom_type": "道具挑战", "rep_name": "设置30秒的", "rep_text": "设置30秒的闹钟轮流传递时间停止在谁手上的喝", "wildness_range": [2, 4], "variants": ["xhs-00059", "xhs-02206"]}
+{"cluster_id": "clu-065", "size": 2, "atom_type": "道具挑战", "rep_name": "所有人轮流往", "rep_text": "所有人轮流往一个杯子里面倒酒谁流出来谁喝", "wildness_range": [2, 4], "variants": ["xhs-00062", "xhs-02209"]}
+{"cluster_id": "clu-066", "size": 2, "atom_type": "完整玩法", "rep_name": "两手交叉抓手", "rep_text": "两手交叉抓手指抓到谁谁喝没抓到第四个人喝", "wildness_range": [2, 4], "variants": ["xhs-00067", "xhs-02878"]}
+{"cluster_id": "clu-067", "size": 2, "atom_type": "完整玩法", "rep_name": "打手背没躲开", "rep_text": "打手背没躲开喝", "wildness_range": [2, 3], "variants": ["xhs-00068", "xhs-02879"]}
+{"cluster_id": "clu-068", "size": 2, "atom_type": "条件点名", "rep_name": "前任最多的吗", "rep_text": "前任最多的吗", "wildness_range": [1, 4], "variants": ["xhs-00082", "xhs-00096"]}
+{"cluster_id": "clu-069", "size": 2, "atom_type": "道具挑战", "rep_name": "打开微信雷达", "rep_text": "打开微信雷达随机点头像,点到谁谁喝多点几", "wildness_range": [4, 4], "variants": ["xhs-00206", "xhs-03171"]}
+{"cluster_id": "clu-070", "size": 2, "atom_type": "道具挑战", "rep_name": "轮流用手指纸", "rep_text": "轮流用手指纸巾,戳到纸巾周长断了喝,可", "wildness_range": [4, 4], "variants": ["xhs-00216", "xhs-03177"]}
+{"cluster_id": "clu-071", "size": 2, "atom_type": "条件点名", "rep_name": "无戒指罚酒二", "rep_text": "有戴戒指,其他人手上没戴戒指的喝酒。", "wildness_range": [1, 6], "variants": ["xhs-00258", "xhs-01556"]}
+{"cluster_id": "clu-072", "size": 2, "atom_type": "道具挑战", "rep_name": "把手机拿出来", "rep_text": "把手机拿出来,让所有的人捏着,最后一个放", "wildness_range": [2, 4], "variants": ["xhs-00289", "xhs-01573"]}
+{"cluster_id": "clu-073", "size": 2, "atom_type": "条件点名", "rep_name": "单手比1,抓", "rep_text": "桌上有喜欢的异性,喝酒。", "wildness_range": [1, 4], "variants": ["xhs-00395", "xhs-00474"]}
+{"cluster_id": "clu-074", "size": 2, "atom_type": "完整玩法", "rep_name": "叠拳交换", "rep_text": "拳头交换往上叠,突然", "wildness_range": [2, 4], "variants": ["xhs-00401", "xhs-01165"]}
+{"cluster_id": "clu-075", "size": 2, "atom_type": "道具挑战", "rep_name": "大家做捧水状", "rep_text": "手机倒计时,最后在谁手里谁喝酒。", "wildness_range": [1, 4], "variants": ["xhs-00404", "xhs-02844"]}
+{"cluster_id": "clu-076", "size": 2, "atom_type": "道具挑战", "rep_name": "望远镜数字", "rep_text": "望远镜看数字错了", "wildness_range": [2, 7], "variants": ["xhs-00409", "xhs-02193"]}
+{"cluster_id": "clu-077", "size": 2, "atom_type": "任务内容", "rep_name": "咬发梢挑战", "rep_text": "咬头发没咬到的", "wildness_range": [3, 4], "variants": ["xhs-00414", "xhs-01177"]}
+{"cluster_id": "clu-078", "size": 2, "atom_type": "完整玩法", "rep_name": "拥抱凑人数", "rep_text": "两个或者三个人拥抱没抱上", "wildness_range": [4, 4], "variants": ["xhs-00415", "xhs-02195"]}
+{"cluster_id": "clu-079", "size": 2, "atom_type": "完整玩法", "rep_name": "随机喝交杯", "rep_text": "手叠起来随机选两个喝交杯", "wildness_range": [4, 6], "variants": ["xhs-00416", "xhs-01080"]}
+{"cluster_id": "clu-080", "size": 2, "atom_type": "道具挑战", "rep_name": "弓箭点人", "rep_text": "拉弓箭射到谁谁", "wildness_range": [3, 7], "variants": ["xhs-00417", "xhs-02196"]}
+{"cluster_id": "clu-081", "size": 2, "atom_type": "道具挑战", "rep_name": "纸巾对折挑战", "rep_text": "纸巾对折折到最后折不了的", "wildness_range": [1, 4], "variants": ["xhs-00421", "xhs-01083"]}
+{"cluster_id": "clu-082", "size": 2, "atom_type": "道具挑战", "rep_name": "假装点其他人", "rep_text": "选人,计算机随机输入数字,用数字对应指南针指到谁谁喝酒。", "wildness_range": [4, 4], "variants": ["xhs-00422", "xhs-03202"]}
+{"cluster_id": "clu-083", "size": 2, "atom_type": "完整玩法", "rep_name": "打手背游戏", "rep_text": "一次打手背打中的", "wildness_range": [4, 4], "variants": ["xhs-00430", "xhs-01092"]}
+{"cluster_id": "clu-084", "size": 2, "atom_type": "条件点名", "rep_name": "检查佩戴饰品", "rep_text": "没带项链的或者别的", "wildness_range": [1, 4], "variants": ["xhs-00432", "xhs-01188"]}
+{"cluster_id": "clu-085", "size": 2, "atom_type": "道具挑战", "rep_name": "刷到美女罚酒", "rep_text": "打开抖音第一个刷到美女的喝。", "wildness_range": [5, 7], "variants": ["xhs-00434", "xhs-03212"]}
+{"cluster_id": "clu-086", "size": 2, "atom_type": "任务内容", "rep_name": "公主抱人", "rep_text": "公主抱:公主抱没抱起来的喝。", "wildness_range": [4, 6], "variants": ["xhs-00437", "xhs-02300"]}
+{"cluster_id": "clu-087", "size": 2, "atom_type": "完整玩法", "rep_name": "抢座位淘汰", "rep_text": "抢座位没抢到座位的", "wildness_range": [2, 4], "variants": ["xhs-00438", "xhs-01100"]}
+{"cluster_id": "clu-088", "size": 2, "atom_type": "道具挑战", "rep_name": "扫码添加惩罚", "rep_text": "打开微信二维码加上的喝", "wildness_range": [1, 7], "variants": ["xhs-00439", "xhs-01192"]}
+{"cluster_id": "clu-089", "size": 2, "atom_type": "完整玩法", "rep_name": "手从衣服里面", "rep_text": "手随机比方向,头往反方向,没反应过来的喝酒。", "wildness_range": [2, 4], "variants": ["xhs-00450", "xhs-01202"]}
+{"cluster_id": "clu-090", "size": 2, "atom_type": "任务内容", "rep_name": "衣内伸手挑战", "rep_text": "手从衣服里面由下到上伸出来做不到", "wildness_range": [4, 4], "variants": ["xhs-00456", "xhs-01207"]}
+{"cluster_id": "clu-091", "size": 2, "atom_type": "任务内容", "rep_name": "展示自拍挑战", "rep_text": "选一张自拍给大家看不敢的", "wildness_range": [2, 4], "variants": ["xhs-00494", "xhs-01226"]}
+{"cluster_id": "clu-092", "size": 2, "atom_type": "条件点名", "rep_name": "比身高挑战", "rep_text": "比身高比我高的", "wildness_range": [1, 4], "variants": ["xhs-00495", "xhs-01227"]}
+{"cluster_id": "clu-093", "size": 2, "atom_type": "条件点名", "rep_name": "怎么区分酒吧", "rep_text": "穿裙子的喝酒。", "wildness_range": [1, 4], "variants": ["xhs-00498", "xhs-01307"]}
+{"cluster_id": "clu-094", "size": 2, "atom_type": "道具挑战", "rep_name": "手机画苹果标志", "rep_text": "手机打出苹果标志打不出来", "wildness_range": [1, 1], "variants": ["xhs-00499", "xhs-01229"]}
+{"cluster_id": "clu-095", "size": 2, "atom_type": "完整玩法", "rep_name": "勾指摇断", "rep_text": "所有人手指依次勾住,一起摇,摇断手指的喝。", "wildness_range": [3, 4], "variants": ["xhs-00607", "xhs-01693"]}
+{"cluster_id": "clu-096", "size": 2, "atom_type": "任务内容", "rep_name": "跳性感舞蹈", "rep_text": "跳一些很sexy的舞蹈动作,不会或者不敢跳的喝。", "wildness_range": [5, 7], "variants": ["xhs-00608", "xhs-01951"]}
+{"cluster_id": "clu-097", "size": 2, "atom_type": "道具挑战", "rep_name": "测视力表", "rep_text": "打开视力表,挨个测视力,看不清的喝。", "wildness_range": [1, 4], "variants": ["xhs-00614", "xhs-01959"]}
+{"cluster_id": "clu-098", "size": 2, "atom_type": "完整玩法", "rep_name": "倒酒不溢出", "rep_text": "轮流往酒杯里到酒,谁流出来谁喝酒。", "wildness_range": [2, 3], "variants": ["xhs-00617", "xhs-01681"]}
+{"cluster_id": "clu-099", "size": 2, "atom_type": "任务内容", "rep_name": "蒙眼指人喝", "rep_text": "蒙住别人的眼睛,指着另一个人问喝不竭,喝多少。", "wildness_range": [4, 5], "variants": ["xhs-00623", "xhs-03111"]}
+{"cluster_id": "clu-100", "size": 2, "atom_type": "道具挑战", "rep_name": "指南针罚酒", "rep_text": "打开手机指南针,南针指到谁谁喝", "wildness_range": [2, 3], "variants": ["xhs-00698", "xhs-01788"]}
+{"cluster_id": "clu-101", "size": 2, "atom_type": "完整玩法", "rep_name": "叠罗汉赛", "rep_text": "倒计时321,竖起大拇指开始叠罗汉,最后一个叠上的喝酒。", "wildness_range": [2, 2], "variants": ["xhs-00712", "xhs-01565"]}
+{"cluster_id": "clu-102", "size": 2, "atom_type": "完整玩法", "rep_name": "叠手掌猜数", "rep_text": "所有人叠手掌,随便说一个数,说中的人喝所有人叠手掌,随便说一个数,说中的人喝酒。", "wildness_range": [1, 2], "variants": ["xhs-00715", "xhs-01281"]}
+{"cluster_id": "clu-103", "size": 2, "atom_type": "道具挑战", "rep_name": "传烟灰罚", "rep_text": "点燃一支烟,每人抽一口,传下去,谁烟灰掉谁喝。", "wildness_range": [2, 4], "variants": ["xhs-00719", "xhs-02093"]}
+{"cluster_id": "clu-104", "size": 2, "atom_type": "完整玩法", "rep_name": "拉圈扯断喝", "rep_text": "所有人双手拉一圈,扯断的竭", "wildness_range": [2, 2], "variants": ["xhs-00799", "xhs-00825"]}
+{"cluster_id": "clu-105", "size": 2, "atom_type": "道具挑战", "rep_name": "依次折纸巾", "rep_text": "依次折纸巾,折不动的竭", "wildness_range": [2, 2], "variants": ["xhs-00801", "xhs-00826"]}
+{"cluster_id": "clu-106", "size": 2, "atom_type": "完整玩法", "rep_name": "拍照重复喝", "rep_text": "比照相机拍照,动作重复的竭", "wildness_range": [2, 2], "variants": ["xhs-00807", "xhs-00828"]}
+{"cluster_id": "clu-107", "size": 2, "atom_type": "条件点名", "rep_name": "有纹身喝", "rep_text": "有纹身的喝", "wildness_range": [2, 2], "variants": ["xhs-00837", "xhs-02080"]}
+{"cluster_id": "clu-108", "size": 2, "atom_type": "条件点名", "rep_name": "没美甲喝", "rep_text": "没有美甲的喝", "wildness_range": [1, 4], "variants": ["xhs-00839", "xhs-03106"]}
+{"cluster_id": "clu-109", "size": 2, "atom_type": "条件点名", "rep_name": "罚谈过帅哥", "rep_text": "谈过帅哥的喝", "wildness_range": [1, 2], "variants": ["xhs-00855", "xhs-02178"]}
+{"cluster_id": "clu-110", "size": 2, "atom_type": "条件点名", "rep_name": "罚姐弟恋", "rep_text": "谈过姐弟恋的喝", "wildness_range": [1, 2], "variants": ["xhs-00856", "xhs-02140"]}
+{"cluster_id": "clu-111", "size": 2, "atom_type": "条件点名", "rep_name": "搜宝宝计数喝", "rep_text": "微信聊天记录搜宝宝,搜到一个喝一杯", "wildness_range": [1, 3], "variants": ["xhs-00927", "xhs-00928"]}
+{"cluster_id": "clu-112", "size": 2, "atom_type": "问答题目", "rep_name": "驾考答题挑战", "rep_text": "驾考宝典答错的", "wildness_range": [1, 4], "variants": ["xhs-01187", "xhs-03210"]}
+{"cluster_id": "clu-113", "size": 2, "atom_type": "条件点名", "rep_name": "亮饰品查缺", "rep_text": "亮出首饰,没有戒指耳环项链的喝", "wildness_range": [1, 1], "variants": ["xhs-01258", "xhs-01559"]}
+{"cluster_id": "clu-114", "size": 2, "atom_type": "完整玩法", "rep_name": "抛骰子定输赢", "rep_text": "每人拿一个骰子往上撂,最后撂到的人喝", "wildness_range": [1, 2], "variants": ["xhs-01260", "xhs-01561"]}
+{"cluster_id": "clu-115", "size": 2, "atom_type": "道具挑战", "rep_name": "传冰块融化定罚", "rep_text": "传冰块,用手心温度融化,传到谁手里完全融化谁喝", "wildness_range": [2, 3], "variants": ["xhs-01267", "xhs-01552"]}
+{"cluster_id": "clu-116", "size": 2, "atom_type": "完整玩法", "rep_name": "倒数叠拇指", "rep_text": "倒计时321竖拇指叠罗汉,最后一个叠上的喝", "wildness_range": [1, 2], "variants": ["xhs-01274", "xhs-02296"]}
+{"cluster_id": "clu-117", "size": 2, "atom_type": "完整玩法", "rep_name": "捏手机耐力赛", "rep_text": "所有人捏着手机,最后一个放手的喝", "wildness_range": [1, 3], "variants": ["xhs-01284", "xhs-01643"]}
+{"cluster_id": "clu-118", "size": 2, "atom_type": "完整玩法", "rep_name": "比心抓手指", "rep_text": "双手比爱心,每人伸一根手指,抓到谁谁喝", "wildness_range": [1, 2], "variants": ["xhs-01300", "xhs-02295"]}
+{"cluster_id": "clu-119", "size": 2, "atom_type": "道具挑战", "rep_name": "二维码扫码挑战", "rep_text": "拿出微信二维码,最后扫上的喝", "wildness_range": [1, 2], "variants": ["xhs-01302", "xhs-01585"]}
+{"cluster_id": "clu-120", "size": 2, "atom_type": "任务内容", "rep_name": "抹口红男喝", "rep_text": "女生把口红抹在手上,在场男生都喝", "wildness_range": [3, 4], "variants": ["xhs-01317", "xhs-01592"]}
+{"cluster_id": "clu-121", "size": 2, "atom_type": "问答题目", "rep_name": "猜戒指藏指", "rep_text": "戒指在两只手随机放一根手指,背手让大家猜,猜中或猜不中按原帖规则喝", "wildness_range": [1, 2], "variants": ["xhs-01318", "xhs-01593"]}
+{"cluster_id": "clu-122", "size": 2, "atom_type": "任务内容", "rep_name": "摘瞳罚酒", "rep_text": "徒手摘美瞳,没有或摘不下来的喝", "wildness_range": [4, 4], "variants": ["xhs-01325", "xhs-01799"]}
+{"cluster_id": "clu-123", "size": 2, "atom_type": "条件点名", "rep_name": "电量好友罚酒", "rep_text": "手机电量谁低谁喝,微信好友谁少谁喝。", "wildness_range": [1, 4], "variants": ["xhs-01475", "xhs-03208"]}
+{"cluster_id": "clu-124", "size": 2, "atom_type": "道具挑战", "rep_name": "指圈穿杯二", "rep_text": "所有人手指做成OK状,不许动,谁的OK能被小酒杯穿过谁要喝。", "wildness_range": [3, 3], "variants": ["xhs-01551", "xhs-02279"]}
+{"cluster_id": "clu-125", "size": 2, "atom_type": "条件点名", "rep_name": "亮独有应用二", "rep_text": "打开手机有什么APP别人没有就要喝。", "wildness_range": [1, 2], "variants": ["xhs-01555", "xhs-02719"]}
+{"cluster_id": "clu-126", "size": 2, "atom_type": "完整玩法", "rep_name": "开火车抢座", "rep_text": "开火车,大家双手搭在旁边人肩膀上围着卡座转圈,突然坐沙发,最后一个坐上的喝。", "wildness_range": [2, 3], "variants": ["xhs-01575", "xhs-01703"]}
+{"cluster_id": "clu-127", "size": 2, "atom_type": "完整玩法", "rep_name": "比心点人", "rep_text": "依次比爱心,你意让谁吗,到他那就比个心来喝酒了喂#酒吧游戏玩法#小美小帅聚集地#一起喝酒吧#天黑心话 309249评论", "wildness_range": [3, 3], "variants": ["xhs-01624", "xhs-01636"]}
+{"cluster_id": "clu-128", "size": 2, "atom_type": "完整玩法", "rep_name": "建群抢包", "rep_text": "面对面建群,最后进群的喝;发个红包,红包抢最大喝,适合大局局。", "wildness_range": [3, 3], "variants": ["xhs-01630", "xhs-01654"]}
+{"cluster_id": "clu-129", "size": 2, "atom_type": "完整玩法", "rep_name": "传机罚酒", "rep_text": "手机设置30秒的闹钟,从自己开始传手机,手机在谁手上响了就喝。", "wildness_range": [2, 3], "variants": ["xhs-01655", "xhs-02721"]}
+{"cluster_id": "clu-130", "size": 2, "atom_type": "条件点名", "rep_name": "秀吊带罚酒", "rep_text": "女生掏出自己的吊带,没有的喝,男生只能", "wildness_range": [5, 5], "variants": ["xhs-01666", "xhs-03140"]}
+{"cluster_id": "clu-131", "size": 2, "atom_type": "完整玩法", "rep_name": "传机罚酒", "rep_text": "手机设置15秒闹钟,轮流传手机,最后在谁手里响了谁喝。", "wildness_range": [2, 3], "variants": ["xhs-01682", "xhs-02276"]}
+{"cluster_id": "clu-132", "size": 2, "atom_type": "完整玩法", "rep_name": "套指挑战", "rep_text": "用食指和拇指比出OK,套住旁边人的手指,套中后对方喝,没套中自己喝。", "wildness_range": [4, 5], "variants": ["xhs-01688", "xhs-01871"]}
+{"cluster_id": "clu-133", "size": 2, "atom_type": "道具挑战", "rep_name": "传烟挑战", "rep_text": "点燃一支烟,轮流抽一口,谁的烟灰掉了谁喝。", "wildness_range": [3, 5], "variants": ["xhs-01700", "xhs-01956"]}
+{"cluster_id": "clu-134", "size": 2, "atom_type": "道具挑战", "rep_name": "指尖立币", "rep_text": "双手伸出,让别人往你手指上放硬币,谁的硬币先掉谁喝。", "wildness_range": [3, 3], "variants": ["xhs-01718", "xhs-01893"]}
+{"cluster_id": "clu-135", "size": 2, "atom_type": "完整玩法", "rep_name": "比字母撞车", "rep_text": "轮流用手指比字母,比出和上一人相同字母的喝。", "wildness_range": [3, 3], "variants": ["xhs-01721", "xhs-01896"]}
+{"cluster_id": "clu-136", "size": 2, "atom_type": "完整玩法", "rep_name": "数三放指", "rep_text": "所有人伸出手指,数1、2、3后同时放下,最后放下的喝。", "wildness_range": [3, 3], "variants": ["xhs-01722", "xhs-01897"]}
+{"cluster_id": "clu-137", "size": 2, "atom_type": "道具挑战", "rep_name": "蘸酒画圈", "rep_text": "用手指蘸酒在地上画圈,画得最不圆的喝。", "wildness_range": [3, 3], "variants": ["xhs-01729", "xhs-01904"]}
+{"cluster_id": "clu-138", "size": 2, "atom_type": "完整玩法", "rep_name": "模拟开车", "rep_text": "用手指在桌子上模拟开车,谁的车开出桌子谁喝。", "wildness_range": [3, 3], "variants": ["xhs-01741", "xhs-01915"]}
+{"cluster_id": "clu-139", "size": 2, "atom_type": "任务内容", "rep_name": "捏耳转圈", "rep_text": "用手指捏住耳朵,原地转3圈,转晕的喝。", "wildness_range": [3, 4], "variants": ["xhs-01750", "xhs-01924"]}
+{"cluster_id": "clu-140", "size": 2, "atom_type": "道具挑战", "rep_name": "传冰接住", "rep_text": "用手指捏住冰块传递给对方,对方没接住的喝。", "wildness_range": [3, 4], "variants": ["xhs-01762", "xhs-01935"]}
+{"cluster_id": "clu-141", "size": 2, "atom_type": "问答题目", "rep_name": "手心写名", "rep_text": "用手指在对方手心里写自己的名字,对方猜不到的喝。", "wildness_range": [4, 6], "variants": ["xhs-01763", "xhs-01936"]}
+{"cluster_id": "clu-142", "size": 2, "atom_type": "完整玩法", "rep_name": "共同指人", "rep_text": "所有人伸出手指,数1、2、3后同时指向一人,被指到最多的喝。", "wildness_range": [3, 4], "variants": ["xhs-01770", "xhs-01943"]}
+{"cluster_id": "clu-143", "size": 2, "atom_type": "问答题目", "rep_name": "手臂写字猜", "rep_text": "用手指蘸酒在对方手臂上写字,对方猜不到的喝。", "wildness_range": [4, 5], "variants": ["xhs-01771", "xhs-01860"]}
+{"cluster_id": "clu-144", "size": 2, "atom_type": "任务内容", "rep_name": "露内衣肩带", "rep_text": "女孩子勾一下内衣肩带或露出内衣一角,没有的喝酒(一般不建议太污)。", "wildness_range": [6, 8], "variants": ["xhs-01783", "xhs-02734"]}
+{"cluster_id": "clu-145", "size": 2, "atom_type": "完整玩法", "rep_name": "传杯轮饮", "rep_text": "一杯酒,喝一点再往下传,谁喝完了谁喝。", "wildness_range": [3, 5], "variants": ["xhs-01785", "xhs-02736"]}
+{"cluster_id": "clu-146", "size": 2, "atom_type": "完整玩法", "rep_name": "脖夹传物", "rep_text": "用脖子传一个稍大的东西,谁掉了谁喝。", "wildness_range": [5, 6], "variants": ["xhs-01786", "xhs-02737"]}
+{"cluster_id": "clu-147", "size": 2, "atom_type": "问答题目", "rep_name": "猜戒指藏指", "rep_text": "拿戒指放在两只手的任意一根手指上,背着手让大家猜,猜中者喝或猜不中者喝。", "wildness_range": [3, 4], "variants": ["xhs-01791", "xhs-01991"]}
+{"cluster_id": "clu-148", "size": 2, "atom_type": "任务内容", "rep_name": "含酒抢先吐", "rep_text": "喝一口酒别咽下去,所有人学着喝的时候率先吐出来的喝。", "wildness_range": [4, 4], "variants": ["xhs-01793", "xhs-01993"]}
+{"cluster_id": "clu-149", "size": 2, "atom_type": "道具挑战", "rep_name": "雷达找物品", "rep_text": "打开手机雷达,找不到指定物品的人喝。", "wildness_range": [3, 4], "variants": ["xhs-01794", "xhs-01994"]}
+{"cluster_id": "clu-150", "size": 2, "atom_type": "任务内容", "rep_name": "刮对方脸颊", "rep_text": "用手指轻轻刮一下对面人的脸颊,不敢动手或抗拒的喝。", "wildness_range": [6, 6], "variants": ["xhs-01801", "xhs-02000"]}
+{"cluster_id": "clu-151", "size": 2, "atom_type": "任务内容", "rep_name": "托下巴夸赞", "rep_text": "双手托住任意一人的下巴,说一句‘你今天真好看’,说不出口的喝。", "wildness_range": [6, 7], "variants": ["xhs-01803", "xhs-02002"]}
+{"cluster_id": "clu-152", "size": 2, "atom_type": "任务内容", "rep_name": "比心贴额头", "rep_text": "用食指和中指比出心,贴在旁边人的额头保持3秒,做不到的喝。", "wildness_range": [6, 7], "variants": ["xhs-01804", "xhs-02003"]}
+{"cluster_id": "clu-153", "size": 2, "atom_type": "任务内容", "rep_name": "耳语说秘密", "rep_text": "轻声对距离最近的异性说‘我知道一个你的小秘密’,不敢说或对方不配合的喝。", "wildness_range": [5, 6], "variants": ["xhs-01805", "xhs-02004"]}
+{"cluster_id": "clu-154", "size": 2, "atom_type": "任务内容", "rep_name": "嘴唇碰手背", "rep_text": "用嘴唇轻轻碰一下旁边人的手背(不接触皮肤),不敢尝试的喝。", "wildness_range": [7, 8], "variants": ["xhs-01808", "xhs-02007"]}
+{"cluster_id": "clu-155", "size": 2, "atom_type": "道具挑战", "rep_name": "传冰块规则", "rep_text": "用手指捏住冰块传递给下一人,冰块掉落或用其他部位辅助的吗", "wildness_range": [4, 4], "variants": ["xhs-01811", "xhs-02010"]}
+{"cluster_id": "clu-156", "size": 2, "atom_type": "道具挑战", "rep_name": "点手机图标", "rep_text": "轮流用手指在手机上点屏幕,点到指定APP图标的喝。", "wildness_range": [3, 4], "variants": ["xhs-01814", "xhs-02013"]}
+{"cluster_id": "clu-157", "size": 2, "atom_type": "问答题目", "rep_name": "猜藏物之手", "rep_text": "双手背后,让别人猜哪只手藏了小物件,猜中则你喝,猜错对方喝。", "wildness_range": [4, 4], "variants": ["xhs-01815", "xhs-02014"]}
+{"cluster_id": "clu-158", "size": 2, "atom_type": "完整玩法", "rep_name": "数数握拳最后", "rep_text": "快速伸出手指,数1、2、3后突然握拳,最后一个握拳的喝。", "wildness_range": [3, 4], "variants": ["xhs-01816", "xhs-02015"]}
+{"cluster_id": "clu-159", "size": 2, "atom_type": "任务内容", "rep_name": "弹酒躲闪", "rep_text": "用手指一点酒弹向任意一人,不敢弹或被弹到后躲闪的喝。", "wildness_range": [6, 6], "variants": ["xhs-01817", "xhs-02016"]}
+{"cluster_id": "clu-160", "size": 2, "atom_type": "完整玩法", "rep_name": "喊落放手指", "rep_text": "所有人手指朝上,主持人喊‘落’,最后一个放下手指的喝。", "wildness_range": [3, 4], "variants": ["xhs-01821", "xhs-02018"]}
+{"cluster_id": "clu-161", "size": 2, "atom_type": "任务内容", "rep_name": "发短信认罚", "rep_text": "用手指在手机上输入‘我喝酒了’,随机发给通讯录第3个人,不敢发的喝。", "wildness_range": [5, 5], "variants": ["xhs-01822", "xhs-02019"]}
+{"cluster_id": "clu-162", "size": 2, "atom_type": "完整玩法", "rep_name": "比数字重复", "rep_text": "轮流用手指比数字,比出和上一人相同数字的喝。", "wildness_range": [3, 4], "variants": ["xhs-01824", "xhs-02021"]}
+{"cluster_id": "clu-163", "size": 2, "atom_type": "完整玩法", "rep_name": "双手被抓最多", "rep_text": "所有人伸出双手,主持人喊‘抓’,被抓到次数最多的人喝。", "wildness_range": [5, 6], "variants": ["xhs-01826", "xhs-02023"]}
+{"cluster_id": "clu-164", "size": 2, "atom_type": "完整玩法", "rep_name": "手指相握掰开", "rep_text": "两人一组用手指交叉相握,谁先把对方的手掰开谁赢,输的喝。", "wildness_range": [5, 6], "variants": ["xhs-01827", "xhs-02024"]}
+{"cluster_id": "clu-165", "size": 2, "atom_type": "完整玩法", "rep_name": "弯指话题接龙", "rep_text": "所有人伸出5根手指,轮流说一个话题,不能说出来的弯一根手指,手指全弯的喝。", "wildness_range": [3, 4], "variants": ["xhs-01829", "xhs-02026"]}
+{"cluster_id": "clu-166", "size": 2, "atom_type": "任务内容", "rep_name": "牵手绕桌一圈", "rep_text": "与任意一人牵手绕桌子走一圈,中途松手或表情不自然的喝。", "wildness_range": [6, 6], "variants": ["xhs-01830", "xhs-02027"]}
+{"cluster_id": "clu-167", "size": 2, "atom_type": "任务内容", "rep_name": "戳酒窝脸", "rep_text": "用手指轻轻旁边人的酒窝(没有酒窝戳脸颊),不敢戳或躲闪的喝", "wildness_range": [6, 6], "variants": ["xhs-01831", "xhs-02028"]}
+{"cluster_id": "clu-168", "size": 2, "atom_type": "任务内容", "rep_name": "夸对方好闻", "rep_text": "轻声对身边人说‘你今天身上的味道很好闻’,说不出口或对方不回应的喝。", "wildness_range": [4, 5], "variants": ["xhs-01832", "xhs-02029"]}
+{"cluster_id": "clu-169", "size": 2, "atom_type": "任务内容", "rep_name": "说三个优点", "rep_text": "说出在场一人的3个优点,同时用手指着他,说不出来的喝。", "wildness_range": [4, 4], "variants": ["xhs-01837", "xhs-02033"]}
+{"cluster_id": "clu-170", "size": 2, "atom_type": "任务内容", "rep_name": "耳边说悄悄话", "rep_text": "用嘴唇对着旁边人的耳朵说一句悄悄话(内容自定),不敢说的喝。", "wildness_range": [6, 6], "variants": ["xhs-01838", "xhs-02035"]}
+{"cluster_id": "clu-171", "size": 2, "atom_type": "任务内容", "rep_name": "牵手比心", "rep_text": "牵手后一起比心拍照,不配合或表情硬的喝。", "wildness_range": [6, 6], "variants": ["xhs-01841", "xhs-02038"]}
+{"cluster_id": "clu-172", "size": 2, "atom_type": "任务内容", "rep_name": "托手说合作", "rep_text": "双手托住对方的手,轻轻晃一晃,说‘合作愉快’,不说的喝。", "wildness_range": [6, 6], "variants": ["xhs-01844", "xhs-02041"]}
+{"cluster_id": "clu-173", "size": 2, "atom_type": "任务内容", "rep_name": "十指相扣手势", "rep_text": "与对方一起做情侣手势(如十指相扣),做不到的喝。", "wildness_range": [6, 7], "variants": ["xhs-01846", "xhs-02043"]}
+{"cluster_id": "clu-174", "size": 2, "atom_type": "任务内容", "rep_name": "绕发不敢", "rep_text": "用手指统对方的头发(长发绕发尾,短发绕发梢),不敢的吗", "wildness_range": [6, 6], "variants": ["xhs-01848", "xhs-02045"]}
+{"cluster_id": "clu-175", "size": 2, "atom_type": "道具挑战", "rep_name": "舔辣椒面", "rep_text": "用手指蘸辣椒面(少量)舔一下,不敢的喝。", "wildness_range": [5, 5], "variants": ["xhs-01852", "xhs-01876"]}
+{"cluster_id": "clu-176", "size": 2, "atom_type": "道具挑战", "rep_name": "打字比速度", "rep_text": "用手指在手机屏幕上快速打字(指定内容,如‘酒吧真好玩’),最慢的喝。", "wildness_range": [3, 3], "variants": ["xhs-01856", "xhs-01880"]}
+{"cluster_id": "clu-177", "size": 2, "atom_type": "完整玩法", "rep_name": "喊数字对手指", "rep_text": "所有人手指伸出,主持人喊数字,伸出的手指数量与数字相同的人喝。", "wildness_range": [3, 3], "variants": ["xhs-01858", "xhs-01882"]}
+{"cluster_id": "clu-178", "size": 2, "atom_type": "完整玩法", "rep_name": "假亲竖指", "rep_text": "假装要亲嘴,快要亲到的时候竖大拇指(这招慎用)。", "wildness_range": [7, 8], "variants": ["xhs-01992", "xhs-02740"]}
+{"cluster_id": "clu-179", "size": 2, "atom_type": "道具挑战", "rep_name": "传手机响", "rep_text": "手机设置30秒的闹钟,从自己开始传手机,手在谁手上响了谁就喝。", "wildness_range": [2, 4], "variants": ["xhs-02076", "xhs-03191"]}
+{"cluster_id": "clu-180", "size": 2, "atom_type": "条件点名", "rep_name": "点过外卖领罚", "rep_text": "昨天点过外卖喝", "wildness_range": [1, 4], "variants": ["xhs-02130", "xhs-03229"]}
+{"cluster_id": "clu-181", "size": 2, "atom_type": "问答题目", "rep_name": "猜戒指方位", "rep_text": "猜戒指/般子在哪个手,错了", "wildness_range": [2, 4], "variants": ["xhs-02192", "xhs-03160"]}
+{"cluster_id": "clu-182", "size": 2, "atom_type": "完整玩法", "rep_name": "接歌不上罚", "rep_text": "听音乐接歌没接上", "wildness_range": [2, 4], "variants": ["xhs-02198", "xhs-03201"]}
+{"cluster_id": "clu-183", "size": 2, "atom_type": "完整玩法", "rep_name": "打手背游戏", "rep_text": "依次打手背被打者的喝", "wildness_range": [3, 5], "variants": ["xhs-02205", "xhs-02831"]}
+{"cluster_id": "clu-184", "size": 2, "atom_type": "道具挑战", "rep_name": "含酒不吞", "rep_text": "喝一口酒不吞,喝完谁吐不出谁喝", "wildness_range": [3, 5], "variants": ["xhs-02254", "xhs-03098"]}
+{"cluster_id": "clu-185", "size": 2, "atom_type": "道具挑战", "rep_name": "吐烟传杯", "rep_text": "吸一口烟往酒杯里吐,杯子起雾后传下去,传到谁没了谁喝", "wildness_range": [3, 3], "variants": ["xhs-02258", "xhs-02875"]}
+{"cluster_id": "clu-186", "size": 2, "atom_type": "条件点名", "rep_name": "写小作文", "rep_text": "给前任写过小作文的喝", "wildness_range": [2, 3], "variants": ["xhs-02320", "xhs-02423"]}
+{"cluster_id": "clu-187", "size": 2, "atom_type": "条件点名", "rep_name": "电量过低", "rep_text": "现在手机电量低于50%的喝", "wildness_range": [2, 2], "variants": ["xhs-02501", "xhs-02574"]}
+{"cluster_id": "clu-188", "size": 2, "atom_type": "条件点名", "rep_name": "最易脸红领罚", "rep_text": "最容易脸红的喝", "wildness_range": [2, 4], "variants": ["xhs-02520", "xhs-03295"]}
+{"cluster_id": "clu-189", "size": 2, "atom_type": "条件点名", "rep_name": "三天可见领罚", "rep_text": "朋友圈三天可见的喝", "wildness_range": [2, 4], "variants": ["xhs-02629", "xhs-03248"]}
+{"cluster_id": "clu-190", "size": 2, "atom_type": "任务内容", "rep_name": "托脸对视十秒", "rep_text": "托着你的小猫的脸井对视十秒钟", "wildness_range": [7, 7], "variants": ["xhs-02670", "xhs-02680"]}
