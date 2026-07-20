@@ -38,7 +38,12 @@ STYLE_SUFFIX = (
     "人物为无特征简笔角色;多格时按从左到右分格排布,格间留白。"
 )
 
-DASHSCOPE_SUBMIT_URL = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text2image/image-synthesis"
+# 万相 2.5–2.7 全系(含 wan2.7-image-pro)统一走 image2image 口,文生图也是它;
+# 老 text2image 口对新模型回 "url error"。IMAGE_API_URL 可整条覆盖(比如业务空间
+# 专属域名 https://<空间ID>.cn-<region>.maas.aliyuncs.com/api/v1/services/...)。
+DASHSCOPE_SUBMIT_URL = os.environ.get(
+    "IMAGE_API_URL",
+    "https://dashscope.aliyuncs.com/api/v1/services/aigc/image2image/image-synthesis")
 DASHSCOPE_TASK_URL = "https://dashscope.aliyuncs.com/api/v1/tasks/{task_id}"
 DASHSCOPE_POLL_INTERVAL = 3  # 秒
 DASHSCOPE_POLL_MAX_ROUNDS = 40
@@ -83,6 +88,14 @@ def _dashscope_result_url(resp: dict) -> str | None:
     return None
 
 
+def _image_params() -> dict:
+    params = {"n": 1}
+    size = os.environ.get("IMAGE_API_SIZE", "1536*1024")
+    if size:
+        params["size"] = size
+    return params
+
+
 def _render_dashscope(prompt: str) -> bytes:
     """走 DashScope(阿里百炼)图像口:提交异步任务 → 轮询 → SUCCEEDED 后下载图。"""
     key = os.environ["DASHSCOPE_API_KEY"]
@@ -97,7 +110,8 @@ def _render_dashscope(prompt: str) -> bytes:
         data=json.dumps({
             "model": model,
             "input": {"prompt": prompt},
-            "parameters": {"size": os.environ.get("IMAGE_API_SIZE", "1536*1024"), "n": 1},
+            # IMAGE_API_SIZE 置空串 = 不传 size,交给模型默认(有的档位挑尺寸)
+            "parameters": _image_params(),
         }).encode(),
     )
     # 4xx 的真实原因(模型名不存在/尺寸不合法/空间未授权)在响应正文里,
