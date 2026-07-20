@@ -139,12 +139,44 @@ class OpenAICompatTransport:
         key = os.environ.get(self.key_env)
         if not key:
             raise RuntimeError(f"缺 {self.key_env} 环境变量")
-        resp = _post_json(
-            f"{self.base}/chat/completions",
-            {"Authorization": f"Bearer {key}"},
-            {"model": self.model, "max_tokens": self.max_tokens,
-             "messages": [{"role": "system", "content": system}] + messages})
-        return resp["choices"][0]["message"]["content"]
+        # 深度思考模型(qwen3.x-max 等)在 DashScope 上开思考=强制流式,非流式直接
+        # 报 "only supports stream mode"。我们不要思考的推理过程(要快、要省),但
+        # 有的模型不接受 enable_thinking=False 关不掉——统一走流式聚合最稳:
+        # 拿最终答案,丢弃 reasoning_content(思考痕迹不进主持词)。
+        payload = {"model": self.model, "max_tokens": self.max_tokens, "stream": True,
+                   "messages": [{"role": "system", "content": system}] + messages}
+        url = f"{self.base}/chat/completions"
+        req = urllib.request.Request(
+            url, method="POST",
+            headers={"Content-Type": "application/json",
+                     "Authorization": f"Bearer {key}"},
+            data=json.dumps(payload).encode())
+        parts: list[str] = []
+        try:
+            with urllib.request.urlopen(req, timeout=90) as r:
+                for raw in r:
+                    line = raw.decode("utf-8", "replace").strip()
+                    if not line.startswith("data:"):
+                        continue
+                    data = line[5:].strip()
+                    if data == "[DONE]":
+                        break
+                    try:
+                        chunk = json.loads(data)
+                    except json.JSONDecodeError:
+                        continue
+                    choices = chunk.get("choices") or [{}]
+                    delta = choices[0].get("delta") or {}
+                    # 只收正式答案 content;reasoning_content(思考过程)丢弃
+                    if delta.get("content"):
+                        parts.append(delta["content"])
+        except urllib.error.HTTPError as e:
+            detail = e.read().decode("utf-8", "replace")[:500]
+            raise TransportError(
+                f"{url} 返回 HTTP {e.code}:{detail}(model={self.model!r})", e.code) from None
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
+            raise TransportError(f"{url} 网络层失败:{e}") from None
+        return "".join(parts)
 
 
 def make_transport(provider: str, model: str | None = None):

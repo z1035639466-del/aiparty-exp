@@ -40,18 +40,31 @@ def test_anthropic_payload_shape(monkeypatch):
 
 
 def test_openai_compat_payload_shape(monkeypatch):
+    """国产口走流式(深度思考模型开思考=强制流式);断言请求形状 + SSE 聚合。"""
     from modeb import transports
+    import io
     captured = {}
 
-    def fake_post(url, headers, payload, timeout=60):
-        captured.update(url=url, headers=headers, payload=payload)
-        return {"choices": [{"message": {"content": "ok"}}]}
+    class _FakeResp(io.BytesIO):
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
 
-    monkeypatch.setattr(transports, "_post_json", fake_post)
+    def fake_urlopen(req, timeout=90):
+        captured["url"] = req.full_url
+        captured["headers"] = {k.lower(): v for k, v in req.header_items()}
+        captured["payload"] = json.loads(req.data.decode())
+        # 两块 SSE:思考痕迹(reasoning_content,应丢)+ 正式答案(content,应收)
+        sse = (b'data: {"choices":[{"delta":{"reasoning_content":"\xe5\x97\xaf"}}]}\n'
+               b'data: {"choices":[{"delta":{"content":"ok"}}]}\n'
+               b'data: [DONE]\n')
+        return _FakeResp(sse)
+
+    monkeypatch.setattr(transports.urllib.request, "urlopen", fake_urlopen)
     monkeypatch.setenv("DEEPSEEK_API_KEY", "dk-test")
     t = transports.make_transport("deepseek")
-    assert t.complete("SYS", [{"role": "user", "content": "hi"}]) == "ok"
+    assert t.complete("SYS", [{"role": "user", "content": "hi"}]) == "ok", "只收 content,丢 reasoning"
     assert captured["url"] == "https://api.deepseek.com/chat/completions"
+    assert captured["payload"]["stream"] is True, "国产口必须流式,否则思考模型报 only-stream"
     assert captured["payload"]["messages"][0] == {"role": "system", "content": "SYS"}
     assert captured["payload"]["model"] == "deepseek-v4-pro"
 
