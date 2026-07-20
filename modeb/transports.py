@@ -7,10 +7,42 @@ from __future__ import annotations
 
 import json
 import os
+import time
 import urllib.error
 import urllib.request
 
 ANTHROPIC_BASE = "https://api.anthropic.com"
+
+
+class TransportError(RuntimeError):
+    """带状态码的传输错误。code=None 表示网络层(连接断/超时)。"""
+
+    def __init__(self, msg: str, code: int | None = None) -> None:
+        super().__init__(msg)
+        self.code = code
+
+    @property
+    def transient(self) -> bool:
+        """再试可能就好了的错(网络/限流/服务端);key 错、参数错重试一万次也一样。"""
+        return self.code is None or self.code in (408, 429, 500, 502, 503, 504, 529)
+
+
+class Resilient:
+    """主持专用外套:瞬时错误等一拍重试一次,再挂就上抛(引擎接手静默等下拍)。
+    只包主持不包桌友——桌友已有响亮降级,失败一个 bot 天塌不下来。"""
+
+    def __init__(self, inner, wait_s: float = 2.0) -> None:
+        self.inner = inner
+        self.wait_s = wait_s
+
+    def complete(self, system: str, messages: list[dict]) -> str:
+        try:
+            return self.inner.complete(system, messages)
+        except TransportError as e:
+            if not e.transient:
+                raise
+            time.sleep(self.wait_s)
+            return self.inner.complete(system, messages)
 
 MODELS = {
     "sonnet": "claude-sonnet-5",
@@ -39,8 +71,10 @@ def _post_json(url: str, headers: dict, payload: dict, timeout: int = 60) -> dic
         # 供应商把真正的原因(模型名不存在/参数不合法/余额不足)写在正文里,
         # 光靠状态码没法定位。正文里不含密钥,可以安全带进异常。
         detail = e.read().decode("utf-8", "replace")[:500]
-        raise RuntimeError(
-            f"{url} 返回 HTTP {e.code}:{detail}(model={payload.get('model')!r})") from None
+        raise TransportError(
+            f"{url} 返回 HTTP {e.code}:{detail}(model={payload.get('model')!r})", e.code) from None
+    except (urllib.error.URLError, TimeoutError, OSError) as e:
+        raise TransportError(f"{url} 网络层失败:{e}") from None
 
 
 class AnthropicTransport:

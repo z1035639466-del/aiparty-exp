@@ -23,7 +23,7 @@ from .driver_scripted import ScriptedDriver
 from .engine import Engine
 from .player_agent import LLMPlayerAgent, ScriptedPlayerAgent
 from .state import GameState
-from .transports import make_transport
+from .transports import Resilient, make_transport
 
 MIN_PLAYERS, MAX_PLAYERS = 2, 10  # 机位上限只是这一行常数,机制不感知机位数
 
@@ -61,7 +61,8 @@ class Session:
         if driver_kind == "scripted":
             self.driver = ScriptedDriver()
         elif driver_kind == "llm":
-            self.driver = LLMDriver(make_transport(provider, host_model),
+            # 主持包重试外套(瞬时错误等 2 秒再试一次);桌友不包,已有响亮降级
+            self.driver = LLMDriver(Resilient(make_transport(provider, host_model)),
                                     players, wildness, minutes, score_style=score_style)
         else:
             self.driver = ManualDriver()
@@ -125,6 +126,11 @@ class Session:
             # 桌友调用失败数:静默降级会让 key 错表现成「bot 好闷」,得摆到台面上
             "bot_errors": {b.name: {"count": b.errors, "last": b.last_error}
                            for b in self.bots if getattr(b, "errors", 0)},
+            # 主持沉默拍同理:错误不进游戏,只进台面
+            "host_errors": ({"count": self.engine.marks["host_errors"],
+                             "streak": self.engine.host_error_streak,
+                             "last": self.engine.last_host_error}
+                            if self.engine.marks["host_errors"] else None),
         }
 
 
@@ -256,7 +262,9 @@ class Handler(BaseHTTPRequestHandler):
                     red = s.route_private(line)
                     s.recent.append(red)
                     digest = s.state.digest(s.engine.time_left_min())
-                    for bot in s.bots:  # 桌友对本回合反应,入队待下回合聚合;私件只随本人
+                    # 主持沉默拍(调用失败):桌上没发生任何事,桌友无从反应,不烧调用
+                    bots = [] if line.get("host_silent") else s.bots
+                    for bot in bots:  # 桌友对本回合反应,入队待下回合聚合;私件只随本人
                         try:
                             evs = bot.react(red, digest, inbox=s.inbox.get(bot.name, [])[-3:])
                         except TypeError:

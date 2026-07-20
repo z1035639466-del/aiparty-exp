@@ -224,9 +224,9 @@ def test_bots_see_redacted_line_but_own_inbox(server, monkeypatch):
     assert "芒果" not in by_seat["琳琳"], "非目标座位不得见到私发原文"
 
 
-def test_turn_exception_returns_json_500_and_server_survives(server, monkeypatch):
-    """异常逃逸会让处理线程当场死掉、一个字节都不回,浏览器那头表现为
-    「点了没反应」——真原因只在终端。必须转成 JSON 错误送回前端。"""
+def test_host_failure_becomes_silent_beat_not_500(server, monkeypatch):
+    """主持调用挂了:错误不进游戏,只进台面。/api/turn 回 200 的沉默拍,
+    真相在 snapshot 的 host_errors 仪表里;服务活着,局没死,事件不丢。"""
     class _Exploding:
         def complete(self, system, messages):
             raise RuntimeError("模拟 429 限流")
@@ -235,10 +235,14 @@ def test_turn_exception_returns_json_500_and_server_survives(server, monkeypatch
     call(server, "/api/start", {"players": ["我", "阿伟"], "bots": {"阿伟": "显眼包"},
                                 "minutes": 30, "wildness": 6, "objects": ["瓶子"],
                                 "driver": "llm", "provider": "deepseek"})
+    call(server, "/api/event", {"type": "done", "player": "我"})
 
     body, status = call(server, "/api/turn", {})
-    assert status == 500, f"异常应返回 500,实际 {status}"
-    assert "429" in body["error"], f"错误正文要带原因,实际 {body}"
+    assert status == 200 and body["host_silent"] is True
+    assert "429" in body["host_error"], f"错误原因要留痕,实际 {body}"
 
     snap, code = call(server, "/api/state")     # 服务必须还活着
     assert code == 200 and snap["finished"] is False
+    assert snap["host_errors"]["count"] == 1 and "429" in snap["host_errors"]["last"]
+    assert snap["pending_events"], "沉默拍不得吞事件——玩家按的「完成」还在队列里"
+    assert snap["turn_ready"] is False, "冷却期内自动循环不该再撞"

@@ -229,8 +229,10 @@ async function refresh() {
   await pullInboxes();
   $("panes").innerHTML = s.players.map(p => paneHtml(p, s)).join("");
   renderAsk(s);
+  const he = s.host_errors;
   $("digest").textContent = JSON.stringify(s.digest, null, 1)
-    + "\n埋点 " + JSON.stringify(s.marks) + (s.finished ? "\n【局已收】" : "");
+    + "\n埋点 " + JSON.stringify(s.marks) + (s.finished ? "\n【局已收】" : "")
+    + (he ? `\n${he.streak >= 5 ? "⛔ 主持掉线" : "⚠️ 主持沉默拍"}×${he.streak}(累计${he.count}): ${he.last}` : "");
   $("log").innerHTML = s.recent_turns.map(t => t.episode_summary
     ? `<div class="turnline">🏁 ${JSON.stringify(t)}</div>`
     : `<div class="turnline">#${t.turn} <span class="host-text">${t.text}</span> `

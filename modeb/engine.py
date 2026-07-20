@@ -15,6 +15,7 @@ from .tools import ToolExecutor
 
 MAX_TOOLS_PER_TURN = 2
 MAX_SENTENCES = 3
+HOST_COOLDOWN_S = 8  # 主持调用失败后的冷却拍:期间 turn_ready=False,事件在队列里等
 
 
 class Driver(Protocol):
@@ -30,7 +31,11 @@ class Engine:
         self.tools = ToolExecutor(state, rng_seed)
         self.episode_path = episode_path
         self.event_queue: list[dict] = []
-        self.marks = {"laugh_events": 0, "skips": 0, "forfeits": 0, "turns": 0}
+        self.marks = {"laugh_events": 0, "skips": 0, "forfeits": 0, "turns": 0,
+                      "host_errors": 0}
+        self.host_error_streak = 0      # 连续沉默拍;成功一拍归零,≥5 台面亮红牌
+        self.last_host_error = ""
+        self.cooldown_until = 0.0       # 失败后的冷却:免得自动循环每秒撞一次死 API
         self._t0 = time.time()
         episode_path.parent.mkdir(parents=True, exist_ok=True)
         self._ep = episode_path.open("w", encoding="utf-8")
@@ -112,6 +117,8 @@ class Engine:
                 return False
             return True
 
+        if time.time() < self.cooldown_until:
+            return False  # 主持刚断线:冷却期内不叫醒,事件都在队列里等着
         if self.marks["turns"] == 0 or any(wakes(e) for e in self.event_queue):
             return True
         now = time.time()
@@ -130,7 +137,22 @@ class Engine:
             events.append(closed)
         # 现场的局长是半瞎半聋的:听不见桌上的自由交谈,只知道谁按了什么。
         # 模拟台默认给全文,会把主持的本桌化改造能力测得虚高——真机上它拿不到这些。
-        decision = self.driver.decide(digest, self._perceive(events))
+        try:
+            decision = self.driver.decide(digest, self._perceive(events))
+        except Exception as e:
+            # 主持沉默拍:错误不进游戏,只进台面。事件塞回队列头一个不丢
+            # (否则玩家按的「完成」就此蒸发),冷却几拍后 turn_ready 自然重来。
+            self.event_queue = events + self.event_queue
+            self.marks["host_errors"] += 1
+            self.host_error_streak += 1
+            self.last_host_error = f"{type(e).__name__}: {e}"
+            self.cooldown_until = time.time() + HOST_COOLDOWN_S
+            line = {"turn": self.marks["turns"], "host_silent": True,
+                    "host_error": self.last_host_error, "events_requeued": len(events)}
+            self._ep.write(json.dumps(line, ensure_ascii=False) + "\n")
+            self._ep.flush()
+            return line
+        self.host_error_streak = 0
         text = decision.get("text", "")
         calls = decision.get("tool_use", [])[:MAX_TOOLS_PER_TURN]
         overflow = len(decision.get("tool_use", [])) - len(calls)
