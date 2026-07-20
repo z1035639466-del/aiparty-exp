@@ -546,6 +546,11 @@ class ToolExecutor:
     # 现场有匹配实物就绑定(换皮不改机制),没有就虚拟态照发(系统仪式补皮)
     # ——"道具不在场"永远不拦技能,那道闸只管实体门槛玩法。
     def _t_skill(self, name: str, a: dict) -> dict:
+        op = name.split(".", 1)[1] if "." in name else "deal"
+        if op == "transfer":
+            return self._skill_transfer(a)  # 技能转手:抢夺/交换/截胡的唯一账面原语
+        if op != "deal":
+            raise ClampError(f"skill 未知子操作: {op}")
         holder = a.get("grant_to") or self.state.focus or self.state.players[0]
         if holder not in self.state.players:
             raise ClampError(f"skill.deal 授予对象必须在座,收到: {holder}")
@@ -568,3 +573,43 @@ class ToolExecutor:
                 "ritual": atom["skill"]["ritual"],
                 "bound_object": bound or None,
                 "form": "实物绑定" if bound else "虚拟态(系统仪式补皮,照常发动)"}
+
+    # —— skill.transfer:技能转手(唯一账面原语)——顺走王牌/手牌互换/优先购买权
+    # 三张"抢夺·交换"卡此前被砍,砍点只有一个:引擎没有"把一张 grant 从 A 名下挪到
+    # B 名下"的动作,主持嘴上转了、账本(digest.grants)没转 = 嘴账不一。这里补上。
+    # 钳制:源无此牌→驳回(只回执,不公开出丑);目标已持同名→驳回(沿用同名不重发)。
+    # 转手不是局长随意没收:只有技能牌自己文本写明可抢/可换/可截胡时才走这条。
+    def _skill_transfer(self, a: dict) -> dict:
+        src = a.get("from") or a.get("holder")
+        dst = a.get("to") or a.get("grant_to")
+        if src not in self.state.players:
+            raise ClampError(f"skill.transfer 转出方必须在座,收到: {src}")
+        if dst not in self.state.players:
+            raise ClampError(f"skill.transfer 转入方必须在座,收到: {dst}")
+        if src == dst:
+            raise ClampError("skill.transfer 转出转入不能是同一人")
+        # 源玩家名下可用技能(uses_left>0);指定 prop 就锁那张,不指定取名下第一张
+        prop = a.get("prop")
+        owned = [g for g in self.state.grants if g.holder == src and g.uses_left > 0]
+        if prop:
+            owned = [g for g in owned if g.prop == prop]
+        if not owned:
+            which = f"「{prop}」" if prop else "任何可用技能"
+            # 源没这张牌就是没有:回执驳回,不当众宣布免得出丑(与私发同姿势)
+            raise ClampError(f"{src} 名下没有{which},无法转手(嘴上转≠账上转,不许硬圆)")
+        g = owned[0]
+        # 目标已持同名技能:沿用现有那张,不叠一张同名(与 skill.deal 的同名不重发一致)
+        if any(x.holder == dst and x.prop == g.prop and x.uses_left > 0
+               for x in self.state.grants):
+            raise ClampError(f"{dst} 已持有「{g.prop}」,同名不重发,转手驳回")
+        g.holder = dst  # ledger 归属变更:digest.grants 里这张牌的 holder 随之翻到 dst
+        # 私件挂账:转出/转入方各记一笔去向(只记 holder+kind、不记内容,与 show 私件同姿势)。
+        # 内容(下面的 notices)按观看者遮蔽——每人只在自己收件箱看到自己那一份。
+        self.state.private_out.append({"holder": src, "kind": "技能转出"})
+        self.state.private_out.append({"holder": dst, "kind": "技能转入"})
+        return {"transferred": g.prop, "from": src, "to": dst, "uses_left": g.uses_left,
+                "notices": [
+                    {"player": src, "text": f"你的技能「{g.prop}」已被转走,现归 {dst}"},
+                    {"player": dst, "text": f"你得到技能「{g.prop}」(来自 {src},剩 {g.uses_left} 次)"
+                                            f";发动仪式:{g.ritual}"},
+                ]}

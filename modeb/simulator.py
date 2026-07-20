@@ -177,6 +177,18 @@ class Session:
             res = r.get("result") if isinstance(r, dict) else None
             if not (r.get("ok") and isinstance(res, dict)):
                 continue
+            # 技能转手:一次调用要私件知会两个人(转出方/转入方),内容各不相同——
+            # 单 player 的遮蔽路子塞不下,走 notices 列表:每份投进各自收件箱,公开面只留摘要。
+            notices = res.get("notices")
+            if isinstance(notices, list) and notices:
+                delivered = 0
+                for n in notices:
+                    pl, txt = n.get("player"), n.get("text")
+                    if pl in self.inbox and txt:
+                        self.inbox[pl].append(f"🔒 {txt}")
+                        delivered += 1
+                res["notices"] = f"🔒技能转手私件(已投递 {delivered} 人,内容仅各自可见)"
+                continue
             vis, target = res.get("visibility"), res.get("player")
             # 秘密载荷可能在 display(show)、也可能在 value/picked(random 私密摇)
             field = next((k for k in ("display", "value", "picked") if k in res), None)

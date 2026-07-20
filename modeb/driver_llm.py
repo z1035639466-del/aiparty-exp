@@ -31,6 +31,7 @@ TOOLS_DECLARATION = [
     {"name": "state.finish", "desc": "收局", "args": {}},
     {"name": "fx", "desc": "音效/特效", "args": {"effect": "str"}},
     {"name": "skill.deal", "desc": "从技能库发一张技能牌给指定玩家(单独库,不占内容抽取):自动绑现场实物或虚拟态照发,自动登记 digest.grants;同名技能在有人持有期间不重发", "args": {"grant_to": "str(在座玩家)", "exclude": "list?"}},
+    {"name": "skill.transfer", "desc": "技能转手:把一张已发的技能从 from 名下转到 to 名下,digest.grants 归属随之翻面(这是'抢夺/交换/截胡'类技能牌唯一的账面动作——嘴上说转、账上必须真转)。只在技能牌自己文本写明可抢/可换/可截胡时用,不是局长随意没收别人的牌。钳制:源玩家名下没这张牌→驳回(只回执,别当众宣布出丑),目标已持同名技能→驳回(沿用同名不重发);不填 prop 就转源玩家名下第一张可用技能。转出/转入方各收一封私件(仅各自可见)", "args": {"from": "str(转出方,在座)", "to": "str(转入方,在座)", "prop": "str?(指定哪张,默认第一张可用)"}},
     {"name": "judge.photo", "desc": "拍照判定(变身验收/造型评比/摆阵检查等):点人出题,他的手机拍照后由视觉裁判按你给的标准判,结果以 judge_result 事件送达(verdict+理由);判不了/他不拍就走 ask 共识兜底。一次一单,期间别催", "args": {"player": "str(在座玩家)", "prompt": "str(判定标准,写给裁判看)"}},
     {"name": "judge.audio", "desc": "录音判定(语调模仿/口令复述/学声音):点人出题,他录一段由听觉裁判按你的标准判,结果以 judge_result 事件送达;裁判未接入时会回'无法判定',那就走 ask 共识兜底。一次一单", "args": {"player": "str(在座玩家)", "prompt": "str(判定标准)"}},
     {"name": "judge.cancel", "desc": "撤销进行中的拍照/录音判定", "args": {}},
@@ -159,7 +160,10 @@ def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: 
         "一两张,综艺味就起来了。授予后 digest.grants 挂账:持有人喊用时你调 state.use_grant"
         "结算;发动必须做全仪式(动作+台词),缺一失灵反罚;绑不绑现场实物系统自动定,"
         "没实物就是虚拟态照常发动(回执里 form 字段会告诉你)。发出去的技能要有下文,"
-        "别发完就忘。\n"
+        "别发完就忘。有的技能牌自己写明可抢/可换/可截胡(顺走王牌、手牌互换、优先购买权这类)——"
+        "触发时用 skill.transfer(from→to)真把牌转过去,digest.grants 归属会跟着翻面;"
+        "**只在牌面文本授权时转,不是你随意没收别人的牌**。源没这张牌或目标已持同名会被驳回,"
+        "驳回只回执给你、别当众宣布让人出丑,当拍换个说法圆场。\n"
         f"【记分观】{SCORE_STYLES.get(score_style, SCORE_STYLES['清账'])}\n"
         f"{SCORE_BOTTOM_LINE}\n"
         f"【输出契约】{OUTPUT_CONTRACT}\n"
