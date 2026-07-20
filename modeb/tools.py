@@ -184,6 +184,31 @@ class ToolExecutor:
     def _t_fx(self, name: str, a: dict) -> dict:
         return {"fx": a.get("effect", "")}
 
+    # —— music:AI 局头当 DJ。歌单是房主上传的资产(真人可写、AI 只读只调),
+    # 模型只发「放这首」的意图,播放由运行时执行;点歌单外的歌 = 钳制,
+    # 与 demo_ref 资产册同一姿势——防的是主持幻觉出一首不存在的歌。 ——
+    def _t_music(self, name: str, a: dict) -> dict:
+        op = name.split(".", 1)[1] if "." in name else a.get("op", "play")
+        if op == "stop":
+            prev, self.state.now_playing = self.state.now_playing, None
+            return {"stopped": prev}
+        if op != "play":
+            raise ClampError(f"music 未知子操作: {op}")
+        if not self.state.playlist:
+            raise ClampError("本局没有歌单(房主未上传),music 不可用")
+        want = (a.get("track") or "").strip()
+        if not want:
+            raise ClampError("music.play 需要 track")
+        hits = [t for t in self.state.playlist if t == want] \
+            or [t for t in self.state.playlist if want.lower() in t.lower()]
+        if not hits:
+            sample = "、".join(self.state.playlist[:5])
+            raise ClampError(f"歌单里没有「{want}」——只许点已上传的歌(如: {sample}…)")
+        if len(hits) > 1:
+            raise ClampError(f"「{want}」在歌单里有 {len(hits)} 首撞名: {'、'.join(hits[:4])};说全名")
+        self.state.now_playing = hits[0]
+        return {"playing": hits[0], "mood": a.get("mood", "")}
+
     def _t_timer(self, name: str, a: dict) -> dict:
         import time as _time
         secs = int(a.get("seconds", 10))

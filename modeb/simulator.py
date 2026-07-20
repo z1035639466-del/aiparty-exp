@@ -45,7 +45,8 @@ class Session:
                  objects: list[str], driver_kind: str, out_dir: Path,
                  bots: dict[str, str] | None = None, provider: str = "anthropic",
                  host_model: str = "sonnet", seat_model: str = "sonnet",
-                 score_style: str = "自动", host_perception: str = "转写") -> None:
+                 score_style: str = "自动", host_perception: str = "转写",
+                 playlist: list[str] | None = None) -> None:
         if not MIN_PLAYERS <= len(players) <= MAX_PLAYERS:
             raise ValueError(f"玩家数须在 {MIN_PLAYERS}–{MAX_PLAYERS}(收到 {len(players)})")
         if driver_kind == "scripted" and len(players) < 3:
@@ -56,14 +57,16 @@ class Session:
             raise ValueError(f"bot 座位不在玩家名单里: {sorted(unknown)}")
         self.state = GameState(players=players, wildness_cap=wildness,
                                time_budget_min=minutes, scene_objects=objects,
-                               score_style=score_style, host_perception=host_perception)
+                               score_style=score_style, host_perception=host_perception,
+                               playlist=[t.strip() for t in (playlist or []) if t.strip()])
         self.driver_kind = driver_kind
         if driver_kind == "scripted":
             self.driver = ScriptedDriver()
         elif driver_kind == "llm":
             # 主持包重试外套(瞬时错误等 2 秒再试一次);桌友不包,已有响亮降级
             self.driver = LLMDriver(Resilient(make_transport(provider, host_model)),
-                                    players, wildness, minutes, score_style=score_style)
+                                    players, wildness, minutes, score_style=score_style,
+                                    playlist=self.state.playlist)
         else:
             self.driver = ManualDriver()
         if provider == "mock":  # 测试:确定性假人
@@ -164,6 +167,7 @@ class Session:
             "turn_ready": self.engine.turn_ready(), "focus": digest.get("focus"),
             "finished": self.state.finished,
             "time_left_min": digest.get("time_left_min"),
+            "now_playing": digest.get("now_playing"),  # 音乐是全场公开的:现实里人人听得见
             "scores": digest.get("scores"), "scene_objects": digest.get("scene_objects"),
             "inbox": self.inbox.get(me, [])[-8:],          # 只有自己的
             "open_ask": ({"prompt": ask["prompt"], "asked": ask["asked"],
@@ -226,6 +230,7 @@ class Hub:
             seat_model=cfg.get("seat_model", "sonnet"),
             score_style=cfg.get("score_style", "自动"),
             host_perception=cfg.get("host_perception", "转写"),
+            playlist=cfg.get("playlist") or [],
         )
         return self.session.snapshot()
 

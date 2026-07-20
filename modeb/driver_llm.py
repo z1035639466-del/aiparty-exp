@@ -28,6 +28,8 @@ TOOLS_DECLARATION = [
     {"name": "state.use_grant", "desc": "消耗一次已持有技能", "args": {"prop": "str", "holder": "str"}},
     {"name": "state.finish", "desc": "收局", "args": {}},
     {"name": "fx", "desc": "音效/特效", "args": {"effect": "str"}},
+    {"name": "music.play", "desc": "DJ 换歌:只许点房主上传歌单里的曲目(歌单在系统提示的 DJ 台一节;无歌单则本工具不可用);音乐是背景,换歌不必播报", "args": {"track": "str(歌单内曲目,可只写歌名)", "mood": "str?"}},
+    {"name": "music.stop", "desc": "停止播放", "args": {}},
     {"name": "draw_atom", "desc": "从弹药库抽原子(分面过滤+排已用);野度=上限,野度min=下限——想加档就抬野度min,别只嘴上说;tier=铺垫(小快垫场:通用局开局款/敢不敢微挑战都在这档)|主打(副歌重拍:摆阵重器/大流程);人数下限系统按本桌自动过滤(2人桌抽不到全场类,5人及以下抽不到卧底类核心循环),空返报错会告诉你被哪关挡了多少条", "args": {"atom_type": "str?", "野度": "int?", "野度min": "int?", "tier": "str?", "exclude": "list?", "grant_to": "str?"}},
 ]
 
@@ -68,9 +70,21 @@ SCORE_BOTTOM_LINE = (
 
 
 def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: int,
-                        score_style: str = "清账") -> str:
+                        score_style: str = "清账", playlist: list[str] | None = None) -> str:
     persona = Path("docs/records/狂野模式-活局长prompt-v0.md")
     persona_text = persona.read_text(encoding="utf-8") if persona.exists() else ""
+    dj = ""
+    if playlist:
+        # 歌单进 system(每局静态,吃缓存);上限截断防 prompt 失控
+        songs = playlist[:120]
+        dj = (
+            f"【DJ 台】房主上传了歌单({len(playlist)} 首),你兼任 DJ:{'、'.join(songs)}"
+            + ("……(已截断)" if len(playlist) > 120 else "") + "\n"
+            "选曲靠你对这些歌的了解读氛围配节拍:开局热场、主打挑战起手、结算/高光收尾是三个"
+            "天然换歌点;铺垫拍连发时别换歌。music.play 只许点歌单里有的(点错被钳制),"
+            "digest.now_playing 是正在放的。**音乐是背景不是主持词**:换歌不必播报,顶多顺口"
+            "带半句;没有合适的歌就不放,安静也是一种氛围。\n"
+        )
     return (
         f"{persona_text}\n\n"
         f"【本桌】玩家:{'、'.join(players)};野度档:{wildness_cap};时长预算:{time_budget_min}分钟。\n"
@@ -100,6 +114,7 @@ def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: 
         "换了就不是改版,是现挂,现挂另算且要自知。例:「有纹身的喝」→「玩无畏契约上过钻的喝」是"
         "改版;「最上面的人喝」→「最后一个叠上去的接惩罚」只是复述。**说到做到**:嘴上说加档就传"
         "野度min 真加档,不许话术与工具参数两张皮。纯现挂为辅。\n"
+        f"{dj}"
         f"【记分观】{SCORE_STYLES.get(score_style, SCORE_STYLES['清账'])}\n"
         f"{SCORE_BOTTOM_LINE}\n"
         f"【输出契约】{OUTPUT_CONTRACT}\n"
@@ -143,9 +158,10 @@ class LLMDriver:
 
     def __init__(self, transport: Transport, players: list[str],
                  wildness_cap: int, time_budget_min: int, max_retries: int = 1,
-                 score_style: str = "清账") -> None:
+                 score_style: str = "清账", playlist: list[str] | None = None) -> None:
         self.transport = transport
-        self.system = build_system_prompt(players, wildness_cap, time_budget_min, score_style)
+        self.system = build_system_prompt(players, wildness_cap, time_budget_min,
+                                          score_style, playlist)
         self.history: list[dict] = []  # [{"role": "assistant"|"user", "content": str}]
         self.max_retries = max_retries
         self.malformed_count = 0

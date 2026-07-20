@@ -36,6 +36,8 @@ class GameState:
     timers: list[float] = field(default_factory=list)  # 活动计时器到期时刻(epoch)
     host_perception: str = "转写"  # 感知档:按钮=真机基线(只知道谁按了什么);转写=开发台上帝视角仪器
     open_ask: dict | None = None  # 进行中的限时问询:{prompt, options, deadline, answers}
+    playlist: list[str] = field(default_factory=list)  # 房主上传歌单(真人可写、AI 只读只调)
+    now_playing: str | None = None  # 当前曲目(music 工具唯一写入口)
     settled: dict[str, int] = field(default_factory=dict)  # 已清账累计口数(清账制的另一半)
     discards: list[dict] = field(default_factory=list)  # 主动弃牌留痕:弃牌≠用牌
     finished: bool = False
@@ -59,6 +61,7 @@ class GameState:
             "time_left_min": round(time_left_min, 1),
             "timer_running": bool(self.timers),
             "野度档": self.wildness_cap,
+            "now_playing": self.now_playing,
         }
 
 

@@ -43,6 +43,7 @@
     </div>
     <input id="objects" value="瓶子,冰块,纸巾,手机,杯子,打火机" title="现场实物(perceive 扫描占位)">
     <input id="bots" placeholder="bot 座位,如 阿伟:显眼包,琳琳:气氛组组长(留空=全真人)">
+    <input id="playlist" placeholder="🎵 歌单(逗号分隔,如 Mojito-周杰伦,APT.-ROSÉ;留空=局长不当DJ)" title="房主上传歌单;AI 只读只调,点歌单外的歌会被钳制">
     <div style="display:flex;gap:6px;margin-top:4px">
       <select id="provider" onchange="syncModels()"><option>anthropic</option><option>deepseek</option><option>kimi</option><option>glm</option><option>qwen</option><option>minimax</option></select>
       <input id="hostmodel" value="sonnet" title="主持模型">
@@ -120,6 +121,7 @@ async function start() {
   const r = await api("/api/start", {
     players: $("players").value.split(","), minutes: +$("minutes").value,
     wildness: +$("wildness").value, objects: $("objects").value.split(","),
+    playlist: $("playlist").value.split(",").map(s => s.trim()).filter(Boolean),
     driver: $("driver").value, bots,
     provider: $("provider").value, host_model: $("hostmodel").value,
     seat_model: $("seatmodel").value, score_style: $("scorestyle").value });
