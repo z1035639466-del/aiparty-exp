@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import threading
 import traceback
@@ -75,7 +76,34 @@ class Session:
         self.episode_path = out_dir / f"sim_{stamp}.jsonl"
         self.engine = Engine(self.state, self.driver, self.episode_path)
         self.recent: list[dict] = []  # 最近回合行,供前端轮询
+        self.inbox: dict[str, list[str]] = {n: [] for n in players}  # 私发收件箱(可见性引擎落地)
         self.lock = threading.Lock()
+
+    def route_private(self, line: dict) -> dict:
+        """show(自己看/额头) 路由进收件箱;返回轮询面用的遮蔽版回合行。
+        episode 文件保留全文(审计);/api/state 面上私密内容一律遮蔽——
+        防偷看必须在服务端成立,不能靠前端自觉(与感知档同理)。"""
+        red = copy.deepcopy(line)
+        calls = red.get("tool_use", [])  # 与 results 同序同长(engine.turn 保证)
+        for i, r in enumerate(red.get("results", [])):
+            res = r.get("result") if isinstance(r, dict) else None
+            if not (r.get("ok") and isinstance(res, dict)):
+                continue
+            vis, target = res.get("visibility"), res.get("player")
+            if vis == "自己看" and target:
+                self.inbox[target].append(f"🔒 {res.get('display', '')}")
+                res["display"] = "🔒私发(已投递,内容仅目标可见)"
+            elif vis == "额头" and target:
+                for pl in self.state.players:
+                    if pl != target:
+                        self.inbox[pl].append(f"👀 额头·{target}: {res.get('display', '')}")
+                res["display"] = f"👀额头牌(仅 {target} 本人不可见,已发其余人)"
+            else:
+                continue
+            # 结果遮了、指令没遮等于没遮:tool_use[i].input.content 是同一份原文
+            if i < len(calls) and isinstance(calls[i].get("input"), dict):
+                calls[i]["input"]["content"] = res["display"]
+        return red
 
     def snapshot(self) -> dict:
         return {
@@ -87,6 +115,7 @@ class Session:
             # /api/state 就能读到原文,约束退化成"靠它自觉",而且污染在流水里看不出来。
             "pending_events": self.engine._perceive(list(self.engine.event_queue)),
             "recent_turns": self.recent[-12:],
+            "inbox_counts": {k: len(v) for k, v in self.inbox.items() if v},
             "clamps": self.engine.tools.clamp_log[-5:],
             "episode_path": str(self.episode_path),
             "driver": self.driver_kind,
@@ -169,6 +198,17 @@ class Handler(BaseHTTPRequestHandler):
             self.send_response(204)
             self.end_headers()
             return
+        if self.path.startswith("/api/inbox"):
+            from urllib.parse import parse_qs, urlparse
+            s0 = self.hub.session
+            if s0 is None:
+                self._json(409, {"error": "先开局"}); return
+            q = parse_qs(urlparse(self.path).query)
+            player = (q.get("player") or [""])[0]
+            if player not in s0.inbox:
+                self._json(400, {"error": f"未知座位: {player}"}); return
+            self._json(200, {"player": player, "inbox": s0.inbox[player][-8:]})
+            return
         if self.path == "/api/state":
             s = self.hub.session
             self._json(200, s.snapshot() if s else {"no_session": True,
@@ -210,15 +250,23 @@ class Handler(BaseHTTPRequestHandler):
                         s.driver.pending = {"text": body.get("text", ""),
                                             "tool_use": body.get("tool_use", [])}
                     line = s.engine.turn()
-                    s.recent.append(line)
+                    # 出服务端的一律是遮蔽版:回合响应、轮询面、桌友输入全走 red。
+                    # 原文只活在 episode 文件(审计)和目标收件箱里——防偷看在
+                    # 服务端成立,不靠任何客户端自觉。
+                    red = s.route_private(line)
+                    s.recent.append(red)
                     digest = s.state.digest(s.engine.time_left_min())
-                    for bot in s.bots:  # 桌友对本回合反应,入队待下回合聚合
-                        for ev in bot.react(line, digest):
+                    for bot in s.bots:  # 桌友对本回合反应,入队待下回合聚合;私件只随本人
+                        try:
+                            evs = bot.react(red, digest, inbox=s.inbox.get(bot.name, [])[-3:])
+                        except TypeError:
+                            evs = bot.react(red, digest)
+                        for ev in evs:
                             s.engine.push_event(ev)
                     if s.state.finished:
                         summary = s.engine.run(max_turns=s.engine.marks["turns"])
                         s.recent.append(summary)
-                self._json(200, line)
+                self._json(200, red)
                 return
             self._json(404, {"error": "not found"})
         except (ValueError, json.JSONDecodeError) as e:

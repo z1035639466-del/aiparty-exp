@@ -94,7 +94,12 @@ class ToolExecutor:
 
     # —— show / fx / timer / ask:M1 CLI 仅落 episode,UI 指令由客户端消费 ——
     def _t_show(self, name: str, a: dict) -> dict:
-        return {"display": a.get("content", ""), "visibility": a.get("visibility", "全场公开")}
+        vis = a.get("visibility", "全场公开")
+        player = a.get("player")
+        if vis in ("自己看", "额头"):
+            if player not in self.state.players:
+                raise ClampError(f"show({vis}) 必须指定在座玩家,收到: {player}")
+        return {"display": a.get("content", ""), "visibility": vis, "player": player}
 
     def _t_fx(self, name: str, a: dict) -> dict:
         return {"fx": a.get("effect", "")}

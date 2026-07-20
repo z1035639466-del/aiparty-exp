@@ -130,6 +130,7 @@ class Engine:
                         + ([f"主持词 {sentence_count} 句超 {MAX_SENTENCES}"] if sentence_count > MAX_SENTENCES else []),
         }
         self._ep.write(json.dumps(line, ensure_ascii=False) + "\n")
+        self._ep.flush()  # 审计线逐行落地:进程中途死掉,流水不能跟着蒸发
         self.marks["turns"] += 1
         return line
 

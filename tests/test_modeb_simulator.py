@@ -2,6 +2,7 @@
 import json
 import sys
 import threading
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -134,6 +135,93 @@ def test_turn_does_cost_api_calls(server, monkeypatch):
     tr = _start_llm_table(server, monkeypatch)
     call(server, "/api/turn", {})
     assert tr.calls >= 3, f"一回合应有 1 次主持 + 2 次座位调用,实际 {tr.calls}"
+
+
+# —— 私发防偷看(可见性引擎 §1.3 落地):遮蔽必须在服务端成立 ——
+
+def _inbox(base, player):
+    return call(base, "/api/inbox?player=" + urllib.parse.quote(player))
+
+
+def _show(base, content, visibility, player=None):
+    inp = {"content": content, "visibility": visibility}
+    if player is not None:
+        inp["player"] = player
+    return call(base, "/api/turn", {"text": "", "tool_use": [{"name": "show", "input": inp}]})
+
+
+def test_private_show_routes_only_to_target(server):
+    """自己看:内容只进目标收件箱;回合响应/轮询面一律遮蔽;episode 留全文审计。"""
+    _start(server, 4)
+    line, code = _show(server, "秘密任务:学猫叫三声", "自己看", "玩家2")
+    assert code == 200
+    disp = line["results"][0]["result"]["display"]
+    assert "学猫叫" not in disp and "私发" in disp, f"回合响应必须遮蔽私发内容,实际: {disp}"
+
+    box, _ = _inbox(server, "玩家2")
+    assert any("学猫叫" in x for x in box["inbox"]), "目标座位收件箱应有原文"
+    for other in ("玩家1", "玩家3", "玩家4"):
+        box, _ = _inbox(server, other)
+        assert not box["inbox"], f"{other} 不是目标,收件箱应为空"
+
+    snap, _ = call(server, "/api/state")
+    assert "学猫叫" not in json.dumps(snap["recent_turns"], ensure_ascii=False), \
+        "轮询面(recent_turns)不得出现私发原文"
+    assert snap["inbox_counts"] == {"玩家2": 1}
+    assert "学猫叫" in Path(snap["episode_path"]).read_text(encoding="utf-8"), \
+        "episode 文件须保留全文(审计线)"
+
+
+def test_forehead_show_routes_to_everyone_but_target(server):
+    """额头牌:目标本人看不见,其余所有人收件箱都有。"""
+    _start(server, 4)
+    _show(server, "词:美人鱼", "额头", "玩家1")
+    box, _ = _inbox(server, "玩家1")
+    assert not box["inbox"], "额头牌目标本人不得收到内容"
+    for other in ("玩家2", "玩家3", "玩家4"):
+        box, _ = _inbox(server, other)
+        assert any("美人鱼" in x and "玩家1" in x for x in box["inbox"]), \
+            f"{other} 应收到玩家1的额头牌内容"
+    snap, _ = call(server, "/api/state")
+    assert "美人鱼" not in json.dumps(snap["recent_turns"], ensure_ascii=False)
+
+
+def test_private_show_without_target_is_clamped(server):
+    """自己看/额头缺目标座位 = 钳制:局照转,证据入 clamp_log,不投递任何收件箱。"""
+    _start(server, 3)
+    line, code = _show(server, "无主的秘密", "自己看")
+    assert code == 200 and line["results"][0]["ok"] is False
+    snap, _ = call(server, "/api/state")
+    assert any("在座玩家" in c["clamped"] for c in snap["clamps"])
+    assert snap["inbox_counts"] == {}, "钳制掉的私发不得投递"
+    box, code = call(server, "/api/inbox?player=%E9%99%8C%E7%94%9F%E4%BA%BA")
+    assert code == 400, "未知座位查收件箱应 400"
+
+
+class _RecordingTransport:
+    """记录每次调用收到的用户消息,回一个合法空事件——用来验证桌友到底看见了什么。"""
+
+    def __init__(self) -> None:
+        self.messages: list[str] = []
+
+    def complete(self, system, messages):
+        self.messages.append(messages[-1]["content"])
+        return '{"events": []}'
+
+
+def test_bots_see_redacted_line_but_own_inbox(server, monkeypatch):
+    """桌友座位拿到的回合行必须是遮蔽版;私发原文只经由目标本人的收件箱进入其上下文。
+    否则 bot 座位(以及未来产品端玩家面)一轮就把底牌看光。"""
+    tr = _RecordingTransport()
+    monkeypatch.setattr("modeb.simulator.make_transport", lambda *a, **k: tr)
+    call(server, "/api/start", {"players": ["我", "阿伟", "琳琳"],
+                                "bots": {"阿伟": "显眼包", "琳琳": "气氛组组长"},
+                                "minutes": 30, "wildness": 6, "objects": ["瓶子"],
+                                "driver": "manual", "provider": "deepseek"})
+    _show(server, "秘密暗号:芒果", "自己看", "阿伟")
+    by_seat = {json.loads(m)["you"]: m for m in tr.messages}
+    assert "芒果" in by_seat["阿伟"], "目标座位应通过私密收件拿到原文"
+    assert "芒果" not in by_seat["琳琳"], "非目标座位不得见到私发原文"
 
 
 def test_turn_exception_returns_json_500_and_server_survives(server, monkeypatch):

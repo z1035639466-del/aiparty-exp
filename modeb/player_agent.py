@@ -56,9 +56,10 @@ class LLMPlayerAgent:
         self.errors = 0          # 累计失败次数,供模拟台在座位上打 ⚠️
         self.last_error = ""     # 最近一次失败原因,首次即打到 stderr
 
-    def react(self, turn_line: dict, digest: dict) -> list[dict]:
+    def react(self, turn_line: dict, digest: dict, inbox: list | None = None) -> list[dict]:
         msg = json.dumps({
             "host_text": turn_line.get("text", ""),
+            "你的私密收件(仅你可见,别念出来)": inbox or [],
             "tool_results": [r for r in turn_line.get("results", []) if r.get("ok")],
             "digest": {"round": digest.get("round"), "focus": digest.get("focus"),
                        "scores": digest.get("scores")},
@@ -85,6 +86,6 @@ class ScriptedPlayerAgent:
         self.name = name
         self.script = list(script)
 
-    def react(self, turn_line: dict, digest: dict) -> list[dict]:
+    def react(self, turn_line: dict, digest: dict, inbox: list | None = None) -> list[dict]:
         events = self.script.pop(0) if self.script else []
         return [dict(ev, player=self.name) for ev in events]
