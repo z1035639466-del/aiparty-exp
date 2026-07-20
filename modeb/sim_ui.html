@@ -52,7 +52,7 @@
         <option value="清账">清账(即时结算)</option>
         <option value="综艺">综艺(可攒分颁奖)</option>
         <option value="竞技">竞技(真排名真冠军)</option></select>
-      <label style="white-space:nowrap"><input type="checkbox" id="auto" style="width:auto"> 自动回合</label>
+      <label style="white-space:nowrap" title="开局前勾好:llm 局由服务器自驱(本页可关);scripted 由本页代打"><input type="checkbox" id="auto" style="width:auto"> 自动回合</label>
     </div>
     <button onclick="start()">开局</button>
   </div>
@@ -124,6 +124,7 @@ async function start() {
     wildness: +$("wildness").value, objects: $("objects").value.split(","),
     playlist: $("playlist").value.split(",").map(s => s.trim()).filter(Boolean),
     driver: $("driver").value, bots,
+    autoplay: $("auto").checked,   // llm 局:服务器自驱回合,本页可关、电脑可合盖
     provider: $("provider").value, host_model: $("hostmodel").value,
     seat_model: $("seatmodel").value, score_style: $("scorestyle").value });
   if (bail(r)) return;
@@ -132,7 +133,8 @@ async function start() {
 setInterval(async () => {  // 事件驱动心跳:有新事件/计时器到点才叫醒主持——没动静就让它等
   const st = await api("/api/state");
   if (bail(st)) return;
-  if ($("auto").checked && !st.no_session && !st.finished && st.driver !== "manual" && st.turn_ready) {
+  // llm 局的发动机已进服务器(autoplay);本页只替 scripted 演示代打
+  if ($("auto").checked && !st.no_session && !st.finished && st.driver === "scripted" && st.turn_ready) {
     const line = await api("/api/turn", {});
     if (bail(line)) return;   // 一次失败即停自动回合,不做无声重试
     refresh();

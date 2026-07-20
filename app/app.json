@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "Yappa",
+    "slug": "yappa",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#14141c",
+    "splash": { "backgroundColor": "#14141c" },
+    "ios": { "supportsTablet": false, "bundleIdentifier": "app.yappa.party" },
+    "android": { "package": "app.yappa.party" }
+  }
+}

@@ -13,6 +13,7 @@ import argparse
 import copy
 import json
 import threading
+import time as _t
 import traceback
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
@@ -124,6 +125,55 @@ class Session:
                 if "content" in calls[i]["input"]:
                     calls[i]["input"]["content"] = res[field]
         return red
+
+    def run_turn(self, body: dict | None = None) -> dict:
+        """执行一拍(须在持有 self.lock 下调用):HTTP 手动驱动与服务端自驱共用。
+        出服务端的一律是遮蔽版;原文只活在 episode(审计)和目标收件箱里。"""
+        if isinstance(self.driver, ManualDriver):
+            body = body or {}
+            self.driver.pending = {"text": body.get("text", ""),
+                                   "tool_use": body.get("tool_use", [])}
+        line = self.engine.turn()
+        red = self.route_private(line)
+        self.recent.append(red)
+        digest = self.state.digest(self.engine.time_left_min())
+        # 主持沉默拍(调用失败):桌上没发生任何事,桌友无从反应,不烧调用
+        bots = [] if line.get("host_silent") else self.bots
+        t_bots = datetime.now().timestamp()
+        if bots:
+            # 桌友并行反应:串行时 7 座 × 每座数秒 = 一拍半分钟。收齐再统一
+            # 入队(push_event 动共享账本,不在工作线程里做)。
+            def _react(bot):
+                try:
+                    return bot.react(red, digest,
+                                     inbox=self.inbox.get(bot.name, [])[-3:])
+                except TypeError:
+                    return bot.react(red, digest)
+
+            with ThreadPoolExecutor(max_workers=len(bots)) as pool:
+                reactions = list(pool.map(_react, bots))
+            for evs in reactions:
+                for ev in evs:
+                    self.engine.push_event(ev)
+        self.last_timing = {"host_ms": getattr(self.engine, "last_host_ms", 0),
+                            "bots_ms": int((datetime.now().timestamp() - t_bots) * 1000)}
+        if self.state.finished:
+            self.recent.append(self.engine.run(max_turns=self.engine.marks["turns"]))
+        return red
+
+    def start_autoloop(self, interval_s: float = 1.0) -> None:
+        """服务端自驱回合环(App 时代的回合发动机):llm 驱动下起一条守护线程,
+        turn_ready 就跑拍——驾驶舱页面从此不是发动机,电脑起完服可以合盖。"""
+        def _loop():
+            while not self.state.finished:
+                _t.sleep(interval_s)
+                try:
+                    with self.lock:
+                        if not self.state.finished and self.engine.turn_ready():
+                            self.run_turn()
+                except Exception:
+                    traceback.print_exc()  # 单拍失败不杀发动机;主持断线已有沉默拍兜底
+        threading.Thread(target=_loop, daemon=True).start()
 
     def player_view(self, me: str, depth: int = 6) -> dict:
         """一台手机该看见的东西,别的一个字都不给(房主裁定 2026-07-20)。
@@ -250,6 +300,9 @@ class Hub:
             playlist=cfg.get("playlist") or [],
         )
         self.session.join_base = self.join_base
+        if cfg.get("autoplay") and cfg.get("driver") == "llm":
+            # 服务端自驱:回合发动机进服务器,驾驶舱页面可关、电脑可合盖
+            self.session.start_autoloop(float(cfg.get("autoplay_interval_s", 1.0)))
         return self.session.snapshot()
 
 
@@ -385,40 +438,7 @@ class Handler(BaseHTTPRequestHandler):
                     if s.state.finished:
                         self._json(409, {"error": "局已收"})
                         return
-                    if isinstance(s.driver, ManualDriver):
-                        s.driver.pending = {"text": body.get("text", ""),
-                                            "tool_use": body.get("tool_use", [])}
-                    line = s.engine.turn()
-                    # 出服务端的一律是遮蔽版:回合响应、轮询面、桌友输入全走 red。
-                    # 原文只活在 episode 文件(审计)和目标收件箱里——防偷看在
-                    # 服务端成立,不靠任何客户端自觉。
-                    red = s.route_private(line)
-                    s.recent.append(red)
-                    digest = s.state.digest(s.engine.time_left_min())
-                    # 主持沉默拍(调用失败):桌上没发生任何事,桌友无从反应,不烧调用
-                    bots = [] if line.get("host_silent") else s.bots
-                    t_bots = datetime.now().timestamp()
-                    if bots:
-                        # 桌友并行反应:串行时 7 座 × 每座数秒 = 一拍半分钟,真人
-                        # 入座直接坐牢。现实里大家本来就是同时起哄的。收齐再统一
-                        # 入队(push_event 动共享账本,不在工作线程里做)。
-                        def _react(bot):
-                            try:
-                                return bot.react(red, digest,
-                                                 inbox=s.inbox.get(bot.name, [])[-3:])
-                            except TypeError:
-                                return bot.react(red, digest)
-
-                        with ThreadPoolExecutor(max_workers=len(bots)) as pool:
-                            reactions = list(pool.map(_react, bots))
-                        for evs in reactions:
-                            for ev in evs:
-                                s.engine.push_event(ev)
-                    s.last_timing = {"host_ms": getattr(s.engine, "last_host_ms", 0),
-                                     "bots_ms": int((datetime.now().timestamp() - t_bots) * 1000)}
-                    if s.state.finished:
-                        summary = s.engine.run(max_turns=s.engine.marks["turns"])
-                        s.recent.append(summary)
+                    red = s.run_turn(body)
                 self._json(200, red)
                 return
             self._json(404, {"error": "not found"})

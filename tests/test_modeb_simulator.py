@@ -132,6 +132,26 @@ def test_finish_costs_no_api_call(server, monkeypatch):
     assert tr.calls == 0, "重复收局仍不该调用模型"
 
 
+def test_server_autoloop_drives_turns_without_client(server, monkeypatch):
+    """App 时代的回合发动机:autoplay 的 llm 局由服务器自驱——
+    驾驶舱页面关掉、没有任何客户端调 /api/turn,局也得自己走。"""
+    import time
+    tr = _CountingTransport()
+    monkeypatch.setattr("modeb.simulator.make_transport", lambda *a, **k: tr)
+    call(server, "/api/start", {"players": ["我", "阿伟"], "bots": {"阿伟": "显眼包"},
+                                "minutes": 30, "wildness": 6, "objects": ["瓶子"],
+                                "driver": "llm", "provider": "deepseek",
+                                "autoplay": True, "autoplay_interval_s": 0.05})
+    deadline = time.time() + 3
+    while time.time() < deadline:
+        snap, _ = call(server, "/api/state")
+        if snap.get("marks", {}).get("turns", 0) >= 1:
+            break
+        time.sleep(0.05)
+    assert snap["marks"]["turns"] >= 1, "服务器自驱应在无客户端驱动下跑出首拍"
+    assert tr.calls >= 1
+
+
 def test_turn_does_cost_api_calls(server, monkeypatch):
     """对照组:证明上面那个计数器真的会动——否则零调用的断言毫无意义。"""
     tr = _start_llm_table(server, monkeypatch)
