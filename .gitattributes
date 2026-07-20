@@ -1,0 +1,4 @@
+# Preserve the frozen upstream JSONL byte-for-byte across Windows checkouts.
+inputs/xhs/batch1-upstream/*.jsonl -text
+# dirty-164 is historically CRLF; keep it verbatim without flagging its CR as trailing whitespace.
+inputs/xhs/batch1-upstream/dirty-164.jsonl whitespace=cr-at-eol
