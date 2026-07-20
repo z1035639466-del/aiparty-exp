@@ -1,10 +1,16 @@
 """演示资产渲染管线:模式卡 demo_prompt → 图像生成 API → demo/ 落盘 → 回填 demo_ref。
 
 房主裁定(2026-07-21):T2 用图像生成(gptimage2 这类)做序列图,不用视频。
-本脚本是"你接 key 我先铺管"的管:走 OpenAI 兼容 images 口,三个环境变量即通——
-  IMAGE_API_BASE(如 https://api.openai.com/v1 或任意兼容中转)
-  IMAGE_API_KEY
-  IMAGE_API_MODEL(如 gpt-image-2)
+本脚本是"你接 key 我先铺管"的管,支持两条口子(按环境变量自动选路):
+  ① OpenAI 兼容 images 口(设了 IMAGE_API_BASE 就走这条,同步取图)——
+      IMAGE_API_BASE(如 https://api.openai.com/v1 或任意兼容中转)
+      IMAGE_API_KEY
+      IMAGE_API_MODEL(如 gpt-image-2)
+  ② DashScope(阿里百炼)图像口(没配 IMAGE_API_BASE、但有 DASHSCOPE_API_KEY 时走这条)——
+      房主只有一把 DASHSCOPE_API_KEY,调 wan2.7-image-pro / qwen-image-2.0 这类模型出图。
+      百炼图片接口是异步任务式:提交任务拿 task_id → 轮询任务状态 → SUCCEEDED 后取图 url 下载。
+      DASHSCOPE_API_KEY
+      IMAGE_API_MODEL(如 wan2.7-image-pro,默认值即此)
 铁律沿用资产线既有规矩:
 - 只画动作与队形,槽位留白(prompt 由蒸馏卡自带,生成前追加统一负面约束);
 - 资产挂模式:落盘名 = demo/<tier>/<pattern_id>.png,回填 demo_ref 即生效,
@@ -19,6 +25,7 @@ import base64
 import json
 import os
 import sys
+import time
 import urllib.request
 from pathlib import Path
 
@@ -30,6 +37,97 @@ STYLE_SUFFIX = (
     "人物为无特征简笔角色;多格时按从左到右分格排布,格间留白。"
 )
 
+DASHSCOPE_SUBMIT_URL = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text2image/image-synthesis"
+DASHSCOPE_TASK_URL = "https://dashscope.aliyuncs.com/api/v1/tasks/{task_id}"
+DASHSCOPE_POLL_INTERVAL = 3  # 秒
+DASHSCOPE_POLL_MAX_ROUNDS = 40
+
+
+def _render_openai(prompt: str, base: str, key: str) -> bytes:
+    """走现有 OpenAI 兼容 images 口(同步取图)。"""
+    model = os.environ.get("IMAGE_API_MODEL", "gpt-image-2")
+    req = urllib.request.Request(
+        base.rstrip("/") + "/images/generations", method="POST",
+        headers={"Content-Type": "application/json", "Authorization": f"Bearer {key}"},
+        data=json.dumps({"model": model, "prompt": prompt,
+                         "size": "1536x1024", "n": 1}).encode())
+    with urllib.request.urlopen(req, timeout=180) as r:
+        resp = json.loads(r.read())
+    b64 = resp["data"][0].get("b64_json")
+    if not b64:  # 有的口回 url
+        url = resp["data"][0]["url"]
+        with urllib.request.urlopen(url, timeout=180) as r2:
+            return r2.read()
+    return base64.b64decode(b64)
+
+
+def _dashscope_dig(resp: dict, *keys: str):
+    """从 DashScope 响应里挖字段:先看 output.<key>,兜底看顶层 <key>——接口字段偶有出入,按能跑通来。"""
+    output = resp.get("output") if isinstance(resp.get("output"), dict) else {}
+    for k in keys:
+        if k in output:
+            return output[k]
+    for k in keys:
+        if k in resp:
+            return resp[k]
+    return None
+
+
+def _dashscope_result_url(resp: dict) -> str | None:
+    results = _dashscope_dig(resp, "results")
+    if isinstance(results, list) and results:
+        r0 = results[0]
+        if isinstance(r0, dict):
+            return r0.get("url")
+    return None
+
+
+def _render_dashscope(prompt: str) -> bytes:
+    """走 DashScope(阿里百炼)图像口:提交异步任务 → 轮询 → SUCCEEDED 后下载图。"""
+    key = os.environ["DASHSCOPE_API_KEY"]
+    model = os.environ.get("IMAGE_API_MODEL", "wan2.7-image-pro")
+    req = urllib.request.Request(
+        DASHSCOPE_SUBMIT_URL, method="POST",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {key}",
+            "X-DashScope-Async": "enable",
+        },
+        data=json.dumps({
+            "model": model,
+            "input": {"prompt": prompt},
+            "parameters": {"size": "1536*1024", "n": 1},
+        }).encode(),
+    )
+    with urllib.request.urlopen(req, timeout=180) as r:
+        resp = json.loads(r.read())
+    task_id = _dashscope_dig(resp, "task_id")
+    if not task_id:
+        raise RuntimeError(f"DashScope 未返回 task_id:{resp}")
+
+    task_url = DASHSCOPE_TASK_URL.format(task_id=task_id)
+    url = None
+    for _ in range(DASHSCOPE_POLL_MAX_ROUNDS):
+        poll_req = urllib.request.Request(
+            task_url, method="GET",
+            headers={"Authorization": f"Bearer {key}"},
+        )
+        with urllib.request.urlopen(poll_req, timeout=60) as r:
+            resp = json.loads(r.read())
+        status = str(_dashscope_dig(resp, "task_status", "status") or "").upper()
+        if status == "SUCCEEDED":
+            url = _dashscope_result_url(resp)
+            break
+        if status == "FAILED":
+            msg = _dashscope_dig(resp, "message") or resp
+            raise RuntimeError(f"DashScope 任务失败:{msg}")
+        time.sleep(DASHSCOPE_POLL_INTERVAL)
+    if not url:
+        raise RuntimeError("DashScope 任务轮询超时或未返回图片 url")
+
+    with urllib.request.urlopen(url, timeout=180) as r:
+        return r.read()
+
 
 def render_one(card: dict, out_dir: Path, dry: bool) -> str | None:
     prompt = (card.get("demo_prompt") or "").strip()
@@ -40,25 +138,20 @@ def render_one(card: dict, out_dir: Path, dry: bool) -> str | None:
     if dry:
         print(f"[dry] {card['pattern_id']} → {out}")
         return None
+    full_prompt = prompt + STYLE_SUFFIX
     base = os.environ.get("IMAGE_API_BASE")
-    key = os.environ.get("IMAGE_API_KEY")
-    model = os.environ.get("IMAGE_API_MODEL", "gpt-image-2")
-    if not base or not key:
-        raise SystemExit("缺 IMAGE_API_BASE / IMAGE_API_KEY 环境变量(房主接 key 即通,管线已就绪)")
-    req = urllib.request.Request(
-        base.rstrip("/") + "/images/generations", method="POST",
-        headers={"Content-Type": "application/json", "Authorization": f"Bearer {key}"},
-        data=json.dumps({"model": model, "prompt": prompt + STYLE_SUFFIX,
-                         "size": "1536x1024", "n": 1}).encode())
-    with urllib.request.urlopen(req, timeout=180) as r:
-        resp = json.loads(r.read())
-    b64 = resp["data"][0].get("b64_json")
-    if not b64:  # 有的口回 url
-        url = resp["data"][0]["url"]
-        with urllib.request.urlopen(url, timeout=180) as r2:
-            img = r2.read()
+    if base:
+        key = os.environ.get("IMAGE_API_KEY")
+        if not key:
+            raise SystemExit("缺 IMAGE_API_KEY 环境变量(配了 IMAGE_API_BASE 需要配对的 key)")
+        img = _render_openai(full_prompt, base, key)
+    elif os.environ.get("DASHSCOPE_API_KEY"):
+        img = _render_dashscope(full_prompt)
     else:
-        img = base64.b64decode(b64)
+        raise SystemExit(
+            "缺 IMAGE_API_BASE/IMAGE_API_KEY,也缺 DASHSCOPE_API_KEY"
+            "(房主接其中一路 key 即通,管线已就绪)"
+        )
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_bytes(img)
     return str(out.relative_to(out_dir))
