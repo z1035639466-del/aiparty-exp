@@ -62,7 +62,9 @@ CN_PROVIDERS = {
 # 不再硬绑 anthropic。控制台真实 id 若不同,VISION_MODEL 环境变量一把覆盖。
 VISION_MODELS = {
     "anthropic": None,          # None = 沿用主持模型(Anthropic 文本模型本身看图)
-    "qwen": "qwen-vl-max",
+    # 千问的视觉焊在 Max 快照里(默认 Max 是纯文本):指向带视觉那版。
+    # 快照名会随版本滚动——控制台真实名不同时用 VISION_MODEL 环境变量一把覆盖。
+    "qwen": "qwen3.7-max-2026-06-08",
     "glm": "glm-4v",
     "mock": None,
 }
