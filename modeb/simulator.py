@@ -20,6 +20,7 @@ from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+from . import persist
 from .driver_llm import LLMDriver
 from .driver_scripted import ScriptedDriver
 from .engine import Engine
@@ -49,7 +50,9 @@ class Session:
                  host_model: str = "sonnet", seat_model: str = "sonnet",
                  score_style: str = "自动", host_perception: str = "转写",
                  playlist: list[str] | None = None,
-                 occasion: str = "", scene_brief: str = "") -> None:
+                 occasion: str = "", scene_brief: str = "",
+                 state: GameState | None = None,
+                 episode_path: Path | None = None, episode_mode: str = "w") -> None:
         if not MIN_PLAYERS <= len(players) <= MAX_PLAYERS:
             raise ValueError(f"玩家数须在 {MIN_PLAYERS}–{MAX_PLAYERS}(收到 {len(players)})")
         if driver_kind == "scripted" and len(players) < 3:
@@ -58,12 +61,24 @@ class Session:
         unknown = set(bots) - set(players)
         if unknown:
             raise ValueError(f"bot 座位不在玩家名单里: {sorted(unknown)}")
-        self.state = GameState(players=players, wildness_cap=wildness,
-                               time_budget_min=minutes, scene_objects=objects,
-                               score_style=score_style, host_perception=host_perception,
-                               playlist=[t.strip() for t in (playlist or []) if t.strip()],
-                               occasion=occasion.strip(), scene_brief=scene_brief.strip())
+        # state 传入 = 局中断点续局:直接接管盘上重建的账本,不新建空局
+        #(驱动器/桌友仍按 cfg 重建——LLM 主持凭 digest 重新入场,history 不持久化)。
+        if state is not None:
+            self.state = state
+        else:
+            self.state = GameState(players=players, wildness_cap=wildness,
+                                   time_budget_min=minutes, scene_objects=objects,
+                                   score_style=score_style, host_perception=host_perception,
+                                   playlist=[t.strip() for t in (playlist or []) if t.strip()],
+                                   occasion=occasion.strip(), scene_brief=scene_brief.strip())
         self.driver_kind = driver_kind
+        # 存局 cfg 用:恢复时按原 cfg 重建驱动/桌友,快照落盘也回读这些
+        self.provider = provider
+        self.host_model = host_model
+        self.seat_model = seat_model
+        self.bots_cfg = dict(bots)
+        self.autoplay = False           # 由 Hub.start / restore 注入
+        self.autoplay_interval_s = 1.0
         if driver_kind == "scripted":
             self.driver = ScriptedDriver()
         elif driver_kind == "llm":
@@ -89,9 +104,13 @@ class Session:
                                         make_transport(provider, seat_model))
                          for n, persona in bots.items()]
         self.bot_names = sorted(bots)
-        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-        self.episode_path = out_dir / f"sim_{stamp}.jsonl"
-        self.engine = Engine(self.state, self.driver, self.episode_path)
+        if episode_path is None:
+            stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            episode_path = out_dir / f"sim_{stamp}.jsonl"
+        self.episode_path = episode_path
+        # 快照与 episode 同目录同 stamp:sim_<stamp>.jsonl ↔ sim_<stamp>.state.json
+        self.state_path = persist.state_path_for(episode_path)
+        self.engine = Engine(self.state, self.driver, self.episode_path, episode_mode=episode_mode)
         self.recent: list[dict] = []  # 最近回合行,供前端轮询
         self.inbox: dict[str, list[str]] = {n: [] for n in players}  # 私发收件箱(可见性引擎落地)
         self.last_timing: dict = {}  # 上一拍耗时拆帐:host_ms / bots_ms(慢要先量再修)
@@ -231,6 +250,10 @@ class Session:
                             "bots_ms": int((datetime.now().timestamp() - t_bots) * 1000)}
         if self.state.finished:
             self.recent.append(self.engine.run(max_turns=self.engine.marks["turns"]))
+            persist.clear_snapshot(self)   # 收局清理快照:收完的局不该被 --resume 捞起
+        else:
+            # 每拍后原子落盘:进程中途死掉,从这个快照能续上整局(计时器恢复时作废)
+            persist.write_snapshot(self)
         return red
 
     def start_autoloop(self, interval_s: float = 1.0) -> None:
@@ -359,6 +382,7 @@ class Hub:
             with old.lock:
                 old.state.finished = True   # 关门后到的回合走 409,不再往这局写
                 old.engine._ep.close()
+                persist.clear_snapshot(old)  # 旧局换掉即清快照,不留孤儿被误恢复
         players = [p.strip() for p in cfg.get("players", []) if p.strip()]
         self.session = Session(
             players=players,
@@ -377,9 +401,11 @@ class Hub:
             occasion=cfg.get("occasion", ""), scene_brief=cfg.get("scene_brief", ""),
         )
         self.session.join_base = self.join_base
+        self.session.autoplay = bool(cfg.get("autoplay"))
+        self.session.autoplay_interval_s = float(cfg.get("autoplay_interval_s", 1.0))
         if cfg.get("autoplay") and cfg.get("driver") == "llm":
             # 服务端自驱:回合发动机进服务器,驾驶舱页面可关、电脑可合盖
-            self.session.start_autoloop(float(cfg.get("autoplay_interval_s", 1.0)))
+            self.session.start_autoloop(self.session.autoplay_interval_s)
         return self.session.snapshot()
 
 
@@ -537,6 +563,7 @@ class Handler(BaseHTTPRequestHandler):
                     if not s.state.finished:
                         s.state.finished = True
                         s.recent.append(s.engine.run(max_turns=s.engine.marks["turns"]))
+                        persist.clear_snapshot(s)   # 收局清理快照,不留待恢复
                 self._json(200, {"finished": True})
                 return
             if self.path == "/api/turn":
@@ -574,10 +601,24 @@ def main() -> None:
     ap.add_argument("--out", default="outputs/episodes")
     ap.add_argument("--lan", action="store_true",
                     help="绑 0.0.0.0,让同一 Wi-Fi 下的手机能连进来(入座链接自动用局域网 IP)")
+    ap.add_argument("--resume", default=None,
+                    help="局中断点续局:从 sim_<stamp>.state.json 快照恢复一局继续玩(可与 --lan 组合)")
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     srv = make_server(args.port, out, bind="0.0.0.0" if args.lan else "127.0.0.1")
+    if args.resume:
+        # 服务重启后恢复整局:计时器作废清零 + resume_note 入队,episode 追加续写,
+        # 对决作废;llm 主持凭 digest + 荷官回执重新入场(history 不持久化)。
+        snap = persist.load_snapshot(args.resume)
+        if snap.get("finished"):
+            print(f"该快照已收局,不恢复:{args.resume}")
+        else:
+            session = persist.restore_session(snap, out, join_base=Handler.hub.join_base)
+            Handler.hub.session = session
+            if session.autoplay and session.driver_kind == "llm":
+                session.start_autoloop(session.autoplay_interval_s)
+            print(f"已从快照恢复:{args.resume}(episode 追加续写 {session.episode_path})")
     base = Handler.hub.join_base
     print(f"模拟台(驾驶舱) → {base}  (机位 {MIN_PLAYERS}–{MAX_PLAYERS},Ctrl-C 退出)")
     print(f"玩家入座        → {base}/play")

@@ -25,7 +25,8 @@ class Driver(Protocol):
 
 
 class Engine:
-    def __init__(self, state: GameState, driver: Driver, episode_path: Path, rng_seed: int = 0) -> None:
+    def __init__(self, state: GameState, driver: Driver, episode_path: Path, rng_seed: int = 0,
+                 episode_mode: str = "w") -> None:
         self.state = state
         self.driver = driver
         self.tools = ToolExecutor(state, rng_seed)
@@ -45,7 +46,9 @@ class Engine:
         # agent 桌冻死是 harness 座位掉线,归座位保活/产品在线心跳,不归引擎。
         self._t0 = time.time()
         episode_path.parent.mkdir(parents=True, exist_ok=True)
-        self._ep = episode_path.open("w", encoding="utf-8")
+        # episode_mode="a":局中断点续局时以追加模式续写原文件,不覆盖既有流水
+        #(裁定:episode 是审计线,恢复后接着写,历史一行都不能丢)。
+        self._ep = episode_path.open(episode_mode, encoding="utf-8")
 
     # —— 玩家端/观察员事件入队(两回合之间聚合,不逐条打驱动器) ——
     def push_event(self, ev: dict) -> None:
