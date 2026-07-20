@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 outputs/*.warnings.json
 .venv/
+
+# modeb 模拟台每局运行时 episode(运维产物,非源码;交付走路径不入库)
+outputs/episodes/
