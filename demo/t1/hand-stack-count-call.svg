@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',sans-serif">
+  <rect width="800" height="500" fill="#fdfbf6"/>
+  <text x="40" y="52" font-size="30" font-weight="bold" fill="#22303f">叠手点喝 · 喊层数</text>
+  <text x="40" y="80" font-size="14" fill="#8a94a0">pat-v1-02 · 手塔第几层是谁的手,一图对上号;结算方式主持临场宣布</text>
+
+  <!-- 手塔:五只手掌心向下依次叠放,手臂交替从左右伸入 -->
+  <g stroke-width="2.5">
+    <!-- 第1层(最底) -->
+    <path d="M60 392 L235 392" stroke="#8a94a0" stroke-width="14" stroke-linecap="round"/>
+    <rect x="205" y="376" width="150" height="32" rx="16" fill="#dde4ea" stroke="#8a94a0"/>
+    <!-- 第2层 -->
+    <path d="M520 356 L340 356" stroke="#8a94a0" stroke-width="14" stroke-linecap="round"/>
+    <rect x="220" y="340" width="150" height="32" rx="16" fill="#eef1f4" stroke="#8a94a0"/>
+    <!-- 第3层:被喊中,绿色高亮 -->
+    <path d="M60 320 L230 320" stroke="#3f8f4f" stroke-width="14" stroke-linecap="round"/>
+    <rect x="200" y="304" width="150" height="32" rx="16" fill="#eef7ee" stroke="#3f8f4f" stroke-width="4"/>
+    <!-- 第4层 -->
+    <path d="M520 284 L345 284" stroke="#8a94a0" stroke-width="14" stroke-linecap="round"/>
+    <rect x="225" y="268" width="150" height="32" rx="16" fill="#eef1f4" stroke="#8a94a0"/>
+    <!-- 第5层(最顶) -->
+    <path d="M60 248 L235 248" stroke="#8a94a0" stroke-width="14" stroke-linecap="round"/>
+    <rect x="205" y="232" width="150" height="32" rx="16" fill="#dde4ea" stroke="#8a94a0"/>
+  </g>
+
+  <!-- 层数标注 -->
+  <g font-size="16" fill="#8a94a0" text-anchor="middle">
+    <text x="395" y="398">1</text>
+    <text x="395" y="362">2</text>
+    <text x="398" y="326" font-size="20" font-weight="bold" fill="#3f8f4f">3 ←</text>
+    <text x="395" y="290">4</text>
+    <text x="395" y="254">5</text>
+  </g>
+
+  <!-- 数数方向留白:两个方向都可能,主持开口前先约定 -->
+  <g stroke="#c9a227" stroke-width="3" fill="none">
+    <path d="M470 380 L470 250" marker-end="url(#arrY)"/>
+    <path d="M510 250 L510 380" marker-end="url(#arrY)"/>
+  </g>
+  <defs>
+    <marker id="arrY" markerWidth="10" markerHeight="10" refX="6" refY="4" orient="auto">
+      <path d="M0 0 L8 4 L0 8 z" fill="#c9a227"/>
+    </marker>
+  </defs>
+  <text x="490" y="230" font-size="15" fill="#c9a227" text-anchor="middle" font-weight="bold">从下数?从上数?</text>
+  <text x="490" y="410" font-size="13" fill="#8a94a0" text-anchor="middle">先约定再喊</text>
+
+  <!-- 点喝人:闭眼喊数 -->
+  <g>
+    <circle cx="660" cy="300" r="34" fill="#fdfbf6" stroke="#22303f" stroke-width="3"/>
+    <path d="M645 296 q6 5 12 0 M665 296 q6 5 12 0" stroke="#22303f" stroke-width="3" fill="none"/>
+    <path d="M650 316 q10 8 20 0" stroke="#22303f" stroke-width="3" fill="none"/>
+    <path d="M700 258 q30 -18 52 -2 l-8 30 q-22 -12 -40 -6 z" fill="#fff" stroke="#22303f" stroke-width="2.5"/>
+    <text x="728" y="278" font-size="22" font-weight="bold" fill="#22303f" text-anchor="middle">3!</text>
+    <text x="660" y="366" font-size="15" fill="#22303f" text-anchor="middle">闭眼喊</text>
+  </g>
+
+  <text x="40" y="470" font-size="16" fill="#22303f">① 众人依次叠手成塔　② 点喝人闭眼喊一个层数　③ 那一层的手主进结算(数向由主持临场约定)</text>
+</svg>

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',sans-serif">
+  <rect width="800" height="500" fill="#fdfbf6"/>
+  <text x="40" y="52" font-size="30" font-weight="bold" fill="#22303f">烧纸骰落 · 摆位图</text>
+  <text x="40" y="80" font-size="14" fill="#8a94a0">pat-v1-52 · 纸巾绷紧当鼓面,骰子放正中央;燎边不燎心,骰子掉落那一下算谁的</text>
+
+  <!-- 容器(侧视,空杯轮廓,不画杯中物) -->
+  <path d="M300 250 L316 430 Q400 448 484 430 L500 250" fill="none" stroke="#8a94a0" stroke-width="5"/>
+
+  <!-- 纸巾:绷紧覆盖杯口,两侧自然下垂 -->
+  <path d="M262 262 Q276 246 296 250 L504 250 Q524 246 538 262" fill="none" stroke="#22303f" stroke-width="4"/>
+  <path d="M296 250 L504 250" stroke="#22303f" stroke-width="4"/>
+  <text x="560" y="252" font-size="15" fill="#22303f">纸巾绷紧成鼓面</text>
+
+  <!-- 骰子:正中央 -->
+  <g>
+    <rect x="374" y="198" width="52" height="52" rx="8" fill="#fff" stroke="#22303f" stroke-width="3.5"/>
+    <circle cx="388" cy="212" r="4.5" fill="#22303f"/>
+    <circle cx="412" cy="236" r="4.5" fill="#22303f"/>
+    <circle cx="400" cy="224" r="4.5" fill="#c0392b"/>
+    <path d="M400 178 L400 192" stroke="#c9a227" stroke-width="3" stroke-dasharray="5 4"/>
+    <text x="400" y="168" font-size="15" fill="#c9a227" text-anchor="middle" font-weight="bold">骰子放正中央</text>
+  </g>
+  <!-- 中央禁区 -->
+  <circle cx="400" cy="250" r="46" fill="none" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="7 6"/>
+  <text x="400" y="322" font-size="15" fill="#c0392b" text-anchor="middle" font-weight="bold">✗ 中央别碰</text>
+
+  <!-- 打火机:45° 靠近纸巾边缘(不画火焰) -->
+  <g transform="rotate(-45 200 350)">
+    <rect x="178" y="322" width="44" height="76" rx="10" fill="#dde4ea" stroke="#22303f" stroke-width="3"/>
+    <rect x="186" y="308" width="28" height="16" rx="4" fill="none" stroke="#22303f" stroke-width="3"/>
+  </g>
+  <path d="M228 310 Q252 282 274 264" fill="none" stroke="#3f8f4f" stroke-width="3" marker-end="url(#arrG)"/>
+  <defs>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="6" refY="4" orient="auto">
+      <path d="M0 0 L8 4 L0 8 z" fill="#3f8f4f"/>
+    </marker>
+  </defs>
+  <text x="152" y="422" font-size="15" fill="#3f8f4f" font-weight="bold">✓ 45° 轻燎纸巾边缘</text>
+
+  <!-- 手臂持打火机 -->
+  <path d="M120 470 L172 392" stroke="#8a94a0" stroke-width="16" stroke-linecap="round"/>
+
+  <text x="40" y="470" font-size="16" fill="#22303f">① 纸巾绷紧盖住杯口,骰子放正中央　② 轮流用打火机轻燎纸巾边缘　③ 谁那一下骰子掉了,谁进结算</text>
+</svg>

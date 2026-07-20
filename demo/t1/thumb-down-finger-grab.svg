@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',sans-serif">
+  <rect width="800" height="500" fill="#fdfbf6"/>
+  <text x="40" y="52" font-size="30" font-weight="bold" fill="#22303f">倒抓手指 · 拇指朝下</text>
+  <text x="40" y="80" font-size="14" fill="#8a94a0">pat-v1-44 · 手型口述易歪,一图定准;口令一响翻手抓邻指</text>
+
+  <!-- 左:俯视队形——四只手食指在中心搭成十字 -->
+  <g stroke-linecap="round">
+    <path d="M280 105 L280 195" stroke="#8a94a0" stroke-width="18"/>
+    <path d="M280 195 L280 248" stroke="#22303f" stroke-width="11"/>
+    <path d="M280 455 L280 365" stroke="#8a94a0" stroke-width="18"/>
+    <path d="M280 365 L280 312" stroke="#22303f" stroke-width="11"/>
+    <path d="M105 280 L195 280" stroke="#8a94a0" stroke-width="18"/>
+    <path d="M195 280 L248 280" stroke="#22303f" stroke-width="11"/>
+    <path d="M455 280 L365 280" stroke="#8a94a0" stroke-width="18"/>
+    <path d="M365 280 L312 280" stroke="#22303f" stroke-width="11"/>
+  </g>
+  <circle cx="280" cy="280" r="34" fill="none" stroke="#c9a227" stroke-width="3" stroke-dasharray="7 6"/>
+  <text x="280" y="130" font-size="14" fill="#8a94a0" text-anchor="middle"> </text>
+  <text x="280" y="435" font-size="15" fill="#22303f" text-anchor="middle" font-weight="bold">食指互相靠拢搭在一起</text>
+
+  <!-- 右:手型判准 ✓ 拇指朝下 / ✗ 掌心朝上 -->
+  <g>
+    <!-- ✓ 正确:侧视手,拇指垂在下方 -->
+    <rect x="545" y="150" width="120" height="58" rx="26" fill="#eef7ee" stroke="#3f8f4f" stroke-width="3"/>
+    <path d="M660 168 L742 168" stroke="#3f8f4f" stroke-width="12" stroke-linecap="round"/>
+    <path d="M585 205 L585 248" stroke="#3f8f4f" stroke-width="13" stroke-linecap="round"/>
+    <circle cx="520" cy="162" r="14" fill="none" stroke="#3f8f4f" stroke-width="4"/>
+    <text x="640" y="278" font-size="19" font-weight="bold" fill="#3f8f4f" text-anchor="middle">✓ 拇指垂直朝下,食指平伸</text>
+
+    <!-- ✗ 错误:掌心朝上摊开 -->
+    <ellipse cx="612" cy="360" rx="62" ry="30" fill="#fdeeed" stroke="#c0392b" stroke-width="3"/>
+    <path d="M672 352 L748 340" stroke="#c0392b" stroke-width="11" stroke-linecap="round"/>
+    <path d="M560 340 L536 315" stroke="#c0392b" stroke-width="11" stroke-linecap="round"/>
+    <circle cx="505" cy="352" r="14" fill="none" stroke="#c0392b" stroke-width="4"/>
+    <text x="640" y="428" font-size="19" font-weight="bold" fill="#c0392b" text-anchor="middle">✗ 掌心朝上摊平 = 手型不对</text>
+  </g>
+
+  <text x="40" y="470" font-size="16" fill="#22303f">① 每人拇指朝下、食指互靠搭在一起　② 口令一响同时翻手抓邻指、同时躲避　③ 被抓住手指者进结算</text>
+</svg>

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',sans-serif">
+  <rect width="800" height="500" fill="#fdfbf6"/>
+  <text x="40" y="52" font-size="30" font-weight="bold" fill="#22303f">拉圈手断 · 一指勾圈</text>
+  <text x="40" y="80" font-size="14" fill="#8a94a0">pat-v1-33 · 俯视队形:共享一只橡皮圈,各出一根手指;脱手/先松者进结算</text>
+
+  <defs>
+    <marker id="arrOut" markerWidth="10" markerHeight="10" refX="6" refY="4" orient="auto">
+      <path d="M0 0 L8 4 L0 8 z" fill="#c0392b"/>
+    </marker>
+  </defs>
+
+  <!-- 橡皮圈(俯视) -->
+  <circle cx="400" cy="285" r="105" fill="none" stroke="#c9a227" stroke-width="12"/>
+
+  <!-- 五根手指均匀勾住圈:手指=圆头短条,从圈上探进内侧;手臂线伸向画面外 -->
+  <g stroke-linecap="round">
+    <!-- 上 -->
+    <path d="M400 60 L400 168" stroke="#8a94a0" stroke-width="16"/>
+    <path d="M400 168 L400 205" stroke="#dde4ea" stroke-width="18"/>
+    <path d="M400 168 L400 205" stroke="#22303f" stroke-width="12"/>
+    <!-- 右上 -->
+    <path d="M690 140 L500 213" stroke="#8a94a0" stroke-width="16"/>
+    <path d="M500 213 L466 233" stroke="#22303f" stroke-width="12"/>
+    <!-- 右下 -->
+    <path d="M700 440 L505 350" stroke="#8a94a0" stroke-width="16"/>
+    <path d="M505 350 L462 335" stroke="#22303f" stroke-width="12"/>
+    <!-- 左下 -->
+    <path d="M100 440 L295 350" stroke="#8a94a0" stroke-width="16"/>
+    <path d="M295 350 L338 335" stroke="#22303f" stroke-width="12"/>
+    <!-- 左上 -->
+    <path d="M110 140 L300 213" stroke="#8a94a0" stroke-width="16"/>
+    <path d="M300 213 L334 233" stroke="#22303f" stroke-width="12"/>
+  </g>
+
+  <!-- 向外发力箭头 -->
+  <g stroke="#c0392b" stroke-width="3" fill="none">
+    <path d="M400 148 L400 118" marker-end="url(#arrOut)"/>
+    <path d="M496 200 L522 185" marker-end="url(#arrOut)"/>
+    <path d="M498 362 L525 378" marker-end="url(#arrOut)"/>
+    <path d="M302 362 L275 378" marker-end="url(#arrOut)"/>
+    <path d="M304 200 L278 185" marker-end="url(#arrOut)"/>
+  </g>
+
+  <text x="400" y="292" font-size="16" fill="#c9a227" text-anchor="middle" font-weight="bold">共享一只圈</text>
+  <text x="620" y="90" font-size="15" fill="#c0392b" font-weight="bold">听口令同时向外拉</text>
+  <text x="40" y="470" font-size="16" fill="#22303f">① 每人一根手指勾住同一橡皮圈　② 听口令同时向外摇晃拉扯　③ 圈脱手或先松开者进结算</text>
+</svg>
