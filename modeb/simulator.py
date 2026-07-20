@@ -676,6 +676,8 @@ def make_server(port: int, out_dir: Path, bind: str = "127.0.0.1") -> ThreadingH
 
 
 def main() -> None:
+    from .env import load_env
+    load_env()  # 仓库根 .env 配一次永久生效(key 不进仓库);export 仍可临时覆盖
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8747)
     ap.add_argument("--out", default="outputs/episodes")

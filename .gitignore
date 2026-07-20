@@ -3,3 +3,6 @@ __pycache__/
 outputs/*.warnings.json
 .venv/
 .claude/
+
+# 密钥文件:永不进仓库
+.env

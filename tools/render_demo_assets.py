@@ -65,6 +65,9 @@ def render_one(card: dict, out_dir: Path, dry: bool) -> str | None:
 
 
 def main() -> None:
+    sys.path.insert(0, str(ROOT))
+    from modeb.env import load_env
+    load_env()  # 仓库根 .env 配一次永久生效(key 不进仓库)
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", help="只渲染指定 pattern_id")
     ap.add_argument("--dry-run", action="store_true")
