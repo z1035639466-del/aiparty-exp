@@ -67,8 +67,10 @@ class Engine:
             ask = self.state.open_ask
             # 应答归到这次问询名下,一人一票、后答覆盖先答。
             ask["answers"][ev["player"]] = ev.get("value") or ev.get("text") or "确认"
-            if ask["deadline"] is None:
-                # 计时从「第一个人应声」才开始,给后到的人留窗口。
+            if ask.get("mode") == "轮流":
+                self._advance_round_ask(ask)  # 答完即轮下一位,不等窗口烧完
+            elif ask["deadline"] is None:
+                # 抢答:计时从「第一个人应声」才开始,给后到的人留窗口。
                 # 没人应声就不计时——安静等着,不催。
                 ask["deadline"] = time.time() + ask["window"]
                 self.state.timers.append(ask["deadline"])
@@ -115,12 +117,29 @@ class Engine:
             return ev.get("to") == "局长"
         return ev.get("type") in ("vote", "tap")
 
+    def _advance_round_ask(self, ask: dict) -> None:
+        """轮流问询推进:下一位开新窗;没有下一位就把 deadline 拨到现在,待收。"""
+        if ask["queue"]:
+            ask["asked"] = ask["queue"].pop(0)
+            ask["deadline"] = time.time() + ask["window"]
+        else:
+            ask["deadline"] = time.time() - 0.001
+        self.state.timers.append(ask["deadline"])
+
     def _close_ask(self) -> dict | None:
         """窗口到点:按多数认,一票也认,平票取先到,没人答就明说没人答。"""
         ask = self.state.open_ask
         # deadline 为 None = 还没人应声。安静等着,不催、不结算、不叫醒主持。
         if not ask or ask["deadline"] is None or time.time() < ask["deadline"]:
             return None
+        if ask.get("mode") == "轮流" and (ask["queue"] or
+                                          ask["asked"] not in ask["answers"]):
+            # 当前这位超时没答:记一笔(挤掉≠沉默的另一面:轮到了没接),轮下一位
+            if ask["asked"] not in ask["answers"] and ask["queue"]:
+                self._advance_round_ask(ask)
+                return None
+            if ask["asked"] not in ask["answers"] and not ask["queue"]:
+                pass  # 最后一位也超时:落到下面正常收
         self.state.open_ask = None
         tally: dict[str, int] = {}
         for v in ask["answers"].values():
@@ -128,7 +147,12 @@ class Engine:
         winner = max(tally, key=lambda k: tally[k])
         # 被问未答名单:主持曾把"被窗口挤掉"读成"安静得可疑"并据此下判——
         # 它不是不想管,是数据里没有这个信息。挤掉≠沉默,必须可分辨。
-        audience = self.state.players if ask.get("asked") in (None, "全场") else [ask["asked"]]
+        if ask.get("mode") == "轮流":
+            audience = ask.get("order_all", [])
+        elif ask.get("asked") in (None, "全场"):
+            audience = self.state.players
+        else:
+            audience = [ask["asked"]]
         silent = [p for p in audience if p not in ask["answers"]]
         return {"type": "ask_result", "prompt": ask["prompt"], "tally": tally,
                 "winner": winner, "answers": dict(ask["answers"]), "silent": silent,

@@ -212,12 +212,25 @@ export default function App() {
           <Text style={s.sigText}>🎙局长</Text>
         </Pressable>
       </View>
-      <Pressable onPress={() => Alert.alert("安全退出", "零代价退出当前环节,确定?", [
-        { text: "再想想" },
-        { text: "退出这轮", onPress: () => sendEvent({ type: "optout" }) },
-      ])}>
-        <Text style={s.optout}>安全退出</Text>
-      </Pressable>
+      <View style={[s.row, { justifyContent: "center" }]}>
+        <Pressable onPress={() => Alert.alert("安全退出", "零代价退出当前环节,确定?", [
+          { text: "再想想" },
+          { text: "退出这轮", onPress: () => sendEvent({ type: "optout" }) },
+        ])}>
+          <Text style={s.optout}>安全退出</Text>
+        </Pressable>
+        <Pressable onPress={async () => {   // 开局拍一张现场:实物清单+场景速写自动进局
+          const perm = await ImagePicker.requestCameraPermissionsAsync();
+          if (!perm.granted) return;
+          const r = await ImagePicker.launchCameraAsync({ quality: 0.4, base64: true });
+          if (r.canceled) return;
+          const res = await api("/api/scene", { image_b64: r.assets[0].base64, media_type: "image/jpeg" })
+            .catch(e => ({ error: e.message }));
+          Alert.alert("场景侦察", res.error || `${res.brief || ""}\n实物:${(res.objects || []).join("、")}`);
+        }}>
+          <Text style={s.optout}>📷 场景侦察</Text>
+        </Pressable>
+      </View>
     </KeyboardAvoidingView>
   );
 }

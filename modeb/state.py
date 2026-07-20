@@ -48,6 +48,9 @@ class GameState:
     scene_brief: str = ""   # 场景速写(手填或将来开局一拍照的视觉摘要)
     # 拍照判定(多模态判定通道 v0):主持显式发起的判定时刻,非常驻监听。
     pending_photo: dict | None = None  # {player, prompt}
+    # 私件挂账:发出去的额头牌/私发任务(只记 holder+档,不记内容——digest 是半公开面)。
+    # 实测:额头牌发完就沉底,"从头到尾没有被使用或提及规则"。
+    private_out: list = field(default_factory=list)
     settled: dict[str, int] = field(default_factory=dict)  # 已清账累计口数(清账制的另一半)
     discards: list[dict] = field(default_factory=list)  # 主动弃牌留痕:弃牌≠用牌
     finished: bool = False
@@ -76,6 +79,7 @@ class GameState:
                       "drawn": _time.time() >= self.duel["draw_at"]}
                      if self.duel else None),
             "photo_wait": self.pending_photo["player"] if self.pending_photo else None,
+            "private_out": list(self.private_out),
         }
 
 

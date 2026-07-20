@@ -20,7 +20,7 @@ HISTORY_WINDOW = 6  # 保留最近 N 回合主持词,维持口风连续
 
 TOOLS_DECLARATION = [
     {"name": "show", "desc": "向玩家端展示内容;自己看=只投给 player 本人(同一内容发多人用 players 列表:发牌先一批发平民词、再单发卧底词,两次调用收工),额头=只有 player 本人看不见、其余人都收到——私密档必须带 player 或 players(在座目标),收件人用 GET /api/inbox 取信;draw_atom 若回了 demo.ref,讲解玩法时把它原样填进 demo 即播放演示件(自己编的引用会被降级)", "args": {"content": "str", "visibility": "自己看|额头|全场公开", "player": "str?", "players": "list?(仅自己看,批量私发)", "demo": "str?"}},
-    {"name": "ask", "desc": "限时问一嘴:发问后安静等,没人应声就一直等(不催);第一个人应声起算窗口,到点按多数认、一票也认。点名问某人时只认那个人的应答。ask_result 里 silent=被问未答名单——那是没赶上窗口,不是故意沉默,不许当'安静得可疑'下判;顺序性玩法(一人一句)别用抢答窗,逐人点名问", "args": {"player": "str|全场", "prompt": "str", "options": "list?", "window": "int?秒,默认5"}},
+    {"name": "ask", "desc": "限时问一嘴。默认抢答:发问后安静等,第一个人应声起算窗口,到点按多数认、一票也认;点名问某人只认那个人。顺序性玩法(一人一句形容/逐个表态)用 mode=轮流:每人独立应答槽逐个开窗,答完或超时自动轮下一位,谁也挤不掉谁。ask_result 里 silent=被问未答名单——那是没赶上/轮到没接,不是故意沉默,不许当'安静得可疑'下判", "args": {"player": "str|全场", "prompt": "str", "options": "list?", "window": "int?秒,默认5", "mode": "抢答(默认)|轮流", "order": "list?(轮流的顺序,默认全场座次)"}},
     {"name": "random.pick", "desc": "公平随机选择;决定隐藏身份时务必带 visibility=自己看+player,否则结果会广播到公开回合行,身份当场穿帮。私密摇的结果不当场回显——下一拍的 tool_receipts 会把答案回执给你,结算要揭晓的事等回执到手再宣布,别当场硬猜", "args": {"from": "players|list", "exclude": "list?", "visibility": "自己看?", "player": "str?"}},
     {"name": "random.int", "desc": "公平随机整数;藏数字(毒杯号等)同样用 visibility=自己看+player 私密摇,答案同样走下一拍 tool_receipts 回执", "args": {"min": "int", "max": "int", "visibility": "自己看?", "player": "str?"}},
     {"name": "timer", "desc": "计时", "args": {"seconds": "int", "label": "str"}},
@@ -36,7 +36,7 @@ TOOLS_DECLARATION = [
     {"name": "duel.cancel", "desc": "撤销进行中的对决(卡住/点错人时用)", "args": {}},
     {"name": "music.play", "desc": "DJ 换歌:只许点房主上传歌单里的曲目(歌单在系统提示的 DJ 台一节;无歌单则本工具不可用);音乐是背景,换歌不必播报", "args": {"track": "str(歌单内曲目,可只写歌名)", "mood": "str?"}},
     {"name": "music.stop", "desc": "停止播放", "args": {}},
-    {"name": "draw_atom", "desc": "从弹药库抽原子(分面过滤+排已用);野度=上限,野度min=下限——想加档就抬野度min,别只嘴上说;tier=铺垫(小快垫场:通用局开局款/敢不敢微挑战都在这档)|主打(副歌重拍:摆阵重器/大流程);人数下限系统按本桌自动过滤(2人桌抽不到全场类,5人及以下抽不到卧底类核心循环),空返报错会告诉你被哪关挡了多少条。库不懂你正在铺什么局(分面无语境):抽出题不对文就 state.discard(带理由)留痕再抽一次或改现挂,别硬用", "args": {"atom_type": "|".join(sorted(ATOM_TYPES)), "野度": "int?", "野度min": "int?", "tier": "str?", "exclude": "list?", "grant_to": "str?"}},
+    {"name": "draw_atom", "desc": "从弹药库抽原子(分面过滤+排已用);野度=上限,野度min=下限——想加档就抬野度min,别只嘴上说;tier=铺垫(小快垫场:通用局开局款/敢不敢微挑战都在这档)|主打(副歌重拍:摆阵重器/大流程);人数下限系统按本桌自动过滤(2人桌抽不到全场类,5人及以下抽不到卧底类核心循环),空返报错会告诉你被哪关挡了多少条。带 context(本环节主题一句话,如'卧底局收尾惩罚')库会按相关度收窄候选;仍抽出题不对文就 state.discard(带理由)留痕再抽或改现挂,别硬用", "args": {"atom_type": "|".join(sorted(ATOM_TYPES)), "context": "str?(本环节主题,软收窄)", "野度": "int?", "野度min": "int?", "tier": "str?", "exclude": "list?", "grant_to": "str?"}},
 ]
 
 OUTPUT_CONTRACT = (
@@ -104,8 +104,9 @@ def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: 
             "· 情侣/暧昧:双向对称秘密任务是主菜,节奏慢热,punish 走互动不走豁出去;\n"
             "· 陌生人破冰:先铺垫拍连发混熟(条件点名/二十问类),中段才上主打;\n"
             "· 老友重聚:直接高野度,内梗现挂优先级高于弹药库;\n"
-            "· 未列出的场合,按同样思路自己推。**开场第一拍必须播报你读到的场**"
-            "(「今晚是XX局,所以规矩是……」)——读了不说,房主感觉不到你在调。\n"
+            "· 未列出的场合,按同样思路自己推。读到的场**不播报不解释**——直接体现在"
+            "你选什么游戏、怎么定节拍里,玩家该感觉到局对味,而不是听你汇报设定。"
+            "房主中途一句话(对局长说)可改场,照改,不复述。\n"
         )
     return (
         f"{persona_text}\n\n"
@@ -125,7 +126,9 @@ def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: 
         "【荷官回执】events 里的 tool_receipts 是你上一拍工具调用的真实结果——你私发的原文、"
         "私密摇出的点数、被钳制的记录都在里面,**仅你可见**。发牌人看自己发的牌,天经地义;"
         "但一个字都不许念出来,结算时用它心里对账(毒杯是几号你自己知道,不用靠持密者自报)。"
-        "回执里有钳制(ok:false)的,本拍必须圆场改口。\n"
+        "回执里有钳制(ok:false)的,本拍必须圆场改口。digest.private_out 是你发出去的"
+        "私件挂账(额头牌/私发任务)——每张都要有下文(被猜/被用/被收),别发完就忘"
+        "(实测额头牌从头挂到尾没人提)。\n"
         "【推理局中立】你是判官:投票或嫌疑讨论开着的窗口内,不对任何玩家下嫌疑评价、"
         "暗示或吐槽——判官的一句话比任何一票都重(真人局的法官惯例同此)。吐槽留到结算"
         "之后随便说。真嘴瓢带了节奏,当拍认账自罚(「这杯我陪一口」)——认账姿势本身是"

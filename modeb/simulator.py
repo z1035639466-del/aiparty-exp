@@ -79,6 +79,9 @@ class Session:
         self._judge_provider = provider if provider in ("anthropic", "mock") else "anthropic"
         self._judge_model = host_model
         self._judge = None
+        # 场景照更新 scene_brief 后重建主持 system 用
+        self._prompt_args = dict(players=players, wildness=wildness, minutes=minutes,
+                                 score_style=score_style)
         if provider == "mock":  # 测试:确定性假人
             self.bots = [ScriptedPlayerAgent(n, [[{"type": "laugh"}]] * 3) for n in bots]
         else:
@@ -159,6 +162,41 @@ class Session:
             verdict = "无法判定"
         return {"type": "judge_result", "player": player, "verdict": verdict,
                 "reason": str(out.get("reason") or "")[:100]}
+
+    def scene_photo(self, image_b64: str, media_type: str | None) -> dict:
+        """开局一拍照(锁外调用,慢):现场照 → 实物清单 + 场景速写。
+        一次性显式动作,非常驻监听(感知线收束);更新后重建主持 system。"""
+        if self._judge is None:
+            self._judge = make_transport(self._judge_provider, self._judge_model)
+        sys_p = ('你是聚会现场侦察员。从照片提取可入游戏的信息,只输出 JSON:'
+                 '{"objects": ["现场实物,可作道具的,如 瓶子/冰块/抱枕/投影"],'
+                 '"brief": "一句场景速写(在哪/什么氛围/有什么可玩的)"}')
+        msgs = [{"role": "user", "content": [
+            {"type": "image", "source": {"type": "base64",
+                                         "media_type": media_type or "image/jpeg",
+                                         "data": image_b64}},
+            {"type": "text", "text": "提取"}]}]
+        try:
+            import re as _re
+            raw = self._judge.complete(sys_p, msgs)
+            m = _re.search(r"\{.*\}", raw, _re.DOTALL)
+            out = json.loads(m.group(0)) if m else {}
+        except Exception as e:
+            return {"error": f"侦察失败({type(e).__name__}),照旧手填"}
+        objs = [str(o) for o in (out.get("objects") or []) if str(o).strip()][:20]
+        brief = str(out.get("brief") or "").strip()[:120]
+        with self.lock:
+            merged = list(dict.fromkeys([*self.state.scene_objects, *objs]))
+            self.state.scene_objects = merged
+            if brief:
+                self.state.scene_brief = brief
+            if isinstance(self.driver, LLMDriver):
+                from .driver_llm import build_system_prompt
+                self.driver.system = build_system_prompt(
+                    self._prompt_args["players"], self._prompt_args["wildness"],
+                    self._prompt_args["minutes"], self._prompt_args["score_style"],
+                    self.state.playlist, self.state.occasion, self.state.scene_brief)
+        return {"objects": objs, "brief": brief, "scene_objects": merged}
 
     def run_turn(self, body: dict | None = None) -> dict:
         """执行一拍(须在持有 self.lock 下调用):HTTP 手动驱动与服务端自驱共用。
@@ -461,6 +499,14 @@ class Handler(BaseHTTPRequestHandler):
                 with s.lock:
                     s.engine.push_event(ev)
                 self._json(200, {"queued": ev})
+                return
+            if self.path == "/api/scene":
+                body = self._body()
+                if not body.get("image_b64"):
+                    self._json(400, {"error": "缺 image_b64"})
+                    return
+                out = s.scene_photo(body["image_b64"], body.get("media_type"))
+                self._json(200 if "error" not in out else 502, out)
                 return
             if self.path == "/api/photo":
                 body = self._body()

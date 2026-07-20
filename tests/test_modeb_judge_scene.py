@@ -28,7 +28,8 @@ from modeb.tools import ToolExecutor  # noqa: E402
 def test_occasion_injects_scene_reading_rules():
     p = build_system_prompt(["甲", "乙"], 6, 30, occasion="生日局", scene_brief="家里,有投影")
     assert "【读场】" in p and "生日局" in p and "有投影" in p
-    assert "开场第一拍必须播报你读到的场" in p, "读了不说=白读"
+    assert "不播报不解释" in p, "读场是暗调(房主裁定:播报设定破坏体验)"
+    assert "房主中途一句话" in p, "修正权留给房主"
     assert "【读场】" not in build_system_prompt(["甲", "乙"], 6, 30), "没输入不注水"
 
 
