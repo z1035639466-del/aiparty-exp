@@ -96,9 +96,11 @@ class _CountingTransport:
 
     def __init__(self) -> None:
         self.calls = 0
+        self._lock = threading.Lock()  # 桌友并行反应后,计数必须防竞态
 
     def complete(self, system, messages):
-        self.calls += 1
+        with self._lock:
+            self.calls += 1
         return json.dumps({"text": "继续。", "tool_use": []}, ensure_ascii=False)
 
 

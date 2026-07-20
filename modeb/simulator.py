@@ -14,6 +14,7 @@ import copy
 import json
 import threading
 import traceback
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -350,13 +351,22 @@ class Handler(BaseHTTPRequestHandler):
                     digest = s.state.digest(s.engine.time_left_min())
                     # 主持沉默拍(调用失败):桌上没发生任何事,桌友无从反应,不烧调用
                     bots = [] if line.get("host_silent") else s.bots
-                    for bot in bots:  # 桌友对本回合反应,入队待下回合聚合;私件只随本人
-                        try:
-                            evs = bot.react(red, digest, inbox=s.inbox.get(bot.name, [])[-3:])
-                        except TypeError:
-                            evs = bot.react(red, digest)
-                        for ev in evs:
-                            s.engine.push_event(ev)
+                    if bots:
+                        # 桌友并行反应:串行时 7 座 × 每座数秒 = 一拍半分钟,真人
+                        # 入座直接坐牢。现实里大家本来就是同时起哄的。收齐再统一
+                        # 入队(push_event 动共享账本,不在工作线程里做)。
+                        def _react(bot):
+                            try:
+                                return bot.react(red, digest,
+                                                 inbox=s.inbox.get(bot.name, [])[-3:])
+                            except TypeError:
+                                return bot.react(red, digest)
+
+                        with ThreadPoolExecutor(max_workers=len(bots)) as pool:
+                            reactions = list(pool.map(_react, bots))
+                        for evs in reactions:
+                            for ev in evs:
+                                s.engine.push_event(ev)
                     if s.state.finished:
                         summary = s.engine.run(max_turns=s.engine.marks["turns"])
                         s.recent.append(summary)
