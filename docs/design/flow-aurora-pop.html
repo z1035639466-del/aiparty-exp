@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>aiparty · A×D 全流程高保真</title>
+<style>
+  :root{
+    --bg:#09090C;--bg-2:#0F0F14;--panel:#141419;--panel-2:#1A1A22;
+    --line:#26262F;--line-soft:#1D1D25;--ink:#F4F3F8;--muted:#9E9CAD;--faint:#66647A;--accent:#6E7BFF;
+    --sans:'PingFang SC','Hiragino Sans GB','Source Han Sans SC','Noto Sans SC','Microsoft YaHei',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono','JetBrains Mono','Menlo','Cascadia Code',monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;letter-spacing:-.005em;-webkit-font-smoothing:antialiased}
+  .bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(760px 420px at 82% -6%,rgba(110,123,255,.15),transparent 62%),
+      radial-gradient(680px 400px at 4% 6%,rgba(244,114,182,.08),transparent 60%),
+      radial-gradient(900px 520px at 60% 108%,rgba(255,87,71,.06),transparent 60%)}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 26px;position:relative;z-index:1}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
+  ::selection{background:var(--accent);color:#fff}
+
+  /* header */
+  header.mast{padding:72px 0 26px}
+  .kicker{display:inline-flex;align-items:center;gap:9px;padding:6px 13px 6px 9px;border:1px solid var(--line);border-radius:100px;
+    background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);margin-bottom:28px}
+  .kicker .live{width:7px;height:7px;border-radius:50%;background:#5EE6A8;box-shadow:0 0 0 3px rgba(94,230,168,.16)}
+  .mast h1{font-size:clamp(34px,5.6vw,60px);line-height:1.02;margin:0;font-weight:800;letter-spacing:-.035em;text-wrap:balance}
+  .mast h1 .a{background:linear-gradient(96deg,#A78BFA,#38BDF8);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .mast h1 .d{background:linear-gradient(96deg,#FF5747,#FFD15C);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .mast .lede{max-width:62ch;margin:22px 0 0;color:var(--muted);font-size:clamp(15px,1.5vw,18px)}
+  .mast .lede strong{color:var(--ink);font-weight:600}
+
+  /* phase stepper */
+  .steps{display:flex;flex-wrap:wrap;gap:8px;margin-top:34px;align-items:stretch}
+  .step{display:flex;align-items:center;gap:9px;border:1px solid var(--line-soft);border-radius:12px;padding:10px 13px;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent)}
+  .step .n{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .step .nm{font-size:13px;font-weight:650;letter-spacing:-.01em}
+  .step .sk{width:8px;height:8px;border-radius:50%}
+  .step.a .sk{background:#A78BFA}.step.d .sk{background:#FF5747}
+  .step .arw{color:var(--faint);align-self:center}
+  .arw{font-family:var(--mono)}
+
+  /* skin ribbon */
+  .ribbon{display:flex;align-items:center;gap:12px;margin:44px 0 20px}
+  .ribbon .tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;letter-spacing:.04em;
+    border:1px solid var(--line);border-radius:100px;padding:6px 13px}
+  .ribbon .tag .s{width:9px;height:9px;border-radius:50%}
+  .ribbon .a .s{background:#A78BFA}.ribbon .d .s{background:#FF5747}
+  .ribbon .line{flex:1;height:1px;background:var(--line-soft)}
+  .ribbon .cap{font-size:12.5px;color:var(--muted)}
+
+  /* screens grid */
+  .screens{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;justify-items:center;padding:6px 0}
+  .cell{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}
+  .cap{text-align:center;min-height:52px}
+  .cap .ph{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .cap .ph .s{width:7px;height:7px;border-radius:50%}
+  .cap.a .ph .s{background:#A78BFA}.cap.d .ph .s{background:#FF5747}
+  .cap h3{margin:5px 0 3px;font-size:15px;font-weight:700;letter-spacing:-.01em}
+  .cap p{margin:0;font-size:12px;color:var(--muted);line-height:1.45;max-width:26ch}
+
+  /* phone */
+  .phone{width:262px;max-width:100%;border-radius:38px;padding:9px;background:linear-gradient(160deg,#2A2A32,#0C0C10);
+    box-shadow:0 28px 56px -22px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.05) inset;position:relative}
+  .screen{border-radius:29px;overflow:hidden;position:relative;height:512px;background:#000}
+  .statusbar{position:absolute;top:0;left:0;right:0;height:38px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 18px 0 20px;font-size:11.5px;font-weight:650;z-index:5;font-variant-numeric:tabular-nums}
+  .pill{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:70px;height:18px;border-radius:11px;background:#000;z-index:6}
+  .scr{position:absolute;inset:0;padding:44px 16px 18px;display:flex;flex-direction:column}
+  .navbar{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600}
+
+  /* ---------- AURORA skin ---------- */
+  .a-scr{background:radial-gradient(130% 80% at 50% -8%,#1E1640,#0A0912 60%);color:#F3F1FB}
+  .a-scr:before{content:"";position:absolute;top:-28%;left:-12%;width:124%;height:66%;pointer-events:none;
+    background:radial-gradient(closest-side,rgba(167,139,250,.5),transparent 70%),radial-gradient(closest-side,rgba(244,114,182,.4),transparent 70%);
+    background-position:18% 30%,84% 6%;background-size:58% 58%,52% 52%;background-repeat:no-repeat;filter:blur(6px);opacity:.5}
+  .a-scr .statusbar{color:#D6CCFF}
+  .a-nav{position:relative;z-index:2;color:#C9BEF5}
+  .a-scr .scr>*{position:relative;z-index:2}
+  .a-k{font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:#38BDF8}
+  .a-title{margin:8px 0 0;font-size:23px;font-weight:800;line-height:1.06;letter-spacing:-.03em}
+  .a-title em{font-style:normal;background:linear-gradient(92deg,#C4B5FD,#F0ABFC);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .a-sub{font-size:12px;color:#B7ADDD;margin:6px 0 0}
+  .glass{border-radius:20px;padding:15px;background:linear-gradient(165deg,rgba(255,255,255,.13),rgba(255,255,255,.035));
+    border:1px solid rgba(255,255,255,.15);box-shadow:0 16px 36px -18px rgba(120,80,255,.5),inset 0 1px 0 rgba(255,255,255,.2);
+    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+  .a-lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#9A8FD0;margin-bottom:10px}
+  /* aurora sliders */
+  .aslide{display:flex;flex-direction:column;gap:12px}
+  .aslide .r{display:grid;grid-template-columns:38px 1fr 26px;align-items:center;gap:10px}
+  .aslide .r .n{font-size:12px;font-weight:600}
+  .aslide .t{position:relative;height:6px;border-radius:6px;background:rgba(255,255,255,.12)}
+  .aslide .t i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:linear-gradient(90deg,#8B7BFF,#F0ABFC)}
+  .aslide .t b{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 0 10px rgba(200,160,255,.9)}
+  .aslide .v{font-family:var(--mono);font-size:10.5px;color:#C9BEF5;text-align:right}
+  .a-mats{display:flex;flex-wrap:wrap;gap:7px}
+  .a-mats span{font-size:11px;padding:5px 11px;border-radius:100px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#E7E0FF}
+  .a-mats .on{background:rgba(139,123,255,.28);border-color:rgba(160,140,255,.5)}
+  .a-mats .add{border-style:dashed;color:#9A8FD0}
+  .a-cta{margin-top:auto;display:flex;gap:9px}
+  .a-cta button{flex:1;border:0;border-radius:14px;padding:13px 0;font-family:var(--sans);font-size:13.5px;font-weight:750;cursor:default;letter-spacing:-.01em}
+  .a-cta .go{background:linear-gradient(180deg,#8B7BFF,#6E5BF0);color:#fff;box-shadow:0 12px 26px -10px rgba(110,91,240,.9)}
+  .a-cta .alt{flex:0 0 48px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14)!important;color:#E7E0FF;font-size:16px}
+  /* generating orb */
+  .orb{width:118px;height:118px;margin:6px auto 0;border-radius:50%;position:relative;
+    background:conic-gradient(from 0deg,#8B7BFF,#F472B6,#38BDF8,#8B7BFF);filter:blur(2px)}
+  .orb:after{content:"";position:absolute;inset:14px;border-radius:50%;background:#0C0A16;box-shadow:inset 0 0 30px rgba(139,123,255,.6)}
+  .gen-steps{list-style:none;margin:20px 0 0;padding:0;display:flex;flex-direction:column;gap:11px}
+  .gen-steps li{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#B7ADDD}
+  .gen-steps li .ck{width:18px;height:18px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px}
+  .gen-steps li.ok .ck{background:rgba(94,230,168,.16);color:#5EE6A8}
+  .gen-steps li.ok{color:#E7E0FF}
+  .gen-steps li.now .ck{background:rgba(139,123,255,.22);color:#C4B5FD}
+  .gen-steps li.wait .ck{background:rgba(255,255,255,.06);color:#6B6580}
+  .gen-bar{margin-top:auto;height:6px;border-radius:6px;background:rgba(255,255,255,.1);overflow:hidden}
+  .gen-bar i{display:block;height:100%;width:64%;border-radius:6px;background:linear-gradient(90deg,#8B7BFF,#38BDF8)}
+  /* game spec card */
+  .a-badge{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;color:#5EE6A8;margin-bottom:9px}
+  .a-badge .d{width:6px;height:6px;border-radius:50%;background:#5EE6A8}
+  .a-name{font-size:20px;font-weight:750;letter-spacing:-.02em;margin:0 0 5px}
+  .a-desc{font-size:11.5px;color:#CFC6EE;line-height:1.5}
+  .a-rules{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+  .a-rules li{display:flex;gap:9px;font-size:11.5px;color:#E7E0FF;line-height:1.45}
+  .a-rules .n{flex:none;width:17px;height:17px;border-radius:50%;background:rgba(139,123,255,.3);color:#D9CEFF;font-size:10px;display:flex;align-items:center;justify-content:center;margin-top:1px;font-weight:600}
+  .a-props{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+  .a-props span{font-size:10px;font-family:var(--mono);padding:4px 9px;border-radius:100px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#E7E0FF}
+  /* live round */
+  .a-eye{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#38BDF8;text-align:center}
+  .a-turn{text-align:center;font-size:24px;font-weight:850;letter-spacing:-.02em;margin:6px 0 0;
+    background:linear-gradient(92deg,#C4B5FD,#F0ABFC 60%,#7DD3FC);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .a-ring{position:relative;width:132px;height:132px;margin:12px auto 4px}
+  .a-ring svg{transform:rotate(-90deg)}
+  .a-ring .t{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .a-ring .t b{font-size:34px;font-weight:850;font-variant-numeric:tabular-nums;color:#fff}
+  .a-ring .t span{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:#8E7FB8;font-family:var(--mono)}
+  .a-idcard{margin-top:4px}
+  .a-idcard .lb{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#F0ABFC}
+  .a-idcard .role{font-size:18px;font-weight:750;margin:7px 0 3px;color:#fff}
+  .a-idcard .wh{font-size:11.5px;color:#CFC6EE;line-height:1.5}
+
+  /* ---------- POP skin ---------- */
+  .p-scr{background:#FF5747;color:#1A0E0C;overflow:hidden}
+  .p-scr:before{content:"";position:absolute;width:210px;height:210px;border-radius:50%;background:#FFD15C;top:-66px;right:-66px}
+  .p-scr:after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;background:#2B2BEE;bottom:-38px;left:-46px;opacity:.92}
+  .p-scr .statusbar{color:#1A0E0C;z-index:3}
+  .p-scr .scr{z-index:2}
+  .p-nav{color:#7A2018;font-weight:750;font-size:12px}
+  .p-badge{align-self:flex-start;background:#1A0E0C;color:#FFD15C;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;padding:5px 11px;border-radius:100px;margin-top:12px}
+  .p-h{font-size:35px;font-weight:900;line-height:.94;letter-spacing:-.045em;margin:12px 0 0;color:#1A0E0C}
+  /* leaderboard */
+  .p-board{margin-top:16px;background:#FFF6E9;border:2.5px solid #1A0E0C;border-radius:18px;box-shadow:6px 6px 0 #1A0E0C;overflow:hidden}
+  .p-board .row{display:flex;align-items:center;gap:10px;padding:11px 13px;border-bottom:2px solid #1A0E0C}
+  .p-board .row:last-child{border-bottom:0}
+  .p-board .row.win{background:#FFD15C}
+  .p-board .rk{font-family:var(--mono);font-size:13px;font-weight:800;width:18px}
+  .p-board .who2{flex:1;font-size:13px;font-weight:750;letter-spacing:-.01em}
+  .p-board .who2 small{display:block;font-family:var(--sans);font-weight:500;font-size:10px;color:#7A2018}
+  .p-board .sc{font-size:17px;font-weight:900;font-variant-numeric:tabular-nums}
+  .p-cta{margin-top:auto;display:flex;gap:9px;position:relative;z-index:2}
+  .p-cta button{border:2.5px solid #1A0E0C;border-radius:100px;padding:12px 0;font-family:var(--sans);font-size:13.5px;font-weight:850;cursor:default;letter-spacing:-.01em}
+  .p-cta .main{flex:1;background:#1A0E0C;color:#FFD15C}
+  .p-cta .ic{flex:0 0 48px;background:#FFF6E9;color:#1A0E0C;font-size:16px}
+  /* share card */
+  .p-share{margin-top:14px;background:#FFF6E9;border:2.5px solid #1A0E0C;border-radius:20px;padding:16px;box-shadow:7px 7px 0 #1A0E0C;position:relative;z-index:2}
+  .p-share .t{font-size:11.5px;font-weight:750;color:#7A2018;letter-spacing:.02em}
+  .p-share .num{font-size:52px;font-weight:900;letter-spacing:-.045em;color:#1A0E0C;line-height:1;margin:3px 0 2px;font-variant-numeric:tabular-nums}
+  .p-share .cap2{font-size:11.5px;color:#5A3A34;font-weight:550}
+  .p-share .who{display:flex;margin-top:12px}
+  .p-share .who i{width:24px;height:24px;border-radius:50%;border:2px solid #FFF6E9;margin-left:-6px;display:block}
+  .p-share .who i:first-child{margin-left:0}
+  .p-tags{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+  .p-tags span{font-family:var(--mono);font-size:9.5px;background:#1A0E0C;color:#FFD15C;padding:3px 8px;border-radius:100px}
+
+  /* handoff */
+  .handoff{margin:34px 0 0;padding:18px 20px;border:1px dashed var(--line);border-radius:14px;background:linear-gradient(120deg,rgba(167,139,250,.06),rgba(255,87,71,.05));
+    font-size:13.5px;color:var(--muted)}
+  .handoff b{color:var(--ink);font-weight:650}
+
+  /* tokens appendix */
+  section.tok{margin-top:56px;padding-top:36px;border-top:1px solid var(--line-soft)}
+  section.tok h4{font-size:12px;font-family:var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:0 0 20px;font-weight:600}
+  .tok-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .tokcard{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--panel)}
+  .tokcard .th{display:flex;align-items:center;gap:9px;padding:15px 18px;border-bottom:1px solid var(--line-soft)}
+  .tokcard .th .s{width:11px;height:11px;border-radius:4px}
+  .tokcard .th .nm{font-weight:750;font-size:15px;letter-spacing:-.01em}
+  .tokcard .th .en{font-family:var(--mono);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
+  .tokcard .body{padding:16px 18px;display:flex;flex-direction:column;gap:15px}
+  .tok-colors{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .tok-colors .c{display:flex;flex-direction:column;gap:5px}
+  .tok-colors .c i{height:38px;border-radius:9px;border:1px solid rgba(255,255,255,.08)}
+  .tok-colors .c code{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.02em}
+  .tok-rows{display:flex;flex-direction:column;gap:9px;font-size:12.5px}
+  .tok-rows .r{display:flex;gap:12px}
+  .tok-rows .r .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);width:76px;flex:none;padding-top:2px}
+  .tok-rows .r .v{color:var(--ink)}
+  .tok-rows .r .v span{color:var(--muted)}
+
+  .signoff{margin:34px 0 80px;color:var(--faint);font-size:12px;font-family:var(--mono);letter-spacing:.02em}
+
+  @media (max-width:1080px){.screens{grid-template-columns:repeat(2,1fr);row-gap:38px}}
+  @media (max-width:860px){.steps .step .nm{font-size:12px}.tok-grid{grid-template-columns:1fr}}
+  @media (max-width:560px){.screens{grid-template-columns:1fr}header.mast{padding-top:48px}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bg-fx"></div>
+
+<header class="mast">
+  <div class="wrap">
+    <span class="kicker"><span class="live"></span><span class="eyebrow">aiparty · 选定组合 · 全流程高保真</span></span>
+    <h1><span class="a">极光</span> 主流程 × <span class="d">糖果</span> 战报分享</h1>
+    <p class="lede">
+      一个 App、两张皮、一条动线。<strong>极光 Aurora</strong> 撑起从配局到对局的核心体验——克制、发光、有惊喜；
+      到了结算与分享，切到 <strong>糖果 Pop</strong> 的撞色战报，制造「忍不住转发」的传播爆点。
+      两张皮共用同一套机制词汇（现制 · 身份牌·信息朝向 · 口味·素材），过渡处骨相不变，只换气质。
+    </p>
+    <div class="steps">
+      <div class="step a"><span class="sk"></span><span class="n">01</span><span class="nm">配局</span></div>
+      <span class="arw">→</span>
+      <div class="step a"><span class="sk"></span><span class="n">02</span><span class="nm">现制</span></div>
+      <span class="arw">→</span>
+      <div class="step a"><span class="sk"></span><span class="n">03</span><span class="nm">开局</span></div>
+      <span class="arw">→</span>
+      <div class="step a"><span class="sk"></span><span class="n">04</span><span class="nm">对局</span></div>
+      <span class="arw">⇥</span>
+      <div class="step d"><span class="sk"></span><span class="n">05</span><span class="nm">战报</span></div>
+      <span class="arw">→</span>
+      <div class="step d"><span class="sk"></span><span class="n">06</span><span class="nm">分享</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="ribbon">
+    <span class="tag a"><span class="s"></span>Aurora · 主流程</span>
+    <span class="line"></span>
+    <span class="cap">配局 → 现制 → 开局 → 对局</span>
+  </div>
+
+  <section class="screens">
+
+    <!-- 01 配局 -->
+    <div class="cell">
+      <div class="phone"><div class="pill"></div><div class="screen"><div class="scr a-scr">
+        <div class="statusbar"><span>20:08</span><span>●●●</span></div>
+        <div class="navbar a-nav"><span>← 这一桌</span><span>5 人 · 就位</span></div>
+        <div style="margin-top:16px"><div class="a-k">Step 01 · Compose</div>
+        <h3 class="a-title">今晚这桌，<em>什么味</em>？</h3>
+        <p class="a-sub">拖一拖、丢几个梗，局长照着编。</p></div>
+        <div class="glass" style="margin-top:15px">
+          <div class="a-lab">口味 · 偏好滑块</div>
+          <div class="aslide">
+            <div class="r"><span class="n">推理</span><div class="t"><i style="width:82%"></i><b style="left:82%"></b></div><span class="v">82</span></div>
+            <div class="r"><span class="n">表演</span><div class="t"><i style="width:58%"></i><b style="left:58%"></b></div><span class="v">58</span></div>
+            <div class="r"><span class="n">黄暴</span><div class="t"><i style="width:26%"></i><b style="left:26%"></b></div><span class="v">26</span></div>
+          </div>
+        </div>
+        <div class="glass" style="margin-top:11px">
+          <div class="a-lab">素材 · 你们的梗</div>
+          <div class="a-mats"><span class="on">部门黑话 ✓</span><span class="on">老板语录 ✓</span><span>团建黑历史</span><span class="add">+ 添加</span></div>
+        </div>
+        <div class="a-cta"><button class="go">现制一局 →</button></div>
+      </div></div></div>
+      <div class="cap a"><span class="ph"><span class="s"></span>01 · Aurora</span><h3>配局</h3><p>口味滑块 + 素材投喂，一步定基调。</p></div>
+    </div>
+
+    <!-- 02 现制中 -->
+    <div class="cell">
+      <div class="phone"><div class="pill"></div><div class="screen"><div class="scr a-scr">
+        <div class="statusbar"><span>20:08</span><span>●●●</span></div>
+        <div class="navbar a-nav"><span></span><span>局长 · 在编</span></div>
+        <div style="margin-top:22px;text-align:center"><div class="a-k">Generating</div>
+        <h3 class="a-title" style="margin-top:6px">局长正在<em>为你们编</em></h3></div>
+        <div class="orb"></div>
+        <ul class="gen-steps">
+          <li class="ok"><span class="ck">✓</span>读懂你们的口味</li>
+          <li class="ok"><span class="ck">✓</span>从固定库挑机制</li>
+          <li class="now"><span class="ck">◍</span>给机制穿上你们的梗</li>
+          <li class="wait"><span class="ck">◌</span>校验：能不能玩得通</li>
+        </ul>
+        <div class="gen-bar"><i></i></div>
+      </div></div></div>
+      <div class="cap a"><span class="ph"><span class="s"></span>02 · Aurora</span><h3>现制中</h3><p>把生成过程做成会发光的惊喜等待。</p></div>
+    </div>
+
+    <!-- 03 开局卡 -->
+    <div class="cell">
+      <div class="phone"><div class="pill"></div><div class="screen"><div class="scr a-scr">
+        <div class="statusbar"><span>20:09</span><span>●●●</span></div>
+        <div class="navbar a-nav"><span>← 换一个</span><span>为「你们这桌」</span></div>
+        <div class="glass" style="margin-top:18px">
+          <div class="a-badge"><span class="d"></span>刚为你们现制 · 12s 前</div>
+          <h3 class="a-name">《谁在装外宾》</h3>
+          <p class="a-desc">用你们的部门黑话当暗号，桌上藏着一个只会点头的卧底——把他找出来。</p>
+          <ol class="a-rules">
+            <li><span class="n">1</span>每人偷看自己的身份牌，别翻给别人。</li>
+            <li><span class="n">2</span>轮流说一句只有自己人听得懂的黑话。</li>
+            <li><span class="n">3</span>怀疑谁在装，摇骰盅投他一票。</li>
+          </ol>
+          <div class="a-props"><span>身份牌 · 自己看</span><span>骰盅</span><span>≈15 分钟</span></div>
+        </div>
+        <div class="a-cta"><button class="go">发牌开局 →</button><button class="alt">↻</button></div>
+      </div></div></div>
+      <div class="cap a"><span class="ph"><span class="s"></span>03 · Aurora</span><h3>开局卡</h3><p>风味名 + 白话规则 + 道具，一眼读懂。</p></div>
+    </div>
+
+    <!-- 04 对局 -->
+    <div class="cell">
+      <div class="phone"><div class="pill"></div><div class="screen"><div class="scr a-scr">
+        <div class="statusbar"><span>20:23</span><span>●●●</span></div>
+        <div class="navbar a-nav"><span>第 3 局</span><span>4 / 5 就位</span></div>
+        <div class="a-eye" style="margin-top:14px">Your turn · 声明质疑</div>
+        <div class="a-turn">轮到你摊牌</div>
+        <div class="a-ring">
+          <svg width="132" height="132" viewBox="0 0 132 132">
+            <circle cx="66" cy="66" r="57" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="9"/>
+            <circle cx="66" cy="66" r="57" fill="none" stroke="#C4B5FD" stroke-width="9" stroke-linecap="round" stroke-dasharray="358" stroke-dashoffset="120"/>
+          </svg>
+          <div class="t"><b>09</b><span>seconds</span></div>
+        </div>
+        <div class="glass a-idcard">
+          <div class="lb">🂠 身份牌 · 自己看</div>
+          <div class="role">你是「卧底股东」</div>
+          <div class="wh">让分歧悄悄扩大。被抓到，罚一杯气泡水。</div>
+        </div>
+        <div class="a-cta"><button class="go" style="background:linear-gradient(180deg,#38BDF8,#0EA5E9)">说真话</button><button class="alt" style="flex:1;font-size:13.5px">诈一手</button></div>
+      </div></div></div>
+      <div class="cap a"><span class="ph"><span class="s"></span>04 · Aurora</span><h3>对局</h3><p>身份牌自己看 + 倒计时 + 声明质疑。</p></div>
+    </div>
+
+  </section>
+
+  <div class="ribbon" style="margin-top:38px">
+    <span class="tag d"><span class="s"></span>Pop · 战报 & 分享</span>
+    <span class="line"></span>
+    <span class="cap">结算 → 一键晒</span>
+  </div>
+
+  <section class="screens" style="grid-template-columns:repeat(4,1fr)">
+
+    <!-- 05 战报 -->
+    <div class="cell">
+      <div class="phone"><div class="pill"></div><div class="screen"><div class="scr p-scr">
+        <div class="statusbar"><span>23:12</span><span>●●●</span></div>
+        <div class="navbar p-nav"><span>× 收工</span><span>今晚战报</span></div>
+        <span class="p-badge">局终 · 结算</span>
+        <h3 class="p-h">谁赢了？</h3>
+        <div class="p-board">
+          <div class="row win"><span class="rk">1</span><span class="who2">卧底股东（你）<small>骗成 3 次没被抓</small></span><span class="sc">+9</span></div>
+          <div class="row"><span class="rk">2</span><span class="who2">阿May<small>识破 1 次卧底</small></span><span class="sc">+5</span></div>
+          <div class="row"><span class="rk">3</span><span class="who2">老陈<small>投错 2 票</small></span><span class="sc">+2</span></div>
+        </div>
+        <div class="p-cta"><button class="main">看我的战报</button><button class="ic">↻</button></div>
+      </div></div></div>
+      <div class="cap d"><span class="ph"><span class="s"></span>05 · Pop</span><h3>战报</h3><p>撞色排行榜，赢家一眼跳出来。</p></div>
+    </div>
+
+    <!-- 06 分享卡 -->
+    <div class="cell">
+      <div class="phone"><div class="pill"></div><div class="screen"><div class="scr p-scr">
+        <div class="statusbar"><span>23:13</span><span>●●●</span></div>
+        <div class="navbar p-nav"><span>← 返回</span><span>分享战报</span></div>
+        <span class="p-badge">MVP · 卧底股东</span>
+        <h3 class="p-h">你把<br>全桌<br>都骗了</h3>
+        <div class="p-share">
+          <div class="t">连蒙对 · 场次</div>
+          <div class="num">3×</div>
+          <div class="cap2">全场只有你一个卧底笑到最后</div>
+          <div class="who"><i style="background:#FF5747"></i><i style="background:#2B2BEE"></i><i style="background:#FFD15C"></i><i style="background:#1A0E0C"></i><i style="background:#6355FF"></i></div>
+          <div class="p-tags"><span>#谁在装外宾</span><span>#aiparty</span></div>
+        </div>
+        <div class="p-cta"><button class="main">晒到群里</button><button class="ic">↗</button></div>
+      </div></div></div>
+      <div class="cap d"><span class="ph"><span class="s"></span>06 · Pop</span><h3>分享卡</h3><p>为转发而生的一张图，带梗带话题。</p></div>
+    </div>
+
+    <div class="cell" style="grid-column:span 2;align-self:stretch">
+      <div class="handoff" style="width:100%;align-self:center">
+        <b>过渡处怎么接？</b><br>
+        对局最后一票落定 → 屏幕从极光暗底「翻面」成糖果撞色（0.4s 卡片翻转），机制词汇不变：
+        <b>身份牌</b>、<b>声明质疑</b>、<b>连蒙对</b> 在两张皮里是同一套 settlement 数据，只是换了张脸出场。
+        <br><br>
+        分享卡回流入口 = 拉新钩子：好友点开战报 → 落地 <b>极光</b> 配局页，动线闭环。
+      </div>
+    </div>
+
+  </section>
+
+  <section class="tok">
+    <h4>Design Tokens · 两张皮的底层变量</h4>
+    <div class="tok-grid">
+      <div class="tokcard">
+        <div class="th"><span class="s" style="background:#A78BFA"></span><span class="nm">极光 Aurora</span><span class="en">primary skin</span></div>
+        <div class="body">
+          <div class="tok-colors">
+            <div class="c"><i style="background:#0A0912"></i><code>#0A0912</code></div>
+            <div class="c"><i style="background:#A78BFA"></i><code>#A78BFA</code></div>
+            <div class="c"><i style="background:#F472B6"></i><code>#F472B6</code></div>
+            <div class="c"><i style="background:#38BDF8"></i><code>#38BDF8</code></div>
+            <div class="c"><i style="background:#F3F1FB"></i><code>#F3F1FB</code></div>
+          </div>
+          <div class="tok-rows">
+            <div class="r"><span class="k">字体</span><span class="v">中文无衬线 800/750 · <span>Mono 标签</span></span></div>
+            <div class="r"><span class="k">圆角</span><span class="v">卡片 20–22 · <span>设备 38–40</span></span></div>
+            <div class="r"><span class="k">材质</span><span class="v">玻璃 blur 12 · <span>紫光外发光</span></span></div>
+            <div class="r"><span class="k">重点色</span><span class="v">极光渐变 <span>紫→粉→青</span></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="tokcard">
+        <div class="th"><span class="s" style="background:#FF5747"></span><span class="nm">糖果 Pop</span><span class="en">share skin</span></div>
+        <div class="body">
+          <div class="tok-colors">
+            <div class="c"><i style="background:#FF5747"></i><code>#FF5747</code></div>
+            <div class="c"><i style="background:#FFD15C"></i><code>#FFD15C</code></div>
+            <div class="c"><i style="background:#2B2BEE"></i><code>#2B2BEE</code></div>
+            <div class="c"><i style="background:#FFF6E9"></i><code>#FFF6E9</code></div>
+            <div class="c"><i style="background:#1A0E0C"></i><code>#1A0E0C</code></div>
+          </div>
+          <div class="tok-rows">
+            <div class="r"><span class="k">字体</span><span class="v">超粗黑体 900 · <span>Mono 标签</span></span></div>
+            <div class="r"><span class="k">圆角</span><span class="v">卡片 18–20 · <span>按钮 pill</span></span></div>
+            <div class="r"><span class="k">材质</span><span class="v">硬投影 6–7px · <span>2.5px 描边</span></span></div>
+            <div class="r"><span class="k">重点色</span><span class="v">撞色 <span>珊瑚 / 阳黄 / 群青</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="signoff">全流程 6 屏 · Aurora ×4 + Pop ×2 · 下一步可切真机尺寸切图 / Figma 组件 / 前端 tokens.css</div>
+</main>
+
+</body>
+</html>
