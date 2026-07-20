@@ -99,17 +99,12 @@ def _image_params() -> dict:
     return params
 
 
-def _render_dashscope(prompt: str) -> bytes:
-    """走 DashScope(阿里百炼)图像口:提交异步任务 → 轮询 → SUCCEEDED 后下载图。"""
-    key = os.environ["DASHSCOPE_API_KEY"]
-    model = os.environ.get("IMAGE_API_MODEL", "wan2.7-image-pro")
+def _dashscope_submit(prompt: str, key: str, model: str, async_on: bool) -> dict:
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {key}"}
+    if async_on:
+        headers["X-DashScope-Async"] = "enable"
     req = urllib.request.Request(
-        DASHSCOPE_SUBMIT_URL, method="POST",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {key}",
-            "X-DashScope-Async": "enable",
-        },
+        DASHSCOPE_SUBMIT_URL, method="POST", headers=headers,
         data=json.dumps({
             "model": model,
             "input": {"prompt": prompt},
@@ -121,10 +116,33 @@ def _render_dashscope(prompt: str) -> bytes:
     # 光抛 "HTTP Error 400" 等于没报错——读出来带进异常。
     try:
         with urllib.request.urlopen(req, timeout=180) as r:
-            resp = json.loads(r.read())
+            return json.loads(r.read())
     except urllib.error.HTTPError as e:
         detail = e.read().decode("utf-8", "replace")[:300]
         raise RuntimeError(f"DashScope 提交被拒 HTTP {e.code}:{detail}(model={model!r})") from None
+
+
+def _render_dashscope(prompt: str) -> bytes:
+    """走 DashScope(阿里百炼)图像口。老账号是异步任务式(提交→轮询→下载);
+    新版业务空间的 key 不支持异步("does not support asynchronous calls"),
+    被拒时自动降级为同步一把梭,结果直接在响应里。IMAGE_API_ASYNC=0/1 可强制。"""
+    key = os.environ["DASHSCOPE_API_KEY"]
+    model = os.environ.get("IMAGE_API_MODEL", "wan2.7-image-pro")
+    mode = os.environ.get("IMAGE_API_ASYNC", "")  # "" = 自动:先异步,被拒转同步
+    if mode == "0":
+        resp = _dashscope_submit(prompt, key, model, async_on=False)
+    else:
+        try:
+            resp = _dashscope_submit(prompt, key, model, async_on=True)
+        except RuntimeError as e:
+            if mode == "1" or "asynchronous" not in str(e):
+                raise
+            resp = _dashscope_submit(prompt, key, model, async_on=False)
+    # 同步口:图 url 直接在响应里,不用轮询
+    url = _dashscope_result_url(resp)
+    if url:
+        with urllib.request.urlopen(url, timeout=180) as r:
+            return r.read()
     task_id = _dashscope_dig(resp, "task_id")
     if not task_id:
         raise RuntimeError(f"DashScope 未返回 task_id:{resp}")
