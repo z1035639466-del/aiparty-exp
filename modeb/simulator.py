@@ -91,19 +91,28 @@ class Session:
             if not (r.get("ok") and isinstance(res, dict)):
                 continue
             vis, target = res.get("visibility"), res.get("player")
+            # 秘密载荷可能在 display(show)、也可能在 value/picked(random 私密摇)
+            field = next((k for k in ("display", "value", "picked") if k in res), None)
+            if field is None:
+                continue
+            secret = res[field]
             if vis == "自己看" and target:
-                self.inbox[target].append(f"🔒 {res.get('display', '')}")
-                res["display"] = "🔒私发(已投递,内容仅目标可见)"
+                self.inbox[target].append(f"🔒 {secret}")
+                res[field] = "🔒私发(已投递,内容仅目标可见)"
+                # 收件人不遮:/api/state 是驾驶舱(非产品面),房主调试时本来就该
+                # 看见谁拿到了什么。实测里"元数据泄漏"是 agent 轮询调试口造成的,
+                # 真实玩家看不到这个端点——遮了反而把调试工具弄瞎。
             elif vis == "额头" and target:
                 for pl in self.state.players:
                     if pl != target:
-                        self.inbox[pl].append(f"👀 额头·{target}: {res.get('display', '')}")
-                res["display"] = f"👀额头牌(仅 {target} 本人不可见,已发其余人)"
+                        self.inbox[pl].append(f"👀 额头·{target}: {secret}")
+                res[field] = f"👀额头牌(仅 {target} 本人不可见,已发其余人)"
             else:
                 continue
-            # 结果遮了、指令没遮等于没遮:tool_use[i].input.content 是同一份原文
+            # 结果遮了、指令没遮等于没遮:tool_use[i].input 里是同一份原文与同一个收件人
             if i < len(calls) and isinstance(calls[i].get("input"), dict):
-                calls[i]["input"]["content"] = res["display"]
+                if "content" in calls[i]["input"]:
+                    calls[i]["input"]["content"] = res[field]
         return red
 
     def snapshot(self) -> dict:
@@ -211,6 +220,13 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(409, {"error": "先开局"}); return
             q = parse_qs(urlparse(self.path).query)
             player = (q.get("player") or [""])[0]
+            if player not in s0.inbox:
+                # http.server 按 latin-1 解请求行,裸中文座位名会变成 å°å。
+                # 转回 utf-8 再认一次,免得中文名直接用不了私发。
+                try:
+                    player = player.encode("latin-1").decode("utf-8")
+                except (UnicodeEncodeError, UnicodeDecodeError):
+                    pass
             if player not in s0.inbox:
                 self._json(400, {"error": f"未知座位: {player}"}); return
             self._json(200, {"player": player, "inbox": s0.inbox[player][-8:]})

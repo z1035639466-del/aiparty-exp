@@ -49,9 +49,8 @@ class Engine:
             self.marks["skips"] += 1
         if ev.get("type") == "forfeit":  # 认罚跳过(日常的「过」):正常游戏动作,按赌注结算
             self.marks["forfeits"] += 1
-        ask = self.state.open_ask
-        if ask and ev.get("player") and ev.get("type") in ("vote", "say", "tap") \
-                and (ask["deadline"] is None or time.time() <= ask["deadline"]):
+        if self._is_answer_to_open_ask(ev):
+            ask = self.state.open_ask
             # 应答归到这次问询名下,一人一票、后答覆盖先答。
             ask["answers"][ev["player"]] = ev.get("value") or ev.get("text") or "确认"
             if ask["deadline"] is None:
@@ -61,6 +60,28 @@ class Engine:
                 self.state.timers.append(ask["deadline"])
             ev = dict(ev, _absorbed=True)  # 已被问询吸收,不单独叫醒主持
         self.event_queue.append(ev)
+
+    def _is_answer_to_open_ask(self, ev: dict) -> bool:
+        """哪些事件算这次问询的应答——不设门槛就会被无关闲聊截胡。
+
+        实测(4人桌 turn 57):主持点名问毛毛,阿哲一句发给老K的「糯米丸子」闲聊
+        被吸收成唯一答案并判 winner,毛毛的真答案在窗口关掉后才到、直接作废。
+        玩家原话:「我随便插一句话就能截胡任何一个 ask」。三道门槛:
+        · 点名问某人时,只认那个人的应答(问全场则不限人);
+        · say 只认 to=局长 的定向发言,桌上互说是气氛不是答案;
+        · vote / tap 是刻意的应答动作,一律认。
+        """
+        ask = self.state.open_ask
+        if not ask or not ev.get("player"):
+            return False
+        if ask["deadline"] is not None and time.time() > ask["deadline"]:
+            return False
+        asked = ask.get("asked")
+        if asked and asked not in ("全场", "all") and ev["player"] != asked:
+            return False
+        if ev.get("type") == "say":
+            return ev.get("to") == "局长"
+        return ev.get("type") in ("vote", "tap")
 
     def _close_ask(self) -> dict | None:
         """窗口到点:按多数认,一票也认,平票取先到,没人答就明说没人答。"""

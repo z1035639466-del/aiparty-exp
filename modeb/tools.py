@@ -171,11 +171,27 @@ class ToolExecutor:
                     items.remove(ex)
             if not items:
                 raise ClampError("random.pick 空池")
-            return {"picked": self.rng.choice(items)}
+            return self._maybe_private({"picked": self.rng.choice(items)}, a)
         if name == "random.int":
             lo, hi = int(a.get("min", 1)), int(a.get("max", 6))
-            return {"value": self.rng.randint(lo, hi)}
+            return self._maybe_private({"value": self.rng.randint(lo, hi)}, a)
         raise ClampError(f"random 未知子操作: {name}")
+
+    def _maybe_private(self, res: dict, a: dict) -> dict:
+        """隐藏信息类玩法要能私密摇。
+
+        实测两桌独立撞到同一个洞:摇毒杯号码的 value 明文进公共日志(比私发给
+        目标还早一拍);抽卧底的 picked 当众公示,主持只能临场编掩护、改成自己
+        拍脑袋定人——「隐藏角色的公平性完全依赖主持自律,系统一点都没保证」。
+        标 visibility=自己看 时由 route_private 投进收件箱并遮蔽公开面。
+        """
+        vis = a.get("visibility")
+        if vis in ("自己看", "额头"):
+            player = a.get("player")
+            if player not in self.state.players:
+                raise ClampError(f"random({vis}) 必须指定在座玩家,收到: {player}")
+            res["visibility"], res["player"] = vis, player
+        return res
 
     # —— state:账本唯一入口 ——
     def _t_state(self, name: str, a: dict) -> dict:

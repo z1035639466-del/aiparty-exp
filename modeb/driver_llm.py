@@ -17,10 +17,10 @@ MAX_TOOLS_PER_TURN = 2
 HISTORY_WINDOW = 6  # 保留最近 N 回合主持词,维持口风连续
 
 TOOLS_DECLARATION = [
-    {"name": "show", "desc": "向玩家端展示内容;自己看/额头必须带 player(在座目标);draw_atom 若回了 demo.ref,讲解玩法时把它原样填进 demo 即播放演示件(自己编的引用会被降级)", "args": {"content": "str", "visibility": "自己看|额头|全场公开", "player": "str?", "demo": "str?"}},
-    {"name": "ask", "desc": "向玩家提问/发起确认", "args": {"player": "str|全场", "prompt": "str", "options": "list?"}},
-    {"name": "random.pick", "desc": "公平随机选择", "args": {"from": "players|list", "exclude": "list?"}},
-    {"name": "random.int", "desc": "公平随机整数", "args": {"min": "int", "max": "int"}},
+    {"name": "show", "desc": "向玩家端展示内容;自己看=只投给 player 本人,额头=只有 player 本人看不见、其余人都收到——两档都必须带 player(在座目标),收件人用 GET /api/inbox 取信;draw_atom 若回了 demo.ref,讲解玩法时把它原样填进 demo 即播放演示件(自己编的引用会被降级)", "args": {"content": "str", "visibility": "自己看|额头|全场公开", "player": "str(自己看/额头必填)", "demo": "str?"}},
+    {"name": "ask", "desc": "限时问一嘴:发问后安静等,没人应声就一直等(不催);第一个人应声起算窗口,到点按多数认、一票也认。点名问某人时只认那个人的应答", "args": {"player": "str|全场", "prompt": "str", "options": "list?", "window": "int?秒,默认5"}},
+    {"name": "random.pick", "desc": "公平随机选择;决定隐藏身份时务必带 visibility=自己看+player,否则结果会广播到公开回合行,身份当场穿帮", "args": {"from": "players|list", "exclude": "list?", "visibility": "自己看?", "player": "str?"}},
+    {"name": "random.int", "desc": "公平随机整数;藏数字(毒杯号等)同样用 visibility=自己看+player 私密摇", "args": {"min": "int", "max": "int", "visibility": "自己看?", "player": "str?"}},
     {"name": "timer", "desc": "计时", "args": {"seconds": "int", "label": "str"}},
     {"name": "state.add_score", "desc": "写分(账本唯一入口,钳制 |delta|<=3)", "args": {"player": "str", "delta": "int", "reason": "str"}},
     {"name": "state.set_focus", "desc": "设焦点人物", "args": {"player": "str"}},
