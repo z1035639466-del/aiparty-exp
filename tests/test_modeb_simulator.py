@@ -342,3 +342,22 @@ def test_join_base_uses_reachable_host(server):
     assert ":" in snap["join_base"].split("//", 1)[1], "入座前缀要带端口"
     ip = lan_host()
     assert not ip.startswith("127."), f"lan_host 不该返回回环地址,拿到 {ip}"
+
+
+def test_duel_result_reaches_player_view(server):
+    """对决揭晓要能到手机上。duel_result 没有 player 字段,而玩家视图按
+    「无 player 就跳过」过滤事件——不特判就整条被滤掉,手机上永远看不到胜负。"""
+    from urllib.parse import quote
+    call(server, "/api/start", {"players": ["甲", "乙", "丙"], "minutes": 30, "wildness": 6,
+                                "objects": ["杯子"], "driver": "manual", "provider": "mock"})
+    call(server, "/api/turn", {"text": "对决", "tool_use": [
+        {"name": "duel.start", "input": {"players": ["甲", "乙"]}}]})
+    v, _ = call(server, f"/api/view?player={quote('甲')}")
+    assert v["duel"] == {"vs": ["甲", "乙"], "drawn": False}, "对决方要看得见对峙状态"
+    assert "draw_at" not in json.dumps(v, ensure_ascii=False), "拔枪时点不许出现在玩家视图"
+
+    call(server, "/api/event", {"type": "tap", "player": "甲"})   # 立刻拍=抢跑
+    call(server, "/api/turn", {"text": "", "tool_use": []})
+    v3, _ = call(server, f"/api/view?player={quote('丙')}")       # 观战者也该看见
+    de = [e for t in v3["recent"] for e in t["table"] if e.get("type") == "duel_result"]
+    assert de and de[-1]["winner"] == "乙" and "抢跑" in de[-1]["reason"]

@@ -150,6 +150,13 @@ class Session:
                      and r["result"].get("display")]
             table = []
             for e in (line.get("events_in") or []):
+                if e.get("type") == "duel_result":
+                    # 对决揭晓没有 player 字段,但它是全场该看见的结果,不能被
+                    # 「无 player 就跳过」滤掉——手机上要演这一下。
+                    table.append({"type": "duel_result", "winner": e.get("winner"),
+                                  "loser": e.get("loser"), "reason": e.get("reason"),
+                                  "vs": e.get("vs")})
+                    continue
                 who = e.get("player")
                 if not who:
                     continue

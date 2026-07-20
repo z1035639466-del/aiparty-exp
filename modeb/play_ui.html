@@ -53,6 +53,33 @@
   .pick button{display:block;width:100%;font-size:22px;padding:18px;margin:10px 0;
                border-radius:14px;border:1px solid var(--line);background:var(--card);color:#eee}
   .end{background:#16241c;border-radius:14px;padding:16px;font-size:18px;color:#9d9;text-align:center}
+  /* ── 快枪手:反射游戏,别的一律让开,全屏 ── */
+  .duel{position:fixed;inset:0;z-index:9;display:flex;flex-direction:column;
+        align-items:center;justify-content:center;text-align:center;padding:24px}
+  .duel .vs{font-size:15px;color:#aab;letter-spacing:.1em;margin-bottom:6px}
+  .duel .who{font-size:26px;font-weight:700;margin-bottom:28px}
+  /* 对峙:暗、静、憋着 */
+  .duel.wait{background:#0d0d12}
+  .duel.wait .hint{font-size:19px;color:#7a7a88}
+  .duel.wait .dots{font-size:44px;color:#4a4a58;letter-spacing:.2em;
+                   animation:breathe 1.6s ease-in-out infinite}
+  @keyframes breathe{0%,100%{opacity:.25}50%{opacity:.75}}
+  /* 枪响:整屏变成按钮 */
+  /* 闪一下就够:暗处的手机上,纯白全屏超过一瞬间是晃眼不是提示 */
+  .duel.go{background:#7d1020;animation:flash .18s ease-out 1}
+  @keyframes flash{0%{background:#ffe8e8}22%{background:#c02033}100%{background:#7d1020}}
+  .duel.go .bang{font-size:96px;font-weight:900;color:#fff;line-height:1;
+                 text-shadow:0 0 30px rgba(255,90,90,.8)}
+  .duel.go .sub{font-size:20px;color:#ffd4d4;margin-top:10px}
+  /* 观战 */
+  .duel.watch{background:#0f0f16}
+  .duel.watch .hint{font-size:17px;color:#8a8a99}
+  /* 揭晓 */
+  .duelend{background:#1d2033;border:1px solid #3d4266;border-radius:16px;
+           padding:16px;margin-bottom:10px;text-align:center}
+  .duelend .win{font-size:22px;color:#8ef0a8;font-weight:700}
+  .duelend .why{font-size:14px;color:#99a;margin-top:4px}
+  .tapzone{position:absolute;inset:0}
   .toast{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 108px);
          background:#333a44;color:#fff;padding:11px 14px;border-radius:12px;font-size:15px;
          opacity:0;transition:opacity .2s;pointer-events:none;text-align:center}
@@ -90,14 +117,50 @@ function sayNow(){
 }
 function toggleTo(){SAYTO=SAYTO==='桌上'?'局长':'桌上';render(last);}
 
+// 轮询节奏自适应:平时 2.5 秒够了,但对峙期间必须快。
+// 引擎按 t_ms 判先后,而"枪响"是靠轮询看到的——慢一拍就等于慢一拍拔枪,
+// 而两台手机的轮询相位是随机的,公平性直接毁在这里。对峙时压到 120ms。
+let timer=null, period=0;
+function schedule(ms){
+  if(period===ms) return;
+  period=ms; clearInterval(timer); timer=setInterval(tick, ms);
+}
 async function tick(){
   if(!ME) return;
   const v=await api('/api/view?player='+encodeURIComponent(ME));
   if(v.error){toast('⚠️ '+v.error);return;}
   last=v; render(v);
+  const duelPending=v.duel && !v.duel.drawn && (v.duel.vs||[]).includes(ME);
+  schedule(duelPending?120:(v.duel?400:2500));
 }
 
 function esc(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+// 快枪手全屏。对峙期间别的全让开——这是反射游戏,多一个像素都是干扰。
+// 抢跑判负是规则的一部分,所以对峙时整屏照样可点:早拍就是输,系统按毫秒判。
+let bangAt=0;
+function duelHtml(v){
+  const d=v.duel; if(!d) return null;
+  const me=(d.vs||[]).includes(ME), other=(d.vs||[]).find(x=>x!==ME);
+  if(!me){
+    return `<div class="duel watch">
+      <div class="vs">对 决 中</div>
+      <div class="who">${esc(d.vs[0])} <span style="color:#666">vs</span> ${esc(d.vs[1])}</div>
+      <div class="hint">${d.drawn?'枪响了——看谁快':'等枪响…… 别出声'}</div></div>`;
+  }
+  if(!d.drawn){
+    return `<div class="duel wait"><div class="tapzone" onclick="draw()"></div>
+      <div class="vs">你 的 对 手</div>
+      <div class="who">${esc(other)}</div>
+      <div class="dots">• • •</div>
+      <div class="hint" style="margin-top:22px">等「拔!」出现<br>
+        <span style="font-size:14px;color:#665">早拍算抢跑,直接判负</span></div></div>`;
+  }
+  if(!bangAt) bangAt=Date.now();
+  return `<div class="duel go"><div class="tapzone" onclick="draw()"></div>
+    <div class="bang">拔!</div><div class="sub">点屏幕 —— 越快越好</div></div>`;
+}
+function draw(){ send('tap'); }
 
 function render(v){
   if(!ME){
@@ -110,6 +173,8 @@ function render(v){
     return;
   }
   if(!v) return;
+  const duel=duelHtml(v);
+  if(duel){ $('app').innerHTML=duel; return; }   // 对峙/枪响:全屏独占
   const r=(v.recent||[]).filter(t=>t.host||((t.table||[]).length));
   const cur=r[r.length-1]||{};
   const ask=v.open_ask, mine=ask&&(ask.asked===ME||ask.asked==='全场');
@@ -123,6 +188,11 @@ function render(v){
     h+=`<div class="end">🏁 收局了<br><span style="font-size:15px">${esc(JSON.stringify(v.scores))}</span></div>`;
     $('app').innerHTML=h; return;
   }
+
+  // 对决揭晓:全场都该看见谁赢了、为什么(抢跑还是手快)
+  const de=(cur.table||[]).find(e=>e.type==='duel_result');
+  if(de) h+=`<div class="duelend"><div class="win">🔫 ${esc(de.winner)} 赢了</div>`
+           +`<div class="why">${esc(de.reason)}</div></div>`;
 
   h+= cur.host ? `<div class="host">${esc(cur.host)}</div>`
                : `<div class="host quiet">局长在等桌上的动静……</div>`;
@@ -142,7 +212,7 @@ function render(v){
       +v.inbox.slice(-4).map(m=>`<div>${esc(m)}</div>`).join('')+`</div>`;
   }
 
-  const evs=(cur.table||[]).map(e=>{
+  const evs=(cur.table||[]).filter(e=>e.type!=='duel_result').map(e=>{
     const icon={laugh:'😂',done:'✅',forfeit:'🍺',optout:'🚫',vote:'🗳',tap:'👍',say:'💬',ritual_done:'🪄'}[e.type]||e.type;
     const body=e.note?`<i>${esc(e.note)}</i>`:esc(e.text||e.value||'');
     return `<div class="ev"><b>${esc(e.player)}</b> ${icon} ${body}</div>`;
@@ -172,5 +242,5 @@ function render(v){
   $('app').innerHTML=h;
 }
 
-render(null); tick(); setInterval(tick,2500);
+render(null); tick(); schedule(2500);
 </script>
