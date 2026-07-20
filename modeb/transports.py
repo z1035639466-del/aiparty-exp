@@ -58,6 +58,20 @@ CN_PROVIDERS = {
     "deepseek": {"base": "https://api.deepseek.com", "model": "deepseek-v4-pro", "key_env": "DEEPSEEK_API_KEY"},
 }
 
+# 视觉裁判(judge.photo/场景扫描)按 provider 走对应视觉模型——千问一家即可通,
+# 不再硬绑 anthropic。控制台真实 id 若不同,VISION_MODEL 环境变量一把覆盖。
+VISION_MODELS = {
+    "anthropic": None,          # None = 沿用主持模型(Anthropic 文本模型本身看图)
+    "qwen": "qwen-vl-max",
+    "glm": "glm-4v",
+    "mock": None,
+}
+
+
+def vision_model_for(provider: str, host_model: str) -> str:
+    import os
+    return os.environ.get("VISION_MODEL") or VISION_MODELS.get(provider) or host_model
+
 
 def _post_json(url: str, headers: dict, payload: dict, timeout: int = 60) -> dict:
     req = urllib.request.Request(
