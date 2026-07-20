@@ -295,18 +295,23 @@ class ToolExecutor:
     def _t_judge(self, name: str, a: dict) -> dict:
         op = name.split(".", 1)[1] if "." in name else "photo"
         if op == "cancel":
-            prev, self.state.pending_photo = self.state.pending_photo, None
+            prev = self.state.pending_photo or self.state.pending_audio
+            self.state.pending_photo = None
+            self.state.pending_audio = None
             return {"cancelled": bool(prev)}
-        if op != "photo":
+        if op not in ("photo", "audio"):
             raise ClampError(f"judge 未知子操作: {op}")
         player = a.get("player")
         if player not in self.state.players:
-            raise ClampError(f"judge.photo 必须指定在座玩家,收到: {player}")
-        if self.state.pending_photo:
-            raise ClampError("已有拍照判定进行中(可 judge.cancel)")
+            raise ClampError(f"judge.{op} 必须指定在座玩家,收到: {player}")
+        if self.state.pending_photo or self.state.pending_audio:
+            raise ClampError("已有判定进行中(可 judge.cancel)")
         prompt = (a.get("prompt") or "").strip()
         if not prompt:
-            raise ClampError("judge.photo 需要 prompt(判什么,给视觉裁判看的标准)")
+            raise ClampError(f"judge.{op} 需要 prompt(判什么,给裁判看的标准)")
+        if op == "audio":
+            self.state.pending_audio = {"player": player, "prompt": prompt}
+            return {"requested": player, "note": "等他录音;结果以 judge_result 事件送达,期间别催"}
         self.state.pending_photo = {"player": player, "prompt": prompt}
         return {"requested": player, "note": "等他拍照;结果以 judge_result 事件送达,期间别催"}
 

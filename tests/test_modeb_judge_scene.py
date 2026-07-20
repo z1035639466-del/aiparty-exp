@@ -99,6 +99,55 @@ def test_photo_judge_full_chain(server, monkeypatch):
     assert ("judge_result", "过") in evs, "判定结果要叫醒主持宣布"
 
 
+# —— judge.audio(录音判定通道:管路先通,裁判接 key 即生效)——
+
+def test_judge_audio_tool_and_digest():
+    ex = ToolExecutor(GameState(players=["甲", "乙"], wildness_cap=6, time_budget_min=30))
+    r = ex.execute({"name": "judge.audio", "input": {"player": "甲", "prompt": "学周杰伦语调说早安"}})
+    assert r["ok"] and ex.state.digest(30.0)["audio_wait"] == "甲"
+    again = ex.execute({"name": "judge.photo", "input": {"player": "乙", "prompt": "x"}})
+    assert not again["ok"], "拍照/录音判定共用'一次一单'"
+    assert ex.execute({"name": "judge.cancel", "input": {}})["result"]["cancelled"] is True
+    assert ex.state.pending_audio is None
+
+
+def test_audio_judge_honest_when_not_plugged(server, monkeypatch):
+    """裁判未接入(无 AUDIO_JUDGE_* 环境变量)必须诚实报'无法判定',主持走共识兜底。"""
+    for k in ("AUDIO_JUDGE_BASE", "AUDIO_JUDGE_KEY", "AUDIO_JUDGE_MODEL"):
+        monkeypatch.delenv(k, raising=False)
+    call(server, "/api/start", {"players": ["甲", "乙"], "minutes": 30, "wildness": 6,
+                                "objects": [], "driver": "manual"})
+    call(server, "/api/turn", {"text": "学!", "tool_use": [
+        {"name": "judge.audio", "input": {"player": "甲", "prompt": "学猫叫三声像不像"}}]})
+    view_jia, _ = call(server, "/api/view?player=%E7%94%B2")
+    assert view_jia["audio_request"] == "学猫叫三声像不像"
+    res, code = call(server, "/api/audio", {"player": "甲", "audio_b64": "aGk=", "format": "m4a"})
+    assert code == 200 and res["verdict"] == "无法判定" and "未接入" in res["reason"]
+    snap, _ = call(server, "/api/state")
+    assert snap["digest"]["audio_wait"] is None, "未接入也要正常结案,不悬单"
+
+
+def test_audio_judge_with_plugged_transport(server, monkeypatch):
+    """接上音频口(monkeypatch 工厂)后全链生效:input_audio 块送达裁判。"""
+    class _FakeEar:
+        def complete(self, system, messages):
+            blocks = messages[0]["content"]
+            assert any(b.get("type") == "input_audio" for b in blocks), "裁判必须收到音频块"
+            return '{"verdict": "过", "reason": "尾音很周杰伦"}'
+    monkeypatch.setattr("modeb.simulator._make_audio_judge", lambda: _FakeEar())
+    call(server, "/api/start", {"players": ["甲", "乙"], "minutes": 30, "wildness": 6,
+                                "objects": [], "driver": "manual"})
+    call(server, "/api/turn", {"text": "学!", "tool_use": [
+        {"name": "judge.audio", "input": {"player": "甲", "prompt": "像不像周杰伦"}}]})
+    _, code = call(server, "/api/audio", {"player": "乙", "audio_b64": "x"})
+    assert code == 403, "别人不能替他交卷"
+    res, code = call(server, "/api/audio", {"player": "甲", "audio_b64": "aGk=", "format": "m4a"})
+    assert code == 200 and res["verdict"] == "过" and "周杰伦" in res["reason"]
+    snap, _ = call(server, "/api/state")
+    evs = [(e.get("type"), e.get("verdict")) for e in snap["pending_events"]]
+    assert ("judge_result", "过") in evs
+
+
 # —— judge.photo frames(视频抽帧判定通道)——
 
 class _FakeVisionCountFrames:

@@ -10,6 +10,7 @@ import {
   StyleSheet, Text, TextInput, View,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
 import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
@@ -27,7 +28,32 @@ export default function App() {
   const [err, setErr] = useState("");
   const [say, setSay] = useState("");
   const [dueled, setDueled] = useState(false); // 本次对决我开过枪了
+  const [recording, setRecording] = useState(null); // 录音判定进行中的 Recording 对象
   const prevRef = useRef({ inbox: 0, drawn: false });
+
+  // 录音判定(judge.audio):按一下录、再按一下交卷;裁判在服务端(接 key 即通)
+  const toggleRecord = async () => {
+    try {
+      if (recording) {
+        setRecording(null);
+        await recording.stopAndUnloadAsync();
+        const uri = recording.getURI();
+        const b64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" });
+        const res = await api("/api/audio", { player: me, audio_b64: b64, format: "m4a" });
+        Alert.alert("裁判", res.error || `${res.verdict}${res.reason ? ":" + res.reason : ""}`);
+        return;
+      }
+      const perm = await Audio.requestPermissionsAsync();
+      if (!perm.granted) { Alert.alert("需要麦克风权限", "录音判定要用麦克风"); return; }
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+      const { recording: rec } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      setRecording(rec);
+    } catch (e) {
+      setRecording(null);
+      Alert.alert("录音失败", String(e.message));
+    }
+  };
 
   // —— 手机开局页(v0 欠账补):此前开局只能在电脑驾驶舱,手机只能入座 ——
   const [creating, setCreating] = useState(false);
@@ -268,6 +294,16 @@ export default function App() {
               <Text style={s.photoActionText}>🎥 拍视频</Text>
             </Pressable>
           </View>
+        </View>
+      )}
+
+      {v.audio_request && (
+        <View style={s.photoBtn}>
+          <Text style={s.photoText}>🎤 {v.audio_request}</Text>
+          <Text style={s.photoSub}>{recording ? "录音中…再按一下结束并交卷" : "按一下开录,听觉裁判来判"}</Text>
+          <Pressable style={s.photoActionBtn} onPress={toggleRecord}>
+            <Text style={s.photoActionText}>{recording ? "⏹ 停止并交卷" : "🎤 开始录音"}</Text>
+          </Pressable>
         </View>
       )}
 

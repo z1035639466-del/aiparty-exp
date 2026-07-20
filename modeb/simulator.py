@@ -31,6 +31,16 @@ from .transports import Resilient, make_transport
 MIN_PLAYERS, MAX_PLAYERS = 2, 10  # 机位上限只是这一行常数,机制不感知机位数
 
 
+def _make_audio_judge():
+    """音频裁判工厂:房主接 key 即通(OpenAI 兼容口,qwen-audio 等)。缺配置返回 None。"""
+    import os
+    base, model = os.environ.get("AUDIO_JUDGE_BASE"), os.environ.get("AUDIO_JUDGE_MODEL")
+    if not base or not model or not os.environ.get("AUDIO_JUDGE_KEY"):
+        return None
+    from .transports import OpenAICompatTransport
+    return OpenAICompatTransport(model, base, "AUDIO_JUDGE_KEY")
+
+
 class ManualDriver:
     """主持台驱动:/api/turn 随请求带入决策,decide 原样返回。"""
 
@@ -223,6 +233,35 @@ class Session:
                     self.state.playlist, self.state.occasion, self.state.scene_brief)
         return {"objects": objs, "brief": brief, "scene_objects": merged}
 
+    def judge_audio(self, player: str, audio_b64: str, fmt: str | None) -> dict:
+        """音频裁判(锁外调用,慢):语调打分/口令复述这类"像不像"判断。
+        管路已通,裁判待接入——设 AUDIO_JUDGE_BASE/KEY/MODEL(OpenAI 兼容
+        音频口,如 qwen-audio)即生效;未接入时诚实报「无法判定」,主持走
+        共识兜底。分贝/音高这类纯信号活归 App 端 DSP,不走这里。"""
+        pend = self.state.pending_audio or {}
+        judge = _make_audio_judge()
+        if judge is None:
+            return {"type": "judge_result", "player": player, "verdict": "无法判定",
+                    "reason": "音频裁判未接入(设 AUDIO_JUDGE_BASE/KEY/MODEL 即通)"}
+        sys_p = ("你是聚会游戏的听觉裁判:只按给定标准判,宽松判、气氛优先、拿不准给过。"
+                 '只输出 JSON:{"verdict":"过|不过|无法判定","reason":"一句话,现场能念"}')
+        msgs = [{"role": "user", "content": [
+            {"type": "input_audio", "input_audio": {"data": audio_b64,
+                                                    "format": fmt or "wav"}},
+            {"type": "text", "text": f"判定标准:{pend.get('prompt', '')}"}]}]
+        try:
+            import re as _re
+            raw = judge.complete(sys_p, msgs)
+            m = _re.search(r"\{.*\}", raw, _re.DOTALL)
+            out = json.loads(m.group(0)) if m else {}
+        except Exception as e:
+            out = {"verdict": "无法判定", "reason": f"裁判失联({type(e).__name__})"}
+        verdict = out.get("verdict")
+        if verdict not in ("过", "不过", "无法判定"):
+            verdict = "无法判定"
+        return {"type": "judge_result", "player": player, "verdict": verdict,
+                "reason": str(out.get("reason") or "")[:100]}
+
     def run_turn(self, body: dict | None = None) -> dict:
         """执行一拍(须在持有 self.lock 下调用):HTTP 手动驱动与服务端自驱共用。
         出服务端的一律是遮蔽版;原文只活在 episode(审计)和目标收件箱里。"""
@@ -335,6 +374,9 @@ class Session:
             "photo_request": (self.state.pending_photo["prompt"]
                               if self.state.pending_photo
                               and self.state.pending_photo["player"] == me else None),
+            "audio_request": (self.state.pending_audio["prompt"]
+                              if self.state.pending_audio
+                              and self.state.pending_audio["player"] == me else None),
             "scores": digest.get("scores"), "scene_objects": digest.get("scene_objects"),
             "now_playing": digest.get("now_playing"),   # 手机上要显示正在放的歌
             "timer_running": digest.get("timer_running"),
@@ -539,6 +581,27 @@ class Handler(BaseHTTPRequestHandler):
                     return
                 out = s.scene_photo(body["image_b64"], body.get("media_type"))
                 self._json(200 if "error" not in out else 502, out)
+                return
+            if self.path == "/api/audio":
+                body = self._body()
+                player = body.get("player")
+                with s.lock:
+                    pend = s.state.pending_audio
+                if not pend:
+                    self._json(409, {"error": "没有进行中的录音判定"})
+                    return
+                if pend["player"] != player:
+                    self._json(403, {"error": f"这单判定点的是 {pend['player']},不是 {player}"})
+                    return
+                if not body.get("audio_b64"):
+                    self._json(400, {"error": "缺 audio_b64"})
+                    return
+                result = s.judge_audio(player, body["audio_b64"], body.get("format"))
+                with s.lock:
+                    if s.state.pending_audio == pend:
+                        s.state.pending_audio = None
+                        s.engine.push_event(dict(result))
+                self._json(200, {"verdict": result["verdict"], "reason": result["reason"]})
                 return
             if self.path == "/api/photo":
                 body = self._body()
