@@ -246,3 +246,54 @@ def test_host_failure_becomes_silent_beat_not_500(server, monkeypatch):
     assert snap["host_errors"]["count"] == 1 and "429" in snap["host_errors"]["last"]
     assert snap["pending_events"], "沉默拍不得吞事件——玩家按的「完成」还在队列里"
     assert snap["turn_ready"] is False, "冷却期内自动循环不该再撞"
+
+
+def _view(base, player):
+    from urllib.parse import quote
+    return call(base, f"/api/view?player={quote(player)}")
+
+
+def test_player_view_hides_everything_not_on_your_phone(server):
+    """玩家视图 = 一台手机该看见的东西。房主裁定:模拟台只有驾驶舱一个口时,
+    玩家为了看「到我了吗」被迫读它,顺带撞见私件元数据——泄漏面是测试工具
+    带进去的。三条注记:带进度、别人的 to=局长 不给内容、不含调试字段。"""
+    call(server, "/api/start", {"players": ["甲", "乙", "丙"], "minutes": 30, "wildness": 6,
+                                "objects": ["扑克牌"], "driver": "manual", "provider": "mock"})
+    call(server, "/api/turn", {"text": "发牌", "tool_use": [
+        {"name": "show", "input": {"content": "你是卧底", "visibility": "自己看", "player": "乙"}},
+        {"name": "random.int", "input": {"min": 1, "max": 6, "visibility": "自己看", "player": "乙"}}]})
+    call(server, "/api/event", {"type": "say", "player": "丙", "text": "局长这不公平", "to": "局长"})
+    call(server, "/api/event", {"type": "say", "player": "甲", "text": "丙又开始了", "to": "桌上"})
+    call(server, "/api/turn", {"text": "稍等", "tool_use": []})
+
+    v_jia, code = _view(server, "甲")
+    assert code == 200
+    # 进度必须给,否则玩家还得回驾驶舱看 /api/state,泄漏面等于没堵
+    for k in ("turn", "turn_ready", "focus", "round", "scores", "scene_objects"):
+        assert k in v_jia, f"玩家视图缺进度字段 {k}"
+    # 调试字段一个都不许有
+    for k in ("tool_use", "results", "inbox_counts", "clamps", "pending_events"):
+        assert k not in v_jia, f"玩家视图不该含调试字段 {k}"
+    # 别人的私件内容与收件人都不出现
+    blob = json.dumps(v_jia, ensure_ascii=False)
+    assert "你是卧底" not in blob, "别人的私件内容泄漏进了玩家视图"
+    assert v_jia["inbox"] == [], "甲没收到过私件,收件箱该是空的"
+    # 别人的定向发言只留痕不留字
+    tbl = [e for t in v_jia["recent"] for e in t["table"] if e["player"] == "丙"]
+    assert tbl and "text" not in tbl[0] and tbl[0].get("note"), "别人的 to=局长 不该给内容"
+    # 桌上互说照常听得见
+    assert any(e.get("text") == "丙又开始了" for t in v_jia["recent"] for e in t["table"])
+
+    # 本人视角:自己的私件全文可见,自己说的话也看得见
+    v_yi, _ = _view(server, "乙")
+    assert any("你是卧底" in s for s in v_yi["inbox"])
+    v_bing, _ = _view(server, "丙")
+    assert any(e.get("text") == "局长这不公平"
+               for t in v_bing["recent"] for e in t["table"] if e["player"] == "丙")
+
+
+def test_player_view_rejects_unknown_seat(server):
+    call(server, "/api/start", {"players": ["甲", "乙"], "minutes": 30, "wildness": 6,
+                                "objects": ["扑克牌"], "driver": "manual", "provider": "mock"})
+    _, code = _view(server, "路人")
+    assert code == 400

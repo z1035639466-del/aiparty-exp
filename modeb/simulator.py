@@ -115,6 +115,58 @@ class Session:
                     calls[i]["input"]["content"] = res[field]
         return red
 
+    def player_view(self, me: str, depth: int = 6) -> dict:
+        """一台手机该看见的东西,别的一个字都不给(房主裁定 2026-07-20)。
+
+        实测三桌的私密性结论全部作废,因为模拟台只有 /api/state 一个口,
+        而那是驾驶舱。玩家为了看「到我了吗」被迫读它,顺带撞见 inbox_counts、
+        show 的收件人、random 的结果——「我没法不看到」(小圆)。泄漏面是
+        测试工具带进去的,不是产品的。
+
+        三条设计注记:
+        · 必须带进度(回合号/turn_ready/焦点),否则玩家还得回驾驶舱,等于没堵;
+        · 别人的 to=局长 定向发言只显示「有人跟主持说了句话」,不给内容;
+        · 不含 tool_use / results / inbox_counts / 别人的收件箱。
+        """
+        digest = self.state.digest(self.engine.time_left_min())
+        ask = self.state.open_ask
+        recent = []
+        for line in self.recent[-depth:]:
+            if line.get("episode_summary"):
+                continue
+            shown = [r["result"].get("display") for r in (line.get("results") or [])
+                     if r.get("ok") and isinstance(r.get("result"), dict)
+                     and r["result"].get("visibility") == "全场公开"
+                     and r["result"].get("display")]
+            table = []
+            for e in (line.get("events_in") or []):
+                who = e.get("player")
+                if not who:
+                    continue
+                item = {"player": who, "type": e.get("type")}
+                if e.get("type") == "say":
+                    if e.get("to") == "局长" and who != me:
+                        item["note"] = "跟主持说了句话"      # 听得见有人开口,听不见内容
+                    elif e.get("text"):
+                        item["text"] = e["text"]
+                elif e.get("value"):
+                    item["value"] = e["value"]
+                table.append(item)
+            recent.append({"turn": line.get("turn"), "host": line.get("text", ""),
+                           "shown": shown, "table": table})
+        return {
+            "you": me,
+            "round": digest.get("round"), "turn": self.engine.marks["turns"],
+            "turn_ready": self.engine.turn_ready(), "focus": digest.get("focus"),
+            "finished": self.state.finished,
+            "time_left_min": digest.get("time_left_min"),
+            "scores": digest.get("scores"), "scene_objects": digest.get("scene_objects"),
+            "inbox": self.inbox.get(me, [])[-8:],          # 只有自己的
+            "open_ask": ({"prompt": ask["prompt"], "asked": ask["asked"],
+                          "options": ask["options"]} if ask else None),  # 不含 answers
+            "recent": recent,
+        }
+
     def snapshot(self) -> dict:
         return {
             "players": self.state.players,
@@ -200,6 +252,19 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, *a) -> None:  # 静默访问日志
         pass
 
+    def _seat_param(self) -> str:
+        """取 ?player= 座位名。http.server 按 latin-1 解请求行,裸中文会变成
+        å°å——转回 utf-8 再认一次,免得中文座位名默认用不了。"""
+        from urllib.parse import parse_qs, urlparse
+        player = (parse_qs(urlparse(self.path).query).get("player") or [""])[0]
+        s0 = self.hub.session
+        if s0 and player not in s0.inbox:
+            try:
+                player = player.encode("latin-1").decode("utf-8")
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                pass
+        return player
+
     def do_GET(self) -> None:
         if self.path in ("/", "/index.html"):
             body = HTML_PATH.read_bytes()
@@ -213,23 +278,19 @@ class Handler(BaseHTTPRequestHandler):
             self.send_response(204)
             self.end_headers()
             return
-        if self.path.startswith("/api/inbox"):
-            from urllib.parse import parse_qs, urlparse
+        if self.path.startswith("/api/inbox") or self.path.startswith("/api/view"):
             s0 = self.hub.session
             if s0 is None:
                 self._json(409, {"error": "先开局"}); return
-            q = parse_qs(urlparse(self.path).query)
-            player = (q.get("player") or [""])[0]
-            if player not in s0.inbox:
-                # http.server 按 latin-1 解请求行,裸中文座位名会变成 å°å。
-                # 转回 utf-8 再认一次,免得中文名直接用不了私发。
-                try:
-                    player = player.encode("latin-1").decode("utf-8")
-                except (UnicodeEncodeError, UnicodeDecodeError):
-                    pass
+            player = self._seat_param()
             if player not in s0.inbox:
                 self._json(400, {"error": f"未知座位: {player}"}); return
-            self._json(200, {"player": player, "inbox": s0.inbox[player][-8:]})
+            if self.path.startswith("/api/view"):
+                # 玩家视图:一台手机该看见的东西。带进度(否则玩家还得回驾驶舱),
+                # 不含 tool_use / results / inbox_counts / 别人的收件箱。
+                self._json(200, s0.player_view(player))
+            else:
+                self._json(200, {"player": player, "inbox": s0.inbox[player][-8:]})
             return
         if self.path == "/api/state":
             s = self.hub.session
