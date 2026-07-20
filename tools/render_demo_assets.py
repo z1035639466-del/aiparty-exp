@@ -196,7 +196,9 @@ def render_one(card: dict, out_dir: Path, dry: bool) -> str | None:
     full_prompt = prompt + STYLE_SUFFIX
     base = os.environ.get("IMAGE_API_BASE")
     if base:
-        key = os.environ.get("IMAGE_API_KEY")
+        # IMAGE_API_KEY 缺省回落 DASHSCOPE_API_KEY——把 compatible-mode 口对准百炼空间
+        # 时就是同一把 key(在 .env 里,shell 里未必 export 过),不逼房主在终端搬 key。
+        key = os.environ.get("IMAGE_API_KEY") or os.environ.get("DASHSCOPE_API_KEY")
         if not key:
             raise SystemExit("缺 IMAGE_API_KEY 环境变量(配了 IMAGE_API_BASE 需要配对的 key)")
         img = _render_openai(full_prompt, base, key)
