@@ -51,12 +51,19 @@ class AnthropicTransport:
         self.base = (base_url or os.environ.get("ANTHROPIC_BASE_URL") or ANTHROPIC_BASE).rstrip("/")
 
     def complete(self, system: str, messages: list[dict]) -> str:
+        # 同一个密钥值,两种放法:官方认 x-api-key;OAuth 与部分中转口只认 Bearer。
+        # 二选一发出去——两个头同时发官方会直接拒。
         key = os.environ.get("ANTHROPIC_API_KEY")
-        if not key:
-            raise RuntimeError("缺 ANTHROPIC_API_KEY 环境变量")
+        token = os.environ.get("ANTHROPIC_AUTH_TOKEN")
+        if key:
+            auth = {"x-api-key": key}
+        elif token:
+            auth = {"Authorization": f"Bearer {token}"}
+        else:
+            raise RuntimeError("缺 ANTHROPIC_API_KEY(或 ANTHROPIC_AUTH_TOKEN)环境变量")
         resp = _post_json(
             f"{self.base}/v1/messages",
-            {"x-api-key": key, "anthropic-version": "2023-06-01"},
+            {**auth, "anthropic-version": "2023-06-01"},
             {"model": self.model, "system": system, "messages": messages,
              "max_tokens": self.max_tokens})
         return "".join(b.get("text", "") for b in resp.get("content", []))

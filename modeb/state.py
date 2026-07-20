@@ -34,6 +34,10 @@ class GameState:
     grants: list[SkillGrant] = field(default_factory=list)
     notes: dict[str, Any] = field(default_factory=dict)
     timers: list[float] = field(default_factory=list)  # 活动计时器到期时刻(epoch)
+    host_perception: str = "转写"  # 主持感知档:转写(听得见全文)| 按钮(只知道谁按了什么)
+    open_ask: dict | None = None  # 进行中的限时问询:{prompt, options, deadline, answers}
+    settled: dict[str, int] = field(default_factory=dict)  # 已清账累计口数(清账制的另一半)
+    discards: list[dict] = field(default_factory=list)  # 主动弃牌留痕:弃牌≠用牌
     finished: bool = False
 
     def __post_init__(self) -> None:

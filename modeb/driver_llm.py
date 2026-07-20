@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 from typing import Protocol
 
@@ -153,6 +154,10 @@ class LLMDriver:
         for _ in range(1 + self.max_retries):
             raw = self.transport.complete(self.system, messages)
             decision = parse_decision(raw)
+            if decision is None:
+                # 解析失败就吐兜底文案,原文一丢就查不下去了——留证。
+                print(f"⚠️ 主持决策解析失败,模型原文前 400 字:\n{raw[:400]!r}",
+                      file=sys.stderr, flush=True)
             if decision is not None:
                 break
             self.malformed_count += 1

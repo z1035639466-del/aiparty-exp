@@ -13,6 +13,13 @@ from .atoms_seed import SEED_ATOMS
 from .state import ClampError, GameState, SkillGrant
 
 MAX_SCORE_DELTA = 3  # 单次写分钳制
+
+ATOM_TYPES = {"完整玩法", "条件点名", "任务内容", "道具挑战", "问答题目", "规则修饰", "技能授予"}
+
+# 默认关掉的安全闸。判据不是"隐私"而是「会不会离开这个房间、能不能撤回」:
+# 发朋友圈会离开且撤不回,翻手机不离开房间但侵犯在场的人,"前任最多的喝"只是自曝。
+# 三者性质不同,只前两类进闸。语料侧需补打 外发不可逆 标记(现约 26 条命中)。
+BLOCKED_SAFETY = {"逼量嫌疑", "外发不可逆"}
 ATOMS_FILE = "inputs/atoms/atoms-v1.jsonl"  # M-int-1 抽取产物;存在即自动并入弹药库
 
 
@@ -57,7 +64,13 @@ class ToolExecutor:
 
     # —— 分发 ——
     def execute(self, call: dict[str, Any]) -> dict[str, Any]:
-        name, args = call["name"], call.get("input") or {}
+        name = call["name"]
+        # 形状归一:契约要求 {"name":..., "input":{...}},但模型常把参数平铺到顶层
+        # ({"name":"ask","player":"全场","prompt":"..."})。此时 call.get("input") 是 None,
+        # 参数会被整包丢掉——工具照样"执行成功"却带着空参数,比报错更难查。
+        args = call.get("input")
+        if not isinstance(args, dict):
+            args = {k: v for k, v in call.items() if k not in ("name", "input")}
         # 模型爱把不填的参数显式写成 null,而 a.get(k, 默认值) 在「键在、值为 null」
         # 时返回 None 而非默认值,下游 int()/for 就地爆炸。入口剥掉 null,让默认值生效。
         args = {k: v for k, v in args.items() if v is not None}
@@ -95,8 +108,23 @@ class ToolExecutor:
         return {"timer_started": secs, "label": a.get("label", "")}
 
     def _t_ask(self, name: str, a: dict) -> dict:
-        # M1:提问下发即返回;回答由事件队列(玩家端)带回下一回合
-        return {"asked": a.get("player", "全场"), "prompt": a.get("prompt", ""), "options": a.get("options")}
+        """限时问一嘴:开一个窗口,到点按多数认,一票也认,没人答就往下走。
+
+        房主裁定:不要求全场共识——"和问一嘴没区别"。共识门槛会把局卡死,
+        而现场问"这轮谁输了"本来就是谁应声算谁。
+        """
+        window = int(a.get("window", 5))
+        if not 1 <= window <= 120:
+            raise ClampError(f"ask 窗口越界: {window} 秒")
+        # deadline 留空:计时从第一个人应声才开始。没人应声就一直等着,
+        # 不催、不叫醒主持——房主裁定「等着回复就行,别疯狂 push 人」。
+        self.state.open_ask = {
+            "prompt": a.get("prompt", ""), "asked": a.get("player", "全场"),
+            "options": a.get("options"), "deadline": None, "answers": {},
+            "window": window,
+        }
+        return {"asked": a.get("player", "全场"), "prompt": a.get("prompt", ""),
+                "options": a.get("options"), "window": window}
 
     # —— random ——
     def _t_random(self, name: str, a: dict) -> dict:
@@ -143,6 +171,30 @@ class ToolExecutor:
                     g.uses_left -= 1
                     return {"prop": prop, "uses_left": g.uses_left}
             raise ClampError(f"未持有技能: {a.get('holder')}/{prop}")
+        if op == "settle":
+            # 清账制缺的另一半:欠的口数喝掉了,账要能清零。
+            # 没有这个动作时,主持只能把"喝一口"记成 -1,分数越滚越没有意义。
+            player = a.get("player")
+            targets = list(self.state.scores) if player in (None, "全场") else [player]
+            if player not in (None, "全场") and player not in self.state.scores:
+                raise ClampError(f"未知玩家: {player}")
+            cleared = {}
+            for p in targets:
+                owed = -self.state.scores[p]
+                if owed > 0:
+                    cleared[p] = owed
+                    self.state.settled[p] = self.state.settled.get(p, 0) + owed
+                    self.state.scores[p] = 0
+            return {"settled": cleared, "settled_total": dict(self.state.settled),
+                    "scores": dict(self.state.scores)}
+        if op == "discard":
+            # 主动弃牌(隐私牌/重复牌)。抽过就已进 atoms_used,不留痕的话
+            # 流水里弃牌和用牌长得一模一样,复盘分不清主持是用了还是撕了。
+            aid = a.get("atom_id")
+            if not aid:
+                raise ClampError("state.discard 需要 atom_id")
+            self.state.discards.append({"atom_id": aid, "reason": a.get("reason", "")})
+            return {"discarded": aid, "reason": a.get("reason", "")}
         if op == "note":
             self.state.notes[a.get("key", "_")] = a.get("value")
             return {"noted": a.get("key", "_")}
@@ -153,25 +205,41 @@ class ToolExecutor:
 
     # —— draw_atom:接口先定库后换(M1=种子数组;M3 换 atoms.sqlite,签名不变) ——
     def _t_draw_atom(self, name: str, a: dict) -> dict:
+        # 空池有四种成因,过去合成一句「无可用原子」,主持无法自我修复。
+        # 逐条计数,报错时告诉它是哪一关卡住的。
+        want_type = a.get("atom_type")
+        if want_type and want_type not in ATOM_TYPES:
+            raise ClampError(f"atom_type 不合法: {want_type!r};可用值: {'/'.join(sorted(ATOM_TYPES))}")
+        why = {"已用过": 0, "野度超档": 0, "野度不够": 0, "分档不符": 0,
+               "安全闸": 0, "类型不符": 0, "道具不在场": 0}
         pool = []
         for atom in self.atom_pool:
             if atom["id"] in self.state.atoms_used or atom["id"] in a.get("exclude", []):
+                why["已用过"] += 1
                 continue
             if atom["wildness"] > min(self.state.wildness_cap, int(a.get("野度", 10))):
+                why["野度超档"] += 1
                 continue
             if atom["wildness"] < int(a.get("野度min", 0)):
+                why["野度不够"] += 1
                 continue  # 加档下限:说到做到,嘴上加档必须参数加档
             if a.get("tier") and atom.get("tier") != a["tier"]:
+                why["分档不符"] += 1
                 continue  # 价值分档过滤:铺垫拍/主打拍各取所需
-            if atom["safety"] and a.get("exclude_safety", True) and set(atom["safety"]) & {"逼量嫌疑"}:
+            if atom["safety"] and a.get("exclude_safety", True) and set(atom["safety"]) & BLOCKED_SAFETY:
+                why["安全闸"] += 1
                 continue
-            if a.get("atom_type") and atom["type"] != a["atom_type"]:
+            if want_type and atom["type"] != want_type:
+                why["类型不符"] += 1
                 continue
             if atom["props"] and not (set(atom["props"]) & set(self.state.scene_objects)):
+                why["道具不在场"] += 1
                 continue  # 实体门槛:现场没有所需实物则不抽(通用桌具按在场清单动态放行)
             pool.append(atom)
         if not pool:
-            raise ClampError("draw_atom 无可用原子(检查野度/道具/排除项)")
+            top = ", ".join(f"{k}{v}条" for k, v in
+                            sorted(why.items(), key=lambda kv: -kv[1]) if v)
+            raise ClampError(f"draw_atom 无可用原子——被挡在:{top}")
         atom = self.rng.choice(pool)
         self.state.atoms_used.append(atom["id"])
         if "skill" in atom:  # 技能授予型:自动登记权力(绑实物取现场匹配第一件)

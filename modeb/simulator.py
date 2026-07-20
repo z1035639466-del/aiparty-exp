@@ -44,7 +44,7 @@ class Session:
                  objects: list[str], driver_kind: str, out_dir: Path,
                  bots: dict[str, str] | None = None, provider: str = "anthropic",
                  host_model: str = "sonnet", seat_model: str = "sonnet",
-                 score_style: str = "自动") -> None:
+                 score_style: str = "自动", host_perception: str = "转写") -> None:
         if not MIN_PLAYERS <= len(players) <= MAX_PLAYERS:
             raise ValueError(f"玩家数须在 {MIN_PLAYERS}–{MAX_PLAYERS}(收到 {len(players)})")
         if driver_kind == "scripted" and len(players) < 3:
@@ -55,7 +55,7 @@ class Session:
             raise ValueError(f"bot 座位不在玩家名单里: {sorted(unknown)}")
         self.state = GameState(players=players, wildness_cap=wildness,
                                time_budget_min=minutes, scene_objects=objects,
-                               score_style=score_style)
+                               score_style=score_style, host_perception=host_perception)
         self.driver_kind = driver_kind
         if driver_kind == "scripted":
             self.driver = ScriptedDriver()
@@ -83,12 +83,15 @@ class Session:
             "digest": self.state.digest(self.engine.time_left_min()),
             "finished": self.state.finished,
             "marks": dict(self.engine.marks),
-            "pending_events": list(self.engine.event_queue),
+            # 感知档必须在服务端落地。只裁 turn 的 events_in 是不够的:主持轮询
+            # /api/state 就能读到原文,约束退化成"靠它自觉",而且污染在流水里看不出来。
+            "pending_events": self.engine._perceive(list(self.engine.event_queue)),
             "recent_turns": self.recent[-12:],
             "clamps": self.engine.tools.clamp_log[-5:],
             "episode_path": str(self.episode_path),
             "driver": self.driver_kind,
             "bots": self.bot_names,
+            "host_perception": self.state.host_perception,
             "turn_ready": self.engine.turn_ready(),
             # 桌友调用失败数:静默降级会让 key 错表现成「bot 好闷」,得摆到台面上
             "bot_errors": {b.name: {"count": b.errors, "last": b.last_error}
@@ -103,7 +106,12 @@ class Hub:
 
     def start(self, cfg: dict) -> dict:
         if self.session and not self.session.state.finished:
-            self.session.engine._ep.close()  # 旧局落盘关账
+            # 关账要拿旧局的锁:自动回合可能还有飞行中的 turn 握着这个 session,
+            # 抢在它写完前关文件,它就会撞 "I/O operation on closed file"。
+            old = self.session
+            with old.lock:
+                old.state.finished = True   # 关门后到的回合走 409,不再往这局写
+                old.engine._ep.close()
         players = [p.strip() for p in cfg.get("players", []) if p.strip()]
         self.session = Session(
             players=players,
@@ -117,6 +125,7 @@ class Hub:
             host_model=cfg.get("host_model", "sonnet"),
             seat_model=cfg.get("seat_model", "sonnet"),
             score_style=cfg.get("score_style", "自动"),
+            host_perception=cfg.get("host_perception", "转写"),
         )
         return self.session.snapshot()
 
@@ -129,11 +138,16 @@ class Handler(BaseHTTPRequestHandler):
 
     def _json(self, code: int, obj: dict) -> None:
         body = json.dumps(obj, ensure_ascii=False).encode()
-        self.send_response(code)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+        try:
+            self.send_response(code)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError):
+            # 浏览器刷新/关页面时连接已断,写不回去是正常的,不是错误。
+            # 不吞掉的话下游那个 500 兜底会二次写、二次爆炸。
+            pass
 
     def _body(self) -> dict:
         n = int(self.headers.get("Content-Length", 0))

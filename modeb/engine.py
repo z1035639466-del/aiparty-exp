@@ -44,15 +44,59 @@ class Engine:
             self.marks["skips"] += 1
         if ev.get("type") == "forfeit":  # 认罚跳过(日常的「过」):正常游戏动作,按赌注结算
             self.marks["forfeits"] += 1
+        ask = self.state.open_ask
+        if ask and ev.get("player") and ev.get("type") in ("vote", "say", "tap") \
+                and (ask["deadline"] is None or time.time() <= ask["deadline"]):
+            # 应答归到这次问询名下,一人一票、后答覆盖先答。
+            ask["answers"][ev["player"]] = ev.get("value") or ev.get("text") or "确认"
+            if ask["deadline"] is None:
+                # 计时从「第一个人应声」才开始,给后到的人留窗口。
+                # 没人应声就不计时——安静等着,不催。
+                ask["deadline"] = time.time() + ask["window"]
+                self.state.timers.append(ask["deadline"])
+            ev = dict(ev, _absorbed=True)  # 已被问询吸收,不单独叫醒主持
         self.event_queue.append(ev)
+
+    def _close_ask(self) -> dict | None:
+        """窗口到点:按多数认,一票也认,平票取先到,没人答就明说没人答。"""
+        ask = self.state.open_ask
+        # deadline 为 None = 还没人应声。安静等着,不催、不结算、不叫醒主持。
+        if not ask or ask["deadline"] is None or time.time() < ask["deadline"]:
+            return None
+        self.state.open_ask = None
+        tally: dict[str, int] = {}
+        for v in ask["answers"].values():
+            tally[v] = tally.get(v, 0) + 1
+        winner = max(tally, key=lambda k: tally[k])
+        return {"type": "ask_result", "prompt": ask["prompt"], "tally": tally,
+                "winner": winner, "answers": dict(ask["answers"]),
+                "note": "按多数认,一票也认"}
 
     def time_left_min(self) -> float:
         return self.state.time_budget_min - (time.time() - self._t0) / 60.0
 
+    def _perceive(self, events: list[dict]) -> list[dict]:
+        """按感知档裁剪送给主持的事件——决定这局在多接近真机的条件下被测。
+
+        转写档:全文送达(需要 ASR 落地才成立,当前模拟台默认)。
+        按钮档:只送结构化按压,say 降级成「有人说话」,内容听不见。
+        """
+        mode = getattr(self.state, "host_perception", "转写")
+        if mode != "按钮":
+            return events
+        out = []
+        for e in events:
+            if e.get("type") == "say":
+                out.append({"type": "say", "player": e.get("player"), "inaudible": True})
+            else:
+                out.append(e)
+        return out
+
     def turn_ready(self) -> bool:
         """事件驱动心跳:开局首拍 / 有新事件 / 有计时器到点,才该叫醒主持。
         房主裁定(2026-07-18):没回应就等——桌上没动静不打扰,主持不必编进展。"""
-        if self.marks["turns"] == 0 or self.event_queue:
+        # 被问询吸收的应答不单独叫醒主持——等窗口收完一起给它,免得它半途插话。
+        if self.marks["turns"] == 0 or any(not e.get("_absorbed") for e in self.event_queue):
             return True
         now = time.time()
         return any(t <= now for t in self.state.timers)
@@ -65,7 +109,12 @@ class Engine:
         digest = self.state.digest(self.time_left_min())
         events, self.event_queue = self.event_queue, []
         events += [{"type": "timer_expired"} for _ in fired]
-        decision = self.driver.decide(digest, events)
+        closed = self._close_ask()
+        if closed:
+            events.append(closed)
+        # 现场的局长是半瞎半聋的:听不见桌上的自由交谈,只知道谁按了什么。
+        # 模拟台默认给全文,会把主持的本桌化改造能力测得虚高——真机上它拿不到这些。
+        decision = self.driver.decide(digest, self._perceive(events))
         text = decision.get("text", "")
         calls = decision.get("tool_use", [])[:MAX_TOOLS_PER_TURN]
         overflow = len(decision.get("tool_use", [])) - len(calls)
