@@ -26,6 +26,7 @@ import json
 import os
 import sys
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -96,11 +97,17 @@ def _render_dashscope(prompt: str) -> bytes:
         data=json.dumps({
             "model": model,
             "input": {"prompt": prompt},
-            "parameters": {"size": "1536*1024", "n": 1},
+            "parameters": {"size": os.environ.get("IMAGE_API_SIZE", "1536*1024"), "n": 1},
         }).encode(),
     )
-    with urllib.request.urlopen(req, timeout=180) as r:
-        resp = json.loads(r.read())
+    # 4xx 的真实原因(模型名不存在/尺寸不合法/空间未授权)在响应正文里,
+    # 光抛 "HTTP Error 400" 等于没报错——读出来带进异常。
+    try:
+        with urllib.request.urlopen(req, timeout=180) as r:
+            resp = json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        detail = e.read().decode("utf-8", "replace")[:300]
+        raise RuntimeError(f"DashScope 提交被拒 HTTP {e.code}:{detail}(model={model!r})") from None
     task_id = _dashscope_dig(resp, "task_id")
     if not task_id:
         raise RuntimeError(f"DashScope 未返回 task_id:{resp}")
