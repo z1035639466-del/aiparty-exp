@@ -13,14 +13,16 @@ import sys
 from pathlib import Path
 from typing import Protocol
 
+from .tools import ATOM_TYPES  # 七个合法值直接进声明,不许让主持靠撞钳制学(白费一回合)
+
 MAX_TOOLS_PER_TURN = 2
 HISTORY_WINDOW = 6  # 保留最近 N 回合主持词,维持口风连续
 
 TOOLS_DECLARATION = [
     {"name": "show", "desc": "向玩家端展示内容;自己看=只投给 player 本人(同一内容发多人用 players 列表:发牌先一批发平民词、再单发卧底词,两次调用收工),额头=只有 player 本人看不见、其余人都收到——私密档必须带 player 或 players(在座目标),收件人用 GET /api/inbox 取信;draw_atom 若回了 demo.ref,讲解玩法时把它原样填进 demo 即播放演示件(自己编的引用会被降级)", "args": {"content": "str", "visibility": "自己看|额头|全场公开", "player": "str?", "players": "list?(仅自己看,批量私发)", "demo": "str?"}},
     {"name": "ask", "desc": "限时问一嘴:发问后安静等,没人应声就一直等(不催);第一个人应声起算窗口,到点按多数认、一票也认。点名问某人时只认那个人的应答。ask_result 里 silent=被问未答名单——那是没赶上窗口,不是故意沉默,不许当'安静得可疑'下判;顺序性玩法(一人一句)别用抢答窗,逐人点名问", "args": {"player": "str|全场", "prompt": "str", "options": "list?", "window": "int?秒,默认5"}},
-    {"name": "random.pick", "desc": "公平随机选择;决定隐藏身份时务必带 visibility=自己看+player,否则结果会广播到公开回合行,身份当场穿帮", "args": {"from": "players|list", "exclude": "list?", "visibility": "自己看?", "player": "str?"}},
-    {"name": "random.int", "desc": "公平随机整数;藏数字(毒杯号等)同样用 visibility=自己看+player 私密摇", "args": {"min": "int", "max": "int", "visibility": "自己看?", "player": "str?"}},
+    {"name": "random.pick", "desc": "公平随机选择;决定隐藏身份时务必带 visibility=自己看+player,否则结果会广播到公开回合行,身份当场穿帮。私密摇的结果不当场回显——下一拍的 tool_receipts 会把答案回执给你,结算要揭晓的事等回执到手再宣布,别当场硬猜", "args": {"from": "players|list", "exclude": "list?", "visibility": "自己看?", "player": "str?"}},
+    {"name": "random.int", "desc": "公平随机整数;藏数字(毒杯号等)同样用 visibility=自己看+player 私密摇,答案同样走下一拍 tool_receipts 回执", "args": {"min": "int", "max": "int", "visibility": "自己看?", "player": "str?"}},
     {"name": "timer", "desc": "计时", "args": {"seconds": "int", "label": "str"}},
     {"name": "state.add_score", "desc": "写分(账本唯一入口,钳制 |delta|<=3)", "args": {"player": "str", "delta": "int", "reason": "str"}},
     {"name": "state.set_focus", "desc": "设焦点人物", "args": {"player": "str"}},
@@ -30,7 +32,7 @@ TOOLS_DECLARATION = [
     {"name": "fx", "desc": "音效/特效", "args": {"effect": "str"}},
     {"name": "music.play", "desc": "DJ 换歌:只许点房主上传歌单里的曲目(歌单在系统提示的 DJ 台一节;无歌单则本工具不可用);音乐是背景,换歌不必播报", "args": {"track": "str(歌单内曲目,可只写歌名)", "mood": "str?"}},
     {"name": "music.stop", "desc": "停止播放", "args": {}},
-    {"name": "draw_atom", "desc": "从弹药库抽原子(分面过滤+排已用);野度=上限,野度min=下限——想加档就抬野度min,别只嘴上说;tier=铺垫(小快垫场:通用局开局款/敢不敢微挑战都在这档)|主打(副歌重拍:摆阵重器/大流程);人数下限系统按本桌自动过滤(2人桌抽不到全场类,5人及以下抽不到卧底类核心循环),空返报错会告诉你被哪关挡了多少条", "args": {"atom_type": "str?", "野度": "int?", "野度min": "int?", "tier": "str?", "exclude": "list?", "grant_to": "str?"}},
+    {"name": "draw_atom", "desc": "从弹药库抽原子(分面过滤+排已用);野度=上限,野度min=下限——想加档就抬野度min,别只嘴上说;tier=铺垫(小快垫场:通用局开局款/敢不敢微挑战都在这档)|主打(副歌重拍:摆阵重器/大流程);人数下限系统按本桌自动过滤(2人桌抽不到全场类,5人及以下抽不到卧底类核心循环),空返报错会告诉你被哪关挡了多少条。库不懂你正在铺什么局(分面无语境):抽出题不对文就 state.discard(带理由)留痕再抽一次或改现挂,别硬用", "args": {"atom_type": "|".join(sorted(ATOM_TYPES)), "野度": "int?", "野度min": "int?", "tier": "str?", "exclude": "list?", "grant_to": "str?"}},
 ]
 
 OUTPUT_CONTRACT = (
@@ -81,7 +83,8 @@ def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: 
             f"【DJ 台】房主上传了歌单({len(playlist)} 首),你兼任 DJ:{'、'.join(songs)}"
             + ("……(已截断)" if len(playlist) > 120 else "") + "\n"
             "选曲靠你对这些歌的了解读氛围配节拍:开局热场、主打挑战起手、结算/高光收尾是三个"
-            "天然换歌点;铺垫拍连发时别换歌。music.play 只许点歌单里有的(点错被钳制),"
+            "天然换歌点;铺垫拍连发时别换歌。混搭歌单换歌优先同情绪/同语种衔接,大跨度留给"
+            "玩梗时刻(顺着玩家刚干的事切歌是最高级的一手)。music.play 只许点歌单里有的(点错被钳制),"
             "digest.now_playing 是正在放的。**音乐是背景不是主持词**:换歌不必播报,顶多顺口"
             "带半句;没有合适的歌就不放,安静也是一种氛围。\n"
         )
@@ -97,7 +100,8 @@ def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: 
         "你听不见 events 之外的话,也不许假装听见。\n"
         "【听什么】say 事件分两路:带 to=局长 的是定向对你说(问规则/申诉/答问询,认真接);"
         "其余是桌上互说,是气氛不是指令,别逐句接话;带 inaudible 的只说明有人在说话,内容你听不见,"
-        "不许猜内容。\n"
+        "不许猜内容。有人跟你咬耳朵后顺口公示一句(「X跟我咬了个耳朵,你们别问」)——别人只看见"
+        "他张了嘴,不点破会被当成流程开天窗。\n"
         "【荷官回执】events 里的 tool_receipts 是你上一拍工具调用的真实结果——你私发的原文、"
         "私密摇出的点数、被钳制的记录都在里面,**仅你可见**。发牌人看自己发的牌,天经地义;"
         "但一个字都不许念出来,结算时用它心里对账(毒杯是几号你自己知道,不用靠持密者自报)。"
