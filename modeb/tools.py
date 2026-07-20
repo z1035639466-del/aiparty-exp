@@ -1,7 +1,7 @@
 """七件工具 + 钳制层。模型只发意图;这里是唯一执行者。
 
 钳制层拦在工具调用与账本之间(架构案 L2):分数越界拒写、未知玩家拒写、
-野度/S 位过滤、「过」字短路。拒写不是异常流,是正常留痕事件。
+野度过滤、「过」字短路。拒写不是异常流,是正常留痕事件。
 """
 from __future__ import annotations
 
@@ -16,10 +16,9 @@ MAX_SCORE_DELTA = 3  # 单次写分钳制
 
 ATOM_TYPES = {"完整玩法", "条件点名", "任务内容", "道具挑战", "问答题目", "规则修饰", "技能授予"}
 
-# 默认关掉的安全闸。判据不是"隐私"而是「会不会离开这个房间、能不能撤回」:
-# 发朋友圈会离开且撤不回,翻手机不离开房间但侵犯在场的人,"前任最多的喝"只是自曝。
-# 三者性质不同,只前两类进闸。语料侧需补打 外发不可逆 标记(现约 26 条命中)。
-BLOCKED_SAFETY = {"逼量嫌疑", "外发不可逆"}
+# 安全闸已拆(房主裁定 2026-07-20):只组织不监督——外发/强灌本来就监督不了,
+# 不想玩的人 forfeit/optout 自己过就完事,引擎侧不替现场做道德把关。
+# safety_flags 仍随数据存留(语料层照旧打标),只是不再参与抽取过滤。
 ATOMS_FILE = "inputs/atoms/atoms-v1.jsonl"  # M-int-1 抽取产物;存在即自动并入弹药库
 PATTERNS_FILE = "inputs/patterns/patterns-v0.jsonl"  # 模式卡(手工首批;M-int-2 聚类产物原地并入)
 
@@ -247,7 +246,7 @@ class ToolExecutor:
         if want_type and want_type not in ATOM_TYPES:
             raise ClampError(f"atom_type 不合法: {want_type!r};可用值: {'/'.join(sorted(ATOM_TYPES))}")
         why = {"已用过": 0, "野度超档": 0, "野度不够": 0, "分档不符": 0,
-               "安全闸": 0, "类型不符": 0, "道具不在场": 0}
+               "类型不符": 0, "道具不在场": 0}
         pool = []
         for atom in self.atom_pool:
             if atom["id"] in self.state.atoms_used or atom["id"] in a.get("exclude", []):
@@ -262,9 +261,6 @@ class ToolExecutor:
             if a.get("tier") and atom.get("tier") != a["tier"]:
                 why["分档不符"] += 1
                 continue  # 价值分档过滤:铺垫拍/主打拍各取所需
-            if atom["safety"] and a.get("exclude_safety", True) and set(atom["safety"]) & BLOCKED_SAFETY:
-                why["安全闸"] += 1
-                continue
             if want_type and atom["type"] != want_type:
                 why["类型不符"] += 1
                 continue
