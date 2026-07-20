@@ -7,11 +7,52 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 import time
 import urllib.error
 import urllib.request
 
 ANTHROPIC_BASE = "https://api.anthropic.com"
+
+
+class BudgetGateError(RuntimeError):
+    """计费闸:本局 LLM 调用已达上限。故意不继承 TransportError——它不是瞬时错,
+    Resilient 不该重试(重试只会再撞一次闸);主持接住它走静默拍,桌友那拍被跳过。"""
+
+
+class CallMeter:
+    """一局的 LLM 调用计量表(Session 级,主持+桌友共用一块表)。limit=0 表示不限。
+    每次真实调用记一次数——包在 transport 外(MeteredTransport)才拦得住全部出口。"""
+
+    def __init__(self, limit: int = 0) -> None:
+        self.limit = max(0, int(limit))   # 0 = 不限
+        self.used = 0
+        self._lock = threading.Lock()     # 桌友并行反应会并发记数,防竞态
+
+    @property
+    def exhausted(self) -> bool:
+        return self.limit > 0 and self.used >= self.limit
+
+    def charge(self) -> None:
+        with self._lock:
+            self.used += 1
+
+
+class MeteredTransport:
+    """计费闸外套:包法与 Resilient 同(套在真实 transport 外)。每次调用先看闸:
+    到限则抛 BudgetGateError(不烧钱、不走网络),否则记一次数再放行。
+    主持包成 Resilient(MeteredTransport(inner)):瞬时重试=第二次真实调用,各记一次。"""
+
+    def __init__(self, inner, meter: CallMeter) -> None:
+        self.inner = inner
+        self.meter = meter
+
+    def complete(self, system: str, messages: list[dict]) -> str:
+        if self.meter.exhausted:
+            raise BudgetGateError(
+                f"预算闸:本局 LLM 调用已达上限 {self.meter.limit} 次,主持转静默拍")
+        self.meter.charge()
+        return self.inner.complete(system, messages)
 
 
 class TransportError(RuntimeError):

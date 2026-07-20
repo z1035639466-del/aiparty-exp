@@ -381,3 +381,101 @@ def test_duel_result_reaches_player_view(server):
     v3, _ = call(server, f"/api/view?player={quote('丙')}")       # 观战者也该看见
     de = [e for t in v3["recent"] for e in t["table"] if e.get("type") == "duel_result"]
     assert de and de[-1]["winner"] == "乙" and "抢跑" in de[-1]["reason"]
+
+
+# —— 多局并发 + 房间码(上线前:一台服务器同时跑多桌) ——
+
+def test_two_rooms_isolated(server):
+    """两房间各自 state/inbox 隔离,互不串台:私发只落本房,座位名不跨房。"""
+    a, ca = call(server, "/api/start", {"players": ["甲", "乙", "丙"], "minutes": 30,
+        "wildness": 6, "objects": ["瓶子"], "driver": "manual", "provider": "mock"})
+    b, cb = call(server, "/api/start", {"players": ["A", "B", "C"], "minutes": 30,
+        "wildness": 6, "objects": ["杯子"], "driver": "manual", "provider": "mock"})
+    ra, rb = a["room_code"], b["room_code"]
+    assert ca == 200 and cb == 200
+    assert ra and rb and ra != rb and len(ra) == 4
+    assert not (set(ra) & set("0O1I")), "房间码须避开易混字符 0O1I"
+
+    # 房间A 私发给乙;房间B 不该受影响
+    _, code = call(server, "/api/turn", {"room": ra, "text": "发牌", "tool_use": [
+        {"name": "show", "input": {"content": "暗号:芒果", "visibility": "自己看", "player": "乙"}}]})
+    assert code == 200
+
+    # 多房间不带 room → 409 要求指定
+    _, code = call(server, "/api/state")
+    assert code == 409, "多房间下不带 room 应 409"
+
+    sa, _ = call(server, "/api/state?room=" + ra)
+    sb, _ = call(server, "/api/state?room=" + rb)
+    assert sa["players"] == ["甲", "乙", "丙"] and sb["players"] == ["A", "B", "C"]
+    assert sa["inbox_counts"] == {"乙": 1}, "私发只落房间A"
+    assert sb["inbox_counts"] == {}, "房间B 不该有任何私件"
+
+    # 座位隔离:乙在房间B 是未知座位;在房间A 能取到原文
+    _, code = call(server, "/api/inbox?room=" + rb + "&player=" + urllib.parse.quote("乙"))
+    assert code == 400, "跨房查座位应 400 未知座位"
+    box, code = call(server, "/api/inbox?room=" + ra + "&player=" + urllib.parse.quote("乙"))
+    assert code == 200 and any("芒果" in x for x in box["inbox"])
+
+
+def test_room_code_seating_and_default_backcompat(server):
+    """房间码入座 + 默认唯一房间向后兼容;不存在的房间码 404。"""
+    a, _ = call(server, "/api/start", {"players": ["甲", "乙"], "minutes": 30, "wildness": 6,
+        "objects": ["瓶子"], "driver": "manual", "provider": "mock"})
+    ra = a["room_code"]
+    # 单房:不带 room 默认命中(现有测试少改的向后兼容)
+    s, code = call(server, "/api/state")
+    assert code == 200 and s["room_code"] == ra
+    # 带正确房间码命中
+    s2, code = call(server, "/api/state?room=" + ra)
+    assert code == 200 and s2["players"] == ["甲", "乙"]
+    # 入座校验也认房间码(GET /api/view 带 room)
+    v, code = call(server, "/api/view?room=" + ra + "&player=" + urllib.parse.quote("甲"))
+    assert code == 200 and v["you"] == "甲"
+    # 不存在的房间码 404
+    _, code = call(server, "/api/state?room=ZZZZ")
+    assert code == 404
+
+
+def test_budget_gate_silences_host_and_surfaces_on_table(server, monkeypatch):
+    """计费闸到限:主持走静默拍(host_error 带「预算闸」),桌友跳过,台面 budget 可见,
+    /api/view 不暴露预算。"""
+    from urllib.parse import quote
+    tr = _CountingTransport()
+    monkeypatch.setattr("modeb.simulator.make_transport", lambda *a, **k: tr)
+    call(server, "/api/start", {"players": ["我", "阿伟"], "bots": {"阿伟": "显眼包"},
+                                "minutes": 30, "wildness": 6, "objects": ["瓶子"],
+                                "driver": "llm", "provider": "deepseek",
+                                "max_llm_calls": 2})
+    # 首拍:主持1 + 桌友1 = 2 次,刚好到限
+    call(server, "/api/turn", {})
+    snap, _ = call(server, "/api/state")
+    assert snap["budget"]["limit"] == 2 and snap["budget"]["used"] == 2
+
+    used_before = tr.calls
+    body, status = call(server, "/api/turn", {})
+    assert status == 200 and body["host_silent"] is True
+    assert "预算闸" in body["host_error"], f"静默拍原因须点明预算闸,实际 {body}"
+    assert tr.calls == used_before, "到限后主持+桌友都不该再烧任何调用"
+
+    snap2, _ = call(server, "/api/state")
+    assert snap2["budget"]["gated"] is True
+
+    v, _ = call(server, f"/api/view?player={quote('我')}")
+    assert "budget" not in json.dumps(v, ensure_ascii=False), "玩家视图不得暴露预算"
+
+
+def test_budget_zero_means_unlimited(server, monkeypatch):
+    """max_llm_calls=0 = 不限:多跑几拍都不合闸。"""
+    tr = _CountingTransport()
+    monkeypatch.setattr("modeb.simulator.make_transport", lambda *a, **k: tr)
+    call(server, "/api/start", {"players": ["我", "阿伟"], "bots": {"阿伟": "显眼包"},
+                                "minutes": 30, "wildness": 6, "objects": ["瓶子"],
+                                "driver": "llm", "provider": "deepseek",
+                                "max_llm_calls": 0})
+    for _ in range(3):
+        body, _ = call(server, "/api/turn", {})
+        assert not body.get("host_silent"), "不限档不该出现预算静默拍"
+    snap, _ = call(server, "/api/state")
+    assert snap["budget"]["limit"] == 0 and snap["budget"]["gated"] is False
+    assert snap["budget"]["used"] >= 6

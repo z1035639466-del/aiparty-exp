@@ -50,6 +50,7 @@ def session_cfg(session) -> dict:
         "bots": dict(session.bots_cfg),
         "autoplay": session.autoplay,
         "autoplay_interval_s": session.autoplay_interval_s,
+        "max_llm_calls": session.meter.limit,   # 计费闸上限随 cfg 走(0=不限)
     }
 
 
@@ -60,6 +61,8 @@ def build_snapshot(session) -> dict:
     return {
         "v": SNAPSHOT_V,
         "finished": s.finished,
+        "room_code": session.room_code,   # 多局并发:快照带房间码,--resume 恢复进字典
+        "budget": {"used": session.meter.used, "limit": session.meter.limit},
         "episode_path": str(session.episode_path),
         "cfg": session_cfg(session),
         "state": asdict(s),  # dataclass 递归成字典,grants(SkillGrant)一并展平
@@ -140,7 +143,11 @@ def restore_session(snap: dict, out_dir: Path, join_base: str = ""):
         playlist=cfg.get("playlist") or [],
         occasion=cfg.get("occasion", ""), scene_brief=cfg.get("scene_brief", ""),
         state=gs, episode_path=episode_path, episode_mode="a",
+        max_llm_calls=cfg.get("max_llm_calls"),   # 计费闸上限随快照恢复
     )
+    # 房间码与计费闸计数续接:恢复后进同一房间码,已用调用数不清零(继续计费)
+    session.room_code = snap.get("room_code", "")
+    session.meter.used = snap.get("budget", {}).get("used", 0)
 
     # —— Engine 关键状态回填 —— #
     eng = snap.get("engine", {})

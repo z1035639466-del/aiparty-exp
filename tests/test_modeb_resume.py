@@ -129,6 +129,23 @@ def test_finished_snapshot_is_cleaned_and_not_restorable(tmp_path):
         persist.restore_session(finished_snap, tmp_path)
 
 
+def test_snapshot_carries_room_code_and_budget(tmp_path):
+    """多局并发:快照带房间码与计费闸计数,恢复后原样进字典、继续计费。"""
+    sess = Session(players=["甲", "乙"], minutes=30, wildness=6, objects=["瓶子"],
+                   driver_kind="manual", out_dir=tmp_path, max_llm_calls=42)
+    sess.room_code = "A7QK"
+    sess.meter.used = 5
+    persist.write_snapshot(sess)
+
+    snap = persist.load_snapshot(sess.state_path)
+    assert snap["room_code"] == "A7QK"
+    assert snap["budget"] == {"used": 5, "limit": 42}
+
+    sess2 = persist.restore_session(snap, tmp_path)
+    assert sess2.room_code == "A7QK", "房间码应随快照恢复"
+    assert sess2.meter.limit == 42 and sess2.meter.used == 5, "计费闸上限与已用数应恢复"
+
+
 def test_grants_survive_roundtrip(tmp_path):
     """技能授予(SkillGrant)要能穿越快照:恢复后仍是可发动的权力件,不退化成裸字典。"""
     from modeb.state import GameState, SkillGrant

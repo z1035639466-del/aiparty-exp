@@ -23,6 +23,7 @@ export default function App() {
   useKeepAwake(); // 快枪手对峙期间息屏=判负,整局常亮
   const [base, setBase] = useState("");
   const [me, setMe] = useState("");
+  const [room, setRoom] = useState("");   // 房间码:多局并发时定位自己那一桌;留空=服务器唯一房间
   const [joined, setJoined] = useState(false);
   const [view, setView] = useState(null);
   const [err, setErr] = useState("");
@@ -65,10 +66,18 @@ export default function App() {
   const [playlist, setPlaylist] = useState("");
   const [botsText, setBotsText] = useState("");
 
+  // 多局并发:除 /api/start 外,所有请求带上房间码(query+body 都带,服务端两处都认);
+  // room 留空则不带,服务器按唯一活跃房间默认命中(向后兼容单桌)。
   const api = async (path, body) => {
-    const r = await fetch(base.replace(/\/$/, "") + path, body ? {
+    let p = path;
+    let b = body;
+    if (room && path.startsWith("/api/") && !path.startsWith("/api/start")) {
+      p += (path.includes("?") ? "&" : "?") + "room=" + encodeURIComponent(room);
+      if (b) b = { room, ...b };
+    }
+    const r = await fetch(base.replace(/\/$/, "") + p, b ? {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify(b),
     } : undefined);
     return r.json();
   };
@@ -158,6 +167,10 @@ export default function App() {
                     // 主持模型/provider 不填:沿用服务端默认(Hub.start 的 anthropic/sonnet)
                   });
                   if (res.error) { Alert.alert("开局失败", res.error); return; }
+                  if (res.room_code) {
+                    setRoom(res.room_code);
+                    Alert.alert("房间码", `本桌房间码:${res.room_code}\n发给其他人,入座时填这个`);
+                  }
                   setMe(seatList[0]); setJoined(true); setCreating(false);
                 } catch (e) {
                   Alert.alert("连不上", String(e.message));
@@ -175,8 +188,12 @@ export default function App() {
             <>
               <TextInput style={s.input} placeholder="你的座位名(开局时定的)"
                 placeholderTextColor="#667" value={me} onChangeText={setMe} />
+              <TextInput style={s.input} placeholder="房间码(如 A7QK;只有一桌可留空)"
+                placeholderTextColor="#667" autoCapitalize="characters" autoCorrect={false}
+                value={room} onChangeText={(t) => setRoom(t.trim().toUpperCase())} />
               <Pressable style={s.bigBtn} onPress={async () => {
                 try {
+                  // room 已在 api() 里自动带上(query+body);留空则命中唯一房间
                   const v = await api("/api/view?player=" + encodeURIComponent(me.trim()));
                   if (v.error) { Alert.alert("入座失败", v.error); return; }
                   setMe(me.trim()); setJoined(true);
@@ -264,7 +281,7 @@ export default function App() {
     <KeyboardAvoidingView style={s.page} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <StatusBar style="light" />
       <View style={s.topbar}>
-        <Text style={s.topText}>{me} · 第{v.round ?? 0}轮 · 余{Math.max(0, Math.round(v.time_left_min ?? 0))}分</Text>
+        <Text style={s.topText}>{me}{room ? ` · 🎫${room}` : ""} · 第{v.round ?? 0}轮 · 余{Math.max(0, Math.round(v.time_left_min ?? 0))}分</Text>
         {v.now_playing ? <Text style={s.topMusic}>🎵 {v.now_playing}</Text> : null}
       </View>
       {err ? <Text style={s.err}>{err}</Text> : null}

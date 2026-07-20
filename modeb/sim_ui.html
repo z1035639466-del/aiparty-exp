@@ -58,6 +58,8 @@
     </div>
     <button onclick="start()">开局</button>
   </div>
+  <div class="card" id="roomcard" style="display:none"><h3>🎫 房间码(手机入座填这个)</h3>
+    <div id="roomcode" style="font-size:34px;letter-spacing:8px;color:#fc6;font-weight:800;text-align:center"></div></div>
   <div class="card" id="joincard" style="display:none"><h3>📱 入座链接(发群里)</h3><div id="join"></div></div>
   <div class="card" id="askcard" style="display:none"><h3>🎤 主持在问</h3><div id="ask"></div></div>
   <div class="card"><h3>玩家机位</h3><div id="panes"></div></div>
@@ -80,9 +82,16 @@
 </div>
 <script>
 const $ = id => document.getElementById(id);
+// 多局并发:开局拿到房间码后,所有 /api/* 轮询/操作都带上 room(除 /api/start 本身)——
+// query 与 body 都带,服务端两处都认。留空 ROOM 时行为不变(单房默认命中,向后兼容)。
+let ROOM = "";
 // 一律返回对象;失败也走 {error} 而不是抛出去。抛出去会变成无人接管的
 // promise rejection,页面纹丝不动,房主只看到「点了没反应」。
 async function api(path, body) {
+  if (ROOM && path.startsWith("/api/") && !path.startsWith("/api/start")) {
+    path += (path.includes("?") ? "&" : "?") + "room=" + encodeURIComponent(ROOM);
+    if (body) body = Object.assign({room: ROOM}, body);
+  }
   try {
     const r = await fetch(path, body ? {method:"POST", body: JSON.stringify(body)} : undefined);
     const raw = await r.text();
@@ -131,6 +140,8 @@ async function start() {
     provider: $("provider").value, host_model: $("hostmodel").value,
     seat_model: $("seatmodel").value, score_style: $("scorestyle").value });
   if (bail(r)) return;
+  ROOM = r.room_code || "";   // 此后所有请求带这个房间码,轮询/操作只认这一桌
+  if (ROOM) { $("roomcard").style.display = ""; $("roomcode").textContent = ROOM; }
   refresh();
 }
 setInterval(async () => {  // 事件驱动心跳:有新事件/计时器到点才叫醒主持——没动静就让它等

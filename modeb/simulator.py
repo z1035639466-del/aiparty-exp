@@ -12,6 +12,8 @@ from __future__ import annotations
 import argparse
 import copy
 import json
+import os
+import random
 import threading
 import time as _t
 import traceback
@@ -26,9 +28,23 @@ from .driver_scripted import ScriptedDriver
 from .engine import Engine
 from .player_agent import LLMPlayerAgent, ScriptedPlayerAgent
 from .state import GameState
-from .transports import Resilient, make_transport
+from .transports import CallMeter, MeteredTransport, Resilient, make_transport
 
 MIN_PLAYERS, MAX_PLAYERS = 2, 10  # 机位上限只是这一行常数,机制不感知机位数
+
+# 房间码字母表:去掉易混的 0O1I,4 位约 70 万种,一台服务器同时跑多桌够用
+ROOM_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+ROOM_CODE_LEN = 4
+IDLE_LIMIT_S = 2 * 3600          # 2 小时无活动即回收房间(episode 文件保留)
+DEFAULT_MAX_LLM_CALLS = 500      # 每局 LLM 调用默认上限(0=不限);环境变量可覆盖
+
+
+def gen_room_code(taken: set[str]) -> str:
+    """生成一个不与现有房间冲突的易读房间码(如 A7QK)。"""
+    while True:
+        code = "".join(random.choice(ROOM_ALPHABET) for _ in range(ROOM_CODE_LEN))
+        if code not in taken:
+            return code
 
 
 def _make_audio_judge():
@@ -69,7 +85,8 @@ class Session:
                  playlist: list[str] | None = None,
                  occasion: str = "", scene_brief: str = "",
                  state: GameState | None = None,
-                 episode_path: Path | None = None, episode_mode: str = "w") -> None:
+                 episode_path: Path | None = None, episode_mode: str = "w",
+                 max_llm_calls: int | None = None) -> None:
         if not MIN_PLAYERS <= len(players) <= MAX_PLAYERS:
             raise ValueError(f"玩家数须在 {MIN_PLAYERS}–{MAX_PLAYERS}(收到 {len(players)})")
         if driver_kind == "scripted" and len(players) < 3:
@@ -96,15 +113,22 @@ class Session:
         self.bots_cfg = dict(bots)
         self.autoplay = False           # 由 Hub.start / restore 注入
         self.autoplay_interval_s = 1.0
+        # —— 计费闸:一局一块计量表,主持+桌友的真实调用共用 —— #
+        # cfg 未传时读环境变量 MAX_LLM_CALLS_PER_GAME,再退默认 500;0=不限。
+        if max_llm_calls is None:
+            max_llm_calls = int(os.environ.get("MAX_LLM_CALLS_PER_GAME", DEFAULT_MAX_LLM_CALLS))
+        self.meter = CallMeter(max_llm_calls)
         if driver_kind == "scripted":
             self.driver = ScriptedDriver()
         elif driver_kind == "llm":
-            # 主持包重试外套(瞬时错误等 2 秒再试一次);桌友不包,已有响亮降级
-            self.driver = LLMDriver(Resilient(make_transport(provider, host_model)),
-                                    players, wildness, minutes, score_style=score_style,
-                                    playlist=self.state.playlist,
-                                    occasion=self.state.occasion,
-                                    scene_brief=self.state.scene_brief)
+            # 主持包两层:内层 MeteredTransport 计费闸(到限抛 BudgetGateError→静默拍),
+            # 外层 Resilient 瞬时重试(等 2 秒再试一次);桌友不包重试,已有响亮降级。
+            self.driver = LLMDriver(
+                Resilient(MeteredTransport(make_transport(provider, host_model), self.meter)),
+                players, wildness, minutes, score_style=score_style,
+                playlist=self.state.playlist,
+                occasion=self.state.occasion,
+                scene_brief=self.state.scene_brief)
         else:
             self.driver = ManualDriver()
         # 视觉裁判(judge.photo/场景扫描):随主持 provider 走对应视觉模型——
@@ -116,11 +140,12 @@ class Session:
         # 场景照更新 scene_brief 后重建主持 system 用
         self._prompt_args = dict(players=players, wildness=wildness, minutes=minutes,
                                  score_style=score_style)
-        if provider == "mock":  # 测试:确定性假人
+        if provider == "mock":  # 测试:确定性假人(不烧调用,不过计费闸)
             self.bots = [ScriptedPlayerAgent(n, [[{"type": "laugh"}]] * 3) for n in bots]
         else:
+            # 桌友调用同过计费闸:到限时 run_turn 直接跳过桌友那拍(不再进这块表)
             self.bots = [LLMPlayerAgent(n, persona or "普通桌友",
-                                        make_transport(provider, seat_model))
+                                        MeteredTransport(make_transport(provider, seat_model), self.meter))
                          for n, persona in bots.items()]
         self.bot_names = sorted(bots)
         if episode_path is None:
@@ -135,6 +160,9 @@ class Session:
         self.last_timing: dict = {}  # 上一拍耗时拆帐:host_ms / bots_ms(慢要先量再修)
         self.lock = threading.Lock()
         self.join_base = ""   # 由 Hub 注入:http://<局域网IP>:<端口>
+        self.room_code = ""   # 由 Hub.start / restore 注入:本桌 4 位房间码
+        self.last_active = _t.time()  # 最近一次被访问的时刻,闲置回收据此判活
+        self.closed = False   # 闲置回收信号:autoplay 线程见到即退出(随房间生命周期)
 
     def route_private(self, line: dict) -> dict:
         """show(自己看/额头) 路由进收件箱;返回轮询面用的遮蔽版回合行。
@@ -282,8 +310,10 @@ class Session:
         red = self.route_private(line)
         self.recent.append(red)
         digest = self.state.digest(self.engine.time_left_min())
-        # 主持沉默拍(调用失败):桌上没发生任何事,桌友无从反应,不烧调用
-        bots = [] if line.get("host_silent") else self.bots
+        # 主持沉默拍(调用失败/计费闸):桌上没发生任何事,桌友无从反应,不烧调用。
+        # 计费闸到限时主持已走静默拍(host_silent),桌友这里再兜一道:即便主持这拍
+        # 是靠最后一次额度成功的,到限后也不再放桌友进表(meter.exhausted)。
+        bots = [] if line.get("host_silent") or self.meter.exhausted else self.bots
         t_bots = datetime.now().timestamp()
         if bots:
             # 桌友并行反应:串行时 7 座 × 每座数秒 = 一拍半分钟。收齐再统一
@@ -314,11 +344,11 @@ class Session:
         """服务端自驱回合环(App 时代的回合发动机):llm 驱动下起一条守护线程,
         turn_ready 就跑拍——驾驶舱页面从此不是发动机,电脑起完服可以合盖。"""
         def _loop():
-            while not self.state.finished:
+            while not self.state.finished and not self.closed:
                 _t.sleep(interval_s)
                 try:
                     with self.lock:
-                        if not self.state.finished and self.engine.turn_ready():
+                        if not self.state.finished and not self.closed and self.engine.turn_ready():
                             self.run_turn()
                 except Exception:
                     traceback.print_exc()  # 单拍失败不杀发动机;主持断线已有沉默拍兜底
@@ -398,9 +428,13 @@ class Session:
     def snapshot(self) -> dict:
         return {
             "players": self.state.players,
+            "room_code": self.room_code,     # 驾驶舱开局后显示、轮询带它
             "digest": self.state.digest(self.engine.time_left_min()),
             "finished": self.state.finished,
             "marks": dict(self.engine.marks),
+            # 计费闸仪表:台面可见(玩家 /api/view 不暴露)。gated=已合闸转静默拍
+            "budget": {"used": self.meter.used, "limit": self.meter.limit,
+                       "gated": self.meter.exhausted},
             # 感知档必须在服务端落地。只裁 turn 的 events_in 是不够的:主持轮询
             # /api/state 就能读到原文,约束退化成"靠它自觉",而且污染在流水里看不出来。
             "pending_events": self.engine._perceive(list(self.engine.event_queue)),
@@ -426,22 +460,61 @@ class Session:
 
 
 class Hub:
+    """多局并发:一台服务器同时跑多桌,dict[room_code, Session]。
+    /api/* 用 pick() 定位房间:带 room 参数指定,不带则默认唯一活跃房间(向后兼容),
+    多房间不带 room 报 409。收局/闲置(2h 无活动)的房间从字典踢出,episode 文件保留。"""
+
     def __init__(self, out_dir: Path, join_base: str = "") -> None:
-        self.session: Session | None = None
+        self.rooms: dict[str, Session] = {}
         self.out_dir = out_dir
         self.join_base = join_base
+        self.lock = threading.Lock()   # 保护 rooms 字典的增删
+
+    def _sweep(self, include_finished: bool) -> None:
+        """回收房间(须持 self.lock):闲置(>2h)一律回收;收局房仅在开新局时回收——
+        平时留着,好让「单房时不带 room 默认命中」对刚收的局也成立(向后兼容)。"""
+        now = _t.time()
+        doomed = [c for c, s in self.rooms.items()
+                  if (include_finished and s.state.finished)
+                  or (now - s.last_active > IDLE_LIMIT_S)]
+        for code in doomed:
+            s = self.rooms.pop(code)
+            with s.lock:
+                s.closed = True             # autoplay 线程见到即退出(随房间生命周期)
+                if not s.state.finished:
+                    s.state.finished = True  # 闲置回收:关掉引擎与文件(快照保留可 --resume)
+                    try:
+                        s.engine._ep.close()
+                    except (ValueError, OSError):
+                        pass
+
+    def pick(self, room: str | None):
+        """定位房间 → (session, code, err)。err 为 None=成功;否则 (http_code, msg)。
+        不回收收局房(单房默认要用它);只顺手清闲置房(2h 门槛,常态不触发)。"""
+        with self.lock:
+            self._sweep(include_finished=False)
+            if room:
+                s = self.rooms.get(room)
+                if s is None:
+                    return None, None, (404, f"房间 {room} 不存在或已回收")
+                s.last_active = _t.time()
+                return s, room, None
+            items = list(self.rooms.items())
+            if not items:
+                return None, None, (409, "先 /api/start 开局")
+            if len(items) == 1:
+                code, s = items[0]
+                s.last_active = _t.time()
+                return s, code, None
+            codes = "、".join(sorted(c for c, _ in items))
+            return None, None, (409, f"有 {len(items)} 个活跃房间,请带 room 指定(可用:{codes})")
 
     def start(self, cfg: dict) -> dict:
-        if self.session and not self.session.state.finished:
-            # 关账要拿旧局的锁:自动回合可能还有飞行中的 turn 握着这个 session,
-            # 抢在它写完前关文件,它就会撞 "I/O operation on closed file"。
-            old = self.session
-            with old.lock:
-                old.state.finished = True   # 关门后到的回合走 409,不再往这局写
-                old.engine._ep.close()
-                persist.clear_snapshot(old)  # 旧局换掉即清快照,不留孤儿被误恢复
+        with self.lock:
+            self._sweep(include_finished=True)   # 开新局时清收局/闲置房,episode 文件保留
+            code = gen_room_code(set(self.rooms))
         players = [p.strip() for p in cfg.get("players", []) if p.strip()]
-        self.session = Session(
+        session = Session(
             players=players,
             minutes=int(cfg.get("minutes", 30)),
             wildness=int(cfg.get("wildness", 6)),
@@ -456,14 +529,18 @@ class Hub:
             host_perception=cfg.get("host_perception", "转写"),
             playlist=cfg.get("playlist") or [],
             occasion=cfg.get("occasion", ""), scene_brief=cfg.get("scene_brief", ""),
+            max_llm_calls=cfg.get("max_llm_calls"),   # None=按环境变量/默认 500
         )
-        self.session.join_base = self.join_base
-        self.session.autoplay = bool(cfg.get("autoplay"))
-        self.session.autoplay_interval_s = float(cfg.get("autoplay_interval_s", 1.0))
+        session.join_base = self.join_base
+        session.room_code = code
+        session.autoplay = bool(cfg.get("autoplay"))
+        session.autoplay_interval_s = float(cfg.get("autoplay_interval_s", 1.0))
         if cfg.get("autoplay") and cfg.get("driver") == "llm":
             # 服务端自驱:回合发动机进服务器,驾驶舱页面可关、电脑可合盖
-            self.session.start_autoloop(self.session.autoplay_interval_s)
-        return self.session.snapshot()
+            session.start_autoloop(session.autoplay_interval_s)
+        with self.lock:
+            self.rooms[code] = session
+        return session.snapshot()
 
 
 def lan_host() -> str:
@@ -519,18 +596,35 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, *a) -> None:  # 静默访问日志
         pass
 
-    def _seat_param(self) -> str:
+    def _seat_param(self, session) -> str:
         """取 ?player= 座位名。http.server 按 latin-1 解请求行,裸中文会变成
         å°å——转回 utf-8 再认一次,免得中文座位名默认用不了。"""
         from urllib.parse import parse_qs, urlparse
         player = (parse_qs(urlparse(self.path).query).get("player") or [""])[0]
-        s0 = self.hub.session
-        if s0 and player not in s0.inbox:
+        if session and player not in session.inbox:
             try:
                 player = player.encode("latin-1").decode("utf-8")
             except (UnicodeEncodeError, UnicodeDecodeError):
                 pass
         return player
+
+    def _room_param(self, body: dict | None = None) -> str | None:
+        """取房间码:query ?room= 优先,其次 POST body 的 room 字段;都没有返回 None。"""
+        from urllib.parse import parse_qs, urlparse
+        q = (parse_qs(urlparse(self.path).query).get("room") or [""])[0]
+        if q:
+            return q
+        if isinstance(body, dict) and body.get("room"):
+            return str(body["room"])
+        return None
+
+    def _pick(self, body: dict | None = None):
+        """定位房间,失败时直接回错误并返回 None(调用方据此提前结束)。"""
+        s, _code, err = self.hub.pick(self._room_param(body))
+        if err:
+            self._json(err[0], {"error": err[1]})
+            return None
+        return s
 
     def do_GET(self) -> None:
         if self.path in ("/", "/index.html") or self.path.startswith("/play"):
@@ -548,43 +642,49 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             return
         if self.path.startswith("/api/inbox") or self.path.startswith("/api/view"):
-            s0 = self.hub.session
+            s0 = self._pick()
             if s0 is None:
-                self._json(409, {"error": "先开局"}); return
-            player = self._seat_param()
+                return
+            player = self._seat_param(s0)
             if player not in s0.inbox:
                 self._json(400, {"error": f"未知座位: {player}"}); return
             if self.path.startswith("/api/view"):
                 # 玩家视图:一台手机该看见的东西。带进度(否则玩家还得回驾驶舱),
-                # 不含 tool_use / results / inbox_counts / 别人的收件箱。
+                # 不含 tool_use / results / inbox_counts / 别人的收件箱 / 计费闸。
                 self._json(200, s0.player_view(player))
             else:
                 self._json(200, {"player": player, "inbox": s0.inbox[player][-8:]})
             return
-        if self.path == "/api/state":
-            s = self.hub.session
-            self._json(200, s.snapshot() if s else {"no_session": True,
-                       "limits": {"min_players": MIN_PLAYERS, "max_players": MAX_PLAYERS}})
+        if self.path.startswith("/api/state"):
+            s, _code, err = self.hub.pick(self._room_param())
+            if err and not self.hub.rooms:
+                # 无房:保持旧的 no_session 契约(前端据此显示未开局)
+                self._json(200, {"no_session": True,
+                           "limits": {"min_players": MIN_PLAYERS, "max_players": MAX_PLAYERS}})
+                return
+            if err:
+                self._json(err[0], {"error": err[1]}); return
+            self._json(200, s.snapshot())
             return
         self._json(404, {"error": "not found"})
 
     def do_POST(self) -> None:
         try:
+            body = self._body()   # 只读一次(rfile 读完即空);room 从 query 或此 body 取
             if self.path == "/api/start":
-                self._json(200, self.hub.start(self._body()))
+                self._json(200, self.hub.start(body))
                 return
-            s = self.hub.session
+            s = self._pick(body)
             if s is None:
-                self._json(409, {"error": "先 /api/start 开局"})
                 return
             if self.path == "/api/event":
-                ev = self._body()
+                ev = dict(body)
+                ev.pop("room", None)   # room 是路由参数,不进事件流
                 with s.lock:
                     s.engine.push_event(ev)
                 self._json(200, {"queued": ev})
                 return
             if self.path == "/api/scene":
-                body = self._body()
                 if not body.get("image_b64"):
                     self._json(400, {"error": "缺 image_b64"})
                     return
@@ -592,7 +692,6 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(200 if "error" not in out else 502, out)
                 return
             if self.path == "/api/audio":
-                body = self._body()
                 player = body.get("player")
                 with s.lock:
                     pend = s.state.pending_audio
@@ -613,7 +712,6 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(200, {"verdict": result["verdict"], "reason": result["reason"]})
                 return
             if self.path == "/api/photo":
-                body = self._body()
                 player = body.get("player")
                 with s.lock:
                     pend = s.state.pending_photo
@@ -656,7 +754,6 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(200, {"finished": True})
                 return
             if self.path == "/api/turn":
-                body = self._body()
                 with s.lock:
                     if s.state.finished:
                         self._json(409, {"error": "局已收"})
@@ -706,10 +803,12 @@ def main() -> None:
             print(f"该快照已收局,不恢复:{args.resume}")
         else:
             session = persist.restore_session(snap, out, join_base=Handler.hub.join_base)
-            Handler.hub.session = session
+            code = session.room_code or gen_room_code(set(Handler.hub.rooms))
+            session.room_code = code
+            Handler.hub.rooms[code] = session
             if session.autoplay and session.driver_kind == "llm":
                 session.start_autoloop(session.autoplay_interval_s)
-            print(f"已从快照恢复:{args.resume}(episode 追加续写 {session.episode_path})")
+            print(f"已从快照恢复:{args.resume}(房间码 {code},episode 追加续写 {session.episode_path})")
     base = Handler.hub.join_base
     print(f"模拟台(驾驶舱) → {base}  (机位 {MIN_PLAYERS}–{MAX_PLAYERS},Ctrl-C 退出)")
     print(f"玩家入座        → {base}/play")
