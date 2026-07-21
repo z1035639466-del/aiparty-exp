@@ -229,9 +229,21 @@ class OpenAICompatTransport:
 
 
 def make_transport(provider: str, model: str | None = None):
-    """provider: anthropic | minimax|kimi|glm|qwen|deepseek(国产五家,竞标同配) | mock。"""
+    """provider: anthropic | minimax|kimi|glm|qwen|deepseek(国产五家,竞标同配)
+    | custom(任意 OpenAI 兼容口/中转站:CUSTOM_BASE_URL + CUSTOM_API_KEY,
+    模型走 model 参数或 CUSTOM_MODEL) | mock。"""
     if provider == "anthropic":
         return AnthropicTransport(model or "haiku")
+    if provider == "custom":
+        base = os.environ.get("CUSTOM_BASE_URL")
+        if not base:
+            raise RuntimeError("provider=custom 需要 CUSTOM_BASE_URL 环境变量(OpenAI 兼容口地址,含 /v1)")
+        # sonnet/haiku 是出厂默认别名,对中转口无意义,回落到 CUSTOM_MODEL
+        if not model or model in MODELS:
+            model = os.environ.get("CUSTOM_MODEL")
+        if not model:
+            raise RuntimeError("provider=custom 需要指定模型(model 参数或 CUSTOM_MODEL 环境变量)")
+        return OpenAICompatTransport(model, base, "CUSTOM_API_KEY")
     if provider in CN_PROVIDERS:
         cfg = CN_PROVIDERS[provider]
         # sonnet/haiku 是 Anthropic 档位别名,对国产口无意义(UI 与 CLI 的出厂默认值
