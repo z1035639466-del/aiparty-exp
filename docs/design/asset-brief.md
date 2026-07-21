@@ -95,3 +95,24 @@ sfx_cup_shake_soft.m4a  sfx_cup_slam.m4a  sfx_dice_roll.m4a  sfx_cyl_spin.m4a  s
 2. 道具规格页 v3「实照版」——CSS 手绘全部换真照片
 3. 可交互网页 demo：摇一摇出骰、按住偷看、拨转弹巢（带你已批的那套震动/音效规格）
 4. 沉淀成 App 用的素材包（切图 + 命名 + 状态机对照表）
+
+---
+
+## 路线 B 补充 · gpt-image-2 直调（OpenAI 兼容接口）
+
+不需要 Codex CLI，一条 curl 即可（KEY 不要提交进仓库）：
+
+```bash
+curl $BASE_URL/v1/images/generations \
+  -H "Authorization: Bearer $API_KEY" -H "Content-Type: application/json" \
+  -d '{"model":"gpt-image-2","prompt":"<下方任选>","size":"1536x1024","quality":"high"}'
+```
+
+**左轮 prompt 组（同一会话连续出，保持同一把枪）：**
+1. 主图：`Product photography, top-down view: a realistic snub-nose revolver, dark steel frame, walnut wood grip, lying flat on dark green felt, soft studio side lighting, realistic soft shadow, photorealistic, 4k, no text, no hands`
+2. 弹巢甩出：`same revolver, cylinder swung open showing six empty chambers, same angle, same lighting`
+3. 旗枪彩蛋：`same revolver, a small red flag with a Chinese character popping out of the muzzle, comedy prop style, same scene`
+
+**骰盅补角度：**`Product photography, 45-degree view: a matte black KTV dice cup upside down on dark green felt, dark red felt rim touching the table, soft side lighting, photorealistic, no text`
+
+产出命名与交付同上方「交付方式」一节；AI 图与 Cycles 渲染图可混用，绒布底色统一往 #14472F 调。
