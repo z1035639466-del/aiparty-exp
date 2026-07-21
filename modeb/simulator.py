@@ -846,9 +846,17 @@ class Handler(BaseHTTPRequestHandler):
 def make_server(port: int, out_dir: Path, bind: str = "127.0.0.1") -> ThreadingHTTPServer:
     srv = ThreadingHTTPServer((bind, port), Handler)
     actual = srv.server_address[1]
-    # 入座链接必须用局域网地址:手机连的是 Wi-Fi,localhost 指向手机自己。
-    host = lan_host() if bind not in ("127.0.0.1", "localhost") else "localhost"
-    Handler.hub = Hub(out_dir, join_base=f"http://{host}:{actual}")
+    # 公网部署(Caddy 同机反代 + 域名 HTTPS)时,入座链接必须是玩家手机在任何网络
+    # 都打得开的公网地址,而不是本机局域网 IP。设 PUBLIC_BASE_URL=https://你的域名
+    # (.env 里配一行即可,main 会先 load_env)整体覆盖 join_base;不设则行为不变,
+    # 完全向后兼容局域网玩法。
+    public = os.environ.get("PUBLIC_BASE_URL", "").strip().rstrip("/")
+    if public:
+        Handler.hub = Hub(out_dir, join_base=public)
+    else:
+        # 入座链接必须用局域网地址:手机连的是 Wi-Fi,localhost 指向手机自己。
+        host = lan_host() if bind not in ("127.0.0.1", "localhost") else "localhost"
+        Handler.hub = Hub(out_dir, join_base=f"http://{host}:{actual}")
     return srv
 
 

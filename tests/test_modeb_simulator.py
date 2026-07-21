@@ -364,6 +364,27 @@ def test_join_base_uses_reachable_host(server):
     assert not ip.startswith("127."), f"lan_host 不该返回回环地址,拿到 {ip}"
 
 
+def test_public_base_url_overrides_join_base(tmp_path, monkeypatch):
+    """公网部署(Caddy 反代)时,PUBLIC_BASE_URL 必须整体覆盖入座链接前缀:
+    手机在 4G/别家 Wi-Fi 上打不开局域网 IP,链接必须是 https://域名。
+    尾部斜杠要吞掉(前端会自行拼 /play?...),不设该变量则行为不变。"""
+    from modeb.simulator import Handler
+    monkeypatch.setenv("PUBLIC_BASE_URL", "https://yappa.example.com/")
+    srv = make_server(0, tmp_path)
+    try:
+        assert Handler.hub.join_base == "https://yappa.example.com"
+    finally:
+        srv.server_close()
+    # 不设(或空串)= 老行为:本机地址 + 端口,局域网玩法不受影响
+    monkeypatch.setenv("PUBLIC_BASE_URL", "  ")
+    srv2 = make_server(0, tmp_path)
+    try:
+        assert Handler.hub.join_base.startswith("http://")
+        assert Handler.hub.join_base.endswith(str(srv2.server_address[1]))
+    finally:
+        srv2.server_close()
+
+
 def test_duel_result_reaches_player_view(server):
     """对决揭晓要能到手机上。duel_result 没有 player 字段,而玩家视图按
     「无 player 就跳过」过滤事件——不特判就整条被滤掉,手机上永远看不到胜负。"""

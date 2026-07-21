@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Caddy 反向代理(launchd 常驻):对外提供 https://你的域名,内部转发到 127.0.0.1:8747。
+
+  路径约定:文件里所有 /Users/YOUR_USERNAME 都是占位符。
+  deploy/install.sh 在安装时会自动替换成你的家目录;手动安装请逐处改成实际路径。
+
+  caddy 二进制由 install.sh 下载校验后放在 ~/bin/caddy(不需要 brew,也不需要 sudo)。
+  macOS 10.14+ 普通用户即可绑定 80/443,所以用户级 LaunchAgent 就够,无需 root。
+
+  证书数据 Caddy 自动存放在 ~/Library/Application Support/Caddy,无需配置。
+-->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.yappa.caddy</string>
+
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/YOUR_USERNAME/bin/caddy</string>
+		<string>run</string>
+		<string>--config</string>
+		<string>/Users/YOUR_USERNAME/aiparty-exp/deploy/Caddyfile</string>
+	</array>
+
+	<key>WorkingDirectory</key>
+	<string>/Users/YOUR_USERNAME/aiparty-exp/deploy</string>
+
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+
+	<key>StandardOutPath</key>
+	<string>/Users/YOUR_USERNAME/Library/Logs/yappa/caddy.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/YOUR_USERNAME/Library/Logs/yappa/caddy.err.log</string>
+</dict>
+</plist>
