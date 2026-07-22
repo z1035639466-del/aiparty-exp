@@ -400,6 +400,15 @@ class ToolExecutor:
         if name == "random.int":
             lo, hi = int(a.get("min", 1)), int(a.get("max", 6))
             return self._maybe_private({"value": self.rng.randint(lo, hi)}, a)
+        if name == "random.dice":
+            # 一把骰:count 颗六面骰(大话骰默认 5 颗)。prompt 里早就让主持这么调,
+            # 工具却一直没实装——调了就被钳,骰子局全被逼成嘴报数。钳制:1–10 颗。
+            count = int(a.get("count", 5))
+            if not (1 <= count <= 10):
+                raise ClampError(f"random.dice count 须在 1–10,收到: {count}")
+            dice = [self.rng.randint(1, 6) for _ in range(count)]
+            # value 用 list——route_private 会 f-string 成 "[3, 1, 6]",App 端按此画骰面
+            return self._maybe_private({"value": dice}, a)
         raise ClampError(f"random 未知子操作: {name}")
 
     def _maybe_private(self, res: dict, a: dict) -> dict:
