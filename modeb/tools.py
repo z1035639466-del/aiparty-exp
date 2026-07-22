@@ -567,6 +567,20 @@ class ToolExecutor:
         op = name.split(".", 1)[1] if "." in name else "deal"
         if op == "transfer":
             return self._skill_transfer(a)  # 技能转手:抢夺/交换/截胡的唯一账面原语
+        if op == "cancel":
+            # 收回一张已发技能(发错人/发重了/持有人退场)。uses_left 清零=销账但留痕
+            #(隔离不删除:grants 流水还在,复盘看得见这张牌发过又收了)。
+            holder = a.get("holder")
+            if holder not in self.state.players:
+                raise ClampError(f"skill.cancel 持有人必须在座,收到: {holder}")
+            prop = a.get("prop")
+            g = next((g for g in self.state.grants
+                      if g.holder == holder and g.uses_left > 0
+                      and (not prop or g.prop == prop)), None)
+            if g is None:
+                raise ClampError(f"{holder} 名下没有可收回的技能" + (f"「{prop}」" if prop else ""))
+            g.uses_left = 0
+            return {"cancelled": g.prop, "holder": holder}
         if op != "deal":
             raise ClampError(f"skill 未知子操作: {op}")
         holder = a.get("grant_to") or self.state.focus or self.state.players[0]
