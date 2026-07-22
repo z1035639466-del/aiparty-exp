@@ -246,6 +246,30 @@ class Session:
                     calls[i]["input"]["content"] = res[field]
         return red
 
+    def roll_cup(self, me: str) -> dict:
+        """玩家自己摇盅(玩的动作留在玩家手里,房主原则:局长不替玩家玩)。须持 self.lock 调用。
+
+        校验:有未摇的盅才许摇;一盅一摇,摇过再摇驳回(防赖账,重摇须局长重发)。
+        引擎 RNG 出点数 → 写进本人 props.rolled;点数经现有 🔒🎲 防伪水印路投进本人
+        inbox(App 只认水印画骰面);公开事件面只出「谁摇了骰盅」(无点数),经 push_event
+        进事件流让主持与旁人看到动作;点数另走引擎对账信道(turn 里从 props 现取)给主持开牌用。
+        """
+        prop = self.state.props.get(me)
+        if not prop or prop.get("kind") != "骰盅":
+            return {"ok": False, "error": "你手上没有骰盅,等局长发"}
+        if prop.get("rolled") is not None:
+            return {"ok": False, "error": "这盅已经摇过了(一盅一摇;想重摇得局长重发)"}
+        count = int(prop.get("count", 5))
+        # 引擎 RNG 出点数(与 random.dice 同一把 rng,公平由系统保证)
+        dice = [self.engine.tools.rng.randint(1, 6) for _ in range(count)]
+        prop["rolled"] = dice
+        # 点数进本人私件:复用引擎防伪水印「🔒🎲」(锁后紧跟骰、无空格),App 端只认它画骰面
+        if me in self.inbox:
+            self.inbox[me].append(f"🔒🎲 {dice}")
+        # 公开事件面只留动作、不留点数:主持从 events 看谁摇了、齐了开吹牛;旁人 view 也只见动作
+        self.engine.push_event({"type": "roll", "player": me})
+        return {"ok": True, "rolled": True, "count": count}
+
     def judge_photo(self, player: str, image_b64: str | None, media_type: str | None,
                      frames: list[str] | None = None) -> dict:
         """视觉裁判(锁外调用,慢):返回 judge_result 事件体。判不了不装懂——
@@ -462,6 +486,13 @@ class Session:
             "scores": digest.get("scores"), "scene_objects": digest.get("scene_objects"),
             "now_playing": digest.get("now_playing"),   # 手机上要显示正在放的歌
             "timer_running": digest.get("timer_running"),
+            # 我自己的骰盅:rolled(点数)只给本人——摇过常驻显示,大话骰全程盯着吹牛
+            "my_prop": ({"kind": me_prop["kind"], "count": me_prop["count"],
+                         "rolled": me_prop.get("rolled")}
+                        if (me_prop := self.state.props.get(me)) else None),
+            # 全桌骰盅状态:谁有盅、摇没摇(布尔)——旁人看得到动作,看不到点数
+            "cups": [{"player": p, "rolled": pr.get("rolled") is not None}
+                     for p, pr in self.state.props.items()],
             "inbox": self.inbox.get(me, [])[-8:],          # 只有自己的
             "open_ask": ({"prompt": ask["prompt"], "asked": ask["asked"],
                           "options": ask["options"]} if ask else None),  # 不含 answers
@@ -785,6 +816,13 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/event":
                 ev = dict(body)
                 ev.pop("room", None)   # room 是路由参数,不进事件流
+                if ev.get("type") == "roll":
+                    # 摇盅是玩家的「玩」动作,不是普通事件:走 roll_cup 校验+出点+私发+对账,
+                    # 点数绝不能明文进事件流(那样就等于局长替玩家摇了)。
+                    with s.lock:
+                        out = s.roll_cup(ev.get("player"))
+                    self._json(200 if out.get("ok") else 409, out)
+                    return
                 with s.lock:
                     s.engine.push_event(ev)
                 self._json(200, {"queued": ev})

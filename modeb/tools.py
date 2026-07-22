@@ -436,6 +436,39 @@ class ToolExecutor:
             res["visibility"], res["player"] = vis, player
         return res
 
+    # —— prop:实体道具发放(发盅,玩家自己摇)——
+    # 房主原则:局长不能替玩家玩了再把结果告知——玩的动作在玩家手里,局长只发玩法。
+    # random.dice 是局长替玩家摇(暗骰快递结果),违反这条;prop.dice_cup 只发一只
+    # 「未摇的盅」到玩家手机,点数此刻不存在,玩家在 App 上自己摇(POST /api/event roll)。
+    # 发放本身公开可见(桌上都知道谁有盅),点数不在这层产生——见 simulator.roll_cup。
+    def _t_prop(self, name: str, a: dict) -> dict:
+        op = name.split(".", 1)[1] if "." in name else "dice_cup"
+        if op == "cancel":
+            # 收盅:指定 players 收这几只,不指定收全部(重摇须局长重发,这里先清)
+            batch = a.get("players") or ([a["player"]] if a.get("player") else None)
+            targets = list(batch) if batch else list(self.state.props)
+            cleared = [p for p in targets if self.state.props.pop(p, None) is not None]
+            return {"cancelled": cleared}
+        if op != "dice_cup":
+            raise ClampError(f"prop 未知子操作: {op}")
+        # 批量发盅:players 列表(大话骰=全员);单发也收 player。至少一名在座玩家。
+        batch = a.get("players") or ([a["player"]] if a.get("player") else [])
+        if not batch:
+            raise ClampError("prop.dice_cup 需要 players(收盅的在座玩家,可批量)")
+        bad = [p for p in batch if p not in self.state.players]
+        if bad:
+            raise ClampError(f"prop.dice_cup players 含不在座者: {bad}")
+        # count:几颗骰,局长按玩法定(大话骰 5、快版 3),钳 1–10
+        count = int(a.get("count", 5))
+        if not (1 <= count <= 10):
+            raise ClampError(f"prop.dice_cup count 须在 1–10,收到: {count}")
+        # 每人挂一只「未摇的盅」(rolled=None);重复发=换新盅重置(覆盖旧盅)
+        for p in dict.fromkeys(batch):  # 去重,同名只发一只
+            self.state.props[p] = {"kind": "骰盅", "count": count, "rolled": None}
+        return {"dealt": list(dict.fromkeys(batch)), "count": count, "kind": "骰盅",
+                "note": "盅已发到各人手机,等他们自己摇(events 里看谁摇了);"
+                        "点数玩家摇出来才有,别替他们摇——替玩=虚构同罪"}
+
     # —— state:账本唯一入口 ——
     def _t_state(self, name: str, a: dict) -> dict:
         op = name.split(".", 1)[1] if "." in name else a.get("op", "")

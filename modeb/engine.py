@@ -228,6 +228,17 @@ class Engine:
             upstream = [{"type": "tool_receipts",
                          "note": "你上一拍工具的真实回执(仅你可见,别念出来;被钳制的必须圆场)",
                          "results": self._last_results}] + upstream
+        # 骰盅对账信道:玩家自己摇的点数只走这条私信道回给主持(与荷官回执同姿势,
+        # 仅主持可见,不进 line/events_in/digest/别人的 view)。摇了盅的点数每拍照亮,
+        # 一路留到开牌——开牌结算凭这条报点数,不用靠玩家自报。从 state.props 现取,
+        # 随收盅/重发自然更新。
+        cups = {p: pr["rolled"] for p, pr in self.state.props.items()
+                if pr.get("rolled") is not None}
+        if cups:
+            upstream = [{"type": "dice_cup_ledger",
+                         "note": "各人骰盅已摇出的点数(玩家自己摇的,仅你对账可见;"
+                                 "别念点数,开牌结算才亮)",
+                         "points": cups}] + upstream
         t_decide = time.time()
         try:
             decision = self.driver.decide(digest, upstream)

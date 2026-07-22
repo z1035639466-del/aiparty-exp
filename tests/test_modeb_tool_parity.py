@@ -21,7 +21,7 @@ TOOLS_SRC = (Path(__file__).resolve().parent.parent / "modeb" / "tools.py").read
 _FAMILIES = {
     "_t_show": "show", "_t_ask": "ask", "_t_fx": "fx", "_t_timer": "timer",
     "_t_draw_atom": "draw_atom",
-    "_t_random": "random", "_t_state": "state", "_t_skill": "skill",
+    "_t_random": "random", "_t_state": "state", "_t_skill": "skill", "_t_prop": "prop",
     "_t_duel": "duel", "_t_judge": "judge", "_t_music": "music",
 }
 _BARE = {"show", "ask", "fx", "timer", "draw_atom"}

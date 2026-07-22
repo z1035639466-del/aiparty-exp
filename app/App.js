@@ -18,6 +18,7 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
 import { useKeepAwake } from "expo-keep-awake";
+import { Accelerometer } from "expo-sensors";
 import * as VideoThumbnails from "expo-video-thumbnails";
 
 const POLL_MS = 900;
@@ -81,6 +82,116 @@ function DiceReveal({ dice }) {
   );
 }
 
+// —— 骰盅道具(玩家自己摇)——
+// 房主原则:局长不替玩家玩。盅由局长发(prop.dice_cup),点数由玩家在这儿自己摇出来。
+// 摇一摇体感:Accelerometer 测晃动脉冲,摇够停下→扣盅→POST roll;点数由引擎 RNG 出
+// (摇的时长/力度不影响点数),但手感让人觉得是自己摇出来的。传感器不可用有"摇!"按钮兜底。
+const SHAKE_G = 1.28;      // 加速度模长(单位 g)离 1g 的偏移超此值算一次晃
+const SHAKE_MIN = 3;       // 摇够几次脉冲才让扣盅(仪式对齐大话骰:摇几下再开)
+const SHAKE_GAP_MS = 170;  // 两次脉冲最小间隔,防一次甩动被数成好几下
+function DiceCup({ prop, rolling, onRoll }) {
+  const { count, rolled } = prop;
+  const [faces, setFaces] = useState(() => Array.from({ length: count }, () => 1));
+  const [shakes, setShakes] = useState(0);
+  const [sensorOk, setSensorOk] = useState(true);
+  const lastPulse = useRef(0);
+  const shakesRef = useRef(0);
+  const settleTimer = useRef(null);
+  const rollRef = useRef(onRoll);
+  rollRef.current = onRoll;                 // 始终指向最新 onRoll,自动扣盅时不吃旧闭包
+  const armed = !rolled && !rolling;        // 持未摇盅且没在扣盅动画里:该订阅传感器
+
+  // 骰面快速乱翻(哗啦哗啦的感觉):摇动脉冲时、脚本兜底 rolling 时都用它
+  const tumble = () => setFaces(Array.from({ length: count }, () => 1 + Math.floor(Math.random() * 6)));
+
+  // 传感器订阅:只在持未摇盅时挂,摇完/离屏即退订——别让轮询页背着传感器跑
+  useEffect(() => {
+    if (!armed) return;
+    shakesRef.current = 0; setShakes(0);
+    let sub = null, alive = true;
+    (async () => {
+      try {
+        if (!(await Accelerometer.isAvailableAsync())) { if (alive) setSensorOk(false); return; }
+      } catch (e) { if (alive) setSensorOk(false); return; }
+      if (!alive) return;
+      Accelerometer.setUpdateInterval(60);   // ~60ms 采样
+      sub = Accelerometer.addListener(({ x, y, z }) => {
+        const mag = Math.sqrt(x * x + y * y + z * z);     // 静止≈1g
+        if (Math.abs(mag - 1) < SHAKE_G - 1) return;      // 偏移不够,不算晃
+        const now = Date.now();
+        if (now - lastPulse.current < SHAKE_GAP_MS) return;
+        lastPulse.current = now;
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);  // 每次晃一次轻触感
+        tumble();
+        shakesRef.current += 1;
+        setShakes(shakesRef.current);
+        // 摇够后骤停自动扣盅:每次脉冲重置 settle 计时,停手 ~420ms 没新脉冲就自动扣
+        if (shakesRef.current >= SHAKE_MIN) {
+          if (settleTimer.current) clearTimeout(settleTimer.current);
+          settleTimer.current = setTimeout(() => rollRef.current(), 420);
+        }
+      });
+    })();
+    return () => {
+      alive = false;
+      if (sub) sub.remove();
+      if (settleTimer.current) clearTimeout(settleTimer.current);
+    };
+  }, [armed, count]);
+
+  // 脚本兜底 / 扣盅瞬间:rolling 期间骰面持续乱翻,直到点数经轮询回来
+  useEffect(() => {
+    if (!rolling) return;
+    const iv = setInterval(tumble, 70);
+    return () => clearInterval(iv);
+  }, [rolling, count]);
+
+  // 摇过的盅:常驻显示自己的点数(大话骰全程要盯着自己的骰吹牛,不能摇完就没了)
+  if (rolled) {
+    const sum = rolled.reduce((a, b) => a + b, 0);
+    return (
+      <View style={s.cupBox}>
+        <Text style={s.cupTitle}>🎲 你的骰盅 · {count}颗(只有你看得到)</Text>
+        <View style={s.diceRow}>
+          {rolled.map((n, i) => <Die key={i} n={n} />)}
+          {rolled.length > 1 ? <Text style={s.diceSum}>Σ{sum}</Text> : null}
+        </View>
+      </View>
+    );
+  }
+
+  const enough = shakes >= SHAKE_MIN;
+  return (
+    <View style={s.cupBoxActive}>
+      <Text style={s.cupTitle}>🎲 骰盅 · {count} 颗</Text>
+      {rolling ? (
+        <>
+          <View style={s.diceRow}>{faces.map((n, i) => <Die key={i} n={n} />)}</View>
+          <Text style={s.cupHint}>哗啦哗啦……扣盅揭晓</Text>
+        </>
+      ) : sensorOk ? (
+        <>
+          <View style={s.diceRow}>{faces.map((n, i) => <Die key={i} n={n} />)}</View>
+          <Text style={s.cupHint}>
+            {enough ? "摇够了!停手自动扣,或点👇" : `摇一摇手机…(${shakes}/${SHAKE_MIN})`}
+          </Text>
+          <Pressable style={[s.rollBtn, !enough && s.rollBtnDim]} onPress={onRoll}>
+            <Text style={s.rollBtnText}>{enough ? "扣盅!" : "摇!"}</Text>
+          </Pressable>
+        </>
+      ) : (
+        // 传感器不可用/无权限/桌面平放:按钮兜底,点了走脚本化震动+乱翻后同样扣盅,终点一致
+        <>
+          <Text style={s.cupHint}>摇不动?点这里替你摇</Text>
+          <Pressable style={s.rollBtn} onPress={onRoll}>
+            <Text style={s.rollBtnText}>摇!</Text>
+          </Pressable>
+        </>
+      )}
+    </View>
+  );
+}
+
 export default function App() {
   useKeepAwake(); // 快枪手对峙期间息屏=判负,整局常亮
   const [base, setBase] = useState("");
@@ -91,6 +202,7 @@ export default function App() {
   const [err, setErr] = useState("");
   const [say, setSay] = useState("");
   const [dueled, setDueled] = useState(false); // 本次对决我开过枪了
+  const [rolling, setRolling] = useState(false); // 骰盅扣盅动画进行中(挡重复扣)
   const [recording, setRecording] = useState(null); // 录音判定进行中的 Recording 对象
   const prevRef = useRef({ inbox: 0, drawn: false });
   const feedRef = useRef(null); // 局长最新一句永远滚到眼前(手机举得远,不能靠手扒)
@@ -162,6 +274,23 @@ export default function App() {
   };
   const sendEvent = (ev) =>
     api("/api/event", { ...ev, player: me }).catch(() => setErr("事件没发出去,再点一次"));
+
+  // 扣盅:玩家自己摇出点数的那一下(手真摇够/骤停自动扣,或按钮兜底都汇到这里)。
+  // 引擎 RNG 出点数(摇的力度/时长不影响),点数经 🔒🎲 水印路回本人私件——App 只认水印
+  // 画骰面,POST 只确认摇了,不信任响应里的点数(防伪架构一致)。结果由轮询 my_prop 揭晓。
+  const rollCup = async () => {
+    if (rolling) return;              // 已在扣盅动画里,别重复 POST
+    setRolling(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);   // 扣盅瞬间重触感
+    const buzz = setInterval(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 70);
+    setTimeout(() => clearInterval(buzz), 420);
+    try {
+      const res = await api("/api/event", { type: "roll", player: me });
+      if (res && res.error) Alert.alert("摇不了", res.error);   // 没盅/已摇过:服务端驳回
+    } catch (e) { setErr("摇盅没发出去,再点一次"); }
+    // 点数经轮询回来(my_prop.rolled),给乱翻动画留够时间再解除 rolling
+    setTimeout(() => setRolling(false), 520);
+  };
 
   // —— 轮询自己的视图 ——
   useEffect(() => {
@@ -379,6 +508,9 @@ export default function App() {
       {v.finished ? <Text style={s.finish}>🏁 本局已收</Text> : null}
       {myCue ? <View style={s.cueBar}><Text style={s.cueText}>{myCue}</Text></View> : null}
 
+      {/* 骰盅道具卡:局长发盅、玩家自己摇——常驻在 feed 之上,大话骰全程盯着自己的骰吹牛 */}
+      {v.my_prop ? <DiceCup prop={v.my_prop} rolling={rolling} onRoll={rollCup} /> : null}
+
       <ScrollView style={s.feed} contentContainerStyle={{ paddingBottom: 12 }}
         ref={feedRef}
         onContentSizeChange={() => feedRef.current && feedRef.current.scrollToEnd({ animated: true })}>
@@ -398,6 +530,10 @@ export default function App() {
                     <Text key={j} style={s.duelResultEv}>
                       🔫 {e.winner} 快枪胜{e.loser ? ` ${e.loser}` : ""}{e.reason ? `(${e.reason})` : ""}
                     </Text>
+                  );
+                if (e.type === "roll")
+                  return ( // 谁摇了骰盅:公开面只见动作、不见点数(点数只在本人手机+局长对账)
+                    <Text key={j} style={s.rollEv}>🎲 {e.player} 摇了骰盅</Text>
                   );
                 if (e.value !== undefined && e.value !== null && e.type !== "say")
                   return ( // 公开随机(random.pick 之类)的结果:开签样式,不混进对话流
@@ -573,6 +709,18 @@ const s = StyleSheet.create({
   pipCell: { width: "33.33%", height: "33.33%", alignItems: "center", justifyContent: "center" },
   pip: { width: 10, height: 10, borderRadius: 5, backgroundColor: "#1c1c24" },
   diceSum: { color: "#fff", fontSize: 24, fontWeight: "800" },
+  // 骰盅道具卡:未摇(醒目、可摇)/ 已摇(常驻显示自己的点数)
+  cupBoxActive: { backgroundColor: "#2a2438", borderColor: "#c9b8ff", borderWidth: 2,
+    borderRadius: 14, padding: 14, marginVertical: 8, alignItems: "center" },
+  cupBox: { backgroundColor: "#241f30", borderColor: "#5a4a8a", borderWidth: 1,
+    borderRadius: 12, padding: 12, marginVertical: 8, alignItems: "center" },
+  cupTitle: { color: "#c9b8ff", fontSize: 15, fontWeight: "700", marginBottom: 8 },
+  cupHint: { color: "#bbade0", fontSize: 14, marginTop: 8, marginBottom: 2, textAlign: "center" },
+  rollBtn: { backgroundColor: "#ffd54a", borderRadius: 16, paddingVertical: 14,
+    paddingHorizontal: 56, marginTop: 10, minHeight: 56, justifyContent: "center" },
+  rollBtnDim: { backgroundColor: "#6a5f3a" },
+  rollBtnText: { color: "#241a05", fontSize: 24, fontWeight: "900" },
+  rollEv: { color: "#c9b8ff", fontSize: 14, fontWeight: "600", marginLeft: 8, marginVertical: 2 },
   inboxBox: { backgroundColor: "#2a2438", borderRadius: 12, padding: 10, marginVertical: 6,
     borderWidth: 1, borderColor: "#5a4a8a" },
   inboxTitle: { color: "#c9b8ff", fontSize: 12, marginBottom: 4 },
