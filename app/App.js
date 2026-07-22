@@ -6,7 +6,7 @@
 // 判定=抽帧走照片通道:视频先在本机抽帧转 base64,仍是 /api/photo 那条口子。
 import { useEffect, useRef, useState } from "react";
 import {
-  Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView,
+  Alert, Animated, KeyboardAvoidingView, Platform, Pressable, ScrollView,
   StyleSheet, Text, TextInput, View,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
@@ -18,6 +18,70 @@ import { useKeepAwake } from "expo-keep-awake";
 import * as VideoThumbnails from "expo-video-thumbnails";
 
 const POLL_MS = 900;
+
+// —— 骰子回执识别 ——
+// 私件是纯字符串:服务端 route_private 把 random 私密摇的载荷(display/value/picked)
+// 直接 f"🔒 {载荷}" 投进收件箱。骰点两种长相:
+//  ① 载荷本身就是点数——random.int 单骰是 "🔒 4",多骰数组转字符串是 "🔒 [3, 1, 6]";
+//  ② show 私发的文案带"骰"字,如 "🔒 你的暗骰:3、5、2"。
+// ①要求整段除分隔符/括号外只有 1-6 的单个数字(相邻两位数如 "14" 不算,毒杯号 7 以上不算);
+// ②只在出现"骰"字后取数,且全部是 1-6 的单数字才算,避免把普通数字文案误当骰子。
+const PURE_DICE_RE = /^[\[(]?\s*[1-6](?:\s*[,,、;\s]+\s*[1-6]){0,5}\s*[\])]?$/;
+const parseDice = (item) => {
+  const raw = String(item).trim();
+  const body = raw.replace(/^🔒\s*/u, "").trim();
+  if (body === raw || !body) return null; // 只认 🔒 私发(额头牌 👀 是别人的信息,保持文字)
+  if (PURE_DICE_RE.test(body)) return body.match(/[1-6]/g).map(Number);
+  if (body.includes("骰")) {
+    const toks = body.slice(body.lastIndexOf("骰") + 1).split(/[^0-9]+/).filter(Boolean);
+    if (toks.length >= 1 && toks.length <= 6 && toks.every((t) => /^[1-6]$/.test(t)))
+      return toks.map(Number);
+  }
+  return null;
+};
+
+// 骰面用 View 点阵画(酒桌暗光下比 ⚀⚁ 字符放大清晰得多,字符骰在部分安卓字体上糊成一团)
+const PIP_MAP = {
+  1: [4], 2: [2, 6], 3: [2, 4, 6], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8],
+};
+function Die({ n }) {
+  const pips = PIP_MAP[n] || [];
+  return (
+    <View style={s.die}>
+      {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+        <View key={i} style={s.pipCell}>
+          {pips.includes(i) ? <View style={s.pip} /> : null}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+// 揭晓感:压 250ms 再弹开(spring 缩放),配一次触感——只在私件首次挂上来时放,
+// 轮询重渲不重放(靠父级稳定 key 保证只挂载一次)。
+function DiceReveal({ dice }) {
+  const anim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const t = setTimeout(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      Animated.spring(anim, { toValue: 1, friction: 5, tension: 80, useNativeDriver: true }).start();
+    }, 250);
+    return () => clearTimeout(t);
+  }, []);
+  const sum = dice.reduce((a, b) => a + b, 0);
+  return (
+    <View>
+      <Text style={s.diceLabel}>🎲 你的暗骰</Text>
+      <Animated.View style={[s.diceRow, {
+        opacity: anim,
+        transform: [{ scale: anim.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }) }],
+      }]}>
+        {dice.map((n, i) => <Die key={i} n={n} />)}
+        {dice.length > 1 ? <Text style={s.diceSum}>Σ{sum}</Text> : null}
+      </Animated.View>
+    </View>
+  );
+}
 
 export default function App() {
   useKeepAwake(); // 快枪手对峙期间息屏=判负,整局常亮
@@ -31,6 +95,7 @@ export default function App() {
   const [dueled, setDueled] = useState(false); // 本次对决我开过枪了
   const [recording, setRecording] = useState(null); // 录音判定进行中的 Recording 对象
   const prevRef = useRef({ inbox: 0, drawn: false });
+  const feedRef = useRef(null); // 局长最新一句永远滚到眼前(手机举得远,不能靠手扒)
 
   // 录音判定(judge.audio):按一下录、再按一下交卷;裁判在服务端(接 key 即通)
   const toggleRecord = async () => {
@@ -180,7 +245,7 @@ export default function App() {
               }}>
                 <Text style={s.bigBtnText}>{starting ? "开局中…" : "开新局"}</Text>
               </Pressable>
-              <Pressable onPress={() => setCreating(false)}>
+              <Pressable hitSlop={14} onPress={() => setCreating(false)}>
                 <Text style={s.optout}>← 返回入座</Text>
               </Pressable>
             </>
@@ -213,6 +278,12 @@ export default function App() {
 
   const v = view || {};
   const inDuel = v.duel && v.duel.vs && v.duel.vs.includes(me);
+  // 「现在该我干嘛」一眼锁定:醒目状态条(拔枪时刻是全屏对峙,不走这里)
+  const askedMe = v.open_ask && v.open_ask.asked === me;
+  const myCue = v.photo_request ? "📸 轮到你:拍照判定,看下方题目"
+    : v.audio_request ? "🎤 轮到你:录音判定,看下方题目"
+    : askedMe ? "🫵 问到你了,往下答"
+    : v.focus === me ? "🎯 焦点在你身上" : null;
 
   const takePhoto = async () => {
     const perm = await ImagePicker.requestCameraPermissionsAsync();
@@ -270,7 +341,7 @@ export default function App() {
         ) : (
           <>
             <Text style={s.duelWait}>对峙中……手别碰屏幕</Text>
-            <Text style={s.dim}>枪响前碰 = 抢跑判负</Text>
+            <Text style={s.duelHint}>枪响前碰 = 抢跑判负</Text>
           </>
         )}
       </View>
@@ -286,19 +357,44 @@ export default function App() {
       </View>
       {err ? <Text style={s.err}>{err}</Text> : null}
       {v.finished ? <Text style={s.finish}>🏁 本局已收</Text> : null}
+      {myCue ? <View style={s.cueBar}><Text style={s.cueText}>{myCue}</Text></View> : null}
 
-      <ScrollView style={s.feed} contentContainerStyle={{ paddingBottom: 12 }}>
-        {(v.recent || []).map((t, i) => (
-          <View key={i} style={s.turn}>
-            {t.host ? <Text style={s.host}>🎩 {t.host}</Text> : null}
-            {(t.shown || []).map((c, j) => <Text key={j} style={s.shown}>📢 {c}</Text>)}
-            {(t.table || []).map((e, j) => (
-              <Text key={j} style={s.tableEv}>
-                {e.player}{e.note ? ` ${e.note}` : e.text ? `:「${e.text}」` : e.value ? ` → ${e.value}` : ` · ${e.type}`}
-              </Text>
-            ))}
-          </View>
-        ))}
+      <ScrollView style={s.feed} contentContainerStyle={{ paddingBottom: 12 }}
+        ref={feedRef}
+        onContentSizeChange={() => feedRef.current && feedRef.current.scrollToEnd({ animated: true })}>
+        {(v.recent || []).map((t, i, arr) => {
+          const latest = i === arr.length - 1; // 局长最新一句最显眼,历史缩小让路
+          return (
+            <View key={i} style={s.turn}>
+              {t.host ? (
+                <Text style={latest ? s.hostNow : s.host}>🎩 {t.host}</Text>
+              ) : null}
+              {(t.shown || []).map((c, j) => (
+                <Text key={j} style={latest ? s.shownNow : s.shown}>📢 {c}</Text>
+              ))}
+              {(t.table || []).map((e, j) => {
+                if (e.type === "duel_result" && e.winner)
+                  return (
+                    <Text key={j} style={s.duelResultEv}>
+                      🔫 {e.winner} 快枪胜{e.loser ? ` ${e.loser}` : ""}{e.reason ? `(${e.reason})` : ""}
+                    </Text>
+                  );
+                if (e.value !== undefined && e.value !== null && e.type !== "say")
+                  return ( // 公开随机(random.pick 之类)的结果:开签样式,不混进对话流
+                    <View key={j} style={s.pickCard}>
+                      <Text style={s.pickLabel}>🎲 当众开签</Text>
+                      <Text style={s.pickValue}>{e.player} → {String(e.value)}</Text>
+                    </View>
+                  );
+                return (
+                  <Text key={j} style={s.tableEv}>
+                    {e.player}{e.note ? ` ${e.note}` : e.text ? `:「${e.text}」` : e.value ? ` → ${e.value}` : ` · ${e.type}`}
+                  </Text>
+                );
+              })}
+            </View>
+          );
+        })}
       </ScrollView>
 
       {v.photo_request && (
@@ -328,9 +424,11 @@ export default function App() {
 
       {v.finished && (
         <View style={s.settleBox}>
-          <Text style={s.inboxTitle}>🏁 终局战报</Text>
-          {Object.entries(v.scores || {}).sort((a, b) => b[1] - a[1]).map(([p, sc]) => (
-            <Text key={p} style={s.inboxItem}>{p}:{sc}</Text>
+          <Text style={s.settleTitle}>🏁 终局战报</Text>
+          {Object.entries(v.scores || {}).sort((a, b) => b[1] - a[1]).map(([p, sc], i) => (
+            <Text key={p} style={i === 0 ? s.settleTop : s.settleItem}>
+              {i === 0 ? "👑 " : ""}{p}:{sc}
+            </Text>
           ))}
         </View>
       )}
@@ -338,13 +436,22 @@ export default function App() {
       {(v.inbox || []).length > 0 && (
         <View style={s.inboxBox}>
           <Text style={s.inboxTitle}>📬 只有你能看到</Text>
-          {v.inbox.slice(-3).map((x, i) => <Text key={i} style={s.inboxItem}>{x}</Text>)}
+          {(() => { // key 用「内容+同文出现序号」:轮询窗口平移不重挂,骰子动画只放一次
+            const seen = {};
+            return v.inbox.slice(-3).map((x) => {
+              seen[x] = (seen[x] || 0) + 1;
+              const k = x + "#" + seen[x];
+              const dice = parseDice(x);
+              return dice ? <DiceReveal key={k} dice={dice} />
+                : <Text key={k} style={s.inboxItem}>{x}</Text>;
+            });
+          })()}
         </View>
       )}
 
       {v.open_ask && (
-        <View style={s.askBox}>
-          <Text style={s.askText}>🎤 {v.open_ask.asked === me ? "问你" : `问${v.open_ask.asked}`}:{v.open_ask.prompt}</Text>
+        <View style={[s.askBox, askedMe && s.askBoxMe]}>
+          <Text style={askedMe ? s.askTextMe : s.askText}>🎤 {askedMe ? "问你" : `问${v.open_ask.asked}`}:{v.open_ask.prompt}</Text>
           <View style={s.row}>
             {(v.open_ask.options || []).map((o, i) => (
               <Pressable key={i} style={s.optBtn}
@@ -381,13 +488,13 @@ export default function App() {
         </Pressable>
       </View>
       <View style={[s.row, { justifyContent: "center" }]}>
-        <Pressable onPress={() => Alert.alert("安全退出", "零代价退出当前环节,确定?", [
+        <Pressable hitSlop={14} onPress={() => Alert.alert("安全退出", "零代价退出当前环节,确定?", [
           { text: "再想想" },
           { text: "退出这轮", onPress: () => sendEvent({ type: "optout" }) },
         ])}>
           <Text style={s.optout}>安全退出</Text>
         </Pressable>
-        <Pressable onPress={async () => {   // 开局拍一张现场:实物清单+场景速写自动进局
+        <Pressable hitSlop={14} onPress={async () => {   // 开局拍一张现场:实物清单+场景速写自动进局
           const perm = await ImagePicker.requestCameraPermissionsAsync();
           if (!perm.granted) return;
           const r = await ImagePicker.launchCameraAsync({ quality: 0.4, base64: true });
@@ -422,33 +529,63 @@ const s = StyleSheet.create({
   finish: { color: "#ffd54a", fontSize: 16, fontWeight: "700", marginVertical: 6 },
   feed: { flex: 1 },
   turn: { marginBottom: 10 },
-  host: { color: "#fff", fontSize: 17, lineHeight: 24, marginBottom: 2 },
-  shown: { color: "#ffd54a", fontSize: 16, marginVertical: 2 },
+  // 历史缩小让路;局长最新一句是屏幕上最大的字(暗光+距离,一眼要能读到)
+  host: { color: "#aab", fontSize: 14, lineHeight: 20, marginBottom: 2 },
+  hostNow: { color: "#fff", fontSize: 23, lineHeight: 32, fontWeight: "700", marginBottom: 2 },
+  shown: { color: "#c9a93e", fontSize: 14, marginVertical: 2 },
+  shownNow: { color: "#ffd54a", fontSize: 18, fontWeight: "600", marginVertical: 2 },
   tableEv: { color: "#99a", fontSize: 13, marginLeft: 8 },
+  duelResultEv: { color: "#ff9a8a", fontSize: 16, fontWeight: "700", marginLeft: 8, marginVertical: 2 },
+  // 「现在该我干嘛」状态条:全屏最亮的一块,抬眼即中
+  cueBar: { backgroundColor: "#ffd54a", borderRadius: 12, paddingVertical: 12,
+    paddingHorizontal: 14, marginVertical: 6 },
+  cueText: { color: "#1a1408", fontSize: 19, fontWeight: "800" },
+  // 公开随机结果的「开签」卡:不混进对话流
+  pickCard: { backgroundColor: "#33290e", borderColor: "#ffd54a", borderWidth: 1,
+    borderRadius: 10, paddingVertical: 8, paddingHorizontal: 12, marginVertical: 4, marginLeft: 4 },
+  pickLabel: { color: "#c9a93e", fontSize: 12, marginBottom: 2 },
+  pickValue: { color: "#ffd54a", fontSize: 22, fontWeight: "800" },
+  // 骰面点阵(私件暗骰揭晓)
+  diceLabel: { color: "#c9b8ff", fontSize: 13, marginTop: 4 },
+  diceRow: { flexDirection: "row", alignItems: "center", gap: 10, marginVertical: 6 },
+  die: { width: 56, height: 56, borderRadius: 12, backgroundColor: "#f4f1e6",
+    flexDirection: "row", flexWrap: "wrap", padding: 6 },
+  pipCell: { width: "33.33%", height: "33.33%", alignItems: "center", justifyContent: "center" },
+  pip: { width: 10, height: 10, borderRadius: 5, backgroundColor: "#1c1c24" },
+  diceSum: { color: "#fff", fontSize: 24, fontWeight: "800" },
   inboxBox: { backgroundColor: "#2a2438", borderRadius: 12, padding: 10, marginVertical: 6,
     borderWidth: 1, borderColor: "#5a4a8a" },
   inboxTitle: { color: "#c9b8ff", fontSize: 12, marginBottom: 4 },
-  inboxItem: { color: "#fff", fontSize: 16, marginVertical: 1 },
+  inboxItem: { color: "#fff", fontSize: 17, lineHeight: 23, marginVertical: 1 },
   askBox: { backgroundColor: "#1e2a38", borderRadius: 12, padding: 10, marginVertical: 6 },
+  askBoxMe: { borderWidth: 2, borderColor: "#ffd54a" },
   askText: { color: "#cde", fontSize: 15, marginBottom: 6 },
+  askTextMe: { color: "#fff", fontSize: 18, fontWeight: "700", marginBottom: 6 },
   row: { flexDirection: "row", gap: 8, marginVertical: 5, alignItems: "center" },
-  optBtn: { backgroundColor: "#31506e", borderRadius: 10, paddingVertical: 8, paddingHorizontal: 14 },
-  optText: { color: "#fff", fontSize: 15 },
-  sigBtn: { flex: 1, borderRadius: 12, paddingVertical: 14, alignItems: "center" },
+  optBtn: { backgroundColor: "#31506e", borderRadius: 10, paddingVertical: 8,
+    paddingHorizontal: 14, minHeight: 44, justifyContent: "center" },
+  optText: { color: "#fff", fontSize: 16 },
+  sigBtn: { flex: 1, borderRadius: 12, paddingVertical: 14, alignItems: "center",
+    minHeight: 48, justifyContent: "center" },
   sigText: { color: "#fff", fontSize: 16, fontWeight: "700" },
-  sayBtn: { backgroundColor: "#31506e", borderRadius: 10, padding: 12 },
-  optout: { color: "#556", fontSize: 12, textAlign: "center", marginVertical: 8 },
+  sayBtn: { backgroundColor: "#31506e", borderRadius: 10, padding: 12,
+    minHeight: 48, justifyContent: "center" },
+  optout: { color: "#667", fontSize: 13, textAlign: "center", marginVertical: 8 },
   photoBtn: { backgroundColor: "#4a3a10", borderColor: "#ffd54a", borderWidth: 1,
     borderRadius: 12, padding: 12, marginVertical: 6 },
-  photoText: { color: "#ffd54a", fontSize: 16, fontWeight: "700" },
+  photoText: { color: "#ffd54a", fontSize: 17, fontWeight: "700" },
   photoSub: { color: "#bb9", fontSize: 12, marginTop: 2 },
   photoActionBtn: { flex: 1, backgroundColor: "#ffd54a", borderRadius: 10,
-    paddingVertical: 10, alignItems: "center" },
+    paddingVertical: 10, alignItems: "center", minHeight: 44, justifyContent: "center" },
   photoActionText: { color: "#222", fontSize: 15, fontWeight: "700" },
-  settleBox: { backgroundColor: "#20242c", borderRadius: 12, padding: 10, marginVertical: 6,
+  settleBox: { backgroundColor: "#20242c", borderRadius: 12, padding: 12, marginVertical: 6,
     borderWidth: 1, borderColor: "#ffd54a" },
-  duelVs: { color: "#fff", fontSize: 26, fontWeight: "800", marginBottom: 30 },
-  duelWait: { color: "#eee", fontSize: 20, marginBottom: 8 },
+  settleTitle: { color: "#ffd54a", fontSize: 18, fontWeight: "800", marginBottom: 6 },
+  settleTop: { color: "#ffd54a", fontSize: 24, fontWeight: "800", marginVertical: 2 },
+  settleItem: { color: "#fff", fontSize: 19, marginVertical: 2 },
+  duelVs: { color: "#fff", fontSize: 30, fontWeight: "800", marginBottom: 30 },
+  duelWait: { color: "#fff", fontSize: 24, fontWeight: "700", marginBottom: 10 },
+  duelHint: { color: "#c7ccda", fontSize: 16 },
   drawBtn: { backgroundColor: "#ffd54a", width: 260, height: 260, borderRadius: 130,
     alignItems: "center", justifyContent: "center" },
   drawText: { fontSize: 80, fontWeight: "900", color: "#7a1010" },
