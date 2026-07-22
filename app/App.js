@@ -11,13 +11,19 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Audio } from "expo-av";
-import * as FileSystem from "expo-file-system";
+// SDK 54 起 "expo-file-system" 主入口的 readAsStringAsync 等只是会抛异常的存根
+// (官方迁移到 File/Directory 类)。录音判定与视频抽帧都靠它读 base64——走 legacy
+// 入口才是真实现,EncodingType 也只在这条线上导出。
+import * as FileSystem from "expo-file-system/legacy";
 import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
 import { useKeepAwake } from "expo-keep-awake";
 import * as VideoThumbnails from "expo-video-thumbnails";
 
 const POLL_MS = 900;
+// 上次入座用的服务器/座位/房间。局域网地址这种东西每开一次 App 重敲一遍没人受得了,
+// 何况派对现场手忙脚乱。存本机,下次进来直接填好,改了照样能改。
+const PREFS = FileSystem.documentDirectory + "yappa-last.json";
 
 // —— 骰子回执识别 ——
 // 私件是纯字符串:服务端 route_private 把 random 私密摇的载荷(display/value/picked)
@@ -96,6 +102,22 @@ export default function App() {
   const [recording, setRecording] = useState(null); // 录音判定进行中的 Recording 对象
   const prevRef = useRef({ inbox: 0, drawn: false });
   const feedRef = useRef(null); // 局长最新一句永远滚到眼前(手机举得远,不能靠手扒)
+
+  // 开 App 就把上次填过的回填进来(没存过=首次,静默略过)
+  useEffect(() => {
+    (async () => {
+      try {
+        const p = JSON.parse(await FileSystem.readAsStringAsync(PREFS));
+        if (p.base) setBase(p.base);
+        if (p.me) setMe(p.me);
+        if (p.room) setRoom(p.room);
+      } catch (e) { /* 首次开、或文件坏了:当没存过 */ }
+    })();
+  }, []);
+  // 只在真的入座/开局成功后才记——失败的地址记下来只会next次继续错
+  const remember = (b, m, r) =>
+    FileSystem.writeAsStringAsync(PREFS, JSON.stringify({ base: b, me: m, room: r }))
+      .catch(() => {});
 
   // 录音判定(judge.audio):按一下录、再按一下交卷;裁判在服务端(接 key 即通)
   const toggleRecord = async () => {
@@ -190,7 +212,8 @@ export default function App() {
           {creating ? (
             <>
               <TextInput style={s.input} placeholder="座位名(逗号分隔,至少2个,如 疯子明,小静)"
-                placeholderTextColor="#667" value={seats} onChangeText={setSeats} />
+                placeholderTextColor="#667" autoCapitalize="none" autoCorrect={false}
+                value={seats} onChangeText={setSeats} />
               <View style={s.row}>
                 <TextInput style={[s.input, { flex: 1 }]} placeholder="时长(分钟)"
                   placeholderTextColor="#667" keyboardType="number-pad"
@@ -237,6 +260,7 @@ export default function App() {
                     Alert.alert("房间码", `本桌房间码:${res.room_code}\n发给其他人,入座时填这个`);
                   }
                   setMe(seatList[0]); setJoined(true); setCreating(false);
+                  remember(base, seatList[0], res.room_code || "");
                 } catch (e) {
                   Alert.alert("连不上", String(e.message));
                 } finally {
@@ -251,8 +275,11 @@ export default function App() {
             </>
           ) : (
             <>
+              {/* 座位名要跟服务端花名册逐字相等——自动更正/首字母大写会把 Jing 改成
+                  King 这种,玩家看屏幕是对的却一直入座失败,必须关掉 */}
               <TextInput style={s.input} placeholder="你的座位名(开局时定的)"
-                placeholderTextColor="#667" value={me} onChangeText={setMe} />
+                placeholderTextColor="#667" autoCapitalize="none" autoCorrect={false}
+                value={me} onChangeText={setMe} />
               <TextInput style={s.input} placeholder="房间码(如 A7QK;只有一桌可留空)"
                 placeholderTextColor="#667" autoCapitalize="characters" autoCorrect={false}
                 value={room} onChangeText={(t) => setRoom(t.trim().toUpperCase())} />
@@ -262,6 +289,7 @@ export default function App() {
                   const v = await api("/api/view?player=" + encodeURIComponent(me.trim()));
                   if (v.error) { Alert.alert("入座失败", v.error); return; }
                   setMe(me.trim()); setJoined(true);
+                  remember(base, me.trim(), room);
                 } catch (e) { Alert.alert("连不上", String(e.message)); }
               }}>
                 <Text style={s.bigBtnText}>入座</Text>
