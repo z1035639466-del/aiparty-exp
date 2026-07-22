@@ -23,3 +23,12 @@
 ## 演进
 MVP 全序列帧+实录声震+结果先行 → 验证道具时刻价值 → V2 仅骰子上真物理 →
 其余停在序列帧，预算归生成质量与音效震动。
+
+## 栈修订 · Expo 结论（2026-07-22）
+Expo 全链路可行，无需换栈：
+- 序列帧/Lottie、expo-sensors（摇盅）、expo-haptics（离散脉冲覆盖全部震动规格）、
+  expo-av（实录音效）、expo-screen-capture（偷看防截屏）——MVP 全绿。
+- 实时 3D 骰子：expo-gl + react-three-fiber + cannon-es 可做（≈原生 85% 质感）；
+  更优后手 = Cycles 预渲 20 组收敛到不同点数的滚动序列帧，按结果先行挑段播放——
+  保真度最高且零引擎依赖。
+- CoreHaptics 高级曲线仅在需要 AHAP 时经 EAS prebuild 加原生模块，非墙。
