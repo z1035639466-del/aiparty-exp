@@ -257,6 +257,9 @@ class Session:
         prop = self.state.props.get(me)
         if not prop or prop.get("kind") != "骰盅":
             return {"ok": False, "error": "你手上没有骰盅,等局长发"}
+        if prop.get("challenged_by"):
+            # 开牌后全桌盅锁定:点数就是清算的证据,开了牌还许摇等于让人当庭改口供
+            return {"ok": False, "error": "已开牌,全桌骰盅锁定(等局长清算,收盅/重发后再摇)"}
         if prop.get("rolled") is not None:
             return {"ok": False, "error": "这盅已经摇过了(一盅一摇;想重摇得局长重发)"}
         count = int(prop.get("count", 5))
@@ -269,6 +272,40 @@ class Session:
         # 公开事件面只留动作、不留点数:主持从 events 看谁摇了、齐了开吹牛;旁人 view 也只见动作
         self.engine.push_event({"type": "roll", "player": me})
         return {"ok": True, "rolled": True, "count": count}
+
+    def challenge(self, me: str, bid: dict | None = None) -> dict:
+        """玩家拍「开牌!」——大话骰唯一进系统的判定时刻(与快枪手的「拔」同类)。须持 self.lock 调用。
+
+        宪法:叫价博弈永远留在嘴上不进系统;唯独开牌是判定时刻,做成按钮。
+        条件:本人持已摇的骰盅才可开(没盅/没摇驳回);一局一开——桌上已有未清算的
+        开牌(局长还没 prop.cancel/重发)时再开驳回。可选 bid={count,face} 是被开的
+        那口叫价(桌上本来就是喊出来的,公开不泄密;越界钳到 count 1–30 / face 1–6)。
+        效果:公开 challenge 事件进事件流(局长与全桌可见,局长配对账信道点数即可清算);
+        全桌骰盅立「已开牌」标(challenged_by/bid)并锁定不可再摇——点数即证据,
+        解锁靠局长清算后收盅/重发。
+        """
+        prop = self.state.props.get(me)
+        if not prop or prop.get("kind") != "骰盅":
+            return {"ok": False, "error": "你手上没有骰盅,开不了牌"}
+        if prop.get("rolled") is None:
+            return {"ok": False, "error": "你的盅还没摇,摇了才有资格开牌"}
+        if any(pr.get("challenged_by") for pr in self.state.props.values()):
+            return {"ok": False, "error": "这一口已经有人开过牌了,等局长清算(收盅/重发后才能再开)"}
+        clean = None
+        if isinstance(bid, dict) and bid:
+            try:  # 叫价钳制:count 1–30(全桌颗数上限量级)、face 1–6;解析不了当没带
+                clean = {"count": max(1, min(30, int(bid.get("count", 1)))),
+                         "face": max(1, min(6, int(bid.get("face", 1))))}
+            except (TypeError, ValueError):
+                clean = None
+        for pr in self.state.props.values():
+            pr["challenged_by"] = me
+            pr["bid"] = clean
+        ev = {"type": "challenge", "player": me}
+        if clean:
+            ev["bid"] = dict(clean)   # 「⚡ 甲开牌!(叫价:3个6)」——各面按此渲染
+        self.engine.push_event(ev)
+        return {"ok": True, "challenged": True, "bid": clean}
 
     def judge_photo(self, player: str, image_b64: str | None, media_type: str | None,
                      frames: list[str] | None = None) -> dict:
@@ -462,6 +499,10 @@ class Session:
                         item["note"] = "跟主持说了句话"      # 听得见有人开口,听不见内容
                     elif e.get("text"):
                         item["text"] = e["text"]
+                elif e.get("type") == "challenge":
+                    # 开牌是全场判定时刻:谁开的+被开那口叫价都是公开信息(桌上喊出来的)
+                    if e.get("bid"):
+                        item["bid"] = e["bid"]
                 elif e.get("value"):
                     item["value"] = e["value"]
                 table.append(item)
@@ -486,12 +527,21 @@ class Session:
             "scores": digest.get("scores"), "scene_objects": digest.get("scene_objects"),
             "now_playing": digest.get("now_playing"),   # 手机上要显示正在放的歌
             "timer_running": digest.get("timer_running"),
-            # 我自己的骰盅:rolled(点数)只给本人——摇过常驻显示,大话骰全程盯着吹牛
+            # 我自己的骰盅:rolled(点数)只给本人——摇过常驻显示,大话骰全程盯着吹牛。
+            # 开牌后带 challenged_by/bid(App 据此显示"已开牌,等局长清算")
             "my_prop": ({"kind": me_prop["kind"], "count": me_prop["count"],
-                         "rolled": me_prop.get("rolled")}
+                         "rolled": me_prop.get("rolled"),
+                         **({"challenged_by": me_prop["challenged_by"],
+                             "bid": me_prop.get("bid")}
+                            if me_prop.get("challenged_by") else {})}
                         if (me_prop := self.state.props.get(me)) else None),
-            # 全桌骰盅状态:谁有盅、摇没摇(布尔)——旁人看得到动作,看不到点数
-            "cups": [{"player": p, "rolled": pr.get("rolled") is not None}
+            # 全桌骰盅状态:谁有盅、摇没摇(布尔)——旁人看得到动作,看不到点数。
+            # 开牌标(challenged_by/bid)是公开信息(桌上拍桌喊出来的),全桌可见——
+            # App 轮询见它从无到有就放「⚡ 开牌!」横幅+重触感;点数依旧不出本人。
+            "cups": [{"player": p, "rolled": pr.get("rolled") is not None,
+                      **({"challenged_by": pr["challenged_by"],
+                          "bid": pr.get("bid")}
+                         if pr.get("challenged_by") else {})}
                      for p, pr in self.state.props.items()],
             "inbox": self.inbox.get(me, [])[-8:],          # 只有自己的
             "open_ask": ({"prompt": ask["prompt"], "asked": ask["asked"],
@@ -821,6 +871,14 @@ class Handler(BaseHTTPRequestHandler):
                     # 点数绝不能明文进事件流(那样就等于局长替玩家摇了)。
                     with s.lock:
                         out = s.roll_cup(ev.get("player"))
+                    self._json(200 if out.get("ok") else 409, out)
+                    return
+                if ev.get("type") == "challenge":
+                    # 开牌是判定时刻(与快枪手的「拔」同类),不是普通事件:走 challenge
+                    # 校验(持已摇盅、一局一开)+ 锁全桌盅 + 公开事件。叫价博弈本身
+                    # 永远留在嘴上不进系统(宪法),这里只收「谁开的+被开那口叫价」。
+                    with s.lock:
+                        out = s.challenge(ev.get("player"), ev.get("bid"))
                     self._json(200 if out.get("ok") else 409, out)
                     return
                 with s.lock:

@@ -52,10 +52,13 @@ class GameState:
     # 私件挂账:发出去的额头牌/私发任务(只记 holder+档,不记内容——digest 是半公开面)。
     # 实测:额头牌发完就沉底,"从头到尾没有被使用或提及规则"。
     private_out: list = field(default_factory=list)
-    # 骰盅道具(prop.dice_cup):{player: {kind:"骰盅", count:int, rolled: None|[点数]}}。
+    # 骰盅道具(prop.dice_cup):{player: {kind:"骰盅", count:int, rolled: None|[点数],
+    # challenged_by?: str, bid?: {count,face}|None}}。
     # 局长只发盅(公开可见:桌上都知道谁有盅),点数由玩家自己在 App 上摇——
     # 玩的动作留在玩家手里(房主原则:局长不替玩家玩)。每人同时最多一只盅,
     # 重复发=换新盅重置(rolled 归 None)。点数不进 digest 公共面,只走本人私件+局长对账信道。
+    # 开牌(玩家拍「开牌!」按钮,type=challenge):全桌盅立 challenged_by/bid 标并锁定
+    # 不可再摇(点数即证据);一局一开,解锁靠局长清算后 prop.cancel/重发(标随盅清)。
     props: dict = field(default_factory=dict)
     settled: dict[str, int] = field(default_factory=dict)  # 已清账累计口数(清账制的另一半)
     discards: list[dict] = field(default_factory=list)  # 主动弃牌留痕:弃牌≠用牌
@@ -89,8 +92,12 @@ class GameState:
             "private_out": list(self.private_out),
             # 骰盅挂账(公共面):谁有盅、几颗、摇没摇——点数不进这里(只走本人私件+局长对账信道),
             # 不然 digest 是半公开面,点数一进来大话骰就没得吹了。
+            # 开牌标(challenged_by)公开挂上(桌上拍桌喊的,不泄密)——challenge 事件只出现
+            # 一拍,主持后续拍凭这里知道这一口还没清算完。
             "dice_cups": [{"player": p, "count": pr.get("count"),
-                           "rolled": pr.get("rolled") is not None}
+                           "rolled": pr.get("rolled") is not None,
+                           **({"challenged_by": pr["challenged_by"]}
+                              if pr.get("challenged_by") else {})}
                           for p, pr in self.props.items()],
         }
 

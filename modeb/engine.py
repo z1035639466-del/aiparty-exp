@@ -235,10 +235,18 @@ class Engine:
         cups = {p: pr["rolled"] for p, pr in self.state.props.items()
                 if pr.get("rolled") is not None}
         if cups:
-            upstream = [{"type": "dice_cup_ledger",
-                         "note": "各人骰盅已摇出的点数(玩家自己摇的,仅你对账可见;"
-                                 "别念点数,开牌结算才亮)",
-                         "points": cups}] + upstream
+            ledger = {"type": "dice_cup_ledger",
+                      "note": "各人骰盅已摇出的点数(玩家自己摇的,仅你对账可见;"
+                              "别念点数,开牌结算才亮)",
+                      "points": cups}
+            # 开牌标随对账信道每拍照亮(challenge 事件只出现一拍,这条留到局长收盅):
+            # 清算拍谁开的+被开叫价+真点数一屏齐,不用翻旧拍也不用问玩家。
+            ch = next((pr for pr in self.state.props.values()
+                       if pr.get("challenged_by")), None)
+            if ch:
+                ledger["challenge"] = {"challenged_by": ch["challenged_by"],
+                                       "bid": ch.get("bid")}
+            upstream = [ledger] + upstream
         t_decide = time.time()
         try:
             decision = self.driver.decide(digest, upstream)

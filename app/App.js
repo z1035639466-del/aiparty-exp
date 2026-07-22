@@ -43,18 +43,21 @@ const parseDice = (item) => {
 const PIP_MAP = {
   1: [4], 2: [2, 6], 3: [2, 4, 6], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8],
 };
-function Die({ n }) {
+function Die({ n, mini }) {
   const pips = PIP_MAP[n] || [];
   return (
-    <View style={s.die}>
+    <View style={[s.die, mini && s.dieMini]}>
       {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
         <View key={i} style={s.pipCell}>
-          {pips.includes(i) ? <View style={s.pip} /> : null}
+          {pips.includes(i) ? <View style={[s.pip, mini && s.pipMini]} /> : null}
         </View>
       ))}
     </View>
   );
 }
+
+// 叫价文案:{count:3, face:6} → 「(叫价:3个6)」;没带叫价就空串
+const fmtBid = (bid) => (bid && bid.count && bid.face ? `(叫价:${bid.count}个${bid.face})` : "");
 
 // 揭晓感:压 250ms 再弹开(spring 缩放),配一次触感——只在私件首次挂上来时放,
 // 轮询重渲不重放(靠父级稳定 key 保证只挂载一次)。
@@ -89,7 +92,68 @@ function DiceReveal({ dice }) {
 const SHAKE_G = 1.28;      // 加速度模长(单位 g)离 1g 的偏移超此值算一次晃
 const SHAKE_MIN = 3;       // 摇够几次脉冲才让扣盅(仪式对齐大话骰:摇几下再开)
 const SHAKE_GAP_MS = 170;  // 两次脉冲最小间隔,防一次甩动被数成好几下
-function DiceCup({ prop, rolling, onRoll }) {
+
+// —— 「开牌!」(challenge)——
+// 宪法:叫价博弈永远留在嘴上;唯独开牌是判定时刻,做成按钮。手感选**长按 600ms**
+// (不走二次确认弹窗):拍桌喊开是一个「按住发力」的动作,长按比对话框更像它,
+// 且天然防误触——短按只轻震提示,不发事件。长按成立后重触感,弹出快速叫价
+// (count 1-10 快拨、10+ 连点递增到 30;face 骰面点选;可跳过=不带 bid)。
+function ChallengeControl({ onChallenge }) {
+  const [picking, setPicking] = useState(false); // 长按成立后进入叫价快选
+  const [cnt, setCnt] = useState(null);
+  const [face, setFace] = useState(null);
+  if (!picking) {
+    return (
+      <Pressable style={s.challengeBtn} delayLongPress={600}
+        onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+        onLongPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); // 拍桌那一下
+          setPicking(true);
+        }}>
+        <Text style={s.challengeBtnText}>⚡ 开牌!</Text>
+        <Text style={s.challengeBtnHint}>长按拍桌喊开</Text>
+      </Pressable>
+    );
+  }
+  const ready = cnt && face;
+  return (
+    <View style={s.bidBox}>
+      <Text style={s.bidLabel}>被开的那口叫到几个几?(桌上喊过的;不记得可跳过)</Text>
+      <View style={s.bidRow}>
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+          <Pressable key={n} style={[s.bidChip, cnt === n && s.bidChipOn]} onPress={() => setCnt(n)}>
+            <Text style={cnt === n ? s.bidChipTextOn : s.bidChipText}>{n}</Text>
+          </Pressable>
+        ))}
+        <Pressable style={[s.bidChip, cnt > 10 && s.bidChipOn]}
+          onPress={() => setCnt(cnt && cnt >= 10 ? Math.min(30, cnt + 1) : 11)}>
+          <Text style={cnt > 10 ? s.bidChipTextOn : s.bidChipText}>{cnt > 10 ? cnt : "10+"}</Text>
+        </Pressable>
+      </View>
+      <View style={s.bidRow}>
+        {[1, 2, 3, 4, 5, 6].map((f) => (
+          <Pressable key={f} style={[s.bidDieWrap, face === f && s.bidDieOn]} onPress={() => setFace(f)}>
+            <Die n={f} mini />
+          </Pressable>
+        ))}
+      </View>
+      <Pressable style={[s.challengeGo, !ready && s.rollBtnDim]} disabled={!ready}
+        onPress={() => onChallenge({ count: cnt, face })}>
+        <Text style={s.challengeGoText}>{ready ? `⚡ 开!(${cnt}个${face})` : "点选几个几,或跳过"}</Text>
+      </Pressable>
+      <View style={s.row}>
+        <Pressable style={s.bidSkip} onPress={() => onChallenge(null)}>
+          <Text style={s.bidSkipText}>跳过叫价直接开</Text>
+        </Pressable>
+        <Pressable style={s.bidSkip} onPress={() => { setPicking(false); setCnt(null); setFace(null); }}>
+          <Text style={s.bidSkipText}>算了,不开</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+function DiceCup({ prop, rolling, onRoll, onChallenge }) {
   const { count, rolled } = prop;
   const [faces, setFaces] = useState(() => Array.from({ length: count }, () => 1));
   const [shakes, setShakes] = useState(0);
@@ -99,7 +163,8 @@ function DiceCup({ prop, rolling, onRoll }) {
   const settleTimer = useRef(null);
   const rollRef = useRef(onRoll);
   rollRef.current = onRoll;                 // 始终指向最新 onRoll,自动扣盅时不吃旧闭包
-  const armed = !rolled && !rolling;        // 持未摇盅且没在扣盅动画里:该订阅传感器
+  const challengedBy = prop.challenged_by;  // 有人开牌:全桌盅锁定,摇的入口一并撤下
+  const armed = !rolled && !rolling && !challengedBy; // 持未摇盅、没在扣、没被开:才订阅传感器
 
   // 骰面快速乱翻(哗啦哗啦的感觉):摇动脉冲时、脚本兜底 rolling 时都用它
   const tumble = () => setFaces(Array.from({ length: count }, () => 1 + Math.floor(Math.random() * 6)));
@@ -146,7 +211,8 @@ function DiceCup({ prop, rolling, onRoll }) {
     return () => clearInterval(iv);
   }, [rolling, count]);
 
-  // 摇过的盅:常驻显示自己的点数(大话骰全程要盯着自己的骰吹牛,不能摇完就没了)
+  // 摇过的盅:常驻显示自己的点数(大话骰全程要盯着自己的骰吹牛,不能摇完就没了)。
+  // 骰面旁常驻「开牌!」入口(醒目但次于摇/扣主流程);被开后换成"等局长清算"。
   if (rolled) {
     const sum = rolled.reduce((a, b) => a + b, 0);
     return (
@@ -156,6 +222,21 @@ function DiceCup({ prop, rolling, onRoll }) {
           {rolled.map((n, i) => <Die key={i} n={n} />)}
           {rolled.length > 1 ? <Text style={s.diceSum}>Σ{sum}</Text> : null}
         </View>
+        {challengedBy ? (
+          <Text style={s.challengedNote}>⚡ {challengedBy} 开牌了{fmtBid(prop.bid)}——已开牌,等局长清算</Text>
+        ) : (
+          <ChallengeControl onChallenge={onChallenge} />
+        )}
+      </View>
+    );
+  }
+
+  // 没摇就被开了牌(别人拍了开牌):盅锁定,摇的入口撤下,只留状态
+  if (challengedBy) {
+    return (
+      <View style={s.cupBox}>
+        <Text style={s.cupTitle}>🎲 骰盅 · {count} 颗</Text>
+        <Text style={s.challengedNote}>⚡ {challengedBy} 开牌了{fmtBid(prop.bid)}——骰盅已锁,等局长清算</Text>
       </View>
     );
   }
@@ -204,7 +285,8 @@ export default function App() {
   const [dueled, setDueled] = useState(false); // 本次对决我开过枪了
   const [rolling, setRolling] = useState(false); // 骰盅扣盅动画进行中(挡重复扣)
   const [recording, setRecording] = useState(null); // 录音判定进行中的 Recording 对象
-  const prevRef = useRef({ inbox: 0, drawn: false });
+  const [challengeFlash, setChallengeFlash] = useState(null); // 「⚡ 开牌!」全屏横幅(1.6s 自动散)
+  const prevRef = useRef({ inbox: 0, drawn: false, challenged: false });
   const feedRef = useRef(null); // 局长最新一句永远滚到眼前(手机举得远,不能靠手扒)
 
   // 开 App 就把上次填过的回填进来(没存过=首次,静默略过)
@@ -292,6 +374,15 @@ export default function App() {
     setTimeout(() => setRolling(false), 520);
   };
 
+  // 开牌:长按「开牌!」成立后到这儿发 challenge 事件(bid=被开那口叫价,可为 null)。
+  // 校验在服务端(持已摇盅、一局一开),驳回原话弹出来;全桌的感知走轮询里的 cups。
+  const sendChallenge = async (bid) => {
+    try {
+      const res = await api("/api/event", { type: "challenge", player: me, ...(bid ? { bid } : {}) });
+      if (res && res.error) Alert.alert("开不了牌", res.error);
+    } catch (e) { setErr("开牌没发出去,再按一次"); }
+  };
+
   // —— 轮询自己的视图 ——
   useEffect(() => {
     if (!joined) return;
@@ -309,7 +400,16 @@ export default function App() {
         if (inDuel && v.duel.drawn && !prev.drawn)
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);             // 枪响!
         if (!v.duel) setDueled(false);
-        prevRef.current = { inbox: (v.inbox || []).length, drawn: !!(v.duel && v.duel.drawn) };
+        // 开牌感知(全桌):cups 里 challenged_by 从无到有 = 有人拍桌开牌——
+        // 重触感一下 + 全屏「⚡ 开牌!」横幅短暂压场(1.6s 自动散,不拦操作)
+        const chCup = (v.cups || []).find((c) => c.challenged_by);
+        if (chCup && !prev.challenged) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          setChallengeFlash({ by: chCup.challenged_by, bid: chCup.bid });
+          setTimeout(() => setChallengeFlash(null), 1600);
+        }
+        prevRef.current = { inbox: (v.inbox || []).length,
+          drawn: !!(v.duel && v.duel.drawn), challenged: !!chCup };
         setView(v);
       } catch (e) { if (alive) setErr("连不上服务器:" + e.message); }
     };
@@ -509,7 +609,16 @@ export default function App() {
       {myCue ? <View style={s.cueBar}><Text style={s.cueText}>{myCue}</Text></View> : null}
 
       {/* 骰盅道具卡:局长发盅、玩家自己摇——常驻在 feed 之上,大话骰全程盯着自己的骰吹牛 */}
-      {v.my_prop ? <DiceCup prop={v.my_prop} rolling={rolling} onRoll={rollCup} /> : null}
+      {v.my_prop ? <DiceCup prop={v.my_prop} rolling={rolling} onRoll={rollCup}
+        onChallenge={sendChallenge} /> : null}
+
+      {/* 「⚡ 开牌!」全屏横幅:短暂压场(1.6s),pointerEvents=none 不拦任何操作 */}
+      {challengeFlash ? (
+        <View pointerEvents="none" style={s.challengeFlash}>
+          <Text style={s.challengeFlashText}>⚡ 开牌!</Text>
+          <Text style={s.challengeFlashSub}>{challengeFlash.by} 开了{fmtBid(challengeFlash.bid)}</Text>
+        </View>
+      ) : null}
 
       <ScrollView style={s.feed} contentContainerStyle={{ paddingBottom: 12 }}
         ref={feedRef}
@@ -534,6 +643,10 @@ export default function App() {
                 if (e.type === "roll")
                   return ( // 谁摇了骰盅:公开面只见动作、不见点数(点数只在本人手机+局长对账)
                     <Text key={j} style={s.rollEv}>🎲 {e.player} 摇了骰盅</Text>
+                  );
+                if (e.type === "challenge")
+                  return ( // 开牌是全场判定时刻:谁开的+被开叫价公开(桌上喊出来的)
+                    <Text key={j} style={s.challengeEv}>⚡ {e.player} 开牌!{fmtBid(e.bid)}</Text>
                   );
                 if (e.value !== undefined && e.value !== null && e.type !== "say")
                   return ( // 公开随机(random.pick 之类)的结果:开签样式,不混进对话流
@@ -721,6 +834,40 @@ const s = StyleSheet.create({
   rollBtnDim: { backgroundColor: "#6a5f3a" },
   rollBtnText: { color: "#241a05", fontSize: 24, fontWeight: "900" },
   rollEv: { color: "#c9b8ff", fontSize: 14, fontWeight: "600", marginLeft: 8, marginVertical: 2 },
+  // 「开牌!」:醒目但次于摇/扣主流程(描边幽灵款,不与黄色主按钮抢);长按 600ms 触发
+  challengeBtn: { borderColor: "#ff9a5a", borderWidth: 2, borderRadius: 14,
+    paddingVertical: 10, paddingHorizontal: 36, marginTop: 10, alignItems: "center",
+    minHeight: 52, justifyContent: "center" },
+  challengeBtnText: { color: "#ff9a5a", fontSize: 19, fontWeight: "900" },
+  challengeBtnHint: { color: "#a97b5a", fontSize: 11, marginTop: 1 },
+  challengedNote: { color: "#ff9a5a", fontSize: 15, fontWeight: "700", marginTop: 10,
+    textAlign: "center" },
+  challengeEv: { color: "#ff9a5a", fontSize: 16, fontWeight: "800", marginLeft: 8, marginVertical: 2 },
+  // 开牌后的快速叫价面板(count 快拨 + face 骰面点选,可跳过)
+  bidBox: { marginTop: 10, alignSelf: "stretch", alignItems: "center" },
+  bidLabel: { color: "#bbade0", fontSize: 13, marginBottom: 6, textAlign: "center" },
+  bidRow: { flexDirection: "row", flexWrap: "wrap", gap: 6, justifyContent: "center",
+    marginVertical: 4 },
+  bidChip: { backgroundColor: "#3a3350", borderRadius: 8, minWidth: 36, minHeight: 36,
+    alignItems: "center", justifyContent: "center", paddingHorizontal: 8 },
+  bidChipOn: { backgroundColor: "#ffd54a" },
+  bidChipText: { color: "#cbc0e8", fontSize: 16, fontWeight: "700" },
+  bidChipTextOn: { color: "#241a05", fontSize: 16, fontWeight: "900" },
+  bidDieWrap: { borderRadius: 10, padding: 3, borderWidth: 2, borderColor: "transparent" },
+  bidDieOn: { borderColor: "#ffd54a" },
+  challengeGo: { backgroundColor: "#ff9a5a", borderRadius: 14, paddingVertical: 12,
+    paddingHorizontal: 32, marginTop: 8, minHeight: 48, justifyContent: "center" },
+  challengeGoText: { color: "#2a1405", fontSize: 18, fontWeight: "900" },
+  bidSkip: { flex: 1, alignItems: "center", paddingVertical: 8, minHeight: 40,
+    justifyContent: "center" },
+  bidSkipText: { color: "#889", fontSize: 13 },
+  // 全屏「⚡ 开牌!」横幅:压场不拦操作(pointerEvents=none),1.6s 自动散
+  challengeFlash: { position: "absolute", left: 0, right: 0, top: "34%", zIndex: 99,
+    alignItems: "center", backgroundColor: "rgba(20,10,4,0.88)", paddingVertical: 26 },
+  challengeFlashText: { color: "#ff9a5a", fontSize: 52, fontWeight: "900" },
+  challengeFlashSub: { color: "#ffd54a", fontSize: 18, fontWeight: "700", marginTop: 6 },
+  dieMini: { width: 34, height: 34, borderRadius: 7, padding: 4 },
+  pipMini: { width: 6, height: 6, borderRadius: 3 },
   inboxBox: { backgroundColor: "#2a2438", borderRadius: 12, padding: 10, marginVertical: 6,
     borderWidth: 1, borderColor: "#5a4a8a" },
   inboxTitle: { color: "#c9b8ff", fontSize: 12, marginBottom: 4 },
