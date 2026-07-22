@@ -190,6 +190,17 @@ class Session:
                 res["notices"] = f"🔒技能转手私件(已投递 {delivered} 人,内容仅各自可见)"
                 continue
             vis, target = res.get("visibility"), res.get("player")
+            # 批量暗骰(random.dice players=[…]):每人一把独立结果,各投各的。
+            # "🔒🎲"(锁后紧跟骰、无空格)是引擎防伪水印:show 私发走 "🔒 {文案}"
+            # 永远带空格,主持在文案里写 🎲 也伪造不出这个前缀——App 只认水印画骰面,
+            # 模型编的假骰子从此上不了骰面(真机实测抓到过一次)。
+            rolls = res.get("rolls")
+            if vis == "自己看" and isinstance(rolls, dict):
+                for pl, dice in rolls.items():
+                    if pl in self.inbox:
+                        self.inbox[pl].append(f"🔒🎲 {dice}")
+                res["rolls"] = f"🔒批量暗骰(已投递 {len(rolls)} 人,点数仅各自可见)"
+                continue
             # 秘密载荷可能在 display(show)、也可能在 value/picked(random 私密摇)
             field = next((k for k in ("display", "value", "picked") if k in res), None)
             if field is None:
@@ -203,7 +214,11 @@ class Session:
                 # 本来就该看见谁拿到了什么;真实玩家走 /api/view,看不到这个端点。
                 res[field] = f"🔒批量私发(已投递 {len(batch)} 人,内容仅目标可见)"
             elif vis == "自己看" and target:
-                self.inbox[target].append(f"🔒 {secret}")
+                # 单人暗骰同样打防伪水印;show/pick/int 维持带空格的普通锁,水印仿不出
+                if field == "value" and isinstance(secret, list):
+                    self.inbox[target].append(f"🔒🎲 {secret}")
+                else:
+                    self.inbox[target].append(f"🔒 {secret}")
                 res[field] = "🔒私发(已投递,内容仅目标可见)"
             elif vis == "额头" and target:
                 for pl in self.state.players:

@@ -19,24 +19,16 @@ import * as VideoThumbnails from "expo-video-thumbnails";
 
 const POLL_MS = 900;
 
-// —— 骰子回执识别 ——
-// 私件是纯字符串:服务端 route_private 把 random 私密摇的载荷(display/value/picked)
-// 直接 f"🔒 {载荷}" 投进收件箱。骰点两种长相:
-//  ① 载荷本身就是点数——random.int 单骰是 "🔒 4",多骰数组转字符串是 "🔒 [3, 1, 6]";
-//  ② show 私发的文案带"骰"字,如 "🔒 你的暗骰:3、5、2"。
-// ①要求整段除分隔符/括号外只有 1-6 的单个数字(相邻两位数如 "14" 不算,毒杯号 7 以上不算);
-// ②只在出现"骰"字后取数,且全部是 1-6 的单数字才算,避免把普通数字文案误当骰子。
-const PURE_DICE_RE = /^[\[(]?\s*[1-6](?:\s*[,,、;\s]+\s*[1-6]){0,5}\s*[\])]?$/;
+// —— 骰子回执识别(只认引擎防伪水印) ——
+// 服务端 route_private 给 random.dice 的真结果打水印:"🔒🎲 [3, 1, 6]"(锁后紧跟骰、
+// 无空格)。show 私发永远是 "🔒 {文案}" 带空格——局长在文案里自己写 🎲 也伪造不出
+// 这个前缀。因此骰面**只**画水印件:真机实测抓到过局长用 show 编假骰子,从此封死。
+const PURE_DICE_RE = /^[\[(]?\s*[1-6](?:\s*[,,、;\s]+\s*[1-6]){0,9}\s*[\])]?$/;
 const parseDice = (item) => {
   const raw = String(item).trim();
-  const body = raw.replace(/^🔒\s*/u, "").trim();
-  if (body === raw || !body) return null; // 只认 🔒 私发(额头牌 👀 是别人的信息,保持文字)
+  if (!raw.startsWith("🔒🎲")) return null; // 无水印=不是引擎摇的,按普通文字渲染
+  const body = raw.replace(/^🔒🎲\s*/u, "").trim();
   if (PURE_DICE_RE.test(body)) return body.match(/[1-6]/g).map(Number);
-  if (body.includes("骰")) {
-    const toks = body.slice(body.lastIndexOf("骰") + 1).split(/[^0-9]+/).filter(Boolean);
-    if (toks.length >= 1 && toks.length <= 6 && toks.every((t) => /^[1-6]$/.test(t)))
-      return toks.map(Number);
-  }
   return null;
 };
 

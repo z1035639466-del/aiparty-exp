@@ -41,3 +41,15 @@ def test_dice_private_requires_seated_player():
     r2 = ex.execute({"name": "random.dice",
                      "input": {"visibility": "自己看", "player": "路人"}})
     assert not r2["ok"], "不在座的人也能收私骰,遮蔽就漏了"
+
+
+def test_dice_batch_per_player_independent():
+    ex = _ex()
+    r = ex.execute({"name": "random.dice",
+                    "input": {"count": 3, "players": ["甲", "乙", "丙"]}})
+    assert r["ok"], r
+    rolls = r["result"]["rolls"]
+    assert set(rolls) == {"甲", "乙", "丙"}
+    assert all(len(v) == 3 and all(1 <= d <= 6 for d in v) for v in rolls.values())
+    r2 = ex.execute({"name": "random.dice", "input": {"players": ["甲", "路人"]}})
+    assert not r2["ok"], "批量里混不在座者必须整单驳回"

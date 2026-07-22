@@ -406,8 +406,17 @@ class ToolExecutor:
             count = int(a.get("count", 5))
             if not (1 <= count <= 10):
                 raise ClampError(f"random.dice count 须在 1–10,收到: {count}")
+            batch = a.get("players")
+            if batch:
+                # 批量暗骰:一次调用全桌各自摇,每人一把独立结果,互不可见——大话骰
+                # 开局的正确姿势(真机实测:主持受每拍工具上限挤压,被逼一颗一颗发)。
+                bad = [p for p in batch if p not in self.state.players]
+                if bad:
+                    raise ClampError(f"random.dice players 含不在座者: {bad}")
+                rolls = {p: [self.rng.randint(1, 6) for _ in range(count)] for p in batch}
+                return {"rolls": rolls, "players": list(batch), "visibility": "自己看"}
             dice = [self.rng.randint(1, 6) for _ in range(count)]
-            # value 用 list——route_private 会 f-string 成 "[3, 1, 6]",App 端按此画骰面
+            # value 用 list——route_private 打 🎲 防伪水印,App 端只认水印画骰面
             return self._maybe_private({"value": dice}, a)
         raise ClampError(f"random 未知子操作: {name}")
 
