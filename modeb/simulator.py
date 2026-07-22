@@ -76,11 +76,21 @@ class ManualDriver:
         return d
 
 
+# 出厂默认走环境变量,.env 配一次就是全局开关(手机开局不带 provider 时也吃这个)。
+# 不设则沿用原来的 anthropic/sonnet,老行为不变。
+def _default_provider() -> str:
+    return os.environ.get("YAPPA_PROVIDER") or "anthropic"
+
+
+def _default_model() -> str:
+    return os.environ.get("YAPPA_MODEL") or "sonnet"
+
+
 class Session:
     def __init__(self, players: list[str], minutes: int, wildness: int,
                  objects: list[str], driver_kind: str, out_dir: Path,
-                 bots: dict[str, str] | None = None, provider: str = "anthropic",
-                 host_model: str = "sonnet", seat_model: str = "sonnet",
+                 bots: dict[str, str] | None = None, provider: str | None = None,
+                 host_model: str | None = None, seat_model: str | None = None,
                  score_style: str = "自动", host_perception: str = "转写",
                  playlist: list[str] | None = None,
                  occasion: str = "", scene_brief: str = "",
@@ -107,6 +117,9 @@ class Session:
                                    occasion=occasion.strip(), scene_brief=scene_brief.strip())
         self.driver_kind = driver_kind
         # 存局 cfg 用:恢复时按原 cfg 重建驱动/桌友,快照落盘也回读这些
+        provider = provider or _default_provider()
+        host_model = host_model or _default_model()
+        seat_model = seat_model or _default_model()
         self.provider = provider
         self.host_model = host_model
         self.seat_model = seat_model
@@ -537,9 +550,10 @@ class Hub:
             driver_kind=cfg.get("driver", "manual"),
             out_dir=self.out_dir,
             bots=cfg.get("bots") or {},
-            provider=cfg.get("provider", "anthropic"),
-            host_model=cfg.get("host_model", "sonnet"),
-            seat_model=cfg.get("seat_model", "sonnet"),
+            # 不带就落到 Session 的环境变量默认(YAPPA_PROVIDER/YAPPA_MODEL)
+            provider=cfg.get("provider"),
+            host_model=cfg.get("host_model"),
+            seat_model=cfg.get("seat_model"),
             score_style=cfg.get("score_style", "自动"),
             host_perception=cfg.get("host_perception", "转写"),
             playlist=cfg.get("playlist") or [],
@@ -742,27 +756,32 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         try:
             body = self._body()   # 只读一次(rfile 读完即空);room 从 query 或此 body 取
-            if self.path == "/api/start":
+            # 路由只看路径,不看 query。客户端多桌模式会给每个请求挂 ?room=XXXX
+            # (App.js 的 api() 除 /api/start 外一律追加),精确匹配 self.path 会
+            # 让这些请求全部 404——而 GET 侧用的是 startswith,轮询照常。症状就是
+            # 玩家画面一切正常、按什么都没反应,填了房间码的桌子等于全员失声。
+            path = self.path.split("?", 1)[0]
+            if path == "/api/start":
                 self._json(200, self.hub.start(body))
                 return
             s = self._pick(body)
             if s is None:
                 return
-            if self.path == "/api/event":
+            if path == "/api/event":
                 ev = dict(body)
                 ev.pop("room", None)   # room 是路由参数,不进事件流
                 with s.lock:
                     s.engine.push_event(ev)
                 self._json(200, {"queued": ev})
                 return
-            if self.path == "/api/scene":
+            if path == "/api/scene":
                 if not body.get("image_b64"):
                     self._json(400, {"error": "缺 image_b64"})
                     return
                 out = s.scene_photo(body["image_b64"], body.get("media_type"))
                 self._json(200 if "error" not in out else 502, out)
                 return
-            if self.path == "/api/audio":
+            if path == "/api/audio":
                 player = body.get("player")
                 with s.lock:
                     pend = s.state.pending_audio
@@ -782,7 +801,7 @@ class Handler(BaseHTTPRequestHandler):
                         s.engine.push_event(dict(result))
                 self._json(200, {"verdict": result["verdict"], "reason": result["reason"]})
                 return
-            if self.path == "/api/photo":
+            if path == "/api/photo":
                 player = body.get("player")
                 with s.lock:
                     pend = s.state.pending_photo
@@ -814,7 +833,7 @@ class Handler(BaseHTTPRequestHandler):
                         s.engine.push_event(dict(result))
                 self._json(200, {"verdict": result["verdict"], "reason": result["reason"]})
                 return
-            if self.path == "/api/finish":
+            if path == "/api/finish":
                 # 收局必须是一条不经过模型的硬路径:llm 驱动下 UI 的 tool_use 会被丢弃,
                 # 走 /api/turn 收局等于再花一次钱问主持人想干嘛,而且收不掉。
                 with s.lock:
@@ -824,7 +843,7 @@ class Handler(BaseHTTPRequestHandler):
                         persist.clear_snapshot(s)   # 收局清理快照,不留待恢复
                 self._json(200, {"finished": True})
                 return
-            if self.path == "/api/turn":
+            if path == "/api/turn":
                 with s.lock:
                     if s.state.finished:
                         self._json(409, {"error": "局已收"})

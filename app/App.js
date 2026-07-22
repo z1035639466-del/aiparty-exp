@@ -247,12 +247,12 @@ export default function App() {
                     objects: [],
                     driver: "llm",
                     autoplay: true,   // 服务器自驱回合,手机可退到后台/锁屏也不停局
-                    // 千问一家默认(房主定案):一把 DASHSCOPE key 全通,手机开局零输入
-                    provider: "qwen", host_model: "qwen3.7-max", seat_model: "qwen3.6-flash",
                     occasion: occasion.trim(),
                     playlist: playlist.split(",").map((t) => t.trim()).filter(Boolean),
                     bots,
-                    // 主持模型/provider 不填:沿用服务端默认(Hub.start 的 anthropic/sonnet)
+                    // provider/模型一律不带:换家换模型是服务端 .env 的事(YAPPA_PROVIDER/
+                    // YAPPA_MODEL),不该焊在客户端里——焊死过一次(qwen 一家),换中转站
+                    // 就得改 App 重发包。手机只管开局,用哪家由开服务的人决定。
                   });
                   if (res.error) { Alert.alert("开局失败", res.error); return; }
                   if (res.room_code) {
