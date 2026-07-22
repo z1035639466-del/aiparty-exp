@@ -182,22 +182,34 @@ def test_challenge_requires_rolled_cup(tmp_path):
     assert not any(pr.get("challenged_by") for pr in s.state.props.values())
 
 
+def test_challenge_rejected_until_everyone_rolled(tmp_path):
+    """骰子都下锅才能开牌(真机实测:有人没摇完就被开牌,全桌锁死只能等重发)。"""
+    s = _session(tmp_path)
+    s.engine.tools.execute({"name": "prop.dice_cup",
+                            "input": {"players": ["甲", "乙", "丙"], "count": 5}})
+    s.roll_cup("甲")
+    s.roll_cup("乙")   # 丙还没摇:此时开牌必须被拒,且不留任何锁
+    r = s.challenge("甲", {"count": 3, "face": 6})
+    assert r["ok"] is False and "丙" in r["error"]
+    assert not any(pr.get("challenged_by") for pr in s.state.props.values())
+    assert s.roll_cup("丙")["ok"], "被拒的开牌不许妨碍丙补摇"
+
+
 def test_challenge_public_event_and_locks_all_cups(tmp_path):
     s = _session(tmp_path)
     s.engine.tools.execute({"name": "prop.dice_cup",
                             "input": {"players": ["甲", "乙", "丙"], "count": 5}})
     s.roll_cup("甲")
-    s.roll_cup("乙")   # 丙故意不摇:开牌后连没摇的盅也一并锁
+    s.roll_cup("乙")
+    s.roll_cup("丙")
     r = s.challenge("甲", {"count": 3, "face": 6})
     assert r["ok"] and r["bid"] == {"count": 3, "face": 6}
     # 公开事件带谁开的+叫价(局长与全桌可见)
     ev = next(e for e in s.engine.event_queue if e.get("type") == "challenge")
     assert ev["player"] == "甲" and ev["bid"] == {"count": 3, "face": 6}
-    # 全桌盅立「已开牌」标并锁定:没摇的丙也不许再摇
+    # 全桌盅立「已开牌」标并锁定,谁都不许再摇(点数即证据)
     assert all(pr["challenged_by"] == "甲" for pr in s.state.props.values())
-    rl = s.roll_cup("丙")
-    assert rl["ok"] is False and "锁" in rl["error"]
-    # 摇过的也照旧摇不了(锁定优先于"摇过"话术)
+    assert s.roll_cup("丙")["ok"] is False
     assert s.roll_cup("乙")["ok"] is False
     # 局长下一拍:events 里有 challenge,对账信道同拍照亮谁开的+叫价+真点数
     rec = _Recorder()
@@ -224,10 +236,12 @@ def test_second_challenge_rejected_until_cancel_or_redeal(tmp_path):
     s.engine.tools.execute({"name": "prop.dice_cup", "input": {"players": ["甲", "乙"], "count": 3}})
     assert not any(pr.get("challenged_by") for pr in s.state.props.values())
     assert s.roll_cup("乙")["ok"]
+    assert s.roll_cup("甲")["ok"]   # 骰子都下锅才能开牌
     assert s.challenge("乙", None)["ok"]
     # 局长清算路②:不 cancel 直接重发也是换新盅(标随盅清),同样解锁
     s.engine.tools.execute({"name": "prop.dice_cup", "input": {"players": ["甲", "乙"], "count": 3}})
     assert s.roll_cup("甲")["ok"]
+    assert s.roll_cup("乙")["ok"]
     assert s.challenge("甲", None)["ok"]
 
 
@@ -248,10 +262,11 @@ def test_bystander_sees_challenged_by_not_points(tmp_path):
                             "input": {"players": ["甲", "乙", "丙"], "count": 5}})
     s.roll_cup("甲")
     s.roll_cup("乙")
+    s.roll_cup("丙")
     s.challenge("甲", {"count": 3, "face": 6})
     dice_a = s.state.props["甲"]["rolled"]
     dice_b = s.state.props["乙"]["rolled"]
-    # 旁人(丙,自己没摇)视图:challenged_by/bid 公开可见(桌上拍桌喊出来的)
+    # 旁人(丙)视图:challenged_by/bid 公开可见(桌上拍桌喊出来的)
     v = s.player_view("丙")
     cups = {c["player"]: c for c in v["cups"]}
     assert all(c["challenged_by"] == "甲" for c in cups.values())

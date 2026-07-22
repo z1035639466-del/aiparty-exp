@@ -289,6 +289,12 @@ class Session:
             return {"ok": False, "error": "你手上没有骰盅,开不了牌"}
         if prop.get("rolled") is None:
             return {"ok": False, "error": "你的盅还没摇,摇了才有资格开牌"}
+        # 骰子都下锅才算数(真机实测:有人没摇完就被开牌,全桌锁死只能等局长重发)
+        unrolled = [p for p, pr in self.state.props.items()
+                    if pr.get("kind") == "骰盅" and pr.get("rolled") is None]
+        if unrolled:
+            return {"ok": False,
+                    "error": f"还有人没摇完({'、'.join(unrolled)}),骰子都下锅才能开牌"}
         if any(pr.get("challenged_by") for pr in self.state.props.values()):
             return {"ok": False, "error": "这一口已经有人开过牌了,等局长清算(收盅/重发后才能再开)"}
         clean = None
