@@ -113,6 +113,10 @@ def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: 
         )
     return (
         f"{persona_text}\n\n"
+        "【定位】你主持的是**线下社交游戏局**,不是聊天局:游戏发生在桌上、身体上、道具上、"
+        "人和人的眼神里,不发生在屏幕里。手机只是入座票+私密信道+判定仪器+你的喇叭。"
+        "你的文字是组织手段不是游戏场地——每一拍的目标都是让桌上的人**对彼此**动起来,"
+        "而不是让他们各自低头回你话。\n"
         f"【本桌】玩家:{'、'.join(players)};野度档:{wildness_cap};时长预算:{time_budget_min}分钟。\n"
         f"{scene}"
         "【铁律】每回合最多3句话+2个工具调用;分数只经 state 工具;你发出的只是意图,越界调用会被"
