@@ -155,6 +155,38 @@ def scene_cup():
     build_die((6.6,-1.6), math.radians(40), ivory, blk, red)
     lights_and_cam(cam_loc=(4.5, -30, 10.5), cam_target=(1.6, 0, 3.8), fstop=5.5, key_power=3800, lens=60)
 
+def scene_cup_sprite():
+    # 透明底 sprite：无桌布、无配骰，竖版构图，供 App 内做 GPU 变换
+    sc.render.film_transparent = True
+    sc.render.resolution_x = 900
+    sc.render.resolution_y = 1080
+    body = obj_add(bpy.ops.mesh.primitive_cone_add, 'cup',
+                   vertices=96, radius1=4.3, radius2=3.55, depth=9.4, location=(0,0,4.7))
+    shade_smooth(body)
+    mcup = bpy.data.materials.new('cupblack'); mcup.use_nodes = True
+    nt = mcup.node_tree; b = nt.nodes['Principled BSDF']
+    b.inputs['Base Color'].default_value = (0.04,0.04,0.045,1)
+    b.inputs['Roughness'].default_value = 0.5
+    b.inputs['Coat Weight'].default_value = 0.25
+    noise = nt.nodes.new('ShaderNodeTexNoise')
+    noise.inputs['Scale'].default_value = 260; noise.inputs['Detail'].default_value = 6
+    bump = nt.nodes.new('ShaderNodeBump'); bump.inputs['Strength'].default_value = 0.06
+    nt.links.new(noise.outputs['Fac'], bump.inputs['Height'])
+    nt.links.new(bump.outputs['Normal'], b.inputs['Normal'])
+    set_mat(body, mcup)
+    ring = obj_add(bpy.ops.mesh.primitive_torus_add, 'mouthring',
+                   major_radius=4.18, minor_radius=0.22, location=(0,0,0.16),
+                   major_segments=96, minor_segments=24)
+    shade_smooth(ring)
+    mred = mat('feltred', **{'Base Color':(0.30,0.02,0.02,1),'Roughness':0.9,'Sheen Weight':0.8})
+    set_mat(ring, mred)
+    cap = obj_add(bpy.ops.mesh.primitive_cylinder_add, 'cap',
+                  vertices=96, radius=3.72, depth=0.5, location=(0,0,9.55))
+    bevel(cap, w=0.12, seg=4); shade_smooth(cap)
+    set_mat(cap, mcup)
+    lights_and_cam(cam_loc=(2.5, -26, 8.5), cam_target=(0, 0, 4.6),
+                   fstop=11.0, key_power=4200, lens=70)
+
 def metal_mat():
     m = bpy.data.materials.new('gunmetal'); m.use_nodes = True
     b = m.node_tree.nodes['Principled BSDF']
@@ -238,7 +270,7 @@ def scene_revolver():
     lights_and_cam(cam_loc=(-0.9, -3.5, 23.5), cam_target=(-1.5, -0.3, 0.4),
                    fstop=7.0, key_power=3600, lens=45)
 
-{'dice': scene_dice, 'dice_gold': scene_dice_gold, 'cup': scene_cup, 'revolver': scene_revolver}[SCENE]()
+{'dice': scene_dice, 'dice_gold': scene_dice_gold, 'cup': scene_cup, 'cup_sprite': scene_cup_sprite, 'revolver': scene_revolver}[SCENE]()
 sc.render.filepath = OUT
 bpy.ops.render.render(write_still=True)
 print('rendered', SCENE, '->', OUT)
