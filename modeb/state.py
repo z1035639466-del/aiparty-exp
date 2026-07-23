@@ -60,6 +60,10 @@ class GameState:
     # 开牌(玩家拍「开牌!」按钮,type=challenge):全桌盅立 challenged_by/bid 标并锁定
     # 不可再摇(点数即证据);一局一开,解锁靠局长清算后 prop.cancel/重发(标随盅清)。
     props: dict = field(default_factory=dict)
+    # 额头牌状态化(房主裁定 2026-07-23):藏信息是**长在人身上的道具**,不是私件短信。
+    # {player: 牌面内容}——App 端"点这个玩家看他的牌",本人视图里自己那张永远拿不到。
+    # 私件流水里仍留 👀 行(向后兼容),但正解渲染走这里。
+    foreheads: dict = field(default_factory=dict)
     settled: dict[str, int] = field(default_factory=dict)  # 已清账累计口数(清账制的另一半)
     discards: list[dict] = field(default_factory=list)  # 主动弃牌留痕:弃牌≠用牌
     finished: bool = False

@@ -236,6 +236,9 @@ class Session:
                     self.inbox[target].append(f"🔒 {secret}")
                 res[field] = "🔒私发(已投递,内容仅目标可见)"
             elif vis == "额头" and target:
+                # 额头牌=长在人身上的道具:状态化存 foreheads(App 点人看牌),
+                # 私件流水里仍留 👀 行(向后兼容老客户端)
+                self.state.foreheads[target] = str(secret)
                 for pl in self.state.players:
                     if pl != target:
                         self.inbox[pl].append(f"👀 额头·{target}: {secret}")
@@ -565,6 +568,9 @@ class Session:
                           "bid": pr.get("bid")}
                          if pr.get("challenged_by") else {})}
                      for p, pr in self.state.props.items()],
+            # 额头牌=人身上的道具:给出**别人**的牌(点人看牌),自己那张永远缺席——
+            # 可见性反转在服务端成立,客户端天然拿不到自己的词
+            "foreheads": {p: t for p, t in self.state.foreheads.items() if p != me},
             "inbox": self.inbox.get(me, [])[-8:],          # 只有自己的
             "open_ask": ({"prompt": ask["prompt"], "asked": ask["asked"],
                           "options": ask["options"]} if ask else None),  # 不含 answers
