@@ -1,4 +1,4 @@
-// Yappa v0 · 两台手机的真人局客户端(Expo / React Native)
+// ZAKZOK(原代号 Yappa)v0 · 两台手机的真人局客户端(Expo / React Native)
 // 服务端 = 现有引擎 HTTP API(Mac 上 python -m modeb.simulator --lan)。
 // 本客户端只消费 /api/view(自己那台手机该看的)与 /api/event(自己的动作)——
 // 防偷看在服务端成立,客户端天然拿不到别人的底牌。
@@ -444,7 +444,7 @@ export default function App() {
         <StatusBar style="light" />
         <ScrollView contentContainerStyle={[s.center, { flexGrow: 1, paddingVertical: 44 }]}
           keyboardShouldPersistTaps="handled">
-          <Text style={s.logo}>Yappa</Text>
+          <Text style={s.logo}>ZAKZOK</Text>
           <Text style={s.dim}>{creating ? "开一局新的" : "局长在等你入座"}</Text>
           {(!DEFAULT_SERVER || showServer) ? (
             <TextInput style={s.input} placeholder="服务器,如 http://192.168.1.5:8747"
