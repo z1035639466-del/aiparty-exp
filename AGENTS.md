@@ -1,3 +1,16 @@
+# 产品铁律(先读这个,再谈工程)
+
+本产品是**线下社交游戏局的活局长**——不是聊天局,不是屏幕游戏。游戏发生在桌上、
+身体上、道具上;手机只有四个角色(入座票/私密信道/判定仪器/局长的喇叭);
+**文字是组织手段,不是游戏场地;道具只发不代玩;让人盯屏变长的功能默认拒。**
+
+宪法全文(动任何 prompt/功能/UI 前必读,五步技术选型判据也在里面):
+**docs/records/裁定-产品定位-线下社交游戏局-20260722.md**
+
+历史教训:此宪法未成文/未接入口时,全链路两次坍缩(向文本、向像素),episode 实测
+道具调用≈0。凡未读宪法即动手的 agent,默认会把产品做成"AI 说话"——这是结构性偏差,
+不是个体失误。
+
 # Git workflow
 
 After completing and committing any user-requested repository change, always run `git push` for the current branch and report the remote synchronization result in the final response.
