@@ -216,6 +216,22 @@ class Session:
                         self.inbox[pl].append(f"🔒🎲 {dice}")
                 res["rolls"] = f"🔒批量暗骰(已投递 {len(rolls)} 人,点数仅各自可见)"
                 continue
+            # 牌卡私发(prop.card):发牌动作公开(桌上知道谁收到一张什么类型的牌),
+            # 牌面内容只投本人收件箱(🎴 牌卡专用前缀,区别于 🔒 杂项私件/👀 额头),
+            # 公开面/别人的 view 一律遮。荷官回执(_last_results)拿遮蔽前原文,局长可对账。
+            if vis == "牌卡":
+                holders = res.get("card_holders") or []
+                kind = res.get("kind", "牌")
+                secret = res.get("content", "")
+                for pl in holders:
+                    if pl in self.inbox:
+                        self.inbox[pl].append(f"🎴 [{kind}] {secret}")
+                masked = f"🎴发牌·{kind}(已投递 {len(holders)} 人,牌面仅本人可见)"
+                res["content"] = masked
+                if (i < len(calls) and isinstance(calls[i].get("input"), dict)
+                        and "content" in calls[i]["input"]):
+                    calls[i]["input"]["content"] = masked
+                continue
             # 秘密载荷可能在 display(show)、也可能在 value/picked(random 私密摇)
             field = next((k for k in ("display", "value", "picked") if k in res), None)
             if field is None:
@@ -571,6 +587,16 @@ class Session:
             # 额头牌=人身上的道具:给出**别人**的牌(点人看牌),自己那张永远缺席——
             # 可见性反转在服务端成立,客户端天然拿不到自己的词
             "foreheads": {p: t for p, t in self.state.foreheads.items() if p != me},
+            # 我的牌(牌卡道具):本人常驻区,kind+content+status 全给——卧底词/密令/
+            # 毒杯号一直摊在自己手机上盯着,不是划过去就没的私件流水。
+            "my_cards": [{"kind": c["kind"], "content": c["content"], "status": c["status"]}
+                         for c in self.state.cards.get(me, [])],
+            # 全桌的牌:谁持什么类型什么状态(无内容)——桌上知道谁手里有张什么牌;
+            # 唯 revealed(翻公开)的牌把 content 一并给出(揭晓了就是公开信息)。
+            "table_cards": [
+                {"player": p, "kind": c["kind"], "status": c["status"],
+                 **({"content": c["content"]} if c["status"] == "revealed" else {})}
+                for p, cs in self.state.cards.items() for c in cs],
             "inbox": self.inbox.get(me, [])[-8:],          # 只有自己的
             "open_ask": ({"prompt": ask["prompt"], "asked": ask["asked"],
                           "options": ask["options"]} if ask else None),  # 不含 answers

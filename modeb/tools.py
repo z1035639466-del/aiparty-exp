@@ -449,6 +449,16 @@ class ToolExecutor:
             targets = list(batch) if batch else list(self.state.props)
             cleared = [p for p in targets if self.state.props.pop(p, None) is not None]
             return {"cancelled": cleared}
+        # 牌卡道具(私发内容全面道具化,房主裁定 2026-07-23):卧底词/密令/毒杯号
+        # 一律走类型化的牌,取代 show(自己看) 的自由文本口。发/用/翻/收四态见下方 helper。
+        if op == "card":
+            return self._card_deal(a)
+        if op == "card_use":
+            return self._card_use(a)
+        if op == "card_reveal":
+            return self._card_reveal(a)
+        if op == "card_cancel":
+            return self._card_cancel(a)
         if op != "dice_cup":
             raise ClampError(f"prop 未知子操作: {op}")
         # 批量发盅:players 列表(大话骰=全员);单发也收 player。至少一名在座玩家。
@@ -468,6 +478,113 @@ class ToolExecutor:
         return {"dealt": list(dict.fromkeys(batch)), "count": count, "kind": "骰盅",
                 "note": "盅已发到各人手机,等他们自己摇(events 里看谁摇了);"
                         "点数玩家摇出来才有,别替他们摇——替玩=虚构同罪"}
+
+    # —— prop.card:牌卡道具(私发内容全面道具化)——
+    # 卧底词/情侣密令/毒杯号不是"私信文本",是有类型有生命周期的牌。发卡动作公开
+    # 可见(桌上知道谁收到一张什么类型的牌),牌面内容只走本人私件(🎴 前缀,区别于
+    # 🔒 杂项私件)+荷官回执给局长对账;内容一律不进 digest/别人的 view,直到 reveal。
+    _CARD_KINDS = {"词卡", "密令卡", "号码卡"}
+    _CARD_MAXLEN = {"词卡": 12, "密令卡": 60}  # 号码卡另有"必须是数字"的钳制
+
+    def _find_card(self, holder: str, kind: str | None,
+                   only_status: str | None = None) -> dict | None:
+        """取持牌人名下第一张匹配的牌(kind 可选缩窄,only_status 可选筛状态)。"""
+        for c in self.state.cards.get(holder, []):
+            if kind and c["kind"] != kind:
+                continue
+            if only_status and c["status"] != only_status:
+                continue
+            return c
+        return None
+
+    def _card_deal(self, a: dict) -> dict:
+        """发牌:kind(词卡|密令卡|号码卡)+content(牌面)+to(单发)或 players(批量,每人同内容)。
+        卧底局两拨调用:一批平民词 + 单发卧底词(沿用 show 老姿势)。一人可持多张。"""
+        kind = a.get("kind")
+        if kind not in self._CARD_KINDS:
+            raise ClampError(
+                f"prop.card kind 不合法: {kind!r};可用: {'|'.join(sorted(self._CARD_KINDS))}")
+        content = str(a.get("content", "")).strip()
+        if not content:
+            raise ClampError("prop.card 需要 content(牌面内容)")
+        # 钳制:词卡≤12字、密令卡≤60字、号码卡必须是数字
+        cap = self._CARD_MAXLEN.get(kind)
+        if cap is not None and len(content) > cap:
+            raise ClampError(f"{kind}牌面须≤{cap}字,收到 {len(content)} 字:{content!r}")
+        if kind == "号码卡" and not content.isdigit():
+            raise ClampError(f"号码卡牌面必须是数字,收到: {content!r}")
+        # 批量 players 或单发 to;至少一名在座玩家
+        batch = a.get("players") or ([a["to"]] if a.get("to") else [])
+        if not batch:
+            raise ClampError("prop.card 需要 to(单发在座玩家)或 players(批量,每人同内容)")
+        bad = [p for p in batch if p not in self.state.players]
+        if bad:
+            raise ClampError(f"prop.card 目标含不在座者: {bad}")
+        holders = list(dict.fromkeys(batch))  # 去重,同名只发一张
+        for p in holders:
+            self.state.cards.setdefault(p, []).append(
+                {"kind": kind, "content": content,
+                 "dealt_turn": self.state.round_no, "status": "held"})
+            # 私件挂账(向后兼容 private_out 旧账):只记去向+牌型,不记内容
+            self.state.private_out.append({"holder": p, "kind": f"牌·{kind}"})
+        # visibility=牌卡:route_private 据此把 content 投本人收件箱并遮蔽公开面;
+        # 荷官回执(_last_results)拿的是遮蔽前的原始结果,局长看得到 content 对账。
+        return {"card_dealt": holders, "kind": kind, "content": content,
+                "visibility": "牌卡", "card_holders": holders,
+                "note": "牌已发到各人手机(牌面仅本人可见,桌上只知道谁收到一张什么牌);"
+                        "牌面别念出来,结算凭荷官回执对账"}
+
+    def _card_use(self, a: dict) -> dict:
+        """用牌:status held→used(密令完成/牌被消耗)。牌面不进公开面,只标状态。"""
+        holder = a.get("player") or a.get("to")
+        if holder not in self.state.players:
+            raise ClampError(f"prop.card_use 持牌人须在座,收到: {holder}")
+        kind = a.get("kind")
+        c = self._find_card(holder, kind, only_status="held")
+        if c is None:
+            which = f"「{kind}」" if kind else "可用"
+            raise ClampError(f"{holder} 名下没有{which}的持牌(held)")
+        c["status"] = "used"
+        return {"card_used": {"player": holder, "kind": c["kind"]},
+                "note": "牌已标记用过(牌面不进公开面,只流转状态)"}
+
+    def _card_reveal(self, a: dict) -> dict:
+        """翻牌:status→revealed,牌面进公开面(密令完成翻公开/毒杯号揭晓)。
+        visibility=全场公开+display 走公开回合行;table_cards 亦据 revealed 给出内容。"""
+        holder = a.get("player") or a.get("to")
+        if holder not in self.state.players:
+            raise ClampError(f"prop.card_reveal 持牌人须在座,收到: {holder}")
+        kind = a.get("kind")
+        c = self._find_card(holder, kind)  # held/used 都能翻(揭晓不限状态)
+        if c is None:
+            which = f"「{kind}」" if kind else "任何"
+            raise ClampError(f"{holder} 名下没有{which}牌可翻")
+        c["status"] = "revealed"
+        return {"card_revealed": {"player": holder, "kind": c["kind"], "content": c["content"]},
+                "display": f"🎴 {holder} 的{c['kind']}揭晓:{c['content']}",
+                "visibility": "全场公开"}
+
+    def _card_cancel(self, a: dict) -> dict:
+        """收牌:不填目标收全部,填 players/player/to 只收这几人;kind 可缩窄只收某型。"""
+        batch = (a.get("players")
+                 or ([a["player"]] if a.get("player") else None)
+                 or ([a["to"]] if a.get("to") else None))
+        targets = list(batch) if batch else list(self.state.cards)
+        kind = a.get("kind")
+        cleared = []
+        for p in targets:
+            cards = self.state.cards.get(p, [])
+            if not cards:
+                continue
+            remain = [c for c in cards if kind and c["kind"] != kind]
+            removed = len(cards) - len(remain)
+            if remain:
+                self.state.cards[p] = remain
+            else:
+                self.state.cards.pop(p, None)
+            if removed:
+                cleared.append({"player": p, "removed": removed})
+        return {"card_cancelled": cleared}
 
     # —— state:账本唯一入口 ——
     def _t_state(self, name: str, a: dict) -> dict:

@@ -19,12 +19,16 @@ MAX_TOOLS_PER_TURN = 2
 HISTORY_WINDOW = 6  # 保留最近 N 回合主持词,维持口风连续
 
 TOOLS_DECLARATION = [
-    {"name": "show", "desc": "向玩家端展示内容;自己看=只投给 player 本人(同一内容发多人用 players 列表:发牌先一批发平民词、再单发卧底词,两次调用收工),额头=只有 player 本人看不见、其余人都收到(在他们手机上长成他头上的牌)——私密档必须带 player 或 players(在座目标)。**私发=发牌,不是私聊**:每一次私发都是给人发一张牌(词卡/密令卡),一张牌一句话,发完就进游戏;不许拿私发当聊天窗口连环递话——藏信息长在道具上,不长在对话里。draw_atom 若回了 demo.ref,讲解玩法时把它原样填进 demo 即播放演示件(自己编的引用会被降级)", "args": {"content": "str(牌面内容,一句话)", "visibility": "自己看|额头|全场公开", "player": "str?", "players": "list?(仅自己看,批量私发)", "demo": "str?"}},
+    {"name": "show", "desc": "向玩家端展示内容。合法用途只剩两档:**全场公开**=桌上人人可见的展示;**额头**=只有 player 本人看不见、其余人都收到(在他们手机上长成他头上的牌)——额头档必须带 player(在座目标)。**私发游戏内容一律走 prop.card,不走这里**:卧底词=词卡、情侣密令=密令卡、毒杯号=号码卡,各有其型、有生命周期(发/用/翻/收),牌面进本人常驻牌区不是划过就没的私件流水。visibility=自己看 是**遗留口**(引擎兼容不删),仅限极少数**非牌**的一次性私密提示;凡是能用卡的一律用卡,别再拿 show 自己看当私聊/发牌窗口。draw_atom 若回了 demo.ref,讲解玩法时把它原样填进 demo 即播放演示件(自己编的引用会被降级)", "args": {"content": "str(展示内容,一句话)", "visibility": "全场公开|额头|自己看(遗留)", "player": "str?(额头/自己看必带)", "players": "list?(自己看遗留批量)", "demo": "str?"}},
     {"name": "ask", "desc": "限时问一嘴。默认抢答:发问后安静等,第一个人应声起算窗口,到点按多数认、一票也认;点名问某人只认那个人。顺序性玩法(一人一句形容/逐个表态)用 mode=轮流:每人独立应答槽逐个开窗,答完或超时自动轮下一位,谁也挤不掉谁。ask_result 里 silent=被问未答名单——那是没赶上/轮到没接,不是故意沉默,不许当'安静得可疑'下判", "args": {"player": "str|全场", "prompt": "str", "options": "list?", "window": "int?秒,默认5", "mode": "抢答(默认)|轮流", "order": "list?(轮流的顺序,默认全场座次)"}},
     {"name": "random.pick", "desc": "公平随机选择;决定隐藏身份时务必带 visibility=自己看+player,否则结果会广播到公开回合行,身份当场穿帮。私密摇的结果不当场回显——下一拍的 tool_receipts 会把答案回执给你,结算要揭晓的事等回执到手再宣布,别当场硬猜", "args": {"from": "players|list", "exclude": "list?", "visibility": "自己看?", "player": "str?"}},
     {"name": "random.int", "desc": "公平随机整数;藏数字(毒杯号等)同样用 visibility=自己看+player 私密摇,答案同样走下一拍 tool_receipts 回执", "args": {"min": "int", "max": "int", "visibility": "自己看?", "player": "str?"}},
     {"name": "prop.dice_cup", "desc": "发骰盅给玩家自己摇(大话骰的正确姿势)——你只发盅,不替玩家摇。给 players 里每人挂一只未摇的骰盅(count 颗,你按玩法定:大话骰 5、快版 3,钳 1–10),玩家在自己手机上摇出点数,点数经骰盅对账信道(仅你可见)回给你开牌结算,别人看不见、你也别念。发盅本身桌上公开可见,点数此刻不存在。发完等玩家自己摇(events 里 type=roll 就是谁摇了),齐了再开吹牛。玩家端有「开牌!」按钮:有人拍它会送来 type=challenge 事件(带谁开的和被开那口叫价 bid),同时全桌盅锁定不可再摇——你凭它配对账信道清算,清算完 prop.cancel 收盅/重发才解锁下一口。重复发=换新盅重置;prop.cancel 收盅。**别用 random.dice 替玩家暗摇(那是替玩家玩=虚构同罪)**", "args": {"players": "list(在座玩家,大话骰=全员)", "count": "int?颗数,默认5", "player": "str?(单发,与 players 二选一)"}},
     {"name": "prop.cancel", "desc": "收回骰盅:不填 players 收全部,填了只收这几只(重摇须先收再重发)", "args": {"players": "list?"}},
+    {"name": "prop.card", "desc": "发牌卡(私发游戏内容全面道具化,取代 show 自己看)。kind 三型各有专用:词卡(卧底词/身份词,牌面≤12字)、密令卡(情侣局对称任务/暗号,牌面≤60字)、号码卡(毒杯号/座次号,牌面必须是纯数字)。to=单发一人、players=批量每人同一张(卧底局两拨:先 players 发平民词、再 to 单发卧底词)。发牌动作桌上公开可见(谁收到一张什么类型的牌),牌面只进本人常驻牌区(my_cards)+荷官回执给你对账,别人看不见、你也别念。牌有生命周期:发出后用 prop.card_use(密令完成/牌消耗,标 used)、prop.card_reveal(揭晓翻公开,毒杯号/密令完成翻面,牌面进公开面)、prop.card_cancel(收牌)。一人可持多张。**藏信息长在牌上,不长在对话里**", "args": {"kind": "词卡|密令卡|号码卡", "content": "str(牌面:词卡≤12字/密令卡≤60字/号码卡纯数字)", "to": "str?(单发在座玩家)", "players": "list?(批量,每人同内容;与 to 二选一)"}},
+    {"name": "prop.card_use", "desc": "用牌:把持牌人名下一张牌标成 used(密令完成/牌被消耗),牌面不进公开面只流转状态。填 kind 指定牌型,否则取其名下第一张 held 牌", "args": {"player": "str(持牌人,在座)", "kind": "str?(词卡|密令卡|号码卡)"}},
+    {"name": "prop.card_reveal", "desc": "翻牌揭晓:把持牌人名下一张牌翻公开(status→revealed),牌面进公开回合行+全桌 table_cards——毒杯号揭晓、密令完成亮牌都走它。填 kind 指定牌型,否则取名下第一张。揭晓前牌面一个字别念,揭晓时报得有锣鼓点", "args": {"player": "str(持牌人,在座)", "kind": "str?(词卡|密令卡|号码卡)"}},
+    {"name": "prop.card_cancel", "desc": "收牌:不填目标收全部,填 players/player 只收这几人;填 kind 只收某型。牌局换轮/发错牌时清台", "args": {"players": "list?", "player": "str?", "kind": "str?"}},
     {"name": "random.dice", "desc": "当众公摇 count 颗六面骰(摇公共目标数/当众定顺序这类桌面公开随机)。玩家自己的暗骰一律走 prop.dice_cup 让人自己摇,不用这个", "args": {"count": "int(1-10)"}},
     {"name": "timer", "desc": "开一个显式倒计时(这是唯一的时限机制:没设 timer 就是开放式等待);到点系统会以 timer_expired 事件叫你", "args": {"seconds": "int(1-600)", "label": "str(计给什么事)"}},
     {"name": "state.add_score", "desc": "写分(账本唯一入口,钳制 |delta|<=3)", "args": {"player": "str", "delta": "int", "reason": "str"}},
@@ -190,6 +194,16 @@ def build_system_prompt(players: list[str], wildness_cap: int, time_budget_min: 
         "· **问不问,看结果长在哪**:线下才知道的结果(硬币落地/纸牌翻面)才需要问;"
         "线上道具(骰盅这类系统摇的)后台本来就有数,**不用问也不许问**——玩家玩完你直接凭"
         "对账信道走后续流程,多问一嘴等于告诉全桌你不知道,道具的仪式感就破了。\n"
+        "· **发牌(藏信息)一律走 prop.card,别再用 show 自己看**:私发的卧底词/密令/毒杯号"
+        "不是私信文本,是有类型有生命周期的**牌**——发下去进本人常驻牌区,牌面只你和本人知道"
+        "(荷官回执给你对账),桌上只看到「谁收到一张什么类型的牌」。三型对号入座,发牌姿势:\n"
+        "  - **卧底局**=prop.card(kind=词卡)两拨:先 players 一批发平民词、再 to 单发卧底词"
+        "(词卡牌面≤12字);谁是卧底你心里有数(牌区+荷官回执),别念。\n"
+        "  - **毒杯/抽号**=prop.card(kind=号码卡, to=某人, content=纯数字)单发;揭晓那一下用"
+        "prop.card_reveal 翻公开(号码进公开面,全桌 table_cards 都看到),揭晓前一个字别漏。\n"
+        "  - **情侣局对称密令**=prop.card(kind=密令卡,牌面≤60字)双向发对称任务;完成后"
+        "prop.card_reveal 翻面亮牌(或 prop.card_use 标用过,不亮牌只流转状态)。\n"
+        "  牌局换轮/发错牌 prop.card_cancel 收牌。一人可持多张,牌各自独立走生命周期。\n"
         "· 快枪手/一对一了断用 duel.start 拔真枪。气氛该起就 music.play。\n"
         "一场局如果从头到尾一个道具工具都没碰,那不是简约,是你把牌桌开成了茶话会——每开一个玩法先自问:"
         "这局的随机源和道具是什么,是不是该发下去让玩家自己玩。\n"

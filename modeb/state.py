@@ -64,6 +64,13 @@ class GameState:
     # {player: 牌面内容}——App 端"点这个玩家看他的牌",本人视图里自己那张永远拿不到。
     # 私件流水里仍留 👀 行(向后兼容),但正解渲染走这里。
     foreheads: dict = field(default_factory=dict)
+    # 私发内容全面道具化(房主裁定 2026-07-23):卧底词/情侣密令/毒杯号不是"私信文本",
+    # 是有类型、有生命周期的**牌**。show(自己看)自由文本口是文字流游戏的最后后门,
+    # 用类型化的 prop.card 取而代之。{player: [{kind, content, dealt_turn, status}]}——
+    # 一人可持多张;kind ∈ 词卡|密令卡|号码卡;status: held(持牌)→used(用过)|revealed(翻公开)。
+    # 发卡动作公开可见(桌上知道谁收到一张什么类型的牌,内容不可见);牌面内容只走本人
+    # 私件(🎴 前缀)+荷官回执给局长对账,不进 digest/别人的 view;revealed 时内容进公开面。
+    cards: dict = field(default_factory=dict)
     settled: dict[str, int] = field(default_factory=dict)  # 已清账累计口数(清账制的另一半)
     discards: list[dict] = field(default_factory=list)  # 主动弃牌留痕:弃牌≠用牌
     finished: bool = False
@@ -103,6 +110,11 @@ class GameState:
                            **({"challenged_by": pr["challenged_by"]}
                               if pr.get("challenged_by") else {})}
                           for p, pr in self.props.items()],
+            # 牌卡挂账(公共面):谁持几张什么类型的牌、什么状态——牌面**内容一律不进**
+            # 这里(digest 是半公开面,进来就等于当众翻牌)。revealed 的牌内容走公开
+            # 回合行(全场公开 display)+玩家 view 的 table_cards,不靠 digest 带。
+            "cards": [{"player": p, "kind": c["kind"], "status": c["status"]}
+                      for p, cs in self.cards.items() for c in cs],
         }
 
 
