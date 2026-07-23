@@ -208,6 +208,12 @@ class Engine:
         now = time.time()
         return any(t <= now for t in self.state.timers)
 
+    def log_meta(self, kind: str, payload: dict) -> None:
+        """episode 里的非回合元信息行(设备绑定等)。与回合行同文件同流水——
+        episode 是产品的用户数据资产,账号体系上线后按这些锚点回溯认领历史局。"""
+        self._ep.write(json.dumps({"meta": kind, **payload}, ensure_ascii=False) + "\n")
+        self._ep.flush()
+
     # —— 一个决策回合 ——
     def turn(self) -> dict:
         now = time.time()

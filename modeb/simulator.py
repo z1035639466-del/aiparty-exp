@@ -169,6 +169,8 @@ class Session:
         self.state_path = persist.state_path_for(episode_path)
         self.engine = Engine(self.state, self.driver, self.episode_path, episode_mode=episode_mode)
         self.recent: list[dict] = []  # 最近回合行,供前端轮询
+        # 设备匿名ID↔座位(用户数据层地基):episode 里同步留 device_bind 元信息行
+        self.device_map: dict[str, str] = {}
         # 局长开口缓存:{(turn, voice): 音频字节}。Session 即房间,天然按 (room,line)
         # 隔离;同一句只烧一次 TTS 钱,进程内存活、不落盘(音频可重合成,不值得持久化)
         self.tts_cache: dict[tuple, bytes] = {}
@@ -245,6 +247,20 @@ class Session:
                 if "content" in calls[i]["input"]:
                     calls[i]["input"]["content"] = res[field]
         return red
+
+    def bind_device(self, player: str, device_id: str) -> None:
+        """设备匿名ID↔座位绑定(账号体系的地基,须持 self.lock 调用)。
+        首见即绑、只绑一次、写进 episode 审计线——将来账号系统上线,历史局按
+        device_id 一键认领,今晚起的每一局都不浪费。座位已绑别的设备时不覆盖
+        (中途换机的归属问题留给账号层裁,裸 ID 之间不许互抢)。"""
+        if not device_id or player not in self.state.players:
+            return
+        dev = str(device_id)[:64]
+        if player in self.device_map:
+            return
+        self.device_map[player] = dev
+        self.engine.log_meta("device_bind", {"player": player, "device_id": dev,
+                                             "room": self.room_code})
 
     def roll_cup(self, me: str) -> dict:
         """玩家自己摇盅(玩的动作留在玩家手里,房主原则:局长不替玩家玩)。须持 self.lock 调用。
@@ -872,6 +888,10 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/event":
                 ev = dict(body)
                 ev.pop("room", None)   # room 是路由参数,不进事件流
+                dev = ev.pop("device_id", None)  # 设备锚点是元信息,不进事件流
+                if dev:
+                    with s.lock:
+                        s.bind_device(ev.get("player"), dev)
                 if ev.get("type") == "roll":
                     # 摇盅是玩家的「玩」动作,不是普通事件:走 roll_cup 校验+出点+私发+对账,
                     # 点数绝不能明文进事件流(那样就等于局长替玩家摇了)。

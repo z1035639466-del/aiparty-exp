@@ -289,20 +289,30 @@ export default function App() {
   const prevRef = useRef({ inbox: 0, drawn: false, challenged: false });
   const feedRef = useRef(null); // 局长最新一句永远滚到眼前(手机举得远,不能靠手扒)
 
+  // 设备匿名ID(用户数据层地基):首启生成、永久复用,随每个事件带给服务端,
+  // episode 里落 device_bind 锚点——将来账号系统上线,历史局按它一键认领。
+  const devRef = useRef(null);
   // 开 App 就把上次填过的回填进来(没存过=首次,静默略过)
   useEffect(() => {
     (async () => {
+      let p = {};
       try {
-        const p = JSON.parse(await FileSystem.readAsStringAsync(PREFS));
+        p = JSON.parse(await FileSystem.readAsStringAsync(PREFS));
         if (p.base) setBase(p.base);
         if (p.me) setMe(p.me);
         if (p.room) setRoom(p.room);
       } catch (e) { /* 首次开、或文件坏了:当没存过 */ }
+      devRef.current = p.dev ||
+        "d-" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+      if (!p.dev)  // 新生成的立刻落盘,别等入座——ID 的稳定性就是它的全部价值
+        FileSystem.writeAsStringAsync(PREFS, JSON.stringify({ ...p, dev: devRef.current }))
+          .catch(() => {});
     })();
   }, []);
   // 只在真的入座/开局成功后才记——失败的地址记下来只会next次继续错
   const remember = (b, m, r) =>
-    FileSystem.writeAsStringAsync(PREFS, JSON.stringify({ base: b, me: m, room: r }))
+    FileSystem.writeAsStringAsync(PREFS,
+      JSON.stringify({ base: b, me: m, room: r, dev: devRef.current }))
       .catch(() => {});
 
   // 录音判定(judge.audio):按一下录、再按一下交卷;裁判在服务端(接 key 即通)
@@ -355,7 +365,8 @@ export default function App() {
     return r.json();
   };
   const sendEvent = (ev) =>
-    api("/api/event", { ...ev, player: me }).catch(() => setErr("事件没发出去,再点一次"));
+    api("/api/event", { ...ev, player: me, device_id: devRef.current })
+      .catch(() => setErr("事件没发出去,再点一次"));
 
   // 扣盅:玩家自己摇出点数的那一下(手真摇够/骤停自动扣,或按钮兜底都汇到这里)。
   // 引擎 RNG 出点数(摇的力度/时长不影响),点数经 🔒🎲 水印路回本人私件——App 只认水印
