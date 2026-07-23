@@ -22,6 +22,10 @@ import { Accelerometer } from "expo-sensors";
 import * as VideoThumbnails from "expo-video-thumbnails";
 
 const POLL_MS = 900;
+// 官方服务器(正式形态):域名定了填在这里,玩家从此只输房间码+座位名,
+// 服务器输入框整个消失(长按标题下方空白 1.2 秒可唤回,开发调试用)。
+// 留空 = 开发期行为:显示服务器输入框(自架地址没法未卜先知)。
+const DEFAULT_SERVER = "";
 // 上次入座用的服务器/座位/房间。局域网地址这种东西每开一次 App 重敲一遍没人受得了,
 // 何况派对现场手忙脚乱。存本机,下次进来直接填好,改了照样能改。
 const PREFS = FileSystem.documentDirectory + "yappa-last.json";
@@ -275,7 +279,8 @@ function DiceCup({ prop, rolling, onRoll, onChallenge }) {
 
 export default function App() {
   useKeepAwake(); // 快枪手对峙期间息屏=判负,整局常亮
-  const [base, setBase] = useState("");
+  const [base, setBase] = useState(DEFAULT_SERVER);
+  const [showServer, setShowServer] = useState(false); // 官方服域名焊死后,长按唤回调试入口
   const [me, setMe] = useState("");
   const [room, setRoom] = useState("");   // 房间码:多局并发时定位自己那一桌;留空=服务器唯一房间
   const [joined, setJoined] = useState(false);
@@ -437,9 +442,15 @@ export default function App() {
           keyboardShouldPersistTaps="handled">
           <Text style={s.logo}>Yappa</Text>
           <Text style={s.dim}>{creating ? "开一局新的" : "局长在等你入座"}</Text>
-          <TextInput style={s.input} placeholder="服务器,如 http://192.168.1.5:8747"
-            placeholderTextColor="#667" autoCapitalize="none" autoCorrect={false}
-            value={base} onChangeText={setBase} />
+          {(!DEFAULT_SERVER || showServer) ? (
+            <TextInput style={s.input} placeholder="服务器,如 http://192.168.1.5:8747"
+              placeholderTextColor="#667" autoCapitalize="none" autoCorrect={false}
+              value={base} onChangeText={setBase} />
+          ) : (
+            <Pressable onLongPress={() => setShowServer(true)} delayLongPress={1200}>
+              <Text style={s.dim}> </Text>
+            </Pressable>
+          )}
 
           {creating ? (
             <>
