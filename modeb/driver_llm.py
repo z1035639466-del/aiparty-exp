@@ -19,7 +19,7 @@ MAX_TOOLS_PER_TURN = 2
 HISTORY_WINDOW = 6  # 保留最近 N 回合主持词,维持口风连续
 
 TOOLS_DECLARATION = [
-    {"name": "show", "desc": "向玩家端展示内容;自己看=只投给 player 本人(同一内容发多人用 players 列表:发牌先一批发平民词、再单发卧底词,两次调用收工),额头=只有 player 本人看不见、其余人都收到——私密档必须带 player 或 players(在座目标),收件人用 GET /api/inbox 取信;draw_atom 若回了 demo.ref,讲解玩法时把它原样填进 demo 即播放演示件(自己编的引用会被降级)", "args": {"content": "str", "visibility": "自己看|额头|全场公开", "player": "str?", "players": "list?(仅自己看,批量私发)", "demo": "str?"}},
+    {"name": "show", "desc": "向玩家端展示内容;自己看=只投给 player 本人(同一内容发多人用 players 列表:发牌先一批发平民词、再单发卧底词,两次调用收工),额头=只有 player 本人看不见、其余人都收到(在他们手机上长成他头上的牌)——私密档必须带 player 或 players(在座目标)。**私发=发牌,不是私聊**:每一次私发都是给人发一张牌(词卡/密令卡),一张牌一句话,发完就进游戏;不许拿私发当聊天窗口连环递话——藏信息长在道具上,不长在对话里。draw_atom 若回了 demo.ref,讲解玩法时把它原样填进 demo 即播放演示件(自己编的引用会被降级)", "args": {"content": "str(牌面内容,一句话)", "visibility": "自己看|额头|全场公开", "player": "str?", "players": "list?(仅自己看,批量私发)", "demo": "str?"}},
     {"name": "ask", "desc": "限时问一嘴。默认抢答:发问后安静等,第一个人应声起算窗口,到点按多数认、一票也认;点名问某人只认那个人。顺序性玩法(一人一句形容/逐个表态)用 mode=轮流:每人独立应答槽逐个开窗,答完或超时自动轮下一位,谁也挤不掉谁。ask_result 里 silent=被问未答名单——那是没赶上/轮到没接,不是故意沉默,不许当'安静得可疑'下判", "args": {"player": "str|全场", "prompt": "str", "options": "list?", "window": "int?秒,默认5", "mode": "抢答(默认)|轮流", "order": "list?(轮流的顺序,默认全场座次)"}},
     {"name": "random.pick", "desc": "公平随机选择;决定隐藏身份时务必带 visibility=自己看+player,否则结果会广播到公开回合行,身份当场穿帮。私密摇的结果不当场回显——下一拍的 tool_receipts 会把答案回执给你,结算要揭晓的事等回执到手再宣布,别当场硬猜", "args": {"from": "players|list", "exclude": "list?", "visibility": "自己看?", "player": "str?"}},
     {"name": "random.int", "desc": "公平随机整数;藏数字(毒杯号等)同样用 visibility=自己看+player 私密摇,答案同样走下一拍 tool_receipts 回执", "args": {"min": "int", "max": "int", "visibility": "自己看?", "player": "str?"}},
