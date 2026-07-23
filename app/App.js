@@ -20,6 +20,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useKeepAwake } from "expo-keep-awake";
 import { Accelerometer } from "expo-sensors";
 import * as VideoThumbnails from "expo-video-thumbnails";
+import PropsBox from "./props";
 
 const POLL_MS = 900;
 // 官方服务器(正式形态):域名定了填在这里,玩家从此只输房间码+座位名,
@@ -291,6 +292,7 @@ export default function App() {
   const [rolling, setRolling] = useState(false); // 骰盅扣盅动画进行中(挡重复扣)
   const [recording, setRecording] = useState(null); // 录音判定进行中的 Recording 对象
   const [challengeFlash, setChallengeFlash] = useState(null); // 「⚡ 开牌!」全屏横幅(1.6s 自动散)
+  const [propsBox, setPropsBox] = useState(false); // 🧰 道具箱:单机试玩四件道具原语,不用开局
   const prevRef = useRef({ inbox: 0, drawn: false, challenged: false });
   const feedRef = useRef(null); // 局长最新一句永远滚到眼前(手机举得远,不能靠手扒)
 
@@ -435,6 +437,8 @@ export default function App() {
   }, [joined]);
 
   if (!joined) {
+    // 道具箱整屏接管:单机玩具,不碰入座/开局任何状态
+    if (propsBox) return <PropsBox onClose={() => setPropsBox(false)} />;
     return (
       <KeyboardAvoidingView style={s.page} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <StatusBar style="light" />
@@ -539,6 +543,9 @@ export default function App() {
               </Pressable>
               <Pressable style={[s.bigBtn, s.bigBtnAlt]} onPress={() => setCreating(true)}>
                 <Text style={s.bigBtnAltText}>开新局</Text>
+              </Pressable>
+              <Pressable hitSlop={14} onPress={() => setPropsBox(true)}>
+                <Text style={s.optout}>🧰 道具箱(不开局也能玩)</Text>
               </Pressable>
             </>
           )}

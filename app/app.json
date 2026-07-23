@@ -7,7 +7,17 @@
     "userInterfaceStyle": "dark",
     "backgroundColor": "#14141c",
     "splash": { "backgroundColor": "#14141c" },
-    "ios": { "supportsTablet": false, "bundleIdentifier": "app.yappa.party" },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "app.yappa.party",
+      "infoPlist": {
+        "NSAppTransportSecurity": { "NSAllowsLocalNetworking": true },
+        "NSLocalNetworkUsageDescription": "同一 Wi-Fi 下连接本局的 Yappa 服务器(局长引擎),不联外网。",
+        "NSCameraUsageDescription": "拍照/拍视频判定与开局场景侦察要用相机。",
+        "NSMicrophoneUsageDescription": "录音判定要用麦克风。",
+        "NSPhotoLibraryUsageDescription": "从相册选图提交判定时要用。"
+      }
+    },
     "android": { "package": "app.yappa.party" }
   }
 }
