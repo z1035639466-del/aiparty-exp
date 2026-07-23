@@ -688,6 +688,14 @@ class Hub:
             return None, None, (409, f"有 {len(items)} 个活跃房间,请带 room 指定(可用:{codes})")
 
     def start(self, cfg: dict) -> dict:
+        # 开局口令闸(公网认证裁定 2026-07-23):隧道公开后,/api/start 是唯一会
+        # 烧 LLM 钱的入口——陌生人扫到就能白嫖开局。设 ZAKZOK_START_KEY 后必须
+        # 对上口令;入座/事件不设闸(房间码即门票,朋友零摩擦)。口令即刻弹出
+        # cfg,不进 Session/快照/episode 任何留痕面。
+        required = os.environ.get("ZAKZOK_START_KEY", "")
+        offered = str(cfg.pop("key", "") or "")
+        if required and offered != required:
+            raise ValueError("开局口令不对(服务器设了开局口令,向房主要)")
         with self.lock:
             self._sweep(include_finished=True)   # 开新局时清收局/闲置房,episode 文件保留
             code = gen_room_code(set(self.rooms))

@@ -32,8 +32,9 @@ sudo cloudflared service install 面板给你的那串token
 
 ## 服务端配套(Mac mini)
 
-- 游戏服务**不需要 --lan**:隧道打的是 localhost,127.0.0.1 监听即可
-  (deploy/com.yappa.server.plist 默认就这么绑,更安全)。
+- 游戏服务**继续用 --lan 起**(网管裁定 2026-07-23:8747 须保持局域网监听,
+  供 iPhone 内网直连;PF 只放行 iPhone 保留 IP → 8747/8081,其余内网源照拦)。
+  隧道的本地目标写 `http://127.0.0.1:8747` 即可(0.0.0.0 监听天然覆盖回环)。
 - 仓库根 `.env` 加一行(入座链接用域名而不是内网 IP):
 
 ```
@@ -56,6 +57,19 @@ curl -s https://你的域名/api/state
 - iPhone 侧务必:设置 → Wi-Fi → 该网络 (i) → 私有 Wi-Fi 地址 → **固定**
   (别用"轮换",MAC 一换保留和 ACL 全失效)。
 - 快枪手/开牌这类毫秒级判定,开发调试优先走内网直连;朋友局一律走域名。
+
+## 公网认证模式(发布前必办,网管裁定)
+
+裁定:**API 走"公开+开局口令",驾驶舱可选套 Cloudflare Access。**
+- Access 的浏览器 OTP 流程没法套在 App 的 API 调用上(入座体验直接死),
+  而公网真正的风险只有一个:陌生人扫到 /api/start 白嫖 LLM 额度开局。
+- 服务端已内置**开局口令闸**:`.env` 设 `ZAKZOK_START_KEY=你的口令` 后,
+  /api/start 必须带对口令才开局;**入座/游戏事件不需要口令**(房间码即门票),
+  朋友零摩擦。口令只给房主自己(App 开局表单里填一次会记住)。
+- 驾驶舱(浏览器页)如需更强保护,可在 Cloudflare 面板给根路径加 Access
+  策略(邮箱 OTP,只影响浏览器访问)。
+- **Tunnel token 纪律:不进聊天、不进仓库、不进日志**——只存在于
+  `sudo cloudflared service install` 那一条命令和系统服务配置里。
 
 ## 故障速查
 

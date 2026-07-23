@@ -355,6 +355,7 @@ export default function App() {
   const [occasion, setOccasion] = useState("");
   const [playlist, setPlaylist] = useState("");
   const [botsText, setBotsText] = useState("");
+  const [startKey, setStartKey] = useState(""); // 开局口令(服务器设了 ZAKZOK_START_KEY 才需要)
 
   // 多局并发:除 /api/start 外,所有请求带上房间码(query+body 都带,服务端两处都认);
   // room 留空则不带,服务器按唯一活跃房间默认命中(向后兼容单桌)。
@@ -471,6 +472,9 @@ export default function App() {
               </View>
               <TextInput style={s.input} placeholder="场合一句话(如 老友重聚/生日局,可选)"
                 placeholderTextColor="#667" value={occasion} onChangeText={setOccasion} />
+              <TextInput style={s.input} placeholder="🔑 开局口令(服务器设了才要填,可选)"
+                placeholderTextColor="#667" autoCapitalize="none" autoCorrect={false}
+                value={startKey} onChangeText={setStartKey} />
               <TextInput style={s.input} placeholder="🎵 歌单(逗号分隔,可选)"
                 placeholderTextColor="#667" value={playlist} onChangeText={setPlaylist} />
               <TextInput style={s.input} placeholder="🤖 bot 座位(可选,名:人设,逗号分隔)"
@@ -488,6 +492,9 @@ export default function App() {
                 setStarting(true);
                 try {
                   const res = await api("/api/start", {
+                    // 开局口令:服务器设了 ZAKZOK_START_KEY 才需要(公网防白嫖开局);
+                    // 没设则此字段被服务端忽略,留空即可
+                    ...(startKey.trim() ? { key: startKey.trim() } : {}),
                     players: seatList,
                     minutes: +minutes || 30,
                     wildness: +wildness || 6,
