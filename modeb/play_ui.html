@@ -181,7 +181,9 @@ function render(v){
 
   let h=`<div class="bar"><b>${esc(ME)}</b>`
        +`<span>第${v.round??0}轮 · ${Math.max(0,Math.round(v.time_left_min||0))}分钟</span>`
-       +(v.focus?`<span>· 焦点 ${esc(v.focus)}</span>`:'')
+       +((v.actor&&v.actor.players&&v.actor.players.length)
+          ?`<span>· 这一手:${esc(v.actor.players.join('、'))}</span>`
+          :(v.focus?`<span>· 焦点 ${esc(v.focus)}</span>`:''))
        +(v.now_playing?`<span class="dj">🎵 ${esc(v.now_playing)}</span>`:'')+`</div>`;
 
   if(v.finished){

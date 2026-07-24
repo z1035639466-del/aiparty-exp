@@ -35,7 +35,7 @@ TOOLS_DECLARATION = [
     {"name": "state.settle", "desc": "清账:某人(或全场)把欠下的账兑现了(接完挑战/认罚喝掉),负分归零并计入已结——罚过的账不清,分数只会越滚越负。注意:这是记账动作,不是判罚建议——判罚默认从弹药库抽共同经历型代价,喝只是玩家 forfeit 的自选项", "args": {"player": "str?(缺省或'全场'=所有人)"}},
     {"name": "state.note", "desc": "记事本:把要跨拍记住的账写下来(谁玩出了什么结果/约定了什么赌注),digest 会带回给你——玩家玩出的结果靠这支笔入账", "args": {"key": "str", "value": "any"}},
     {"name": "state.discard", "desc": "弃牌留痕:抽到不合适的原子,带理由弃掉再抽,复盘能分清你是用了还是撕了。**后厨动作,不播报**:「这条抽岔了撕掉换一张」这种话一个字都不许说——玩家只看端上桌的成品,弃与重抽在同一拍静默完成,主持词直接开新玩法(真机病历:播报撕牌后干等,又死锁)", "args": {"atom_id": "str", "reason": "str"}},
-    {"name": "state.set_focus", "desc": "设焦点人物", "args": {"player": "str"}},
+    {"name": "state.set_focus", "desc": "设焦点人物(台面主角)。**纯口头派活时用它认人**:没走任何工具、只在主持词里点了名(「小美,你来学三声猫叫」),就补一手 set_focus,否则桌上没人知道这活归谁,「完成」按钮对全场一起亮着。走了 ask/judge/duel/draw_atom(for_player)/prop.dice_cup 的不必再设——那些调用系统已自动记了派活账(digest.assigned 里看得到当前是谁的活)", "args": {"player": "str"}},
     {"name": "state.next_round", "desc": "进下一轮", "args": {}},
     {"name": "state.use_grant", "desc": "消耗一次已持有技能", "args": {"prop": "str", "holder": "str"}},
     {"name": "state.finish", "desc": "收局", "args": {}},
@@ -50,7 +50,7 @@ TOOLS_DECLARATION = [
     {"name": "duel.cancel", "desc": "撤销进行中的对决(卡住/点错人时用)", "args": {}},
     {"name": "music.play", "desc": "DJ 换歌:只许点房主上传歌单里的曲目(歌单在系统提示的 DJ 台一节;无歌单则本工具不可用);音乐是背景,换歌不必播报", "args": {"track": "str(歌单内曲目,可只写歌名)", "mood": "str?"}},
     {"name": "music.stop", "desc": "停止播放", "args": {}},
-    {"name": "draw_atom", "desc": "从弹药库抽原子(分面过滤+排已用);野度=上限,野度min=下限——想加档就抬野度min,别只嘴上说;tier=铺垫(小快垫场:通用局开局款/敢不敢微挑战都在这档)|主打(副歌重拍:摆阵重器/大流程);人数下限系统按本桌自动过滤(2人桌抽不到全场类,5人及以下抽不到卧底类核心循环),空返报错会告诉你被哪关挡了多少条。**给输家抽判罚只许抽 任务内容/道具挑战/问答题目——完整玩法不是判罚**(那是开新局:输家零代价,判罚感蒸发)。带 context(本环节主题一句话,如'卧底局收尾惩罚')库会按相关度收窄候选;仍抽出题不对文就 state.discard(带理由)留痕再抽或改现挂,别硬用", "args": {"atom_type": "|".join(sorted(ATOM_TYPES)), "context": "str?(本环节主题,软收窄)", "野度": "int?", "野度min": "int?", "tier": "str?", "exclude": "list?", "grant_to": "str?"}},
+    {"name": "draw_atom", "desc": "从弹药库抽原子(分面过滤+排已用);野度=上限,野度min=下限——想加档就抬野度min,别只嘴上说;tier=铺垫(小快垫场:通用局开局款/敢不敢微挑战都在这档)|主打(副歌重拍:摆阵重器/大流程);人数下限系统按本桌自动过滤(2人桌抽不到全场类,5人及以下抽不到卧底类核心循环),空返报错会告诉你被哪关挡了多少条。**给输家抽判罚只许抽 任务内容/道具挑战/问答题目——完整玩法不是判罚**(那是开新局:输家零代价,判罚感蒸发)。带 context(本环节主题一句话,如'卧底局收尾惩罚')库会按相关度收窄候选;仍抽出题不对文就 state.discard(带理由)留痕再抽或改现挂,别硬用。**抽给某一个人的活(单人任务/惩罚/问答)必须填 for_player**——桌上那颗「完成/认罚」按钮凭它认人:填了,只有当事人的按钮是亮的,别人替他点会被标成旁观确认;不填,全场按钮一起亮,谁先点谁就被记成他交了活(真机病历:派给 Ann 的活,Ming 一点记成了「Ming 完成」)", "args": {"atom_type": "|".join(sorted(ATOM_TYPES)), "context": "str?(本环节主题,软收窄)", "for_player": "str|list?(这条活派给谁;单人任务/惩罚必填,全员一起做才留空)", "野度": "int?", "野度min": "int?", "tier": "str?", "exclude": "list?", "grant_to": "str?"}},
 ]
 
 OUTPUT_CONTRACT = (

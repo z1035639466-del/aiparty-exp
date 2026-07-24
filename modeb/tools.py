@@ -276,6 +276,7 @@ class ToolExecutor:
         op = name.split(".", 1)[1] if "." in name else "start"
         if op == "cancel":
             prev, self.state.duel = self.state.duel, None
+            self.state.unassign("duel")
             return {"cancelled": bool(prev)}
         if op != "start":
             raise ClampError(f"duel 未知子操作: {op}")
@@ -290,6 +291,7 @@ class ToolExecutor:
         import time as _t
         self.state.duel = {"players": ps, "taps": {},
                            "draw_at": _t.time() + self.rng.uniform(2.0, 8.0)}
+        self.state.assign(ps, f"{ps[0]} 和 {ps[1]} 在对峙,等拔枪", "duel")
         return {"duel": ps, "note": "对峙开始;拔枪时点系统保密,结果以 duel_result 事件送达,期间别催"}
 
     # —— judge:拍照判定(多模态判定通道 v0)——主持显式发起的判定时刻,
@@ -301,6 +303,7 @@ class ToolExecutor:
             prev = self.state.pending_photo or self.state.pending_audio
             self.state.pending_photo = None
             self.state.pending_audio = None
+            self.state.unassign("judge")
             return {"cancelled": bool(prev)}
         if op not in ("photo", "audio"):
             raise ClampError(f"judge 未知子操作: {op}")
@@ -314,8 +317,10 @@ class ToolExecutor:
             raise ClampError(f"judge.{op} 需要 prompt(判什么,给裁判看的标准)")
         if op == "audio":
             self.state.pending_audio = {"player": player, "prompt": prompt}
+            self.state.assign([player], f"局长让 {player} 录音判定", "judge")
             return {"requested": player, "note": "等他录音;结果以 judge_result 事件送达,期间别催"}
         self.state.pending_photo = {"player": player, "prompt": prompt}
+        self.state.assign([player], f"局长让 {player} 拍照判定", "judge")
         return {"requested": player, "note": "等他拍照;结果以 judge_result 事件送达,期间别催"}
 
     # —— music:AI 局头当 DJ。歌单是房主上传的资产(真人可写、AI 只读只调),
@@ -393,6 +398,8 @@ class ToolExecutor:
                 "order_all": order, "exclude": excl,
             }
             self.state.timers.append(deadline)
+            # 派活账:轮流问询轮到谁,活就在谁手上(engine._advance_round_ask 逐位改签)
+            self.state.assign([order[0]], f"轮到 {order[0]} 答:{a.get('prompt', '')}"[:60], "ask")
             return {"asked": order[0], "prompt": a.get("prompt", ""), "mode": "轮流",
                     "order": order, "window": window,
                     "note": "逐人开窗,答完或超时自动轮下一位,收齐出 ask_result"}
@@ -403,6 +410,10 @@ class ToolExecutor:
             "options": a.get("options"), "deadline": None, "answers": {},
             "window": window, "exclude": excl,
         }
+        # 点名问=点名派活(问全场不算派活:全场抢答本来就人人有份,不该锁任何人的按钮)
+        asked = a.get("player")
+        if asked and asked not in ("全场", "all"):
+            self.state.assign([asked], f"局长点名问 {asked}:{a.get('prompt', '')}"[:60], "ask")
         return {"asked": a.get("player", "全场"), "prompt": a.get("prompt", ""),
                 "options": a.get("options"), "window": window,
                 **({"exclude": excl} if excl else {})}
@@ -496,6 +507,9 @@ class ToolExecutor:
         # 每人挂一只「未摇的盅」(rolled=None);重复发=换新盅重置(覆盖旧盅)
         for p in dict.fromkeys(batch):  # 去重,同名只发一只
             self.state.props[p] = {"kind": "骰盅", "count": count, "rolled": None}
+        # 派活账:发到盅的人手上就有活(摇盅)。全员发=全员有活,按钮对谁都不锁——
+        # 这正是要的:大话骰不该出现「(某某的活)」把另外四台手机按暗。
+        self.state.assign(list(dict.fromkeys(batch)), "手上有盅要摇", "prop")
         return {"dealt": list(dict.fromkeys(batch)), "count": count, "kind": "骰盅",
                 "note": "盅已发到各人手机,等他们自己摇(events 里看谁摇了);"
                         "点数玩家摇出来才有,别替他们摇——替玩=虚构同罪"}
@@ -623,9 +637,15 @@ class ToolExecutor:
             if player is not None and player not in self.state.players:
                 raise ClampError(f"未知玩家: {player}")
             self.state.focus = player
+            # 显式派活(最强信号,但局长极少调——所以派活账不只靠它,见 state.assign 调用点)
+            if player:
+                self.state.assign([player], f"局长把焦点给了 {player}", "focus")
+            else:
+                self.state.unassign("focus")
             return {"focus": player}
         if op == "next_round":
             self.state.round_no += 1
+            self.state.assigned = None  # 翻轮=上一轮的活作废,按钮回中性
             return {"round": self.state.round_no}
         if op == "use_grant":
             prop = a.get("prop")
@@ -666,6 +686,7 @@ class ToolExecutor:
         if op == "finish":
             st = self.state
             st.finished = True
+            st.assigned = None
             # 收局即清场(真机病历 2026-07-24:finish 只设标志,「焦点在你身上」黄条
             # 永久钉死、问询窗/计时器/对决悬着,放榜之后还有人在抢答)。
             # 进行中的一切当场归零——收了的局不许再欠着任何等待。
@@ -748,6 +769,22 @@ class ToolExecutor:
         card = self.pattern_by_atom.get(atom["id"])
         if card and card.get("demo_ref"):  # 演示件随骨架来:show 时带上 demo 字段即可播放
             out["demo"] = {"ref": card["demo_ref"], "pattern": card["name"]}
+        # 派活账:抽给谁的活就记在谁头上(修法优先级第2级——规则跟着工具走)。
+        # 单人任务/惩罚是「完成」按钮最主要的来源,却一直没有任何账面信号,
+        # 于是那颗按钮只能靠 focus 猜(真机病历:Ming 替 Ann 点完成,记成「Ming 完成」)。
+        who = a.get("for_player") or a.get("for_players")
+        who = [who] if isinstance(who, str) else list(who or [])
+        good = [p for p in who if p in self.state.players]
+        solo = atom.get("type") in ("任务内容", "道具挑战", "问答题目")
+        if good:
+            self.state.assign(good, f"这条{atom.get('type') or '活'}是派给 {'、'.join(good)} 的", "draw")
+            out["assigned_to"] = good
+        elif who:
+            out["assign_note"] = f"for_player 里有不在座的人({who}),没记派活账"
+        elif solo:
+            out["assign_note"] = (
+                "没填 for_player——桌上不知道这活归谁,「完成/认罚」按钮会对全场一起亮着,"
+                "任何人替他一点就记成他交活了。谁的活就填谁(全员一起做才留空)。")
         return out
 
     # —— skill:技能牌专用信道(单独开库,2026-07-21 房主裁定)——

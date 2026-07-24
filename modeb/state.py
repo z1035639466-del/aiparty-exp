@@ -10,6 +10,11 @@ from dataclasses import dataclass, field
 from typing import Any
 
 
+# 派活时效:超过这么久没人交活、也没有新的派活,就当这活已经散了(口头玩法在桌上
+# 早翻篇了)。到期后按钮回到中性——宁可不认领,也不许挂着一条过期的"这是 X 的活"。
+ASSIGN_TTL_S = 240
+
+
 @dataclass
 class SkillGrant:
     """权力型惩罚:可持有的道具原语(绑实物/限次数/限本局)。"""
@@ -31,6 +36,12 @@ class GameState:
     scores: dict[str, int] = field(default_factory=dict)
     round_no: int = 0
     focus: str | None = None
+    # 派活信号(真机病历 2026-07-24:「完成」按钮的「(X的活)」标签挂在 focus 上,而
+    # focus 是局长手动维护的字段——64 拍里只调过 2 次,定向问询却发生了 5 次。前半场
+    # 完全没拦、后半场标签滞后十几拍、该锁时不锁)。焦点归焦点(局长嘴里的主角),
+    # 派活归派活:谁手上有活由**引擎从真实调用里自动记**,不劳局长自觉。
+    # {"players":[...], "why": 一句人话, "src": 工具名, "at": epoch}
+    assigned: dict | None = None
     atoms_used: list[str] = field(default_factory=list)
     grants: list[SkillGrant] = field(default_factory=list)
     notes: dict[str, Any] = field(default_factory=dict)
@@ -85,12 +96,47 @@ class GameState:
         for p in self.players:
             self.scores.setdefault(p, 0)
 
+    # —— 派活账(谁手上有活)——
+    def assign(self, players: list[str], why: str, src: str) -> dict | None:
+        """记一笔派活。后写覆盖先写:最近一次定向动作就是"现在轮到谁"。"""
+        ps = [p for p in players if p in self.players]
+        if not ps:
+            return None
+        self.assigned = {"players": ps, "why": why, "src": src, "at": _time.time()}
+        return self.assigned
+
+    def unassign(self, src: str | None = None) -> None:
+        """收活。src 给定时只收这个来源的(问询收窗不该顺手把对决的活也抹了)。"""
+        if self.assigned and (src is None or self.assigned.get("src") == src):
+            self.assigned = None
+
+    def hand_in(self, player: str) -> None:
+        """某人交活:把他从派活名单里划掉,名单空了这笔活就结了。"""
+        a = self.assigned
+        if not a or player not in a["players"]:
+            return
+        rest = [p for p in a["players"] if p != player]
+        self.assigned = {**a, "players": rest} if rest else None
+
+    def actors(self) -> list[str]:
+        """现在这活是谁的——过期的派活不算数(见 ASSIGN_TTL_S)。空=引擎不知道,
+        此时任何人按「完成」都不算认错人(口头玩法本来就没有派活信号)。"""
+        a = self.assigned
+        if not a or _time.time() - a.get("at", 0) > ASSIGN_TTL_S:
+            return []
+        return list(a["players"])
+
     def digest(self, time_left_min: float) -> dict[str, Any]:
         """上行状态摘要(协议 §五 state_digest)。"""
         return {
             "round": self.round_no,
             "scores": dict(self.scores),
             "focus": self.focus,
+            # 派活账(引擎自动记的,不是你手写的 focus):谁手上有活、因为什么。
+            # 你按这个判「谁交活」就不会认错人;想改就派新活(ask/judge/duel/
+            # draw_atom(for_player)/state.set_focus),别在心里改。
+            "assigned": ({"players": a["players"], "why": a["why"]}
+                         if (a := self.assigned) and self.actors() else None),
             "atoms_used": list(self.atoms_used),
             "grants": [
                 {"prop": g.prop, "holder": g.holder, "uses_left": g.uses_left}

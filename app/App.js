@@ -7,7 +7,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Alert, Animated, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView,
-  StyleSheet, Text, TextInput, View,
+  StyleSheet, Text, TextInput, View, useWindowDimensions,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Audio } from "expo-av";
@@ -356,6 +356,9 @@ function DiceCup({ prop, rolling, onRoll, onChallenge, others, onVoiceStart, onV
 
 export default function App() {
   useKeepAwake(); // 快枪手对峙期间息屏=判负,整局常亮
+  // 控制区高度上限要按真实屏高算(见底部控制区注释):百分比高度在 flex 父容器里
+  // 时灵时不灵,拿到像素才是确定的
+  const { height: winH } = useWindowDimensions();
   const [base, setBase] = useState(DEFAULT_SERVER);
   const [showServer, setShowServer] = useState(false); // 官方服域名焊死后,长按唤回调试入口
   const [me, setMe] = useState("");
@@ -954,10 +957,19 @@ export default function App() {
   const askMine = v.open_ask && (askedMe
     || !v.open_ask.asked || ["全场", "all"].includes(v.open_ask.asked))
     && !((v.open_ask && v.open_ask.exclude) || []).includes(me); // 当事人回避:出题人不出按钮
+  // 「这活是谁的」——认服务端的派活账(v.actor),不认 v.focus(房主复盘 2026-07-24:
+  // focus 是局长手写的字段,64 拍只调过 2 次,而定向派活发生了 5 次;按钮标签挂在它上面
+  // 于是前半场根本没拦、后半场滞后十几拍、该锁时不锁)。actors 空=引擎不知道这活归谁
+  // (纯口头玩法常态),此时人人可按,不做任何认领——宁可不声张,也不挂一条错的归属。
+  const actors = (v.actor && v.actor.players) || [];
+  const mineToDo = actors.length === 0 || actors.includes(me);   // 我能不能名正言顺地交活
+  const othersTurn = actors.length > 0 && !actors.includes(me);  // 明确是别人的活
+  const actorLabel = actors.join("、");
   const myCue = v.photo_request ? "📸 轮到你:拍照判定,看下方题目"
     : v.audio_request ? "🎤 轮到你:录音判定,看下方题目"
     : askedMe ? "🫵 问到你了,往下答"
-    : v.focus === me ? "🎯 焦点在你身上——做完按 ✅ 完成,不接按 🍺 认罚(自动扣分)" : null;
+    : actors.includes(me) ? `🎯 轮到你:${(v.actor && v.actor.why) || "手上有活"}——做完按 ✅ 完成,不接按 🍺 认罚(自动扣分)`
+    : othersTurn ? `⏳ 这一手是 ${actorLabel} 的:${(v.actor && v.actor.why) || ""}` : null;
 
   const takePhoto = async () => {
     const perm = await ImagePicker.requestCameraPermissionsAsync();
@@ -1026,7 +1038,11 @@ export default function App() {
       </View>
       {err ? <Text style={s.err}>{err}</Text> : null}
       {v.finished ? <Text style={s.finish}>🏁 本局已收</Text> : null}
-      {myCue ? <View style={s.cueBar}><Text style={s.cueText}>{myCue}</Text></View> : null}
+      {myCue ? (
+        <View style={othersTurn ? s.cueBarIdle : s.cueBar}>
+          <Text style={othersTurn ? s.cueTextIdle : s.cueText}>{myCue}</Text>
+        </View>
+      ) : null}
       {/* 局长思考指示:run_turn 进行中显示呼吸的「🎩 局长在酝酿 …」,不挡任何操作 */}
       {v.host_thinking ? <HostThinking /> : null}
 
@@ -1209,10 +1225,14 @@ export default function App() {
       </ScrollView>
 
       {/* feed 以下的控制区自己可滚(真机病历 2026-07-24:骰盅面板+问询框一叠,
-          页面超高又不能滑,底部按钮点不到)。flexShrink:1=平时按内容高,挤不下时
-          内部滚动;feed 有 minHeight 兜底不至于被挤成零 */}
-      <ScrollView style={{ flexShrink: 1, flexGrow: 0 }} keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingBottom: 2 }}>
+          页面超高又不能滑,底部按钮点不到)。第一版只给 flexShrink:1,3/4 的人复现
+          「底部划不动」——两个根因:①没有高度上限时 ScrollView 的框就是内容高,
+          内容永远"正好装下"=没得滚,超出的部分被挤出屏幕外(不是被裁在框里);
+          ②框底一路顶到屏幕物理边缘,最后一行压在手势条/home 条底下,看得见点不着。
+          修:硬上限 52% 屏高(拿像素算,百分比在 flex 父里时灵时不灵)+ 底部留白 28。*/}
+      <ScrollView style={{ flexShrink: 1, flexGrow: 0, maxHeight: Math.round(winH * 0.52) }}
+        keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator
+        contentContainerStyle={{ paddingBottom: 28 }}>
       {v.photo_request && (
         <View style={s.photoBtn}>
           <Text style={s.photoText}>📸 {v.photo_request}</Text>
@@ -1338,20 +1358,30 @@ export default function App() {
       {/* 三信号(完成/认罚/抢答)是现实结果回流的唯一通道,砍不得——口头挑战时
           服务器无任何状态可依,靠它们收口(等待权裁定)。但平时亮着是噪音(房主
           观感 2026-07-24):默认调暗蛰伏,流程可见地轮到你/有钩子挂着时点亮 */}
-      <View style={[s.row, !(v.timer_running || v.focus === me || askedMe
+      <View style={[s.row, !(v.timer_running || actors.includes(me) || askedMe
         || v.photo_request || v.audio_request) && { opacity: 0.45 }]}>
         {/* 点名派活时完成/认罚是当事人的活(真机病历:Ming 替 Lin 点了完成,全场跟按)
-            ——不禁点(旁观确认也是信号,服务端已标 bystander),但视觉上让位当事人 */}
+            ——不禁点(旁观确认也是信号,服务端已标 bystander),但先问一句再发:
+            默认按钮是「我完成了」,替别人按得自己承认是替按的,不再闷声记错人 */}
         <Pressable style={[s.sigBtn, { backgroundColor: "#2c5f3f" },
-          v.focus && v.focus !== me && { opacity: 0.35 }]}
-          onPress={() => sendEventEcho({ type: "done" }, "完成")}>
-          <Text style={s.sigText}>✅ 完成{v.focus && v.focus !== me ? `(${v.focus}的活)` : ""}</Text>
+          othersTurn && { opacity: 0.35 }]}
+          onPress={() => {
+            if (!othersTurn) { sendEventEcho({ type: "done" }, "完成"); return; }
+            Alert.alert("这不是你的活", `现在是 ${actorLabel} 的:${(v.actor && v.actor.why) || ""}`, [
+              { text: "点错了" },
+              { text: `我替${actorLabel}按的`, onPress: () => sendEventEcho({ type: "done" }, "替按完成") },
+            ]);
+          }}>
+          <Text style={s.sigText}>✅ 完成{othersTurn ? `(${actorLabel}的活)` : ""}</Text>
         </Pressable>
-        <Pressable style={[s.sigBtn, { backgroundColor: "#6b4a2b" },
-          v.focus && v.focus !== me && { opacity: 0.35 }]}
+        {/* 认罚跳过不常置(房主 2026-07-24:「完全没有长置的必要,轮到某人收罚了要用
+            再调出来显示」)——只在轮到我时出现;引擎不知道这活归谁时留着当兜底出口,
+            明确是别人的活时整颗收走(替人认罚这条路没有存在意义,认罚要自己认) */}
+        {mineToDo && (
+        <Pressable style={[s.sigBtn, { backgroundColor: "#6b4a2b" }]}
           onPress={() => sendEventEcho({ type: "forfeit" }, "认罚")}>
           <Text style={s.sigText}>🍺 认罚跳过</Text>
-        </Pressable>
+        </Pressable>)}
         <Pressable style={[s.sigBtn, { backgroundColor: "#31506e", flex: 0.6 }]}
           onPress={() => sendEventEcho({ type: "tap" }, "抢答")}>
           <Text style={s.sigText}>👏 抢答</Text>
@@ -1465,6 +1495,10 @@ const s = StyleSheet.create({
   cueBar: { backgroundColor: "#ffd54a", borderRadius: 12, paddingVertical: 12,
     paddingHorizontal: 14, marginVertical: 6 },
   cueText: { color: "#1a1408", fontSize: 19, fontWeight: "800" },
+  // 「这一手是别人的」:同一位置、低一档亮度——是提示不是催促,别跟"轮到你"抢眼
+  cueBarIdle: { backgroundColor: "#2a2f3a", borderRadius: 12, paddingVertical: 9,
+    paddingHorizontal: 14, marginVertical: 6 },
+  cueTextIdle: { color: "#9fb0c6", fontSize: 15, fontWeight: "700" },
   // 公开随机结果的「开签」卡:不混进对话流
   pickCard: { backgroundColor: "#33290e", borderColor: "#ffd54a", borderWidth: 1,
     borderRadius: 10, paddingVertical: 8, paddingHorizontal: 12, marginVertical: 4, marginLeft: 4 },

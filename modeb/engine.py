@@ -83,15 +83,21 @@ class Engine:
                 self.state.scores[p] -= 1
                 ev = dict(ev, auto_scored=-1,
                           note="系统已自动扣1分记账(认罚跳过),别再重复扣分,宣布即可")
-        if (ev.get("type") in ("done", "forfeit") and self.state.focus
-                and ev.get("player") and ev["player"] != self.state.focus):
+        if ev.get("type") in ("done", "forfeit") and ev.get("player"):
             # 定向问询洞的另一半(真机病历 2026-07-24:局长派活给 Lin,Ming 一点
             # 「完成」全场跟着点,唯独当事人没动)。信号不拦(旁观确认也是桌上真实
             # 动作),但必须可分辨——判定别认错人。
-            ev = dict(ev, bystander=True,
-                      note=((ev.get("note", "") + ";") if ev.get("note") else "")
-                      + f"按键的不是当前焦点(焦点={self.state.focus})——旁观者的确认,"
-                        f"不是当事人交活,凭它判定{self.state.focus}完成=认错人")
+            # 认人凭**派活账**(引擎自动记的),不凭 focus:focus 是局长手写的字段,
+            # 64 拍只调过 2 次,拿它当判据前半场根本没拦、后半场滞后十几拍。
+            actors = self.state.actors()
+            if actors and ev["player"] not in actors:
+                who = "、".join(actors)
+                ev = dict(ev, bystander=True,
+                          note=((ev.get("note", "") + ";") if ev.get("note") else "")
+                          + f"按键的不是当事人(这活派给{who}:{self.state.assigned['why']})"
+                            f"——旁观者的确认,不是当事人交活,凭它判定{who}完成=认错人")
+            elif actors:
+                self.state.hand_in(ev["player"])  # 当事人交活:这笔派活结清
         duel = self.state.duel
         if (duel and ev.get("type") == "tap" and ev.get("player") in duel["players"]):
             # 快枪手抢拍:第一下 tap 立即定胜负——枪响前抢跑判负,枪响后先到者胜。
@@ -122,6 +128,7 @@ class Engine:
         lead = ev["t_ms"] - draw_ms
         duel["taps"][p] = ev["t_ms"]
         self.state.duel = None
+        self.state.unassign("duel")
         if lead < 0:
             result = {"winner": other, "loser": p,
                       "reason": f"{p} 抢跑(枪响前 {-lead}ms)判负"}
@@ -160,6 +167,7 @@ class Engine:
         if ask["queue"]:
             ask["asked"] = ask["queue"].pop(0)
             ask["deadline"] = time.time() + ask["window"]
+            self.state.assign([ask["asked"]], f"轮到 {ask['asked']} 答:{ask['prompt']}"[:60], "ask")
         else:
             ask["deadline"] = time.time() - 0.001
         self.state.timers.append(ask["deadline"])
@@ -179,6 +187,7 @@ class Engine:
             if ask["asked"] not in ask["answers"] and not ask["queue"]:
                 pass  # 最后一位也超时:落到下面正常收
         self.state.open_ask = None
+        self.state.unassign("ask")  # 问询收窗=这笔派活结清(别的来源的活不动)
         tally: dict[str, int] = {}
         for v in ask["answers"].values():
             tally[v] = tally.get(v, 0) + 1

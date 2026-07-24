@@ -333,6 +333,8 @@ class Session:
         # ——房主裁定 2026-07-24 删私件份;🔒🎲 水印路留给 random.dice 的遗留私摇)
         # 公开事件面只留动作、不留点数:主持从 events 看谁摇了、齐了开吹牛;旁人 view 也只见动作
         self.engine.push_event({"type": "roll", "player": me})
+        if (self.state.assigned or {}).get("src") == "prop":
+            self.state.hand_in(me)   # 摇完这只盅=这人的活交了(全摇完账自然清空)
         return {"ok": True, "rolled": True, "count": count}
 
     def challenge(self, me: str, bid: dict | None = None,
@@ -656,6 +658,11 @@ class Session:
             "you": me,
             "round": digest.get("round"), "turn": self.engine.marks["turns"],
             "turn_ready": self.engine.turn_ready(), "focus": digest.get("focus"),
+            # 派活账(「这活是谁的」的唯一信号源,2026-07-24 修):App 的「完成/认罚」
+            # 按钮认这个,不认 focus——focus 是局长手写的、几乎不更新的字段。
+            # players 空/字段为 null = 引擎不知道这活归谁,此时谁都可以按(口头玩法常态)。
+            "actor": ({"players": a["players"], "why": a["why"]}
+                      if (a := self.state.assigned) and self.state.actors() else None),
             "finished": self.state.finished,
             "time_left_min": digest.get("time_left_min"),
             "now_playing": digest.get("now_playing"),  # 音乐是全场公开的:现实里人人听得见
@@ -1484,6 +1491,7 @@ class Handler(BaseHTTPRequestHandler):
                 with s.lock:
                     if s.state.pending_audio == pend:
                         s.state.pending_audio = None
+                        s.state.unassign("judge")   # 交了活:派活账结清
                         s.engine.push_event(dict(result))
                 self._json(200, {"verdict": result["verdict"], "reason": result["reason"]})
                 return
@@ -1543,6 +1551,7 @@ class Handler(BaseHTTPRequestHandler):
                 with s.lock:
                     if s.state.pending_photo == pend:
                         s.state.pending_photo = None
+                        s.state.unassign("judge")   # 交了活:派活账结清
                         s.engine.push_event(dict(result))
                 self._json(200, {"verdict": result["verdict"], "reason": result["reason"]})
                 return

@@ -38,21 +38,25 @@ def test_forfeit_auto_deducts_and_annotates(tmp_path):
 
 
 def test_bystander_done_annotated(tmp_path):
-    """定向问询洞的另一半:点名派活时旁人替当事人点完成,信号不拦但必须可分辨。"""
+    """定向问询洞的另一半:点名派活时旁人替当事人点完成,信号不拦但必须可分辨。
+
+    2026-07-24 改判据:认人凭**派活账**(引擎自动记),不凭 focus——见
+    test_modeb_actor_signal。这里走 set_focus 工具(它既设焦点也记派活账)。
+    """
     e = _engine(tmp_path)
-    e.state.focus = "乙"
+    e.tools.execute({"name": "state.set_focus", "input": {"player": "乙"}})
     e.push_event({"type": "done", "player": "甲"})
     ev = next(x for x in e.event_queue if x.get("type") == "done")
     assert ev.get("bystander") is True
     assert "认错人" in ev.get("note", "")
-    e.push_event({"type": "done", "player": "乙"})  # 当事人自己按:干净无注记
-    clean = [x for x in e.event_queue if x.get("type") == "done" and x["player"] == "乙"]
-    assert clean and not clean[0].get("bystander")
     # 旁观者认罚:自动扣分(扣自己的)与旁观注记并存
     e.push_event({"type": "forfeit", "player": "甲"})
     fv = next(x for x in e.event_queue if x.get("type") == "forfeit")
     assert fv.get("auto_scored") == -1 and fv.get("bystander") is True
     assert "别再重复扣分" in fv["note"] and "认错人" in fv["note"]
+    e.push_event({"type": "done", "player": "乙"})  # 当事人自己按:干净无注记
+    clean = [x for x in e.event_queue if x.get("type") == "done" and x["player"] == "乙"]
+    assert clean and not clean[0].get("bystander")
 
 
 def test_unknown_player_forfeit_no_crash(tmp_path):
