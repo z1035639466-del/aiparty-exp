@@ -903,7 +903,7 @@ export default function App() {
   const myCue = v.photo_request ? "📸 轮到你:拍照判定,看下方题目"
     : v.audio_request ? "🎤 轮到你:录音判定,看下方题目"
     : askedMe ? "🫵 问到你了,往下答"
-    : v.focus === me ? "🎯 焦点在你身上" : null;
+    : v.focus === me ? "🎯 焦点在你身上——做完按 ✅ 完成,不接按 🍺 认罚(自动扣分)" : null;
 
   const takePhoto = async () => {
     const perm = await ImagePicker.requestCameraPermissionsAsync();

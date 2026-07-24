@@ -65,6 +65,15 @@ class Engine:
             self.marks["skips"] += 1
         if ev.get("type") == "forfeit":  # 认罚跳过(日常的「过」):正常游戏动作,按赌注结算
             self.marks["forfeits"] += 1
+            p = ev.get("player")
+            if p in self.state.scores:
+                # 认罚自动记账(房主裁定 2026-07-24:跳过挑战/惩罚的才喝和扣分,这笔账
+                # 是确定性规则,不劳主持自觉——之前按钮只发信号,记不记分全看主持,
+                # 主持嘴上说「不敢就喝一口」账本一分不动,按钮形同虚设)。
+                # 系统当场扣1分,事件带注记防主持重复扣。
+                self.state.scores[p] -= 1
+                ev = dict(ev, auto_scored=-1,
+                          note="系统已自动扣1分记账(认罚跳过),别再重复扣分,宣布即可")
         duel = self.state.duel
         if (duel and ev.get("type") == "tap" and ev.get("player") in duel["players"]):
             # 快枪手抢拍:第一下 tap 立即定胜负——枪响前抢跑判负,枪响后先到者胜。
