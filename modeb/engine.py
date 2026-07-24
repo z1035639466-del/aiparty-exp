@@ -37,6 +37,7 @@ class Engine:
         self.host_error_streak = 0      # 连续沉默拍;成功一拍归零,≥5 台面亮红牌
         self.last_host_error = ""
         self.cooldown_until = 0.0       # 失败后的冷却:免得自动循环每秒撞一次死 API
+        self._wake_retry = False        # 唤醒券补发标记:timer_expired 被空拍吞掉只补一次
         # 荷官回执:主持上一拍工具的真实结果,只走 driver 专用信道回给它本人。
         # 遮蔽按观看者定,不按出口定——玩家面/驾驶舱照旧遮,发牌人看自己发的牌。
         self._last_results: list[dict] = []
@@ -289,6 +290,18 @@ class Engine:
         self._ep.flush()  # 审计线逐行落地:进程中途死掉,流水不能跟着蒸发
         self.marks["turns"] += 1
         self._last_results = results  # 荷官回执:下一拍随 driver 信道回给主持本人
+        # 唤醒不许浪费(真机死锁病历 2026-07-24):被 timer_expired 叫醒却交了空拍,
+        # 三个唤醒条件从此全灭,全局死锁只能靠真人说话救。把唤醒券还回队列**一次**
+        # 并附提醒;第二次仍空拍就依「没回应就等」的老规矩认了——这不是冷场闹钟
+        # (无任何隐式定时),只是不许把已经响过的铃吞进空拍里。
+        if not text and not calls and any(e.get("type") == "timer_expired" for e in events):
+            if not self._wake_retry:
+                self._wake_retry = True
+                self.event_queue.append({
+                    "type": "timer_expired", "requeued": True,
+                    "note": "上一拍被计时器叫醒却空拍了——结算(ask 表决谁输也行)/追问/设新 timer,三选一"})
+        elif text or calls:
+            self._wake_retry = False
         return line
 
     # —— 跑完一局 ——
