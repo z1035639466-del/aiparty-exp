@@ -12,6 +12,21 @@
 道具调用≈0。凡未读宪法即动手的 agent,默认会把产品做成"AI 说话"——这是结构性偏差,
 不是个体失误。
 
+# 修法优先级:提示词是最后手段(2026-07-24 房主定)
+
+出问题不许条件反射地往提示词里加话——提示词按句膨胀,加到后面全是问题解决不了。
+修任何一个"局长行为不对"的问题,按这个顺序找解法,上一级走不通才降到下一级:
+
+1. **引擎守卫/钳制层**:行为可检验的规则用代码执法(越界拒写、束手拍检测、唤醒券、
+   三句硬截断、开牌当庭报数都是先例)。代码执法零 token、不会被模型忘掉。
+2. **工具声明**:只关一个工具的规范写进那个工具自己的 declaration,不进全局段落。
+3. **条件注入**:上下文相关的规则跟着触发它的信号走(读场规则"没输入不注水"是先例)
+   ——风险出现才付 token。
+4. **常驻提示词**:只留宪法级定位与原则。往这里加句子前先自问:上面三级为什么不行?
+   答不上就不许加。铁律段落长胖时做蒸馏(病历句合并成原则句),不做追加。
+
+裁定背景:docs/records/裁定-修法优先级-提示词最后手段-20260724.md
+
 # Git workflow
 
 After completing and committing any user-requested repository change, always run `git push` for the current branch and report the remote synchronization result in the final response.
