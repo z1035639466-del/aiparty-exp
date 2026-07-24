@@ -678,6 +678,10 @@ class Session:
                               if self.state.pending_audio
                               and self.state.pending_audio["player"] == me else None),
             "scores": digest.get("scores"), "scene_objects": digest.get("scene_objects"),
+            # 分数变动播报(真机病历 2026-07-24:「中途分数变动无实时提示」)。最近
+            # SCORE_FLASH_S 秒内的每一笔 {player, delta, why},手机弹条报账——认罚
+            # 自动扣的那 1 分不再指望主持记得说。账本公开,故全桌的变动都给。
+            "score_flash": self.state.score_flash(),
             "now_playing": digest.get("now_playing"),   # 手机上要显示正在放的歌
             "timer_running": digest.get("timer_running"),
             # 我自己的骰盅:rolled(点数)只给本人——摇过常驻显示,大话骰全程盯着吹牛。

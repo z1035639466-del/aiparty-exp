@@ -14,6 +14,10 @@ from typing import Any
 # 早翻篇了)。到期后按钮回到中性——宁可不认领,也不许挂着一条过期的"这是 X 的活"。
 ASSIGN_TTL_S = 240
 
+# 分数流水在手机上停留多久。够一眼看见(轮询 900ms,十来秒足够跨过一次抬头),
+# 又不至于让上一轮的账压在这一轮的头上。
+SCORE_FLASH_S = 14
+
 
 @dataclass
 class SkillGrant:
@@ -42,6 +46,11 @@ class GameState:
     # 派活归派活:谁手上有活由**引擎从真实调用里自动记**,不劳局长自觉。
     # {"players":[...], "why": 一句人话, "src": 工具名, "at": epoch}
     assigned: dict | None = None
+    # 分数流水(真机病历 2026-07-24:「中途分数变动无实时提示」——账本只有一个当前值,
+    # 手机上那个数字自己变了没人知道为什么;认罚自动扣的那 1 分尤其冤,主持有时还漏播)。
+    # 三个改账的口子(认罚自动扣 / state.add_score / state.settle 清账)全部走 score(),
+    # 每一笔留 {player, delta, why, at},手机拿最近 SCORE_FLASH_S 秒的弹条播报。
+    score_log: list[dict] = field(default_factory=list)
     atoms_used: list[str] = field(default_factory=list)
     grants: list[SkillGrant] = field(default_factory=list)
     notes: dict[str, Any] = field(default_factory=dict)
@@ -97,6 +106,26 @@ class GameState:
             self.scores.setdefault(p, 0)
 
     # —— 派活账(谁手上有活)——
+    def score(self, player: str, delta: int, why: str) -> int:
+        """改账的唯一入口:动数字的同时留一笔流水,手机才有得播报。
+
+        直接写 scores[p] 的老写法一律改走这里——账面变了却说不出为什么,
+        在桌上等于没变(玩家看不见,只会觉得分数在自己乱跳)。
+        """
+        if player not in self.scores or not delta:
+            return self.scores.get(player, 0)
+        self.scores[player] += delta
+        self.score_log.append({"player": player, "delta": int(delta),
+                               "why": why, "at": _time.time()})
+        del self.score_log[:-40]   # 只留个尾巴,流水不是账本
+        return self.scores[player]
+
+    def score_flash(self) -> list[dict]:
+        """最近这几秒的分数变动(全桌可见:账本本来就是公开的)。"""
+        now = _time.time()
+        return [{"player": e["player"], "delta": e["delta"], "why": e["why"]}
+                for e in self.score_log if now - e["at"] <= SCORE_FLASH_S]
+
     def assign(self, players: list[str], why: str, src: str) -> dict | None:
         """记一笔派活。后写覆盖先写:最近一次定向动作就是"现在轮到谁"。"""
         ps = [p for p in players if p in self.players]

@@ -398,7 +398,7 @@ export default function App() {
   // 轮询发现 ask 还开着(轮流模式还在别人/换了题)按服务器状态为准恢复。
   const [askPicked, setAskPicked] = useState(null); // {prompt, asked, choice}
   const [sceneBusy, setSceneBusy] = useState(false); // 场景侦察分析中(几秒,给反馈防"哑巴按钮")
-  const prevRef = useRef({ inbox: 0, drawn: false, challenged: false, verdict: null });
+  const prevRef = useRef({ inbox: 0, drawn: false, challenged: false, verdict: null, flash: "" });
   // 炸铃本地定时:记已排定那口铃的 at(去重,同一铃只触发一次)+ 定时器句柄(新铃覆盖旧铃时清掉)
   const bellRef = useRef({ at: null, timer: null });
   const feedRef = useRef(null); // 局长最新一句永远滚到眼前(手机举得远,不能靠手扒)
@@ -659,8 +659,18 @@ export default function App() {
         // 选择框即收的收尾:轮询发现 ask 已关(或换了题/换了被问的人)按服务器为准,
         // 撤掉本地"✓ 已选"回到服务器状态(下面渲染据 askPicked 与 open_ask 一致性判定)。
         if (!v.open_ask) setAskPicked(null);
+        // 分数变动播报(真机病历 2026-07-24:中途分数变动无实时提示——手机上那个数字
+        // 自己变了,认罚自动扣的那 1 分尤其冤,主持还常漏播)。服务器给的就是"最近
+        // 十几秒的流水",到期自己消失,客户端不用计时;只对**我自己**那笔震手。
+        const myFlash = (v.score_flash || []).filter((x) => x.player === me);
+        const flashSig = JSON.stringify(myFlash);
+        if (myFlash.length && flashSig !== prev.flash)
+          Haptics.notificationAsync(myFlash.some((x) => x.delta < 0)
+            ? Haptics.NotificationFeedbackType.Warning
+            : Haptics.NotificationFeedbackType.Success);
         prevRef.current = { inbox: (v.inbox || []).length,
-          drawn: !!(v.duel && v.duel.drawn), challenged: !!chCup, verdict: vdSig };
+          drawn: !!(v.duel && v.duel.drawn), challenged: !!chCup, verdict: vdSig,
+          flash: flashSig };
         setView(v);
       } catch (e) { if (alive) setErr("连不上服务器:" + e.message); }
     };
@@ -1041,6 +1051,23 @@ export default function App() {
       {myCue ? (
         <View style={othersTurn ? s.cueBarIdle : s.cueBar}>
           <Text style={othersTurn ? s.cueTextIdle : s.cueText}>{myCue}</Text>
+        </View>
+      ) : null}
+      {/* 分数变动条(真机病历 2026-07-24:「中途分数变动无实时提示」)。服务端只给最近
+          十几秒的流水,过期自己不下发,所以这里直接渲染、不必本地计时。我自己的那笔
+          做重色+带上现在几分(账要看得见落到哪),别人的淡色一行带过。 */}
+      {(v.score_flash || []).length > 0 ? (
+        <View style={s.flashBox}>
+          {v.score_flash.map((x, i) => {
+            const mine = x.player === me;
+            return (
+              <Text key={i} style={mine ? s.flashMine : s.flashOther}>
+                {x.delta < 0 ? "🍺" : "⭐"} {mine ? "你" : x.player} {x.delta > 0 ? "+" : ""}{x.delta} 分
+                {x.why ? ` · ${x.why}` : ""}
+                {mine ? ` (现在 ${(v.scores || {})[me] ?? 0} 分)` : ""}
+              </Text>
+            );
+          })}
         </View>
       ) : null}
       {/* 局长思考指示:run_turn 进行中显示呼吸的「🎩 局长在酝酿 …」,不挡任何操作 */}
@@ -1499,6 +1526,11 @@ const s = StyleSheet.create({
   cueBarIdle: { backgroundColor: "#2a2f3a", borderRadius: 12, paddingVertical: 9,
     paddingHorizontal: 14, marginVertical: 6 },
   cueTextIdle: { color: "#9fb0c6", fontSize: 15, fontWeight: "700" },
+  // 分数变动条:自己的一笔要抬眼看得见(账动了要有人告诉你),别人的降到旁白档
+  flashBox: { backgroundColor: "#2b1f14", borderColor: "#8a6134", borderWidth: 1,
+    borderRadius: 10, paddingVertical: 7, paddingHorizontal: 12, marginVertical: 4 },
+  flashMine: { color: "#ffca7a", fontSize: 16, fontWeight: "800", marginVertical: 1 },
+  flashOther: { color: "#9a8b78", fontSize: 13, marginVertical: 1 },
   // 公开随机结果的「开签」卡:不混进对话流
   pickCard: { backgroundColor: "#33290e", borderColor: "#ffd54a", borderWidth: 1,
     borderRadius: 10, paddingVertical: 8, paddingHorizontal: 12, marginVertical: 4, marginLeft: 4 },

@@ -630,8 +630,11 @@ class ToolExecutor:
                 raise ClampError(f"未知玩家: {player}")
             if abs(delta) > MAX_SCORE_DELTA:
                 raise ClampError(f"写分越界 |{delta}|>{MAX_SCORE_DELTA}")
-            self.state.scores[player] += delta
-            return {"scores": dict(self.state.scores), "reason": a.get("reason", "")}
+            reason = a.get("reason", "")
+            # 走 state.score() 留流水:改的原因当场进当事人手机(reason 填了就播
+            # 你的话,没填播个默认)——不然桌上只看见数字自己跳。
+            self.state.score(player, delta, reason or ("加分" if delta > 0 else "扣分"))
+            return {"scores": dict(self.state.scores), "reason": reason}
         if op == "set_focus":
             player = a.get("player")
             if player is not None and player not in self.state.players:
@@ -669,7 +672,7 @@ class ToolExecutor:
                 if owed > 0:
                     cleared[p] = owed
                     self.state.settled[p] = self.state.settled.get(p, 0) + owed
-                    self.state.scores[p] = 0
+                    self.state.score(p, owed, f"清账:欠的 {owed} 口喝掉了,账面归零")
             return {"settled": cleared, "settled_total": dict(self.state.settled),
                     "scores": dict(self.state.scores)}
         if op == "discard":
