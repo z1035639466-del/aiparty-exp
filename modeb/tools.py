@@ -728,6 +728,15 @@ class ToolExecutor:
         self.state.atoms_used.append(atom["id"])
         out = {"atom": {k: atom.get(k) for k in ("id", "name", "type", "text", "wildness", "currency", "tier")},
                "bound_object": next((o for o in atom["props"] if o in self.state.scene_objects), None)}
+        if "喝" in str(atom.get("currency") or ""):
+            # 向喝坍缩的最大孔道是库本身(小红书酒桌源,大半原子以喝为赌注)——
+            # 判罚铁律在工具口兑现(修法优先级第2级,条件触发不烧常驻提示词):
+            # 赌注在回执里当场换掉,喝只留给玩家自己 forfeit(扣分记账)。
+            out["atom"]["currency"] = "输家抽惩罚(原赌注=喝,已按判罚铁律替换)"
+            out["stake_note"] = (
+                "本条原文以酒为赌注——讲玩法时把文本里的『喝』整体替换成:输家抽一个"
+                "共同经历型惩罚(draw_atom 任务内容);不想接惩罚的玩家可自己认罚喝一口,"
+                "同时扣分记账。玩法卡和主持词上不许出现『输的喝』。")
         card = self.pattern_by_atom.get(atom["id"])
         if card and card.get("demo_ref"):  # 演示件随骨架来:show 时带上 demo 字段即可播放
             out["demo"] = {"ref": card["demo_ref"], "pattern": card["name"]}
