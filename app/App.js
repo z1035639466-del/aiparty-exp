@@ -860,7 +860,7 @@ export default function App() {
             <>
               {/* 座位名要跟服务端花名册逐字相等——自动更正/首字母大写会把 Jing 改成
                   King 这种,玩家看屏幕是对的却一直入座失败,必须关掉 */}
-              <TextInput style={s.input} placeholder="你的座位名(开局时定的)"
+              <TextInput style={s.input} placeholder="你的座位名(自己起,朋友认得出就行)"
                 placeholderTextColor="#667" autoCapitalize="none" autoCorrect={false}
                 value={me} onChangeText={setMe} />
               <TextInput style={s.input} placeholder="房间码(如 A7QK;只有一桌可留空)"
@@ -1307,9 +1307,17 @@ export default function App() {
         </Pressable>
       </View>
       <View style={[s.row, { justifyContent: "center" }]}>
-        <Pressable hitSlop={14} onPress={() => Alert.alert("安全退出", "零代价退出当前环节,确定?", [
+        {/* 真机病历 2026-07-24:「点安全退出退不出来」——原来只发 optout 事件
+            (跳过环节),没有离开房间的路,发了也没反馈。现在两条路都给,
+            退出这轮走乐观回显(看得见发出去了),离开房间本地即走(随时可重新入座) */}
+        <Pressable hitSlop={14} onPress={() => Alert.alert("安全退出",
+          "退出这轮=零代价跳过当前环节;离开房间=退回首页,随时可重新入座", [
           { text: "再想想" },
-          { text: "退出这轮", onPress: () => sendEvent({ type: "optout" }) },
+          { text: "退出这轮", onPress: () => sendEventEcho({ type: "optout" }, "退出这轮") },
+          { text: "离开房间", style: "destructive", onPress: () => {
+            setJoined(false); setInLobby(false); setSeated(false); setIsHost(false);
+            setHostToken(""); setRoster([]); setView(null); setAskPicked(null);
+          } },
         ])}>
           <Text style={s.optout}>安全退出</Text>
         </Pressable>
