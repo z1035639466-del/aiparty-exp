@@ -36,8 +36,11 @@ export default function Bomb() {
   const crack = useRef(new Animated.Value(0)).current;   // 屏幕碎裂浮现
   const wobble = useRef(new Animated.Value(0)).current;   // 炸弹图标随震动抖
 
+  // 降级铁律:BombFeel 原生件只在 dev client 存在(propfeel/index 已守卫成 null 安全)。
+  // 缺席时所有原生访问都做特性检测,组件照常渲染,一个 crash 都不许。
   useEffect(() => {
-    try { setSupported(BombFeel.isSupported()); } catch (e) { setSupported(false); }
+    try { setSupported(BombFeel ? BombFeel.isSupported() : false); } catch (e) { setSupported(false); }
+    if (!BombFeel) return;   // 原生缺席:不挂监听,视觉层仍在(炸弹留在仓里待命,未接引擎)
     const tick = BombFeel.addListener('onTick', () => {
       // 每次震动让炸弹图标抖一下(视觉等价物,给没震动的设备也有反馈)
       Animated.sequence([
@@ -54,17 +57,17 @@ export default function Bomb() {
       crack.setValue(0);
       Animated.timing(crack, { toValue: 1, duration: 260, delay: 120, useNativeDriver: true }).start();
     });
-    return () => { tick.remove(); boom.remove(); BombFeel.defuse(); };
+    return () => { tick.remove(); boom.remove(); try { BombFeel.defuse(); } catch (e) {} };
   }, []);
 
   const arm = async () => {
     // 真接引擎时:task 从服务端响应取(局长出的题)。原型先显占位。
     setTask(ENGINE_TASK_PLACEHOLDER);
     setPhase('armed');
-    await BombFeel.arm(8, 18);   // 8~18 秒随机引信(原型客户端随机;真实走服务端)
+    try { if (BombFeel) await BombFeel.arm(8, 18); } catch (e) {}   // 引信走原生;缺席则纯视觉
   };
 
-  const reset = async () => { await BombFeel.defuse(); crack.setValue(0); setPhase('idle'); };
+  const reset = async () => { try { if (BombFeel) await BombFeel.defuse(); } catch (e) {} crack.setValue(0); setPhase('idle'); };
 
   return (
     <View style={s.root}>

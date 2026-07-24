@@ -20,6 +20,12 @@ import * as ImagePicker from "expo-image-picker";
 import { useKeepAwake } from "expo-keep-awake";
 import { Accelerometer } from "expo-sensors";
 import * as VideoThumbnails from "expo-video-thumbnails";
+// —— 道具实感层(局长派发流的皮肉)——
+// 影棚质感组件,吃服务器传入的点数/状态,不产出任何游戏结果;原生手感缺席时无感降级
+// (震动走 expo-haptics、音效走 expo-av、视觉照常),Expo Go/模拟器照常可玩。
+import { DiceStage } from "./props/dice";
+import { DuelStage } from "./props/revolver";
+import { ForeheadCard } from "./props/forehead";
 
 // 乐观回显上线后确认压力小了,轮询提到 600ms(慢不是病、没反馈才是病:节奏更跟手,
 // 但别低于 500——再快只是空烧流量,乐观回显已经把"点了没反应"的死区堵死了)。
@@ -201,8 +207,7 @@ function ChallengeControl({ onChallenge, others }) {
 
 function DiceCup({ prop, rolling, onRoll, onChallenge, others }) {
   const { count, rolled } = prop;
-  const [faces, setFaces] = useState(() => Array.from({ length: count }, () => 1));
-  const [shakes, setShakes] = useState(0);
+  const [shakes, setShakes] = useState(0);  // 摇动脉冲计数:既是仪式进度,也驱动 DiceStage 盅体抖
   const [sensorOk, setSensorOk] = useState(true);
   const lastPulse = useRef(0);
   const shakesRef = useRef(0);
@@ -211,9 +216,6 @@ function DiceCup({ prop, rolling, onRoll, onChallenge, others }) {
   rollRef.current = onRoll;                 // 始终指向最新 onRoll,自动扣盅时不吃旧闭包
   const challengedBy = prop.challenged_by;  // 有人开牌:全桌盅锁定,摇的入口一并撤下
   const armed = !rolled && !rolling && !challengedBy; // 持未摇盅、没在扣、没被开:才订阅传感器
-
-  // 骰面快速乱翻(哗啦哗啦的感觉):摇动脉冲时、脚本兜底 rolling 时都用它
-  const tumble = () => setFaces(Array.from({ length: count }, () => 1 + Math.floor(Math.random() * 6)));
 
   // 传感器订阅:只在持未摇盅时挂,摇完/离屏即退订——别让轮询页背着传感器跑
   useEffect(() => {
@@ -232,10 +234,9 @@ function DiceCup({ prop, rolling, onRoll, onChallenge, others }) {
         const now = Date.now();
         if (now - lastPulse.current < SHAKE_GAP_MS) return;
         lastPulse.current = now;
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);  // 每次晃一次轻触感
-        tumble();
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);  // 每次晃一次轻触感(全平台保底)
         shakesRef.current += 1;
-        setShakes(shakesRef.current);
+        setShakes(shakesRef.current);   // 计数变化 → DiceStage 盅体抖一下 + 撞击音(降级层)
         // 摇够后骤停自动扣盅:每次脉冲重置 settle 计时,停手 ~420ms 没新脉冲就自动扣
         if (shakesRef.current >= SHAKE_MIN) {
           if (settleTimer.current) clearTimeout(settleTimer.current);
@@ -250,24 +251,16 @@ function DiceCup({ prop, rolling, onRoll, onChallenge, others }) {
     };
   }, [armed, count]);
 
-  // 脚本兜底 / 扣盅瞬间:rolling 期间骰面持续乱翻,直到点数经轮询回来
-  useEffect(() => {
-    if (!rolling) return;
-    const iv = setInterval(tumble, 70);
-    return () => clearInterval(iv);
-  }, [rolling, count]);
-
   // 摇过的盅:常驻显示自己的点数(大话骰全程要盯着自己的骰吹牛,不能摇完就没了)。
   // 骰面旁常驻「开牌!」入口(醒目但次于摇/扣主流程);被开后换成"等局长清算"。
+  // 揭的必须是服务器回的那几颗点数(rolled=my_prop.rolled),DiceStage 只忠实揭盅。
   if (rolled) {
     const sum = rolled.reduce((a, b) => a + b, 0);
     return (
       <View style={s.cupBox}>
         <Text style={s.cupTitle}>🎲 你的骰盅 · {count}颗(只有你看得到)</Text>
-        <View style={s.diceRow}>
-          {rolled.map((n, i) => <Die key={i} n={n} />)}
-          {rolled.length > 1 ? <Text style={s.diceSum}>Σ{sum}</Text> : null}
-        </View>
+        <DiceStage count={count} revealed={rolled} />
+        {rolled.length > 1 ? <Text style={s.diceSum}>Σ{sum}</Text> : null}
         {challengedBy ? (
           <Text style={s.challengedNote}>⚡ {challengedBy} 开牌了{fmtBid(prop.bid)}——已开牌,等局长清算</Text>
         ) : (
@@ -277,30 +270,30 @@ function DiceCup({ prop, rolling, onRoll, onChallenge, others }) {
     );
   }
 
-  // 没摇就被开了牌(别人拍了开牌):盅锁定,摇的入口撤下,只留状态
+  // 没摇就被开了牌(别人拍了开牌):盅锁定,摇的入口撤下,只留状态(盅盖着)
   if (challengedBy) {
     return (
       <View style={s.cupBox}>
         <Text style={s.cupTitle}>🎲 骰盅 · {count} 颗</Text>
+        <DiceStage count={count} revealed={null} />
         <Text style={s.challengedNote}>⚡ {challengedBy} 开牌了{fmtBid(prop.bid)}——骰盅已锁,等局长清算</Text>
       </View>
     );
   }
 
   const enough = shakes >= SHAKE_MIN;
+  // 未摇的活盅:主视觉是盖着的骰盅(摇时跟手抖、扣盅时哗啦哗啦),点数不出现在这里——
+  // 盅盖着看不见骰,正是大话骰的产品事实。DiceStage 吃 pulse/rolling,不产出任何结果。
   return (
     <View style={s.cupBoxActive}>
       <Text style={s.cupTitle}>🎲 骰盅 · {count} 颗</Text>
+      <DiceStage count={count} revealed={null} pulse={shakes} rolling={rolling} />
       {rolling ? (
-        <>
-          <View style={s.diceRow}>{faces.map((n, i) => <Die key={i} n={n} />)}</View>
-          <Text style={s.cupHint}>哗啦哗啦……扣盅揭晓</Text>
-        </>
+        <Text style={s.cupHint}>哗啦哗啦……扣盅揭晓</Text>
       ) : sensorOk ? (
-        // 传感器可用:主视觉是「摇一摇手机!」大字+骰盅图形(体感是主交互),
+        // 传感器可用:主视觉是骰盅本体 +「摇一摇手机!」大字(体感是主交互),
         // 摇按钮缩小放底部当兜底——别让常驻大按钮把摇一摇的仪式感盖成毛坯点点点
         <>
-          <View style={s.diceRow}>{faces.map((n, i) => <Die key={i} n={n} />)}</View>
           <Text style={s.shakeMain}>🎲 摇一摇手机!</Text>
           <Text style={s.cupHint}>
             {enough ? "摇够了!停手自动扣盅" : `摇 ${SHAKE_MIN} 下起扣(${shakes}/${SHAKE_MIN})`}
@@ -310,9 +303,8 @@ function DiceCup({ prop, rolling, onRoll, onChallenge, others }) {
           </Pressable>
         </>
       ) : (
-        // 传感器不可用/无权限/桌面平放:按钮放大回主交互位,点了走脚本化震动+乱翻后同样扣盅,终点一致
+        // 传感器不可用/无权限/桌面平放:按钮放大回主交互位,点了同样扣盅,终点一致
         <>
-          <View style={s.diceRow}>{faces.map((n, i) => <Die key={i} n={n} />)}</View>
           <Text style={s.cupHint}>这台手机摇不了——点按钮替你摇</Text>
           <Pressable style={s.rollBtn} onPress={onRoll}>
             <Text style={s.rollBtnText}>摇!</Text>
@@ -351,6 +343,9 @@ export default function App() {
   const pttHeldRef = useRef(false);             // 手指还按着吗(create 是异步的,防松手竞态)
   const [challengeFlash, setChallengeFlash] = useState(null); // 「⚡ 开牌!」全屏横幅(1.6s 自动散)
   const [bellFlash, setBellFlash] = useState(null); // 系统级炸铃满屏大字(1.2s 自动散)
+  // 额头牌查看:点桌面某人的 chip → 用 forehead 组件展示那个人的牌(自己的显示牌背)。
+  // {name, identity, isMe};身份永远来自 view.foreheads(服务端发,自己那张缺席),不本地发牌。
+  const [foreheadPeek, setForeheadPeek] = useState(null);
   // 乐观回显(真机节奏裁定 2026-07-24):任何动作发出的瞬间就在这条 outbox 里以"已发出"
   // 形态显示(淡色+小勾),HTTP 确认后短暂转正常再撤(真实 feed 行由轮询带出正常色),
   // 失败转红可重发。堵死"点了没反应等轮询"的死区。
@@ -936,30 +931,25 @@ export default function App() {
     } catch (e) { Alert.alert("抽帧/上传失败", String(e.message)); }
   };
 
-  // —— 快枪手全屏对峙 ——
+  // —— 快枪手全屏对峙 —— 视听层换成 props/revolver 的 DuelStage(持枪待发→拔枪火光枪响后坐)。
+  // taps 判定 / duel_result 胜负逻辑零改动:onDraw 里做的事和原来那颗按钮一字不差
+  // (setDueled + 重震 + sendEvent tap),胜负永远由服务端 duel_result 定。
   if (inDuel) {
     const drawn = v.duel.drawn;
     return (
-      <View style={[s.page, s.center, { backgroundColor: drawn ? "#7a1010" : "#14141c" }]}>
+      <>
         <StatusBar style="light" />
-        <Text style={s.duelVs}>{v.duel.vs.join("  ⚡  ")}</Text>
-        {dueled ? (
-          <Text style={s.duelWait}>已开枪,等局长宣布……</Text>
-        ) : drawn ? (
-          <Pressable style={s.drawBtn} onPress={() => {
+        <DuelStage
+          vs={v.duel.vs}
+          drawn={drawn}
+          dueled={dueled}
+          onDraw={() => {
             setDueled(true);
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
             sendEvent({ type: "tap" });
-          }}>
-            <Text style={s.drawText}>拔!</Text>
-          </Pressable>
-        ) : (
-          <>
-            <Text style={s.duelWait}>对峙中……手别碰屏幕</Text>
-            <Text style={s.duelHint}>枪响前碰 = 抢跑判负</Text>
-          </>
-        )}
-      </View>
+          }}
+        />
+      </>
     );
   }
 
@@ -981,6 +971,34 @@ export default function App() {
       {v.my_prop ? <DiceCup prop={v.my_prop} rolling={rolling} onRoll={rollCup}
         onChallenge={sendChallenge}
         others={(v.cups || []).map((c) => c.player).filter((p) => p && p !== me)} /> : null}
+
+      {/* 桌面额头牌:局长发额头牌时,这一行 chips 显示桌上每个人,有牌的头上挂 🎴 角标。
+          点带牌的人 → 弹出 forehead 组件亮出「view.foreheads 里那个人的牌」;点自己 →
+          牌背「你的牌你看不见」(可见性反转在服务端焊死,自己那张永远缺席)。 */}
+      {(() => {
+        const fh = v.foreheads || {};                 // 别人的身份(服务端发,自己缺席)
+        const active = Object.keys(fh).length > 0;    // 有额头牌在桌上
+        if (!active) return null;
+        const players = (v.players && v.players.length ? v.players
+          : Object.keys(fh).concat(me)).filter((p, i, a) => p && a.indexOf(p) === i);
+        return (
+          <View style={s.foreheadRow}>
+            <Text style={s.foreheadTitle}>🎴 桌面额头牌 · 点人看牌</Text>
+            <View style={s.chipRow}>
+              {players.map((p) => {
+                const isMe = p === me;
+                const has = isMe || Object.prototype.hasOwnProperty.call(fh, p);
+                return (
+                  <Pressable key={p} style={[s.fhChip, has && s.fhChipHas]}
+                    onPress={() => has && setForeheadPeek({ name: p, identity: isMe ? null : fh[p], isMe })}>
+                    <Text style={s.fhChipText}>{has ? "🎴 " : ""}{p}{isMe ? "(你)" : ""}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+        );
+      })()}
 
       {/* 「⚡ 开牌!」全屏横幅:短暂压场(1.6s),pointerEvents=none 不拦任何操作 */}
       {challengeFlash ? (
@@ -1014,6 +1032,15 @@ export default function App() {
         <View pointerEvents="none" style={s.bellFlash}>
           <Text style={s.bellFlashText}>{bellFlash}</Text>
         </View>
+      ) : null}
+
+      {/* 额头牌查看浮层:点桌面 chip 弹出,用 forehead 组件亮出那个人的牌;点空白收起。
+          自己的牌只显示牌背——身份由服务端在 view 里就摘掉了,客户端天然拿不到。 */}
+      {foreheadPeek ? (
+        <Pressable style={s.foreheadPeek} onPress={() => setForeheadPeek(null)}>
+          <ForeheadCard name={foreheadPeek.name} identity={foreheadPeek.identity} isMe={foreheadPeek.isMe} />
+          <Text style={s.foreheadPeekHint}>{foreheadPeek.isMe ? "你的牌你看不见 · 靠别人给的提示猜" : "点空白处收起"}</Text>
+        </Pressable>
       ) : null}
 
       <ScrollView style={s.feed} contentContainerStyle={{ paddingBottom: 12 }}
@@ -1371,6 +1398,18 @@ const s = StyleSheet.create({
   bellFlash: { position: "absolute", left: 0, right: 0, top: 0, bottom: 0, zIndex: 200,
     alignItems: "center", justifyContent: "center", backgroundColor: "rgba(176,20,20,0.94)" },
   bellFlashText: { color: "#fff", fontSize: 120, fontWeight: "900", letterSpacing: 10 },
+  // 桌面额头牌:一行玩家 chips(有牌的挂 🎴 角标,点开看牌)
+  foreheadRow: { backgroundColor: "#241f30", borderColor: "#5a4a8a", borderWidth: 1,
+    borderRadius: 12, padding: 10, marginVertical: 6 },
+  foreheadTitle: { color: "#c9b8ff", fontSize: 13, fontWeight: "700", marginBottom: 6 },
+  fhChip: { backgroundColor: "#2b2b3a", borderRadius: 16, paddingVertical: 8, paddingHorizontal: 14,
+    minHeight: 40, justifyContent: "center", opacity: 0.6 },
+  fhChipHas: { backgroundColor: "#3a3f6a", opacity: 1 },
+  fhChipText: { color: "#e6e0ff", fontSize: 15, fontWeight: "700" },
+  // 额头牌查看浮层:半透明压场 + 居中大牌 + 收起提示
+  foreheadPeek: { position: "absolute", left: 0, right: 0, top: 0, bottom: 0, zIndex: 150,
+    alignItems: "center", justifyContent: "center", backgroundColor: "rgba(10,8,20,0.92)" },
+  foreheadPeekHint: { color: "#bbade0", fontSize: 15, marginTop: 22 },
   dieMini: { width: 34, height: 34, borderRadius: 7, padding: 4 },
   pipMini: { width: 6, height: 6, borderRadius: 3 },
   inboxBox: { backgroundColor: "#2a2438", borderRadius: 12, padding: 10, marginVertical: 6,
