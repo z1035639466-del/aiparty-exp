@@ -740,14 +740,21 @@ class Lobby:
         brief = str(out.get("brief") or "").strip()[:120]
         occ = str(out.get("occasion_guess") or "").strip()[:40]
         with self.lock:
+            # 多角度侦察(房主实测:场子比一帧大):实物并集、速写**累积拼接**
+            # (不许后一张覆盖前一张——桌面照和全景照各说各的,都要留);
+            # 场合猜测取最新非空(多拍通常越拍越准)。上限 5 张防视觉调用刷钱。
+            self.scene_photos = getattr(self, "scene_photos", 0) + 1
+            if self.scene_photos > 5:
+                return {"error": "侦察最多 5 张,已经够局长看清场子了"}
             merged = list(dict.fromkeys([*self.scene_objects, *objs]))
             self.scene_objects = merged
-            if brief:
-                self.scene_brief = brief
+            if brief and brief not in self.scene_brief:
+                self.scene_brief = (self.scene_brief + ";" + brief).strip(";")[:240]
             if occ:
                 self.occasion_guess = occ
         return {"occasion_guess": occ, "objects": objs, "brief": brief,
-                "scene_objects": merged}
+                "scene_objects": merged, "photos": self.scene_photos,
+                "scene_brief": self.scene_brief}
 
 
 class Hub:

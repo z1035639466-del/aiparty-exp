@@ -573,7 +573,8 @@ export default function App() {
                 </View>
               ) : null}
               <Pressable hitSlop={12} onPress={takeLobbyScene}>
-                <Text style={s.optout}>📷 {lobbyScene && !lobbyScene.pending && !lobbyScene.error ? "重拍场子" : "拍一下场子"}</Text>
+                <Text style={s.optout}>📷 {lobbyScene && !lobbyScene.pending && !lobbyScene.error
+                  ? `再拍一张(多角度,${lobbyScene.photos || 1}/5)` : "拍一下场子"}</Text>
               </Pressable>
             </>
           ) : null}
