@@ -371,6 +371,7 @@ export default function App() {
         if (p.base) setBase(p.base);
         if (p.me) setMe(p.me);
         if (p.room) setRoom(p.room);
+        if (p.skey) setStartKey(p.skey);  // 开局口令也要记住(真机病历:重载即忘,像被改了)
       } catch (e) { /* 首次开、或文件坏了:当没存过 */ }
       devRef.current = p.dev ||
         "d-" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
@@ -382,7 +383,8 @@ export default function App() {
   // 只在真的入座/开局成功后才记——失败的地址记下来只会next次继续错
   const remember = (b, m, r) =>
     FileSystem.writeAsStringAsync(PREFS,
-      JSON.stringify({ base: b, me: m, room: r, dev: devRef.current }))
+      JSON.stringify({ base: b, me: m, room: r, dev: devRef.current,
+                       skey: startKey.trim() }))
       .catch(() => {});
 
   // 录音判定(judge.audio):按一下录、再按一下交卷;裁判在服务端(接 key 即通)
