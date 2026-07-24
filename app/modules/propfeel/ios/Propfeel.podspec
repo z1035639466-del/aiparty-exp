@@ -5,7 +5,11 @@ Pod::Spec.new do |s|
   s.description    = '四件道具原语里需要原生手感的三件(额头牌走 expo-haptics 不在此)。零 3D:手机是私密信道+判定仪器,不是游戏屏幕。'
   s.author         = ''
   s.homepage       = 'https://docs.expo.dev/modules/'
-  s.platforms      = { :ios => '16.4' }
+  # 必须 ≤ App 的部署目标(ios/Podfile 的 platform,现为 15.1)。高于它 expo 自动链接会
+  # 【静默跳过】这个 pod——不报错,只是 ExpoModulesProvider 里没有,JS 端才炸
+  # "Cannot find native module 'DiceFeel'"。16.4 是 RealityKit 模板的遗留数字,
+  # 这里的 Core Haptics/AVFoundation/CoreMotion 都是 iOS 13 就有的,用不着那么高。
+  s.platforms      = { :ios => '15.1' }
   s.source         = { git: '' }
   s.static_framework = true
 
