@@ -610,10 +610,15 @@ class Session:
         for line in self.recent[-depth:]:
             if line.get("episode_summary"):
                 continue
-            shown = [r["result"].get("display") for r in (line.get("results") or [])
-                     if r.get("ok") and isinstance(r.get("result"), dict)
-                     and r["result"].get("visibility") == "全场公开"
-                     and r["result"].get("display")]
+            _public = [r["result"] for r in (line.get("results") or [])
+                       if r.get("ok") and isinstance(r.get("result"), dict)
+                       and r["result"].get("visibility") == "全场公开"
+                       and r["result"].get("display")]
+            shown = [r.get("display") for r in _public]
+            # 演示图最后一公里(2026-07-24):show(demo=...) 校验通过后落在 result.demo_ref,
+            # 与 shown 同序同长原样透传;没配演示件的位置是 None,App 按下标对齐渲染,
+            # 不改 shown 本身的形状(向后兼容既有只读 shown 的调用方)。
+            shown_demo = [r.get("demo_ref") for r in _public]
             table = []
             for e in (line.get("events_in") or []):
                 if e.get("type") == "duel_result":
@@ -640,7 +645,7 @@ class Session:
                     item["value"] = e["value"]
                 table.append(item)
             recent.append({"turn": line.get("turn"), "host": line.get("text", ""),
-                           "shown": shown, "table": table})
+                           "shown": shown, "shown_demo": shown_demo, "table": table})
         # 系统级炸铃:铃是公开广播,人人要响,故 bell 进每台手机的 view(不遮蔽)。
         # 带上 server_now(服务器当前 epoch)让客户端算钟差,把 bell.at 换算到本地钟
         # 精确定时齐响(消灭轮询 900ms 抖动)。铃过期 3 秒以上不再下发(响过就撤)。
@@ -1175,6 +1180,10 @@ p{color:#99a;font-size:17px;margin:14px 0 0;text-align:center;line-height:1.7;pa
 </body></html>"""
 PLAY_PATH = Path(__file__).with_name("play_ui.html")   # 玩家手机页
 
+# 演示图最后一公里(房主裁定 2026-07-24):demo_ref 全仓统一写 demo/t{1,2}/xxx.{svg,png},
+# 资产早就摆在仓库根 demo/ 目录,断的只是"谁伺服它"——这里就是那个人。
+DEMO_ROOT = Path(__file__).resolve().parent.parent / "demo"
+
 
 class Handler(BaseHTTPRequestHandler):
     hub: Hub  # 类属性注入
@@ -1282,6 +1291,48 @@ class Handler(BaseHTTPRequestHandler):
         except (BrokenPipeError, ConnectionResetError):
             pass  # 拉音频的那头关页面了,正常,不是错误
 
+    def _serve_demo(self) -> None:
+        """GET /demo/...:伺服仓库根 demo/ 目录下的演示图资产。
+
+        demo_ref(patterns-v0.jsonl)全仓统一写成 demo/t{1,2}/xxx.{svg,png}——App 端
+        拿到 show(demo=...) 回填的 demo_ref 原样拼 base+'/'+ref 即可用,这条路由零改写:
+        · .svg 请求悄悄换伺服同目录 png/ 下的同名预渲染 png(手绘线稿的产品面出图,不必
+          让手机再啃一次 SVG);pat-v1-*.png 这类 AI 图本来就是 png,原样伺服。
+        · 路径穿越硬挡:resolve 后必须仍落在 demo/ 目录内,`..`/编码穿越/绝对路径统统
+          落网即 404(不报 403,不给探测者多余信号)。
+        · 演示图内容不可变(同名 ref 永远指向同一张图),给足缓存头。
+        """
+        from urllib.parse import unquote, urlparse
+        rel = unquote(urlparse(self.path).path)[len("/demo/"):].lstrip("/")
+        if not rel:
+            self._json(404, {"error": "not found"})
+            return
+        root = DEMO_ROOT.resolve()
+        target = (root / rel).resolve()
+        try:
+            target.relative_to(root)
+        except ValueError:
+            self._json(404, {"error": "not found"})   # 穿出 demo/ 目录之外,一律当不存在
+            return
+        if target.suffix.lower() == ".svg":
+            # demo_ref 里的 .svg 是手绘原稿的登记名;产品面实际出的是 png/ 下预渲染的同名 png
+            target = target.parent / "png" / (target.stem + ".png")
+        if not target.is_file():
+            self._json(404, {"error": "not found"})
+            return
+        ctype = {".png": "image/png", ".webp": "image/webp",
+                 ".svg": "image/svg+xml"}.get(target.suffix.lower(), "application/octet-stream")
+        data = target.read_bytes()
+        try:
+            self.send_response(200)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Length", str(len(data)))
+            self.send_header("Cache-Control", "max-age=86400, immutable")  # 内容不可变,尽力缓存
+            self.end_headers()
+            self.wfile.write(data)
+        except (BrokenPipeError, ConnectionResetError):
+            pass  # 拉图的那头关页面了,正常,不是错误
+
     def do_GET(self) -> None:
         if self.path in ("/", "/index.html"):
             # 公网上线后根路径是产品的门面:给玩家落地页,不给开发驾驶舱
@@ -1306,6 +1357,10 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == "/favicon.ico":
             self.send_response(204)
             self.end_headers()
+            return
+        if self.path.startswith("/demo/"):
+            # 演示图最后一公里:demo_ref 原样可用,App 端零改写(见 _serve_demo)
+            self._serve_demo()
             return
         if self.path.startswith("/api/inbox") or self.path.startswith("/api/view"):
             s0 = self._pick()

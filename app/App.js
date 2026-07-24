@@ -6,7 +6,7 @@
 // 判定=抽帧走照片通道:视频先在本机抽帧转 base64,仍是 /api/photo 那条口子。
 import { useEffect, useRef, useState } from "react";
 import {
-  Alert, Animated, KeyboardAvoidingView, Platform, Pressable, ScrollView,
+  Alert, Animated, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView,
   StyleSheet, Text, TextInput, View,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
@@ -892,6 +892,11 @@ export default function App() {
   const inDuel = v.duel && v.duel.vs && v.duel.vs.includes(me);
   // 「现在该我干嘛」一眼锁定:醒目状态条(拔枪时刻是全屏对峙,不走这里)
   const askedMe = v.open_ask && v.open_ask.asked === me;
+  // 定向题只有被问的人能答(真机病历 2026-07-24:「问 Lin 选对手」的按钮出现在 Jack
+  // 手机上——服务端本就不收错人的答案,但按钮在就会被点,点了变成一条误导局长的私聊,
+  // 一个人一次点击能把整局带偏)。问全场/没写对象才是人人可答。
+  const askMine = v.open_ask && (askedMe
+    || !v.open_ask.asked || ["全场", "all"].includes(v.open_ask.asked));
   const myCue = v.photo_request ? "📸 轮到你:拍照判定,看下方题目"
     : v.audio_request ? "🎤 轮到你:录音判定,看下方题目"
     : askedMe ? "🫵 问到你了,往下答"
@@ -1056,7 +1061,14 @@ export default function App() {
                 <Text style={latest ? s.hostNow : s.host}>🎩 {t.host}</Text>
               ) : null}
               {(t.shown || []).map((c, j) => (
-                <Text key={j} style={latest ? s.shownNow : s.shown}>📢 {c}</Text>
+                <View key={j}>
+                  <Text style={latest ? s.shownNow : s.shown}>📢 {c}</Text>
+                  {/* 演示图最后一公里(2026-07-24):局长文字讲不清的手势/摆位,一张图秒懂 */}
+                  {t.shown_demo && t.shown_demo[j] ? (
+                    <Image source={{ uri: base + "/" + t.shown_demo[j] }}
+                      style={s.demoImg} resizeMode="contain" />
+                  ) : null}
+                </View>
               ))}
               {(t.table || []).map((e, j) => {
                 if (e.type === "duel_result" && e.winner)
@@ -1190,7 +1202,9 @@ export default function App() {
         return (
           <View style={[s.askBox, askedMe && s.askBoxMe]}>
             <Text style={askedMe ? s.askTextMe : s.askText}>🎤 {askedMe ? "问你" : `问${v.open_ask.asked}`}:{v.open_ask.prompt}</Text>
-            {picked ? (
+            {!askMine ? (
+              <Text style={s.askPicked}>等 {v.open_ask.asked} 回答…</Text>
+            ) : picked ? (
               <Text style={s.askPicked}>✓ 已选 {askPicked.choice}</Text>
             ) : (
               <View style={s.row}>
@@ -1323,6 +1337,8 @@ const s = StyleSheet.create({
   hostNow: { color: "#fff", fontSize: 23, lineHeight: 32, fontWeight: "700", marginBottom: 2 },
   shown: { color: "#c9a93e", fontSize: 14, marginVertical: 2 },
   shownNow: { color: "#ffd54a", fontSize: 18, fontWeight: "600", marginVertical: 2 },
+  // 演示图(局长讲玩法时垫的手势/摆位图,2026-07-24):撑满气泡可用宽,原图比例 800:500
+  demoImg: { width: "100%", aspectRatio: 800 / 500, borderRadius: 10, marginVertical: 4 },
   tableEv: { color: "#99a", fontSize: 13, marginLeft: 8 },
   // 实时流即时区(feed 最底部):浅色降一档,与 recent 正式行区分——落地转正后自然消失
   liveZone: { marginTop: 2, marginBottom: 4, paddingLeft: 8, borderLeftWidth: 2,
