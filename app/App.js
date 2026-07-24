@@ -1145,6 +1145,11 @@ export default function App() {
         ))}
       </ScrollView>
 
+      {/* feed 以下的控制区自己可滚(真机病历 2026-07-24:骰盅面板+问询框一叠,
+          页面超高又不能滑,底部按钮点不到)。flexShrink:1=平时按内容高,挤不下时
+          内部滚动;feed 有 minHeight 兜底不至于被挤成零 */}
+      <ScrollView style={{ flexShrink: 1, flexGrow: 0 }} keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 2 }}>
       {v.photo_request && (
         <View style={s.photoBtn}>
           <Text style={s.photoText}>📸 {v.photo_request}</Text>
@@ -1339,6 +1344,7 @@ export default function App() {
       </View>
       </>
       )}
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -1369,7 +1375,7 @@ const s = StyleSheet.create({
   topMusic: { color: "#8fb", fontSize: 13 },
   err: { color: "#f66", fontSize: 13, marginBottom: 4 },
   finish: { color: "#ffd54a", fontSize: 16, fontWeight: "700", marginVertical: 6 },
-  feed: { flex: 1 },
+  feed: { flex: 1, minHeight: 60 },  // 控制区可滚后仍给公屏留一口气,不被挤成零
   turn: { marginBottom: 10 },
   // 历史缩小让路;局长最新一句是屏幕上最大的字(暗光+距离,一眼要能读到)
   host: { color: "#aab", fontSize: 14, lineHeight: 20, marginBottom: 2 },
