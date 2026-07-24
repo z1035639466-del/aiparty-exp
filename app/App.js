@@ -107,18 +107,22 @@ function DiceReveal({ dice }) {
 // 局长在酝酿,不挡任何操作,只把"没反馈的死区"填上一口气。
 function HostThinking() {
   const anim = useRef(new Animated.Value(0.35)).current;
+  const [secs, setSecs] = useState(0); // 真机反馈 4/4:静止一两分钟像死机——计秒示活
   useEffect(() => {
     const loop = Animated.loop(Animated.sequence([
       Animated.timing(anim, { toValue: 1, duration: 650, useNativeDriver: true }),
       Animated.timing(anim, { toValue: 0.35, duration: 650, useNativeDriver: true }),
     ]));
     loop.start();
-    return () => loop.stop();
+    const t = setInterval(() => setSecs((x) => x + 1), 1000);
+    return () => { loop.stop(); clearInterval(t); };
   }, []);
   return (
     <View style={s.thinkingBar}>
       <Text style={s.thinkingHat}>🎩</Text>
-      <Animated.Text style={[s.thinkingDots, { opacity: anim }]}>局长在酝酿 …</Animated.Text>
+      <Animated.Text style={[s.thinkingDots, { opacity: anim }]}>
+        局长在酝酿{secs > 2 ? ` ${secs}s` : ""} …
+      </Animated.Text>
     </View>
   );
 }
@@ -141,16 +145,22 @@ function ChallengeControl({ onChallenge, others }) {
   const [cnt, setCnt] = useState(null);
   const [face, setFace] = useState(null);
   const [bidder, setBidder] = useState(null); // 开的是谁(可选):不选=照旧局长点名
+  const [tapHint, setTapHint] = useState(false); // 真机反馈:短按静默无反应像坏了——亮字提示
   if (!picking) {
     return (
       <Pressable style={s.challengeBtn} delayLongPress={600}
-        onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          setTapHint(true); setTimeout(() => setTapHint(false), 1100);
+        }}
         onLongPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); // 拍桌那一下
           setPicking(true);
         }}>
         <Text style={s.challengeBtnText}>⚡ 开牌!</Text>
-        <Text style={s.challengeBtnHint}>长按拍桌喊开</Text>
+        <Text style={[s.challengeBtnHint, tapHint && { color: "#ffb03a", fontWeight: "800" }]}>
+          {tapHint ? "要按住 0.6 秒——拍桌喊开!" : "长按拍桌喊开"}
+        </Text>
       </Pressable>
     );
   }
@@ -981,6 +991,15 @@ export default function App() {
       {v.my_prop ? <DiceCup prop={v.my_prop} rolling={rolling} onRoll={rollCup}
         onChallenge={sendChallenge}
         others={(v.cups || []).map((c) => c.player).filter((p) => p && p !== me)} /> : null}
+      {/* 在等谁摇(真机病历 2026-07-24:一只未摇的盅锁全桌,被锁的人干等8分钟以为
+          App 坏了——只有去点开牌的人才撞到"还有人没摇完")。cups 数据早就在 view 里,
+          摆到明面即可 */}
+      {v.my_prop && (() => {
+        const waiting = (v.cups || []).filter((c) => !c.rolled && c.player !== me).map((c) => c.player);
+        return waiting.length ? (
+          <Text style={s.cupWait}>⏳ 等 {waiting.join("、")} 摇盅(全摇才能开牌)</Text>
+        ) : null;
+      })()}
 
       {/* 桌面额头牌:局长发额头牌时,这一行 chips 显示桌上每个人,有牌的头上挂 🎴 角标。
           点带牌的人 → 弹出 forehead 组件亮出「view.foreheads 里那个人的牌」;点自己 →
@@ -1274,11 +1293,15 @@ export default function App() {
           观感 2026-07-24):默认调暗蛰伏,流程可见地轮到你/有钩子挂着时点亮 */}
       <View style={[s.row, !(v.timer_running || v.focus === me || askedMe
         || v.photo_request || v.audio_request) && { opacity: 0.45 }]}>
-        <Pressable style={[s.sigBtn, { backgroundColor: "#2c5f3f" }]}
+        {/* 点名派活时完成/认罚是当事人的活(真机病历:Ming 替 Lin 点了完成,全场跟按)
+            ——不禁点(旁观确认也是信号,服务端已标 bystander),但视觉上让位当事人 */}
+        <Pressable style={[s.sigBtn, { backgroundColor: "#2c5f3f" },
+          v.focus && v.focus !== me && { opacity: 0.35 }]}
           onPress={() => sendEventEcho({ type: "done" }, "完成")}>
-          <Text style={s.sigText}>✅ 完成</Text>
+          <Text style={s.sigText}>✅ 完成{v.focus && v.focus !== me ? `(${v.focus}的活)` : ""}</Text>
         </Pressable>
-        <Pressable style={[s.sigBtn, { backgroundColor: "#6b4a2b" }]}
+        <Pressable style={[s.sigBtn, { backgroundColor: "#6b4a2b" },
+          v.focus && v.focus !== me && { opacity: 0.35 }]}
           onPress={() => sendEventEcho({ type: "forfeit" }, "认罚")}>
           <Text style={s.sigText}>🍺 认罚跳过</Text>
         </Pressable>
@@ -1486,6 +1509,7 @@ const s = StyleSheet.create({
   // 选择框即收后的一行"✓ 已选 X"
   askPicked: { color: "#8fd0a8", fontSize: 17, fontWeight: "800", marginTop: 2 },
   settleDim: { color: "#99a", fontSize: 13, marginTop: 4 },
+  cupWait: { color: "#c9a93e", fontSize: 13, textAlign: "center", marginBottom: 4 },
   // 局长思考指示:呼吸的「🎩 局长在酝酿 …」
   thinkingBar: { flexDirection: "row", alignItems: "center", gap: 8, marginVertical: 4,
     paddingHorizontal: 4 },

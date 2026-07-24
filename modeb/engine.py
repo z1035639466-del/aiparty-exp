@@ -74,6 +74,15 @@ class Engine:
                 self.state.scores[p] -= 1
                 ev = dict(ev, auto_scored=-1,
                           note="系统已自动扣1分记账(认罚跳过),别再重复扣分,宣布即可")
+        if (ev.get("type") in ("done", "forfeit") and self.state.focus
+                and ev.get("player") and ev["player"] != self.state.focus):
+            # 定向问询洞的另一半(真机病历 2026-07-24:局长派活给 Lin,Ming 一点
+            # 「完成」全场跟着点,唯独当事人没动)。信号不拦(旁观确认也是桌上真实
+            # 动作),但必须可分辨——判定别认错人。
+            ev = dict(ev, bystander=True,
+                      note=((ev.get("note", "") + ";") if ev.get("note") else "")
+                      + f"按键的不是当前焦点(焦点={self.state.focus})——旁观者的确认,"
+                        f"不是当事人交活,凭它判定{self.state.focus}完成=认错人")
         duel = self.state.duel
         if (duel and ev.get("type") == "tap" and ev.get("player") in duel["players"]):
             # 快枪手抢拍:第一下 tap 立即定胜负——枪响前抢跑判负,枪响后先到者胜。
