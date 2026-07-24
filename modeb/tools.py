@@ -345,8 +345,18 @@ class ToolExecutor:
         secs = int(a.get("seconds", 10))
         if not 1 <= secs <= 600:
             raise ClampError(f"timer 秒数越界: {secs}")
-        self.state.timers.append(_time.time() + secs)
-        return {"timer_started": secs, "label": a.get("label", "")}
+        at = _time.time() + secs
+        self.state.timers.append(at)
+        out = {"timer_started": secs, "label": a.get("label", "")}
+        # 系统级炸铃(fx 可选,喊停类玩法用):带 fx 的 timer 到点由系统精确执行——
+        # 全桌手机在换算后的同一时刻毫秒级齐响那声"停!",LLM 不在回路(和快枪手
+        # draw_at 同姿势)。同一时刻只挂一个铃,新铃覆盖旧铃;timer 正常到期逻辑不变
+        # (上面照常入 timers,到点照发 timer_expired 叫醒主持)。fx 文案两三字,钳上限。
+        fx = str(a.get("fx", "") or "").strip()
+        if fx:
+            self.state.pending_bell = {"at": at, "fx": fx[:8]}
+            out["bell"] = fx[:8]
+        return out
 
     def _t_ask(self, name: str, a: dict) -> dict:
         """限时问一嘴:开一个窗口,到点按多数认,一票也认,没人答就往下走。

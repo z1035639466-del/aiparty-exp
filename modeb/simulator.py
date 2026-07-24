@@ -550,6 +550,13 @@ class Session:
                 table.append(item)
             recent.append({"turn": line.get("turn"), "host": line.get("text", ""),
                            "shown": shown, "table": table})
+        # 系统级炸铃:铃是公开广播,人人要响,故 bell 进每台手机的 view(不遮蔽)。
+        # 带上 server_now(服务器当前 epoch)让客户端算钟差,把 bell.at 换算到本地钟
+        # 精确定时齐响(消灭轮询 900ms 抖动)。铃过期 3 秒以上不再下发(响过就撤)。
+        now = _t.time()
+        bell = self.state.pending_bell
+        bell_out = ({"at": bell["at"], "fx": bell["fx"]}
+                    if bell and now - bell["at"] < 3.0 else None)
         return {
             "you": me,
             "round": digest.get("round"), "turn": self.engine.marks["turns"],
@@ -557,6 +564,8 @@ class Session:
             "finished": self.state.finished,
             "time_left_min": digest.get("time_left_min"),
             "now_playing": digest.get("now_playing"),  # 音乐是全场公开的:现实里人人听得见
+            "server_now": now,   # 服务器当前 epoch:客户端据此算钟差,炸铃本地精确定时
+            "bell": bell_out,    # 系统级炸铃 {at, fx}:全桌手机换算后齐响那声"停!"
             # 对决状态:玩家端只看到 vs 与 drawn 布尔(枪响了没),拔枪时点不出服务端
             "duel": digest.get("duel"),
             # 拍照判定:只有被点名的人看到出题(别人只从主持嘴里听到)

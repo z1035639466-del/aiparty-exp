@@ -297,7 +297,10 @@ export default function App() {
   const [rolling, setRolling] = useState(false); // 骰盅扣盅动画进行中(挡重复扣)
   const [recording, setRecording] = useState(null); // 录音判定进行中的 Recording 对象
   const [challengeFlash, setChallengeFlash] = useState(null); // 「⚡ 开牌!」全屏横幅(1.6s 自动散)
+  const [bellFlash, setBellFlash] = useState(null); // 系统级炸铃满屏大字(1.2s 自动散)
   const prevRef = useRef({ inbox: 0, drawn: false, challenged: false });
+  // 炸铃本地定时:记已排定那口铃的 at(去重,同一铃只触发一次)+ 定时器句柄(新铃覆盖旧铃时清掉)
+  const bellRef = useRef({ at: null, timer: null });
   const feedRef = useRef(null); // 局长最新一句永远滚到眼前(手机举得远,不能靠手扒)
 
   // 设备匿名ID(用户数据层地基):首启生成、永久复用,随每个事件带给服务端,
@@ -405,6 +408,19 @@ export default function App() {
     } catch (e) { setErr("开牌没发出去,再按一次"); }
   };
 
+  // 炸铃音效挂接点:音效资产归道具官的音效包(别在这造资产)。接入后在此播放炸铃音。
+  const playBellSound = () => { /* TODO: 接道具官音效包后在此播放"停!"炸铃音 */ };
+
+  // 炸铃触发:到点那一下——三连重触感(Heavy ×3,间隔 120ms)+ 音效 + 满屏大字(1.2s 散)
+  const triggerBell = (fx) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 120);
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 240);
+    playBellSound();
+    setBellFlash(fx || "停");
+    setTimeout(() => setBellFlash(null), 1200);
+  };
+
   // —— 轮询自己的视图 ——
   useEffect(() => {
     if (!joined) return;
@@ -422,6 +438,18 @@ export default function App() {
         if (inDuel && v.duel.drawn && !prev.drawn)
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);             // 枪响!
         if (!v.duel) setDueled(false);
+        // 系统级炸铃:见 bell → 用 server_now 算钟差,本地精确定时在换算后的时刻齐响。
+        // 钟差 = 本地收包时刻 − 服务器当前时刻(server_now,含时钟偏移+单程网延的粗估);
+        // 本地触发时刻 = bell.at 换算到本地钟 = bell.at*1000 + 钟差;距现在的延迟里 Date.now()
+        // 抵消,净剩服务器视角的剩余时长——轮询何时到达(900ms 抖动)不影响触发点,全桌齐响。
+        const bell = v.bell;
+        if (bell && bell.at && v.server_now && bell.at !== bellRef.current.at) {
+          const skewMs = Date.now() - v.server_now * 1000;      // 钟差
+          const delay = bell.at * 1000 + skewMs - Date.now();   // = (bell.at − server_now)*1000
+          if (bellRef.current.timer) clearTimeout(bellRef.current.timer); // 旧铃被覆盖:清旧定时
+          bellRef.current.at = bell.at;                         // 记 at 去重:同一铃只触发一次
+          bellRef.current.timer = setTimeout(() => triggerBell(bell.fx), Math.max(0, delay));
+        }
         // 开牌感知(全桌):cups 里 challenged_by 从无到有 = 有人拍桌开牌——
         // 重触感一下 + 全屏「⚡ 开牌!」横幅短暂压场(1.6s 自动散,不拦操作)
         const chCup = (v.cups || []).find((c) => c.challenged_by);
@@ -437,7 +465,8 @@ export default function App() {
     };
     tick();
     const t = setInterval(tick, POLL_MS);
-    return () => { alive = false; clearInterval(t); };
+    return () => { alive = false; clearInterval(t);
+      if (bellRef.current.timer) clearTimeout(bellRef.current.timer); }; // 离场清掉待触发的炸铃
   }, [joined]);
 
   // —— 大厅轮询:停在大厅页时拉实时名单;房主一开打(started)全场自动切游戏页 ——
@@ -750,6 +779,14 @@ export default function App() {
         </View>
       ) : null}
 
+      {/* 系统级炸铃:满屏大字那声「停!」(1.2s 自动散),pointerEvents=none 不拦操作。
+          全桌手机在系统换算后的同一时刻齐响,比开牌横幅更大更炸——判定时刻要砸到桌上 */}
+      {bellFlash ? (
+        <View pointerEvents="none" style={s.bellFlash}>
+          <Text style={s.bellFlashText}>{bellFlash}</Text>
+        </View>
+      ) : null}
+
       <ScrollView style={s.feed} contentContainerStyle={{ paddingBottom: 12 }}
         ref={feedRef}
         onContentSizeChange={() => feedRef.current && feedRef.current.scrollToEnd({ animated: true })}>
@@ -1005,6 +1042,10 @@ const s = StyleSheet.create({
     alignItems: "center", backgroundColor: "rgba(20,10,4,0.88)", paddingVertical: 26 },
   challengeFlashText: { color: "#ff9a5a", fontSize: 52, fontWeight: "900" },
   challengeFlashSub: { color: "#ffd54a", fontSize: 18, fontWeight: "700", marginTop: 6 },
+  // 系统级炸铃:满屏大字压全场(比开牌横幅更大更炸),压场不拦操作(pointerEvents=none),1.2s 散
+  bellFlash: { position: "absolute", left: 0, right: 0, top: 0, bottom: 0, zIndex: 200,
+    alignItems: "center", justifyContent: "center", backgroundColor: "rgba(176,20,20,0.94)" },
+  bellFlashText: { color: "#fff", fontSize: 120, fontWeight: "900", letterSpacing: 10 },
   dieMini: { width: 34, height: 34, borderRadius: 7, padding: 4 },
   pipMini: { width: 6, height: 6, borderRadius: 3 },
   inboxBox: { backgroundColor: "#2a2438", borderRadius: 12, padding: 10, marginVertical: 6,
