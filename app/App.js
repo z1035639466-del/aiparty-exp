@@ -21,7 +21,9 @@ import { useKeepAwake } from "expo-keep-awake";
 import { Accelerometer } from "expo-sensors";
 import * as VideoThumbnails from "expo-video-thumbnails";
 
-const POLL_MS = 900;
+// 乐观回显上线后确认压力小了,轮询提到 600ms(慢不是病、没反馈才是病:节奏更跟手,
+// 但别低于 500——再快只是空烧流量,乐观回显已经把"点了没反应"的死区堵死了)。
+const POLL_MS = 600;
 // —— 快捷回应条(输入侧去打字化,房主裁定 2026-07-24)——
 // 社交局不许降维成打字游戏:最常说的几句做成 chips,单点即以桌上说话发出(配轻触感),
 // 玩家少动手、只关注现实场。打字框保留但视觉降级(变矮变淡)。文案在此常量数组里改。
@@ -88,6 +90,27 @@ function DiceReveal({ dice }) {
         {dice.map((n, i) => <Die key={i} n={n} />)}
         {dice.length > 1 ? <Text style={s.diceSum}>Σ{sum}</Text> : null}
       </Animated.View>
+    </View>
+  );
+}
+
+// —— 局长思考指示(真机节奏裁定 2026-07-24:慢不是病,没反馈才是病)——
+// 服务端 run_turn 进行中 view.host_thinking=true,这里给一个呼吸的「🎩 …」——
+// 局长在酝酿,不挡任何操作,只把"没反馈的死区"填上一口气。
+function HostThinking() {
+  const anim = useRef(new Animated.Value(0.35)).current;
+  useEffect(() => {
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(anim, { toValue: 1, duration: 650, useNativeDriver: true }),
+      Animated.timing(anim, { toValue: 0.35, duration: 650, useNativeDriver: true }),
+    ]));
+    loop.start();
+    return () => loop.stop();
+  }, []);
+  return (
+    <View style={s.thinkingBar}>
+      <Text style={s.thinkingHat}>🎩</Text>
+      <Animated.Text style={[s.thinkingDots, { opacity: anim }]}>局长在酝酿 …</Animated.Text>
     </View>
   );
 }
@@ -308,7 +331,15 @@ export default function App() {
   const pttHeldRef = useRef(false);             // 手指还按着吗(create 是异步的,防松手竞态)
   const [challengeFlash, setChallengeFlash] = useState(null); // 「⚡ 开牌!」全屏横幅(1.6s 自动散)
   const [bellFlash, setBellFlash] = useState(null); // 系统级炸铃满屏大字(1.2s 自动散)
-  const prevRef = useRef({ inbox: 0, drawn: false, challenged: false });
+  // 乐观回显(真机节奏裁定 2026-07-24):任何动作发出的瞬间就在这条 outbox 里以"已发出"
+  // 形态显示(淡色+小勾),HTTP 确认后短暂转正常再撤(真实 feed 行由轮询带出正常色),
+  // 失败转红可重发。堵死"点了没反应等轮询"的死区。
+  const [outbox, setOutbox] = useState([]); // [{id, label, status:"pending"|"ok"|"err", ev}]
+  const outboxSeq = useRef(0);
+  // 选择框即收:点了 open_ask 的选项瞬间本地收起换"✓ 已选 X",不等下一拍轮询撤 ask;
+  // 轮询发现 ask 还开着(轮流模式还在别人/换了题)按服务器状态为准恢复。
+  const [askPicked, setAskPicked] = useState(null); // {prompt, asked, choice}
+  const prevRef = useRef({ inbox: 0, drawn: false, challenged: false, verdict: null });
   // 炸铃本地定时:记已排定那口铃的 at(去重,同一铃只触发一次)+ 定时器句柄(新铃覆盖旧铃时清掉)
   const bellRef = useRef({ at: null, timer: null });
   const feedRef = useRef(null); // 局长最新一句永远滚到眼前(手机举得远,不能靠手扒)
@@ -444,6 +475,27 @@ export default function App() {
     api("/api/event", { ...ev, player: me, device_id: devRef.current })
       .catch(() => setErr("事件没发出去,再点一次"));
 
+  // 乐观回显:动作发出的瞬间进 outbox("已发出"淡色+小勾),HTTP 确认转 ok(短暂后撤,
+  // 真实 feed 行由轮询带出正常色),失败转 err 红色可重发。chips/say/done/forfeit/抢答
+  // 一律走它——玩家点下去立刻有反馈,不再有"点了没反应"的死区。
+  const fireOutbox = (id, ev) => {
+    setOutbox((o) => o.map((x) => (x.id === id ? { ...x, status: "pending" } : x)));
+    api("/api/event", { ...ev, player: me, device_id: devRef.current })
+      .then((res) => {
+        if (res && res.error) throw new Error(res.error);
+        setOutbox((o) => o.map((x) => (x.id === id ? { ...x, status: "ok" } : x)));
+        // 确认后短暂显示"已送达"再撤:真实事件此刻已由轮询进 feed(正常色)
+        setTimeout(() => setOutbox((o) => o.filter((x) => x.id !== id)), 900);
+      })
+      .catch(() => setOutbox((o) => o.map((x) => (x.id === id ? { ...x, status: "err" } : x))));
+  };
+  const sendEventEcho = (ev, label) => {
+    const id = ++outboxSeq.current;
+    Haptics.selectionAsync();
+    setOutbox((o) => [...o, { id, label, status: "pending", ev }]);
+    fireOutbox(id, ev);
+  };
+
   // 扣盅:玩家自己摇出点数的那一下(手真摇够/骤停自动扣,或按钮兜底都汇到这里)。
   // 引擎 RNG 出点数(摇的力度/时长不影响),点数经 🔒🎲 水印路回本人私件——App 只认水印
   // 画骰面,POST 只确认摇了,不信任响应里的点数(防伪架构一致)。结果由轮询 my_prop 揭晓。
@@ -520,8 +572,17 @@ export default function App() {
           setChallengeFlash({ by: chCup.challenged_by, bid: chCup.bid });
           setTimeout(() => setChallengeFlash(null), 1600);
         }
+        // 开牌即时清算结果卡:verdict 从无到有(带叫价的开牌当庭报数)→ 重震一下,
+        // 结果卡由 v.challenge_verdict 常驻渲染(留到局长清算收盅才撤,全桌看得清)。
+        const vd = v.challenge_verdict;
+        const vdSig = vd ? `${vd.challenger}|${vd.face}|${vd.face_count}|${vd.bid && vd.bid.count}` : null;
+        if (vdSig && vdSig !== prev.verdict)
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        // 选择框即收的收尾:轮询发现 ask 已关(或换了题/换了被问的人)按服务器为准,
+        // 撤掉本地"✓ 已选"回到服务器状态(下面渲染据 askPicked 与 open_ask 一致性判定)。
+        if (!v.open_ask) setAskPicked(null);
         prevRef.current = { inbox: (v.inbox || []).length,
-          drawn: !!(v.duel && v.duel.drawn), challenged: !!chCup };
+          drawn: !!(v.duel && v.duel.drawn), challenged: !!chCup, verdict: vdSig };
         setView(v);
       } catch (e) { if (alive) setErr("连不上服务器:" + e.message); }
     };
@@ -890,6 +951,8 @@ export default function App() {
       {err ? <Text style={s.err}>{err}</Text> : null}
       {v.finished ? <Text style={s.finish}>🏁 本局已收</Text> : null}
       {myCue ? <View style={s.cueBar}><Text style={s.cueText}>{myCue}</Text></View> : null}
+      {/* 局长思考指示:run_turn 进行中显示呼吸的「🎩 局长在酝酿 …」,不挡任何操作 */}
+      {v.host_thinking ? <HostThinking /> : null}
 
       {/* 骰盅道具卡:局长发盅、玩家自己摇——常驻在 feed 之上,大话骰全程盯着自己的骰吹牛 */}
       {v.my_prop ? <DiceCup prop={v.my_prop} rolling={rolling} onRoll={rollCup}
@@ -900,6 +963,23 @@ export default function App() {
         <View pointerEvents="none" style={s.challengeFlash}>
           <Text style={s.challengeFlashText}>⚡ 开牌!</Text>
           <Text style={s.challengeFlashSub}>{challengeFlash.by} 开了{fmtBid(challengeFlash.bid)}</Text>
+        </View>
+      ) : null}
+
+      {/* 开牌即时清算结果卡:开牌横幅之后紧接着的当庭报数结论(大字),留到局长清算收盅才撤。
+          loser 有名(开牌人输)直接报名;叫价人输时 loser=null,报"叫价人输"等局长点名 */}
+      {v.challenge_verdict ? (
+        <View style={s.verdictCard}>
+          <Text style={s.verdictHead}>
+            ⚡ 叫{v.challenge_verdict.bid.count}个{v.challenge_verdict.bid.face}
+            {" · "}实际{v.challenge_verdict.face_count}个
+            {v.challenge_verdict.wild ? "(带赖子)" : ""}
+          </Text>
+          <Text style={s.verdictLoser}>
+            {v.challenge_verdict.loser
+              ? `${v.challenge_verdict.loser} 输!`
+              : "叫价人输!(等局长点名)"}
+          </Text>
         </View>
       ) : null}
 
@@ -1014,31 +1094,62 @@ export default function App() {
         </View>
       )}
 
-      {v.open_ask && (
-        <View style={[s.askBox, askedMe && s.askBoxMe]}>
-          <Text style={askedMe ? s.askTextMe : s.askText}>🎤 {askedMe ? "问你" : `问${v.open_ask.asked}`}:{v.open_ask.prompt}</Text>
-          <View style={s.row}>
-            {(v.open_ask.options || []).map((o, i) => (
-              <Pressable key={i} style={s.optBtn}
-                onPress={() => sendEvent({ type: "say", text: o, to: "局长" })}>
-                <Text style={s.optText}>{o}</Text>
-              </Pressable>
-            ))}
+      {v.open_ask && (() => {
+        // 选择框即收:选项被点的瞬间本地收起换"✓ 已选 X"(不等轮询撤 ask)。picked 只在
+        // 同一题、同一被问对象下成立;轮询若 ask 换题/换人/关掉,picked 失配自动恢复选项框。
+        const picked = askPicked && askPicked.prompt === v.open_ask.prompt
+          && askPicked.asked === (v.open_ask.asked || "");
+        return (
+          <View style={[s.askBox, askedMe && s.askBoxMe]}>
+            <Text style={askedMe ? s.askTextMe : s.askText}>🎤 {askedMe ? "问你" : `问${v.open_ask.asked}`}:{v.open_ask.prompt}</Text>
+            {picked ? (
+              <Text style={s.askPicked}>✓ 已选 {askPicked.choice}</Text>
+            ) : (
+              <View style={s.row}>
+                {(v.open_ask.options || []).map((o, i) => (
+                  <Pressable key={i} style={s.optBtn}
+                    onPress={() => {
+                      Haptics.selectionAsync();
+                      const asked = v.open_ask.asked || "";
+                      setAskPicked({ prompt: v.open_ask.prompt, asked, choice: o }); // 瞬间收起
+                      api("/api/event", { type: "say", text: o, to: "局长", player: me, device_id: devRef.current })
+                        .then((res) => { if (res && res.error) throw new Error(res.error); })
+                        .catch(() => { setAskPicked(null); setErr("没选上,再点一次"); }); // 发失败恢复选项框
+                    }}>
+                    <Text style={s.optText}>{o}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            )}
           </View>
+        );
+      })()}
+
+      {/* 乐观回显条:任何动作发出的瞬间在这里"已发出"(淡色+小勾),确认后撤、失败转红可重发 */}
+      {outbox.length > 0 && (
+        <View style={s.outboxRow}>
+          {outbox.map((x) => (
+            <Pressable key={x.id} disabled={x.status !== "err"}
+              onPress={() => x.status === "err" && fireOutbox(x.id, x.ev)}
+              style={[s.echoPill, x.status === "err" && s.echoPillErr, x.status === "ok" && s.echoPillOk]}>
+              <Text style={x.status === "err" ? s.echoTextErr : s.echoText}>
+                {x.status === "err" ? `⚠ ${x.label} 没发出·重发` : x.status === "ok" ? `✓ ${x.label}` : `⌛ ${x.label} 已发出`}
+              </Text>
+            </Pressable>
+          ))}
         </View>
       )}
-
       <View style={s.row}>
         <Pressable style={[s.sigBtn, { backgroundColor: "#2c5f3f" }]}
-          onPress={() => sendEvent({ type: "done" })}>
+          onPress={() => sendEventEcho({ type: "done" }, "完成")}>
           <Text style={s.sigText}>✅ 完成</Text>
         </Pressable>
         <Pressable style={[s.sigBtn, { backgroundColor: "#6b4a2b" }]}
-          onPress={() => sendEvent({ type: "forfeit" })}>
+          onPress={() => sendEventEcho({ type: "forfeit" }, "认罚")}>
           <Text style={s.sigText}>🍺 认罚跳过</Text>
         </Pressable>
         <Pressable style={[s.sigBtn, { backgroundColor: "#31506e", flex: 0.6 }]}
-          onPress={() => { Haptics.selectionAsync(); sendEvent({ type: "tap" }); }}>
+          onPress={() => sendEventEcho({ type: "tap" }, "抢答")}>
           <Text style={s.sigText}>👏 抢答</Text>
         </Pressable>
       </View>
@@ -1046,7 +1157,7 @@ export default function App() {
       <View style={s.chipRow}>
         {QUICK_CHIPS.map((c) => (
           <Pressable key={c} style={s.chip}
-            onPress={() => { Haptics.selectionAsync(); sendEvent({ type: "say", text: c, to: "桌上" }); }}>
+            onPress={() => sendEventEcho({ type: "say", text: c, to: "桌上" }, c)}>
             <Text style={s.chipText}>{c}</Text>
           </Pressable>
         ))}
@@ -1055,14 +1166,14 @@ export default function App() {
       <View style={s.row}>
         <TextInput style={[s.sayInputDim, { flex: 1 }]} placeholder="要打字再说…"
           placeholderTextColor="#556" value={say} onChangeText={setSay} />
-        <Pressable style={s.sayBtnDim} onPress={() => { if (say.trim()) { sendEvent({ type: "say", text: say.trim(), to: "桌上" }); setSay(""); } }}>
+        <Pressable style={s.sayBtnDim} onPress={() => { const t = say.trim(); if (t) { sendEventEcho({ type: "say", text: t, to: "桌上" }, t); setSay(""); } }}>
           <Text style={s.sayBtnDimText}>💬桌上</Text>
         </Pressable>
         {/* 「局长」键双态(PTT 获批 2026-07-24):短按=发输入框文字(原样);
             长按 350ms 起=按住说话(变红大化+轻震),松手停录→转写→say(to=局长)。
             onPressOut 每次松手都触发:短按时 pttRef 为空,stopPtt 直接返回,不误伤 */}
         <Pressable style={[s.sayBtnDim, ptt && s.pttBtnOn]} delayLongPress={350}
-          onPress={() => { if (say.trim()) { sendEvent({ type: "say", text: say.trim(), to: "局长" }); setSay(""); } }}
+          onPress={() => { const t = say.trim(); if (t) { sendEventEcho({ type: "say", text: t, to: "局长" }, t); setSay(""); } }}
           onLongPress={() => { pttHeldRef.current = true; startPtt(); }}
           onPressOut={() => { pttHeldRef.current = false; stopPtt(); }}>
           <Text style={ptt ? s.pttBtnOnText : s.sayBtnDimText}>{ptt ? "🎤 松手发给局长" : "🎙局长"}</Text>
@@ -1201,6 +1312,27 @@ const s = StyleSheet.create({
   askBoxMe: { borderWidth: 2, borderColor: "#ffd54a" },
   askText: { color: "#cde", fontSize: 15, marginBottom: 6 },
   askTextMe: { color: "#fff", fontSize: 18, fontWeight: "700", marginBottom: 6 },
+  // 选择框即收后的一行"✓ 已选 X"
+  askPicked: { color: "#8fd0a8", fontSize: 17, fontWeight: "800", marginTop: 2 },
+  // 局长思考指示:呼吸的「🎩 局长在酝酿 …」
+  thinkingBar: { flexDirection: "row", alignItems: "center", gap: 8, marginVertical: 4,
+    paddingHorizontal: 4 },
+  thinkingHat: { fontSize: 18 },
+  thinkingDots: { color: "#c9b8ff", fontSize: 15, fontWeight: "600" },
+  // 开牌即时清算结果卡:开牌横幅后的当庭报数结论(大字)
+  verdictCard: { backgroundColor: "#3a1410", borderColor: "#ff6a4a", borderWidth: 2,
+    borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, marginVertical: 8,
+    alignItems: "center" },
+  verdictHead: { color: "#ffcaa8", fontSize: 15, fontWeight: "700", marginBottom: 4 },
+  verdictLoser: { color: "#ff7a5a", fontSize: 28, fontWeight: "900" },
+  // 乐观回显条:已发出(淡)/ 已送达(绿勾)/ 没发出(红,可重发)
+  outboxRow: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 4, marginBottom: 2 },
+  echoPill: { backgroundColor: "#232432", borderRadius: 14, paddingVertical: 5,
+    paddingHorizontal: 12, opacity: 0.7 },
+  echoPillOk: { opacity: 0.85 },
+  echoPillErr: { backgroundColor: "#4a1414", opacity: 1 },
+  echoText: { color: "#9aa", fontSize: 13, fontWeight: "600" },
+  echoTextErr: { color: "#ff8a7a", fontSize: 13, fontWeight: "800" },
   row: { flexDirection: "row", gap: 8, marginVertical: 5, alignItems: "center" },
   optBtn: { backgroundColor: "#31506e", borderRadius: 10, paddingVertical: 8,
     paddingHorizontal: 14, minHeight: 44, justifyContent: "center" },

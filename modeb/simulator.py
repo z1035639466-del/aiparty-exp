@@ -38,6 +38,22 @@ ROOM_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
 ROOM_CODE_LEN = 4
 IDLE_LIMIT_S = 2 * 3600          # 2 小时无活动即回收房间(episode 文件保留)
 DEFAULT_MAX_LLM_CALLS = 500      # 每局 LLM 调用默认上限(0=不限);环境变量可覆盖
+HOST_BUSY_TTL_S = 60             # 局长思考指示的保险丝:置位超此秒数一律当已复位(防崩溃卡死)
+
+# —— 大话骰赖子(幺)规则 —— #
+# 通例:1(幺)是赖子,开牌数某面个数时算入任意面。房主想玩"没有赖子"的硬核版就把
+# 这行改成 False(模块级开关,一处生效)。特例:叫价面本身是 1 时,1 只算它自己、不翻倍
+# (否则"叫 N 个 1"永远成立,规则自相矛盾)——这条是大话骰通例,不受开关影响。
+WILD_ONES = True
+
+
+def count_face(all_dice: list[int], face: int, wild: bool = WILD_ONES) -> int:
+    """开牌当庭报数:数全桌点数里 face 的个数。
+    wild 且 face≠1 时,1 作赖子一并计入;face==1 时 1 只算自己(通例)。"""
+    n = sum(1 for d in all_dice if d == face)
+    if wild and face != 1:
+        n += sum(1 for d in all_dice if d == 1)
+    return n
 
 
 def gen_room_code(taken: set[str]) -> str:
@@ -188,6 +204,11 @@ class Session:
         self.room_code = ""   # 由 Hub.start / restore 注入:本桌 4 位房间码
         self.last_active = _t.time()  # 最近一次被访问的时刻,闲置回收据此判活
         self.closed = False   # 闲置回收信号:autoplay 线程见到即退出(随房间生命周期)
+        # 局长思考指示(真机节奏裁定 2026-07-24:慢不是病,没反馈才是病):run_turn
+        # 前后置位,player_view 据此给 host_thinking。带时间戳做保险丝——一拍崩溃没走到
+        # 复位也不会永久卡"局长在酝酿"(超 HOST_BUSY_TTL_S 秒一律当 False)。
+        self.host_busy = False
+        self.host_busy_at = 0.0
 
     def route_private(self, line: dict) -> dict:
         """show(自己看/额头) 路由进收件箱;返回轮询面用的遮蔽版回合行。
@@ -346,14 +367,41 @@ class Session:
                          "face": max(1, min(6, int(bid.get("face", 1))))}
             except (TypeError, ValueError):
                 clean = None
+        # 事实先行·开牌即时清算(房主裁定 2026-07-24):带叫价且全桌已摇(上面的
+        # unrolled 校验已保证全摇),当场就把点数数清报出来——「当庭报数不泄密」:
+        # 桌上的骰子迟早要摊开,系统只是把这一下做得毫秒即达、谁也赖不掉。
+        # 输家判据(大话骰通例):数全桌 face 个数(1 作赖子,见 count_face)对比叫价——
+        # 实际≥叫价→叫价成立,开牌人输;实际<叫价→叫价是吹的,叫价人输。
+        # 叫价人身份留在嘴上(系统只收到 {count,face} 不收谁叫的),故叫价人输时
+        # loser=None、由局长当场点名;开牌人是 me,输了直接报名。没带叫价(跳过叫价)
+        # 不清算,照旧等局长社交裁决。
+        verdict = None
+        if clean:
+            all_dice = [d for pr in self.state.props.values()
+                        for d in (pr.get("rolled") or [])]
+            fc = count_face(all_dice, clean["face"])
+            if fc >= clean["count"]:
+                loser, role = me, "开牌人"
+            else:
+                loser, role = None, "叫价人"
+            verdict = {"type": "challenge_verdict", "loser": loser, "loser_role": role,
+                       "challenger": me, "face": clean["face"], "face_count": fc,
+                       "bid": dict(clean), "wild": bool(WILD_ONES and clean["face"] != 1)}
         for pr in self.state.props.values():
             pr["challenged_by"] = me
             pr["bid"] = clean
+            if verdict:  # 判决随开牌标挂到全桌盅上,留到局长清算(收盅/重发)才随盅清
+                pr["verdict"] = verdict
         ev = {"type": "challenge", "player": me}
         if clean:
             ev["bid"] = dict(clean)   # 「⚡ 甲开牌!(叫价:3个6)」——各面按此渲染
         self.engine.push_event(ev)
-        return {"ok": True, "challenged": True, "bid": clean}
+        if verdict:
+            # verdict 紧跟 challenge 立即入队:全桌可见(报数不泄密),局长下一拍在
+            # events 里直接拿到当庭结论,不用自己对账数点。
+            self.engine.push_event(dict(verdict))
+        return {"ok": True, "challenged": True, "bid": clean,
+                **({"verdict": verdict} if verdict else {})}
 
     def judge_photo(self, player: str, image_b64: str | None, media_type: str | None,
                      frames: list[str] | None = None) -> dict:
@@ -478,6 +526,16 @@ class Session:
             body = body or {}
             self.driver.pending = {"text": body.get("text", ""),
                                    "tool_use": body.get("tool_use", [])}
+        # 局长思考指示置位:这一整拍(含主持慢调用与桌友并行)期间 player_view 报
+        # host_thinking,App 亮"🎩 …"呼吸点。finally 复位,异常也不留卡死。
+        self.host_busy = True
+        self.host_busy_at = _t.time()
+        try:
+            return self._run_turn_inner(body)
+        finally:
+            self.host_busy = False
+
+    def _run_turn_inner(self, body: dict | None = None) -> dict:
         line = self.engine.turn()
         red = self.route_private(line)
         self.recent.append(red)
@@ -609,7 +667,9 @@ class Session:
             "my_prop": ({"kind": me_prop["kind"], "count": me_prop["count"],
                          "rolled": me_prop.get("rolled"),
                          **({"challenged_by": me_prop["challenged_by"],
-                             "bid": me_prop.get("bid")}
+                             "bid": me_prop.get("bid"),
+                             **({"verdict": me_prop["verdict"]}
+                                if me_prop.get("verdict") else {})}
                             if me_prop.get("challenged_by") else {})}
                         if (me_prop := self.state.props.get(me)) else None),
             # 全桌骰盅状态:谁有盅、摇没摇(布尔)——旁人看得到动作,看不到点数。
@@ -617,9 +677,17 @@ class Session:
             # App 轮询见它从无到有就放「⚡ 开牌!」横幅+重触感;点数依旧不出本人。
             "cups": [{"player": p, "rolled": pr.get("rolled") is not None,
                       **({"challenged_by": pr["challenged_by"],
-                          "bid": pr.get("bid")}
+                          "bid": pr.get("bid"),
+                          **({"verdict": pr["verdict"]} if pr.get("verdict") else {})}
                          if pr.get("challenged_by") else {})}
                      for p, pr in self.state.props.items()],
+            # 开牌即时清算的当庭结论(全桌可见,报数不泄密):带叫价的开牌当场算好挂在
+            # 盅上,App 据此在开牌横幅后弹结果卡。没带叫价=None,照旧等局长社交裁决。
+            "challenge_verdict": next((pr["verdict"] for pr in self.state.props.values()
+                                       if pr.get("verdict")), None),
+            # 局长思考指示:run_turn 进行中为真(带 60 秒保险丝,防崩溃卡死)。
+            "host_thinking": bool(self.host_busy
+                                  and _t.time() - self.host_busy_at < HOST_BUSY_TTL_S),
             # 额头牌=人身上的道具:给出**别人**的牌(点人看牌),自己那张永远缺席——
             # 可见性反转在服务端成立,客户端天然拿不到自己的词
             "foreheads": {p: t for p, t in self.state.foreheads.items() if p != me},

@@ -14,6 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from modeb.simulator import WILD_ONES, count_face  # noqa: E402
 from modeb.state import GameState  # noqa: E402
 from modeb.tools import ToolExecutor  # noqa: E402
 
@@ -282,3 +283,124 @@ def test_bystander_sees_challenged_by_not_points(tmp_path):
     dc = s.state.digest(30)["dice_cups"]
     assert all(x["challenged_by"] == "甲" for x in dc)
     assert str(dice_a) not in json.dumps(dc, ensure_ascii=False)
+
+
+# —— ⑨ 开牌即时清算(事实先行·当庭报数,房主裁定 2026-07-24)——
+# 带叫价且全桌已摇 → 服务器当场数点报数,verdict 立即入队、输家算对(含 1 当赖子);
+# view 带 verdict(cups/顶层)但不泄点数;无叫价不清算(照旧等局长社交裁决)。
+
+def _dealt_with_rolls(tmp_path, rolls: dict):
+    """发盅并把点数钉成固定值(测清算逻辑要确定性,不靠 RNG)。"""
+    s = _session(tmp_path, names=tuple(rolls))
+    players = list(rolls)
+    n = len(next(iter(rolls.values())))
+    s.engine.tools.execute({"name": "prop.dice_cup",
+                            "input": {"players": players, "count": n}})
+    for p, dice in rolls.items():
+        s.state.props[p]["rolled"] = list(dice)
+    return s
+
+
+def test_count_face_wild_ones():
+    # 幺作赖子:数 4 的个数 = 真 4 + 幺
+    assert count_face([4, 4, 1, 2, 1], 4) == 4          # 两个4 + 两个幺(赖子)
+    assert count_face([4, 4, 1, 2, 1], 4, wild=False) == 2
+    # 叫价面是 1:幺只算自己,不翻倍(否则"叫 N 个 1"永远成立)
+    assert count_face([1, 1, 3, 6], 1) == 2
+    assert WILD_ONES is True   # 模块级开关默认开(房主可关)
+
+
+def test_challenge_verdict_challenger_loses_with_wild(tmp_path):
+    # 甲=[4,4,1], 乙=[4,1,2]:数4 = 三个真4 + 两个幺 = 5;叫 4 个 4 → 实际5≥4 → 开牌人(甲)输
+    s = _dealt_with_rolls(tmp_path, {"甲": [4, 4, 1], "乙": [4, 1, 2]})
+    out = s.challenge("甲", {"count": 4, "face": 4})
+    assert out["ok"]
+    vd = out["verdict"]
+    assert vd["face_count"] == 5 and vd["loser"] == "甲" and vd["loser_role"] == "开牌人"
+    assert vd["wild"] is True
+    # verdict 事件立即入队(全桌可见的当庭报数),紧跟 challenge
+    ev = next(e for e in s.engine.event_queue if e.get("type") == "challenge_verdict")
+    assert ev["loser"] == "甲" and ev["face_count"] == 5 and ev["bid"] == {"count": 4, "face": 4}
+
+
+def test_challenge_verdict_bidder_loses(tmp_path):
+    # 同点数,数4=5;叫 6 个 4 → 实际5<6 → 叫价人输(身份在嘴上,loser=None 由局长点名)
+    s = _dealt_with_rolls(tmp_path, {"甲": [4, 4, 1], "乙": [4, 1, 2]})
+    out = s.challenge("甲", {"count": 6, "face": 4})
+    vd = out["verdict"]
+    assert vd["face_count"] == 5 and vd["loser"] is None and vd["loser_role"] == "叫价人"
+    ev = next(e for e in s.engine.event_queue if e.get("type") == "challenge_verdict")
+    assert ev["loser"] is None and ev["challenger"] == "甲"
+
+
+def test_challenge_verdict_face_one_no_double(tmp_path):
+    # 叫价面是 1:幺只算自己。甲=[1,1,5], 乙=[1,3,4]:数1 = 3;叫 3 个 1 → 实际3≥3 → 开牌人输
+    s = _dealt_with_rolls(tmp_path, {"甲": [1, 1, 5], "乙": [1, 3, 4]})
+    out = s.challenge("甲", {"count": 3, "face": 1})
+    vd = out["verdict"]
+    assert vd["face_count"] == 3 and vd["wild"] is False and vd["loser"] == "甲"
+
+
+def test_challenge_no_bid_no_verdict(tmp_path):
+    s = _dealt_with_rolls(tmp_path, {"甲": [4, 4, 1], "乙": [4, 1, 2]})
+    out = s.challenge("甲", None)
+    assert out["ok"] and "verdict" not in out
+    assert not any(e.get("type") == "challenge_verdict" for e in s.engine.event_queue)
+    assert all("verdict" not in pr for pr in s.state.props.values())
+    assert s.player_view("乙")["challenge_verdict"] is None
+
+
+def test_challenge_verdict_in_view_no_points_leak(tmp_path):
+    s = _dealt_with_rolls(tmp_path, {"甲": [4, 4, 1], "乙": [4, 1, 2], "丙": [6, 6, 3]})
+    s.challenge("甲", {"count": 4, "face": 4})
+    v = s.player_view("丙")   # 旁人视角(丙 自己的点数 [6,6,3] 本就该给本人,不算泄露)
+    vd = v["challenge_verdict"]
+    assert vd["loser"] == "甲" and vd["face_count"] == 5 and vd["bid"] == {"count": 4, "face": 4}
+    # cups 区也带 verdict(view 的 cups/challenge 区带 verdict)
+    cup = next(c for c in v["cups"] if c["player"] == "甲")
+    assert cup["verdict"]["loser"] == "甲"
+    # 别人的点数依旧不泄露(face_count=5 是聚合报数,不是谁的骰面)
+    blob = json.dumps(v, ensure_ascii=False)
+    assert str([4, 4, 1]) not in blob and str([4, 1, 2]) not in blob
+
+
+# —— ⑩ 局长思考指示(host_busy 置位/复位/超时自愈)——
+
+def test_host_busy_set_during_and_reset_after(tmp_path):
+    s = _session(tmp_path)
+    assert s.host_busy is False
+    seen = {}
+
+    class _Probe:
+        def decide(self, digest, events):
+            seen["busy"] = s.host_busy   # run_turn 里叫到主持这一刻,busy 该是真
+            return {"text": "", "tool_use": []}
+
+    s.engine.driver = _Probe()
+    s.run_turn()
+    assert seen["busy"] is True, "run_turn 期间 host_busy 该置位"
+    assert s.host_busy is False, "run_turn 结束该复位"
+    assert s.player_view("甲")["host_thinking"] is False
+
+
+def test_host_busy_reset_on_exception(tmp_path):
+    s = _session(tmp_path)
+
+    class _Boom:
+        def decide(self, digest, events):
+            raise RuntimeError("boom")   # 主持崩了:engine 走沉默拍,但 host_busy 必复位
+
+    s.engine.driver = _Boom()
+    s.run_turn()
+    assert s.host_busy is False
+
+
+def test_host_thinking_ttl_self_heal(tmp_path):
+    import time as _time
+    s = _session(tmp_path)
+    s.host_busy = True
+    s.host_busy_at = _time.time()
+    assert s.player_view("甲")["host_thinking"] is True
+    # 保险丝:置位超 60 秒(崩溃没走到复位)一律当 False,不永久卡"局长在酝酿"
+    s.host_busy_at = _time.time() - 61
+    assert s.player_view("甲")["host_thinking"] is False
