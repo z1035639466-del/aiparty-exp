@@ -326,9 +326,12 @@ class Engine:
                           for pr in self.state.props.values()))
         drew = any(c.get("name") == "draw_atom" and r.get("ok")
                    for c, r in zip(calls, results))
+        # 弃了牌却没抽新的也算束手(真机病历:播报「撕掉换一张」然后干等)
+        binned = any(c.get("name") == "state.discard" and r.get("ok")
+                     for c, r in zip(calls, results))
         if any(e.get("type") != "no_closer" for e in events):
             self._closer_retry = False  # 有真实事件进来=局面是新的,提醒额度恢复
-        if (not self.state.finished and drew and not engaged
+        if (not self.state.finished and (drew or binned) and not engaged
                 and not self.event_queue and not self._closer_retry):
             self._closer_retry = True
             self.event_queue.append({
