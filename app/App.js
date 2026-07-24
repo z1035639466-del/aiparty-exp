@@ -23,10 +23,9 @@ import * as VideoThumbnails from "expo-video-thumbnails";
 import PropsBox from "./props";
 
 const POLL_MS = 900;
-// 官方服务器(正式形态):域名定了填在这里,玩家从此只输房间码+座位名,
-// 服务器输入框整个消失(长按标题下方空白 1.2 秒可唤回,开发调试用)。
-// 留空 = 开发期行为:显示服务器输入框(自架地址没法未卜先知)。
-const DEFAULT_SERVER = "";
+// 官方服务器(正式形态,2026-07-23 定稿):玩家从此只输房间码+座位名,
+// 服务器输入框消失(长按标题下方空白 1.2 秒可唤回,开发调试用)。
+const DEFAULT_SERVER = "https://play.zakzok.app";
 // 上次入座用的服务器/座位/房间。局域网地址这种东西每开一次 App 重敲一遍没人受得了,
 // 何况派对现场手忙脚乱。存本机,下次进来直接填好,改了照样能改。
 const PREFS = FileSystem.documentDirectory + "yappa-last.json";
