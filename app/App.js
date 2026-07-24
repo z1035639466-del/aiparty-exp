@@ -1307,13 +1307,11 @@ export default function App() {
         </Pressable>
       </View>
       <View style={[s.row, { justifyContent: "center" }]}>
-        {/* 真机病历 2026-07-24:「点安全退出退不出来」——原来只发 optout 事件
-            (跳过环节),没有离开房间的路,发了也没反馈。现在两条路都给,
-            退出这轮走乐观回显(看得见发出去了),离开房间本地即走(随时可重新入座) */}
+        {/* 安全退出=离开房间退游戏(房主拍板 2026-07-24):不掺「跳过环节」二义
+            ——跳过某轮的路早有(「过」短语/认罚跳过)。退回首页,随时可重新入座 */}
         <Pressable hitSlop={14} onPress={() => Alert.alert("安全退出",
-          "退出这轮=零代价跳过当前环节;离开房间=退回首页,随时可重新入座", [
+          "离开房间,回到首页?(名字和房间码留着,随时能回来)", [
           { text: "再想想" },
-          { text: "退出这轮", onPress: () => sendEventEcho({ type: "optout" }, "退出这轮") },
           { text: "离开房间", style: "destructive", onPress: () => {
             setJoined(false); setInLobby(false); setSeated(false); setIsHost(false);
             setHostToken(""); setRoster([]); setView(null); setAskPicked(null);
