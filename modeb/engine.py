@@ -149,6 +149,8 @@ class Engine:
         asked = ask.get("asked")
         if asked and asked not in ("全场", "all") and ev["player"] != asked:
             return False
+        if ev["player"] in (ask.get("exclude") or ()):
+            return False  # 当事人回避:出题人不许猜自己的题,他的话照旧当普通发言
         if ev.get("type") == "say":
             return ev.get("to") == "局长"
         return ev.get("type") in ("vote", "tap")
@@ -186,7 +188,8 @@ class Engine:
         if ask.get("mode") == "轮流":
             audience = ask.get("order_all", [])
         elif ask.get("asked") in (None, "全场"):
-            audience = self.state.players
+            audience = [p for p in self.state.players
+                        if p not in (ask.get("exclude") or ())]  # 回避者不算被问未答
         else:
             audience = [ask["asked"]]
         silent = [p for p in audience if p not in ask["answers"]]

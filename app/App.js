@@ -952,7 +952,8 @@ export default function App() {
   // 手机上——服务端本就不收错人的答案,但按钮在就会被点,点了变成一条误导局长的私聊,
   // 一个人一次点击能把整局带偏)。问全场/没写对象才是人人可答。
   const askMine = v.open_ask && (askedMe
-    || !v.open_ask.asked || ["全场", "all"].includes(v.open_ask.asked));
+    || !v.open_ask.asked || ["全场", "all"].includes(v.open_ask.asked))
+    && !((v.open_ask && v.open_ask.exclude) || []).includes(me); // 当事人回避:出题人不出按钮
   const myCue = v.photo_request ? "📸 轮到你:拍照判定,看下方题目"
     : v.audio_request ? "🎤 轮到你:录音判定,看下方题目"
     : askedMe ? "🫵 问到你了,往下答"
@@ -1282,7 +1283,10 @@ export default function App() {
           <View style={[s.askBox, askedMe && s.askBoxMe]}>
             <Text style={askedMe ? s.askTextMe : s.askText}>🎤 {askedMe ? "问你" : `问${v.open_ask.asked}`}:{v.open_ask.prompt}</Text>
             {!askMine ? (
-              <Text style={s.askPicked}>等 {v.open_ask.asked} 回答…</Text>
+              <Text style={s.askPicked}>
+                {(v.open_ask.exclude || []).includes(me)
+                  ? "这题关于你——等大家猜…" : `等 ${v.open_ask.asked} 回答…`}
+              </Text>
             ) : picked ? (
               <Text style={s.askPicked}>✓ 已选 {askPicked.choice}</Text>
             ) : (

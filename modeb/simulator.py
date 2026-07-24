@@ -726,7 +726,9 @@ class Session:
             ],
             "inbox": self.inbox.get(me, [])[-8:],          # 只有自己的
             "open_ask": ({"prompt": ask["prompt"], "asked": ask["asked"],
-                          "options": ask["options"]} if ask else None),  # 不含 answers
+                          "options": ask["options"],
+                          "exclude": ask.get("exclude") or []}
+                         if ask else None),  # 不含 answers;exclude=当事人回避名单
             "recent": recent,
         }
 

@@ -370,11 +370,15 @@ class ToolExecutor:
         window = int(a.get("window", 10))
         if not 1 <= window <= 120:
             raise ClampError(f"ask 窗口越界: {window} 秒")
+        # 当事人回避(真机病历 2026-07-24:「我出题,问全场会问到我自己」——Jack 说
+        # 真假句,猜题的 ask 连他自己的手机都出了作答按钮):exclude 名单不收答案、
+        # 不出按钮;轮流模式从顺序里剔除。
+        excl = [p for p in (a.get("exclude") or []) if p in self.state.players]
         if a.get("mode") == "轮流":
             # 顺序性玩法(一人一句形容/逐个表态)的正解:每人独立应答槽逐个开窗,
             # 不再全场抢答——实测抢答窗把慢玩家和后手挤成"安静得可疑"。
             order = [p for p in (a.get("order") or self.state.players)
-                     if p in self.state.players]
+                     if p in self.state.players and p not in excl]
             if not order:
                 raise ClampError("ask(轮流) 需要至少一名在座玩家")
             import time as _t
@@ -383,7 +387,7 @@ class ToolExecutor:
                 "prompt": a.get("prompt", ""), "asked": order[0],
                 "options": a.get("options"), "deadline": deadline, "answers": {},
                 "window": window, "mode": "轮流", "queue": order[1:],
-                "order_all": order,
+                "order_all": order, "exclude": excl,
             }
             self.state.timers.append(deadline)
             return {"asked": order[0], "prompt": a.get("prompt", ""), "mode": "轮流",
@@ -394,10 +398,11 @@ class ToolExecutor:
         self.state.open_ask = {
             "prompt": a.get("prompt", ""), "asked": a.get("player", "全场"),
             "options": a.get("options"), "deadline": None, "answers": {},
-            "window": window,
+            "window": window, "exclude": excl,
         }
         return {"asked": a.get("player", "全场"), "prompt": a.get("prompt", ""),
-                "options": a.get("options"), "window": window}
+                "options": a.get("options"), "window": window,
+                **({"exclude": excl} if excl else {})}
 
     # —— random ——
     def _t_random(self, name: str, a: dict) -> dict:
