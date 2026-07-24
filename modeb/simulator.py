@@ -65,6 +65,12 @@ def _make_audio_judge():
     return None
 
 
+# 按住说话转写提示词(PTT 裁定 2026-07-24):只要逐字稿,不要裁判意见——
+# 转写口与 judge_audio 共享全模态 transport,但职责完全不同(那边判"像不像",
+# 这边只当耳朵)。改口径只改这一行。
+STT_PROMPT = "逐字转写这段中文口语,只输出说的内容本身,不解释不评论,不加任何前后缀。"
+
+
 class ManualDriver:
     """主持台驱动:/api/turn 随请求带入决策,decide 原样返回。"""
 
@@ -444,6 +450,26 @@ class Session:
             verdict = "无法判定"
         return {"type": "judge_result", "player": player, "verdict": verdict,
                 "reason": str(out.get("reason") or "")[:100]}
+
+    def stt_transcribe(self, judge, audio_b64: str, fmt: str | None) -> str | None:
+        """按住说话转写(PTT,房主裁定 2026-07-24;锁外调用,慢):音频→逐字稿。
+
+        显式判定动作家族的成员:玩家按住「局长」键才收音、松手即停即传——与拍照
+        判定同族,和已除名的"全程录音/监听"划清界限(那条禁令依然有效)。音频
+        在本方法返回后即弃:不落盘、不进 episode、不进任何缓存;事件流里只有
+        转写后的 say 文本,和打字发的一模一样。失败/空稿返回 None(调用方回
+        502,App 端不丢录音可重试)。"""
+        msgs = [{"role": "user", "content": [
+            {"type": "input_audio", "input_audio": {"data": audio_b64,
+                                                    "format": fmt or "m4a"}},
+            {"type": "text", "text": "转写"}]}]
+        try:
+            raw = judge.complete(STT_PROMPT, msgs)
+        except Exception:
+            return None
+        text = (raw or "").strip()
+        # 玩家一口气说不满 200 字;超长多半是模型跑偏在解释,截断保底
+        return text[:200] if text else None
 
     def run_turn(self, body: dict | None = None) -> dict:
         """执行一拍(须在持有 self.lock 下调用):HTTP 手动驱动与服务端自驱共用。
@@ -1308,6 +1334,33 @@ class Handler(BaseHTTPRequestHandler):
                         s.state.pending_audio = None
                         s.engine.push_event(dict(result))
                 self._json(200, {"verdict": result["verdict"], "reason": result["reason"]})
+                return
+            if path == "/api/stt":
+                # 按住说话(PTT,房主获批 2026-07-24):玩家按住「局长」键说一句,
+                # 松手后全模态口转成文字,以 say(to=局长, via=voice) 走既有 push_event
+                # 入事件流——享受既有遮蔽(别人的 view 只见「跟主持说了句话」)。
+                # 音频转写完即弃:不落盘、不入 episode。这是显式动作(按住才收、
+                # 松手即停),不是常驻监听——感知线收束令依然有效,PTT 之外零采集。
+                player = body.get("player")
+                with s.lock:
+                    if player not in s.state.players:
+                        self._json(400, {"error": f"未知座位: {player}"})
+                        return
+                if not body.get("audio_b64"):
+                    self._json(400, {"error": "缺 audio_b64(空音频不转写)"})
+                    return
+                judge = _make_audio_judge()   # 与 judge_audio 同一把 key、同一条全模态口
+                if judge is None:
+                    self._json(501, {"error": "语音通道未接入,打字仍可用"})
+                    return
+                text = s.stt_transcribe(judge, body["audio_b64"], body.get("format"))
+                if text is None:
+                    self._json(502, {"error": "没转写出来,再说一次(打字仍可用)"})
+                    return
+                with s.lock:
+                    s.engine.push_event({"type": "say", "player": player,
+                                         "text": text, "to": "局长", "via": "voice"})
+                self._json(200, {"ok": True, "text": text})   # 回显给说话者,音频不回传
                 return
             if path == "/api/photo":
                 player = body.get("player")

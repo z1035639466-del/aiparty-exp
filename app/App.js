@@ -300,6 +300,12 @@ export default function App() {
   const [dueled, setDueled] = useState(false); // 本次对决我开过枪了
   const [rolling, setRolling] = useState(false); // 骰盅扣盅动画进行中(挡重复扣)
   const [recording, setRecording] = useState(null); // 录音判定进行中的 Recording 对象
+  // —— 按住说话(PTT,房主获批 2026-07-24)——与录音判定 recording 完全独立,互不干扰。
+  // 显式动作:按住「局长」键才收音、松手即停即传;音频服务端转写完即弃,不留存。
+  const [ptt, setPtt] = useState(false);        // 按住收音中(按钮变红大化 + 提示用)
+  const [voiceMsgs, setVoiceMsgs] = useState([]); // 🎤 转写后已发给局长的话(本地回显)
+  const pttRef = useRef(null);                  // 进行中的 PTT Recording 对象
+  const pttHeldRef = useRef(false);             // 手指还按着吗(create 是异步的,防松手竞态)
   const [challengeFlash, setChallengeFlash] = useState(null); // 「⚡ 开牌!」全屏横幅(1.6s 自动散)
   const [bellFlash, setBellFlash] = useState(null); // 系统级炸铃满屏大字(1.2s 自动散)
   const prevRef = useRef({ inbox: 0, drawn: false, challenged: false });
@@ -356,6 +362,57 @@ export default function App() {
       Alert.alert("录音失败", String(e.message));
     }
   };
+
+  // —— 按住说话(PTT):长按「局长」键收音,松手停录→ /api/stt 转写→以 say(to=局长) 入局 ——
+  // 姿势参照 toggleRecord(同一套 expo-av),但状态独立(pttRef),与录音判定互不干扰。
+  const startPtt = async () => {
+    try {
+      if (pttRef.current) return;               // 已在录,别叠第二路
+      const perm = await Audio.requestPermissionsAsync();
+      if (!perm.granted) { Alert.alert("需要麦克风权限", "按住说话要用麦克风"); return; }
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);   // 开录轻震:确认在收
+      const { recording: rec } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      if (!pttHeldRef.current) {                // 手已经松了(create 是异步的):立即停掉弃录
+        rec.stopAndUnloadAsync().catch(() => {});
+        return;
+      }
+      pttRef.current = rec; setPtt(true);
+    } catch (e) { pttRef.current = null; setPtt(false); Alert.alert("录音失败", String(e.message)); }
+  };
+  const stopPtt = async () => {
+    const rec = pttRef.current;
+    pttRef.current = null; setPtt(false);
+    if (!rec) return;                           // 短按/没录起来:这里啥也不做
+    try {
+      await rec.stopAndUnloadAsync();           // 松手即停:PTT 之外零采集
+      const b64 = await FileSystem.readAsStringAsync(rec.getURI(), { encoding: "base64" });
+      uploadPtt(b64, false);
+    } catch (e) { Alert.alert("录音失败", String(e.message)); }
+  };
+  const uploadPtt = async (b64, retried) => {
+    try {
+      const res = await api("/api/stt", { player: me, audio_b64: b64, format: "m4a" });
+      if (!res || res.error || !res.text) throw new Error((res && res.error) || "服务器没回转写");
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setVoiceMsgs((m) => [...m, res.text]);    // 转写文本以已发消息形态回显(标 🎤)
+    } catch (e) {
+      if (!retried) {                           // 失败不丢录音:b64 还在手里,可再送一次
+        Alert.alert("语音没送到局长", String(e.message), [
+          { text: "算了" },
+          { text: "重发这段", onPress: () => uploadPtt(b64, true) },
+        ]);
+      } else {
+        Alert.alert("还是没送到", String(e.message) + "(打字仍可用)");
+      }
+    }
+  };
+  // 离场清资源:组件卸载时若还按着,停掉并弃录(音频不留存)
+  useEffect(() => () => {
+    pttHeldRef.current = false;
+    if (pttRef.current) { pttRef.current.stopAndUnloadAsync().catch(() => {}); pttRef.current = null; }
+  }, []);
 
   // —— 手机开局页(v0 欠账补):此前开局只能在电脑驾驶舱,手机只能入座 ——
   const [creating, setCreating] = useState(false);
@@ -898,6 +955,11 @@ export default function App() {
             </View>
           );
         })}
+        {/* 🎤 按住说话的本地回显:转写文本以已发消息形态挂在 feed 尾部(轮询稍后
+            也会带回同一句——带 🎤 的这份标明它是语音转的) */}
+        {voiceMsgs.map((t, i) => (
+          <Text key={"v" + i} style={s.voiceMsg}>🎤 你对局长说:「{t}」</Text>
+        ))}
       </ScrollView>
 
       {v.photo_request && (
@@ -996,8 +1058,14 @@ export default function App() {
         <Pressable style={s.sayBtnDim} onPress={() => { if (say.trim()) { sendEvent({ type: "say", text: say.trim(), to: "桌上" }); setSay(""); } }}>
           <Text style={s.sayBtnDimText}>💬桌上</Text>
         </Pressable>
-        <Pressable style={s.sayBtnDim} onPress={() => { if (say.trim()) { sendEvent({ type: "say", text: say.trim(), to: "局长" }); setSay(""); } }}>
-          <Text style={s.sayBtnDimText}>🎙局长</Text>
+        {/* 「局长」键双态(PTT 获批 2026-07-24):短按=发输入框文字(原样);
+            长按 350ms 起=按住说话(变红大化+轻震),松手停录→转写→say(to=局长)。
+            onPressOut 每次松手都触发:短按时 pttRef 为空,stopPtt 直接返回,不误伤 */}
+        <Pressable style={[s.sayBtnDim, ptt && s.pttBtnOn]} delayLongPress={350}
+          onPress={() => { if (say.trim()) { sendEvent({ type: "say", text: say.trim(), to: "局长" }); setSay(""); } }}
+          onLongPress={() => { pttHeldRef.current = true; startPtt(); }}
+          onPressOut={() => { pttHeldRef.current = false; stopPtt(); }}>
+          <Text style={ptt ? s.pttBtnOnText : s.sayBtnDimText}>{ptt ? "🎤 松手发给局长" : "🎙局长"}</Text>
         </Pressable>
       </View>
       <View style={[s.row, { justifyContent: "center" }]}>
@@ -1153,6 +1221,11 @@ const s = StyleSheet.create({
   sayBtnDim: { backgroundColor: "#242c3a", borderRadius: 8, paddingVertical: 7,
     paddingHorizontal: 10, minHeight: 34, justifyContent: "center" },
   sayBtnDimText: { color: "#8a97a8", fontSize: 12, fontWeight: "600" },
+  // 按住说话(PTT):按住期间「局长」键变红大化——收音中一眼可见,松手即停
+  pttBtnOn: { backgroundColor: "#b02020", borderRadius: 12, paddingVertical: 14,
+    paddingHorizontal: 18, minHeight: 48 },
+  pttBtnOnText: { color: "#fff", fontSize: 15, fontWeight: "800" },
+  voiceMsg: { color: "#8fd0a8", fontSize: 15, marginVertical: 2, textAlign: "right" },
   // 大厅拍照读场:两行小字回显(场合猜测+认出实物)+ 低调重拍链接
   sceneMini: { backgroundColor: "#20202c", borderRadius: 10, paddingVertical: 8,
     paddingHorizontal: 12, width: "100%", marginTop: 2, marginBottom: 2,
