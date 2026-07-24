@@ -276,6 +276,16 @@ class Engine:
         calls = decision.get("tool_use", [])[:MAX_TOOLS_PER_TURN]
         overflow = len(decision.get("tool_use", [])) - len(calls)
         sentence_count = sum(text.count(p) for p in "。!?!?") or (1 if text else 0)
+        # 超句硬截断(真机节奏裁定 2026-07-24):warning 不改行为,主持一超再超。
+        # 在第 MAX_SENTENCES 个句读符处切——说得短=出得快,桌上等不起长篇。
+        if sentence_count > MAX_SENTENCES:
+            seen = 0
+            for i, ch in enumerate(text):
+                if ch in "。!?!?":
+                    seen += 1
+                    if seen == MAX_SENTENCES:
+                        text = text[:i + 1]
+                        break
         scores_before = dict(self.state.scores)
         results = [self.tools.execute(c) for c in calls]
         line = {
