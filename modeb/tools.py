@@ -364,7 +364,10 @@ class ToolExecutor:
         房主裁定:不要求全场共识——"和问一嘴没区别"。共识门槛会把局卡死,
         而现场问"这轮谁输了"本来就是谁应声算谁。
         """
-        window = int(a.get("window", 5))
+        # 默认窗 10 秒(真机病历 2026-07-24:全局 14 次问询应答率 35%,6 次一票定案
+        # ——线下局人人抬头看彼此,5 秒窗把大多数人挤成「没赶上」。抢答模式计时本就
+        # 从第一个应声起算,这 10 秒是给后到的人的)。
+        window = int(a.get("window", 10))
         if not 1 <= window <= 120:
             raise ClampError(f"ask 窗口越界: {window} 秒")
         if a.get("mode") == "轮流":
@@ -653,7 +656,18 @@ class ToolExecutor:
             self.state.notes[a.get("key", "_")] = a.get("value")
             return {"noted": a.get("key", "_")}
         if op == "finish":
-            self.state.finished = True
+            st = self.state
+            st.finished = True
+            # 收局即清场(真机病历 2026-07-24:finish 只设标志,「焦点在你身上」黄条
+            # 永久钉死、问询窗/计时器/对决悬着,放榜之后还有人在抢答)。
+            # 进行中的一切当场归零——收了的局不许再欠着任何等待。
+            st.focus = None
+            st.open_ask = None
+            st.timers.clear()
+            st.duel = None
+            st.pending_photo = None
+            st.pending_audio = None
+            st.pending_bell = None
             return {"finished": True}
         raise ClampError(f"state 未知子操作: {op}")
 

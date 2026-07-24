@@ -33,7 +33,9 @@ const POLL_MS = 600;
 // —— 快捷回应条(输入侧去打字化,房主裁定 2026-07-24)——
 // 社交局不许降维成打字游戏:最常说的几句做成 chips,单点即以桌上说话发出(配轻触感),
 // 玩家少动手、只关注现实场。打字框保留但视觉降级(变矮变淡)。文案在此常量数组里改。
-const QUICK_CHIPS = ["好!", "过", "完成了", "再来一局", "慢点等等"];
+// 「完成了」已删(真机病历 2026-07-24:和绿色「完成」真按钮挨着,名字几乎一样,
+// 玩家两个都试才分清);「人不在」给等人环节一个台阶(有人上厕所很正常,说一声局长好跳过)
+const QUICK_CHIPS = ["好!", "过", "再来一局", "慢点等等", "人不在,先跳过吧"];
 // 官方服务器(正式形态,2026-07-23 定稿):玩家从此只输房间码+座位名,
 // 服务器输入框消失(长按标题下方空白 1.2 秒可唤回,开发调试用)。
 const DEFAULT_SERVER = "https://play.zakzok.app";
@@ -354,6 +356,7 @@ export default function App() {
   // 选择框即收:点了 open_ask 的选项瞬间本地收起换"✓ 已选 X",不等下一拍轮询撤 ask;
   // 轮询发现 ask 还开着(轮流模式还在别人/换了题)按服务器状态为准恢复。
   const [askPicked, setAskPicked] = useState(null); // {prompt, asked, choice}
+  const [sceneBusy, setSceneBusy] = useState(false); // 场景侦察分析中(几秒,给反馈防"哑巴按钮")
   const prevRef = useRef({ inbox: 0, drawn: false, challenged: false, verdict: null });
   // 炸铃本地定时:记已排定那口铃的 at(去重,同一铃只触发一次)+ 定时器句柄(新铃覆盖旧铃时清掉)
   const bellRef = useRef({ at: null, timer: null });
@@ -1167,16 +1170,25 @@ export default function App() {
         </View>
       )}
 
-      {v.finished && (
-        <View style={s.settleBox}>
-          <Text style={s.settleTitle}>🏁 终局战报</Text>
-          {Object.entries(v.scores || {}).sort((a, b) => b[1] - a[1]).map(([p, sc], i) => (
-            <Text key={p} style={i === 0 ? s.settleTop : s.settleItem}>
-              {i === 0 ? "👑 " : ""}{p}:{sc}
-            </Text>
-          ))}
-        </View>
-      )}
+      {v.finished && (() => {
+        // 皇冠只发给独一份的最高分(真机病历 2026-07-24:全员0分时稳定排序把皇冠
+        // 戴给了座位表第一位——那不是冠军,是数组下标0,还和局长口头封的冠军打架)。
+        // 没有分差就没有账面冠军,战报只列账,加冕以局长宣布为准。
+        const entries = Object.entries(v.scores || {}).sort((a, b) => b[1] - a[1]);
+        const crowned = entries.length > 0 && entries[0][1] > 0
+          && (entries.length < 2 || entries[0][1] > entries[1][1]);
+        return (
+          <View style={s.settleBox}>
+            <Text style={s.settleTitle}>🏁 终局战报</Text>
+            {entries.map(([p, sc], i) => (
+              <Text key={p} style={crowned && i === 0 ? s.settleTop : s.settleItem}>
+                {crowned && i === 0 ? "👑 " : ""}{p}:{sc}
+              </Text>
+            ))}
+            {!crowned ? <Text style={s.settleDim}>无分差,今晚的冠军以局长宣布为准</Text> : null}
+          </View>
+        );
+      })()}
 
       {(v.inbox || []).length > 0 && (
         <View style={s.inboxBox}>
@@ -1241,6 +1253,17 @@ export default function App() {
           ))}
         </View>
       )}
+      {/* 散场出口(真机病历 2026-07-24:「本局已收」后整个局面晾在那儿,按钮全都还能点,
+          「再来一局」是聊天短语没人接——收局后动作区整体收起,只留一扇真门) */}
+      {v.finished ? (
+        <View style={[s.row, { justifyContent: "center" }]}>
+          <Pressable style={[s.sigBtn, { backgroundColor: "#31506e" }]}
+            onPress={() => { setJoined(false); setInLobby(false); setView(null); setAskPicked(null); }}>
+            <Text style={s.sigText}>🚪 散场 · 回到首页</Text>
+          </Pressable>
+        </View>
+      ) : (
+      <>
       <View style={s.row}>
         <Pressable style={[s.sigBtn, { backgroundColor: "#2c5f3f" }]}
           onPress={() => sendEventEcho({ type: "done" }, "完成")}>
@@ -1255,11 +1278,13 @@ export default function App() {
           <Text style={s.sigText}>👏 抢答</Text>
         </Pressable>
       </View>
-      {/* 快捷回应条:最常说的几句单点即以桌上说话发出(配轻触感),少动手、只关注现实场 */}
+      {/* 快捷回应条:最常说的几句单点即发(配轻触感),少动手、只关注现实场。
+          发向哪儿看语境:问到你的窗口开着=刻意应答,发局长计票(真机病历:决赛投票
+          点了「好!」发去桌上,引擎防截胡门槛只认 to=局长,票被静默丢弃);平时=桌上气氛 */}
       <View style={s.chipRow}>
         {QUICK_CHIPS.map((c) => (
           <Pressable key={c} style={s.chip}
-            onPress={() => sendEventEcho({ type: "say", text: c, to: "桌上" }, c)}>
+            onPress={() => sendEventEcho({ type: "say", text: c, to: askMine ? "局长" : "桌上" }, c)}>
             <Text style={s.chipText}>{c}</Text>
           </Pressable>
         ))}
@@ -1288,18 +1313,22 @@ export default function App() {
         ])}>
           <Text style={s.optout}>安全退出</Text>
         </Pressable>
-        <Pressable hitSlop={14} onPress={async () => {   // 开局拍一张现场:实物清单+场景速写自动进局
+        <Pressable hitSlop={14} disabled={sceneBusy} onPress={async () => {   // 拍一张现场:实物清单+场景速写自动进局
           const perm = await ImagePicker.requestCameraPermissionsAsync();
           if (!perm.granted) return;
           const r = await ImagePicker.launchCameraAsync({ quality: 0.4, base64: true });
           if (r.canceled) return;
+          setSceneBusy(true);   // 视觉分析要几秒,没反馈会被当成哑巴按钮(真机病历)
           const res = await api("/api/scene", { image_b64: r.assets[0].base64, media_type: "image/jpeg" })
             .catch(e => ({ error: e.message }));
+          setSceneBusy(false);
           Alert.alert("场景侦察", res.error || `${res.brief || ""}\n实物:${(res.objects || []).join("、")}`);
         }}>
-          <Text style={s.optout}>📷 场景侦察</Text>
+          <Text style={s.optout}>{sceneBusy ? "📷 侦察中…" : "📷 场景侦察"}</Text>
         </Pressable>
       </View>
+      </>
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -1440,6 +1469,7 @@ const s = StyleSheet.create({
   askTextMe: { color: "#fff", fontSize: 18, fontWeight: "700", marginBottom: 6 },
   // 选择框即收后的一行"✓ 已选 X"
   askPicked: { color: "#8fd0a8", fontSize: 17, fontWeight: "800", marginTop: 2 },
+  settleDim: { color: "#99a", fontSize: 13, marginTop: 4 },
   // 局长思考指示:呼吸的「🎩 局长在酝酿 …」
   thinkingBar: { flexDirection: "row", alignItems: "center", gap: 8, marginVertical: 4,
     paddingHorizontal: 4 },
