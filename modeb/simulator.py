@@ -329,9 +329,8 @@ class Session:
         # 引擎 RNG 出点数(与 random.dice 同一把 rng,公平由系统保证)
         dice = [self.engine.tools.rng.randint(1, 6) for _ in range(count)]
         prop["rolled"] = dice
-        # 点数进本人私件:复用引擎防伪水印「🔒🎲」(锁后紧跟骰、无空格),App 端只认它画骰面
-        if me in self.inbox:
-            self.inbox[me].append(f"🔒🎲 {dice}")
+        # 点数只走 my_prop 常驻面板(旧版还往私件塞一份 🔒🎲,同一把点数手机上画两遍
+        # ——房主裁定 2026-07-24 删私件份;🔒🎲 水印路留给 random.dice 的遗留私摇)
         # 公开事件面只留动作、不留点数:主持从 events 看谁摇了、齐了开吹牛;旁人 view 也只见动作
         self.engine.push_event({"type": "roll", "player": me})
         return {"ok": True, "rolled": True, "count": count}

@@ -89,8 +89,9 @@ def test_roll_points_private_only(tmp_path):
     assert all(isinstance(d, int) and 1 <= d <= 6 for d in dice)
     # 本人视图看得到自己的点数(常驻区,大话骰全程盯着吹牛)
     assert s.player_view("甲")["my_prop"]["rolled"] == dice
-    # 点数经 🔒🎲 防伪水印进本人私件(App 只认水印画骰面)
-    assert any(m.startswith("🔒🎲") and str(dice) in m for m in s.inbox["甲"])
+    # 点数只走 my_prop 常驻面板,不再复投私件(房主裁定 2026-07-24:同一把点数
+    # 手机上画两遍——骰盅面板+私件暗骰卡重复,私件份删除)
+    assert not any("🔒🎲" in m for m in s.inbox["甲"]), "摇盅点数不许再走私件,面板是唯一显示"
     # 公开事件面只出"甲摇了骰盅"、无点数:事件流里那条 roll 不带点数
     roll_ev = next(e for e in s.engine.event_queue if e.get("type") == "roll")
     assert roll_ev["player"] == "甲" and "value" not in roll_ev
