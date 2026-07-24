@@ -16,6 +16,7 @@ from .tools import ToolExecutor
 MAX_TOOLS_PER_TURN = 2
 MAX_SENTENCES = 3
 HOST_COOLDOWN_S = 8  # 主持调用失败后的冷却拍:期间 turn_ready=False,事件在队列里等
+IDLE_CHECK_S = 180   # 死锁哨兵阈值:台面无任何游戏结构+无任何动作持续这么久,才提醒一次
 
 
 class Driver(Protocol):
@@ -50,6 +51,12 @@ class Engine:
         # 没有冷场闹钟(房主撤,2026-07-20):时限的唯一机制是主持显式调 timer,
         # 没设时限=选择了开放式等待,一直等是正确行为("没回应就等,就这么简单")。
         # agent 桌冻死是 harness 座位掉线,归座位保活/产品在线心跳,不归引擎。
+        # —— 但另设**死锁哨兵**(房主 2026-07-24:「局长可以感知场上有没有游戏在玩,
+        # 没有游戏持续时间长有可能就是死锁」)。与冷场闹钟的区别:闹钟是催场子填冷场,
+        # 哨兵是感知「没有任何游戏结构在跑+没有任何人动过」的死锁风险——单发、
+        # 可被无视(回空拍=继续等)、有玩家动作即复位,判断权在局长。
+        self._last_activity = time.time()
+        self._idle_nudged = False
         self._t0 = time.time()
         episode_path.parent.mkdir(parents=True, exist_ok=True)
         # episode_mode="a":局中断点续局时以追加模式续写原文件,不覆盖既有流水
@@ -59,6 +66,8 @@ class Engine:
     # —— 玩家端/观察员事件入队(两回合之间聚合,不逐条打驱动器) ——
     def push_event(self, ev: dict) -> None:
         ev.setdefault("t_ms", int(time.time() * 1000))  # 竞速判定公平依据(快枪手等)
+        self._last_activity = time.time()  # 任何玩家动作=场上活着,死锁哨兵复位
+        self._idle_nudged = False
         if ev.get("type") == "laugh":
             self.marks["laugh_events"] += 1
         if ev.get("type") in ("pass", "optout"):  # 安全退出(零代价底线,罕用):立即生效
@@ -230,7 +239,29 @@ class Engine:
         if self.marks["turns"] == 0 or any(wakes(e) for e in self.event_queue):
             return True
         now = time.time()
-        return any(t <= now for t in self.state.timers)
+        if any(t <= now for t in self.state.timers):
+            return True
+        # 死锁哨兵(房主 2026-07-24):没有任何游戏结构在跑(无计时/无问询/无对决/
+        # 无未摇盅/无待拍待录)+ 台面静默超阈值 → 给局长送一次感知事件,它自己判断
+        # 是口头玩法还在进行(继续等)还是死锁(补收口)。单发;玩家一动就复位。
+        structured = (self.state.open_ask is not None or bool(self.state.timers)
+                      or self.state.duel is not None
+                      or self.state.pending_photo is not None
+                      or self.state.pending_audio is not None
+                      or any(pr.get("kind") == "骰盅" and pr.get("rolled") is None
+                             for pr in self.state.props.values()))
+        if (not self.state.finished and not structured and not self._idle_nudged
+                and now - self._last_activity > IDLE_CHECK_S):
+            self._idle_nudged = True
+            self.event_queue.append({
+                "type": "idle_check",
+                "idle_min": round((now - self._last_activity) / 60, 1),
+                "note": "台面静默超3分钟,且没有任何游戏结构在跑(无计时/无问询/无对决/"
+                        "无未摇盅),没人按过任何键。你自己判:①口头玩法还在桌上进行"
+                        "——回空拍继续等;②上一个玩法没收口死锁了——补收口(ask 问一嘴"
+                        "进展,或直接开下一个玩法)。单发提醒,不会再催。"})
+            return True
+        return False
 
     def log_meta(self, kind: str, payload: dict) -> None:
         """episode 里的非回合元信息行(设备绑定等)。与回合行同文件同流水——
@@ -347,6 +378,7 @@ class Engine:
                     "note": "上一拍被计时器叫醒却空拍了——结算(ask 表决谁输也行)/追问/设新 timer,三选一"})
         elif text or calls:
             self._wake_retry = False
+            self._last_activity = time.time()  # 主持真动作也算活着:哨兵从这一拍重新计
         # 束手拍检测(死锁第三变种,真机病历 2026-07-24:discard+draw 抽了新原子,
         # 嘴上只说「局长换一张!」——原子攥在手里没开出来,又没问没计时,三个唤醒
         # 条件全灭)。**故意收窄**到引擎真能看见的束手:抽了原子却没挂任何钩子。
