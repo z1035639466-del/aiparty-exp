@@ -283,6 +283,13 @@ export default function App() {
   const [me, setMe] = useState("");
   const [room, setRoom] = useState("");   // 房间码:多局并发时定位自己那一桌;留空=服务器唯一房间
   const [joined, setJoined] = useState(false);
+  // —— 大厅态(开房改革 2026-07-24):房主空手开房拿码,朋友自己 join,人齐了锁定开打 ——
+  const [inLobby, setInLobby] = useState(false);   // 停在大厅页(等人齐/等房主开打)
+  const [isHost, setIsHost] = useState(false);     // 我是开房那台(能按开打)
+  const [hostToken, setHostToken] = useState("");  // 开房返回的房主令牌(锁定时认人)
+  const [seated, setSeated] = useState(false);     // 我已经报名入座(填了自己的名字)
+  const [roster, setRoster] = useState([]);        // 大厅实时名单(轮询 /api/lobby)
+  const [lobbyErr, setLobbyErr] = useState("");
   const [view, setView] = useState(null);
   const [err, setErr] = useState("");
   const [say, setSay] = useState("");
@@ -346,7 +353,6 @@ export default function App() {
   // —— 手机开局页(v0 欠账补):此前开局只能在电脑驾驶舱,手机只能入座 ——
   const [creating, setCreating] = useState(false);
   const [starting, setStarting] = useState(false);
-  const [seats, setSeats] = useState("");
   const [minutes, setMinutes] = useState("30");
   const [wildness, setWildness] = useState("6");
   const [occasion, setOccasion] = useState("");
@@ -434,6 +440,102 @@ export default function App() {
     return () => { alive = false; clearInterval(t); };
   }, [joined]);
 
+  // —— 大厅轮询:停在大厅页时拉实时名单;房主一开打(started)全场自动切游戏页 ——
+  useEffect(() => {
+    if (!inLobby || !room) return;
+    let alive = true;
+    const tick = async () => {
+      try {
+        const r = await fetch(base.replace(/\/$/, "") + "/api/lobby?room=" + encodeURIComponent(room));
+        const j = await r.json();
+        if (!alive) return;
+        if (j.error) { setLobbyErr(j.error); return; }
+        setLobbyErr("");
+        if (j.started) { setInLobby(false); setJoined(true); return; } // 开打了→进游戏页
+        setRoster(j.roster || []);
+      } catch (e) { if (alive) setLobbyErr("连不上服务器:" + e.message); }
+    };
+    tick();
+    const t = setInterval(tick, POLL_MS);
+    return () => { alive = false; clearInterval(t); };
+  }, [inLobby, room, base]);
+
+  // 报名入座(大厅页里房主/朋友都用它填自己的名字):成功后 seated,名字即 me
+  const joinSeat = async (nm) => {
+    const name = (nm || "").trim();
+    if (!name) { Alert.alert("填个名字", "打上你自己的名字再入座"); return; }
+    try {
+      const res = await api("/api/join", { name, device_id: devRef.current });
+      if (res.error) { Alert.alert("入座失败", res.error); return; }
+      setMe(name); setSeated(true);
+      if (res.roster) setRoster(res.roster);
+      remember(base, name, room);
+      if (res.started) { setInLobby(false); setJoined(true); } // 已开打的房:直接进游戏
+    } catch (e) { Alert.alert("连不上", String(e.message)); }
+  };
+
+  // 房主开打:用最终名单锁定建引擎。成功后大厅轮询会发现 started 自动切页(这里也直接切)
+  const lockAndStart = async () => {
+    try {
+      const res = await api("/api/lock", { host_token: hostToken, device_id: devRef.current });
+      if (res.error) { Alert.alert("开打失败", res.error); return; }
+      setInLobby(false); setJoined(true);
+    } catch (e) { Alert.alert("连不上", String(e.message)); }
+  };
+
+  // —— 大厅页:大字房间码 + 实时名单 + 开打大按钮(人未满 2 置灰) ——
+  if (inLobby) {
+    const enough = roster.length >= 2;
+    return (
+      <KeyboardAvoidingView style={s.page} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+        <StatusBar style="light" />
+        <ScrollView contentContainerStyle={[s.center, { flexGrow: 1, paddingVertical: 44 }]}
+          keyboardShouldPersistTaps="handled">
+          <Text style={s.dim}>{isHost ? "你开的房 · 把房间码发给朋友" : "已进房 · 等房主开打"}</Text>
+          <Text style={s.roomCode}>{room}</Text>
+          {lobbyErr ? <Text style={s.err}>{lobbyErr}</Text> : null}
+          <View style={s.rosterBox}>
+            <Text style={s.rosterTitle}>已入座 {roster.length} 人</Text>
+            {roster.length === 0 ? <Text style={s.rosterEmpty}>还没人入座…</Text> : null}
+            {roster.map((n) => (
+              <Text key={n} style={n === me ? s.rosterMe : s.rosterItem}>
+                {n === me ? "🪑 " + n + "(你)" : "🪑 " + n}
+              </Text>
+            ))}
+          </View>
+
+          {!seated ? (
+            <>
+              <Text style={s.dim}>{isHost ? "顺手给自己入个座:" : "打上你自己的名字:"}</Text>
+              <TextInput style={s.input} placeholder="你的名字(如 疯子明)"
+                placeholderTextColor="#667" autoCapitalize="none" autoCorrect={false}
+                value={me} onChangeText={setMe} />
+              <Pressable style={s.bigBtn} onPress={() => joinSeat(me)}>
+                <Text style={s.bigBtnText}>我要入座</Text>
+              </Pressable>
+            </>
+          ) : isHost ? (
+            <>
+              <Pressable style={[s.bigBtn, !enough && s.rollBtnDim]} disabled={!enough}
+                onPress={lockAndStart}>
+                <Text style={s.bigBtnText}>{enough ? "开打!" : "至少 2 人才能开打"}</Text>
+              </Pressable>
+              <Text style={s.dim}>人到齐点开打,座位就封了</Text>
+            </>
+          ) : (
+            <Text style={s.dim}>🪑 你已入座,等房主开打…</Text>
+          )}
+          <Pressable hitSlop={14} onPress={() => {
+            setInLobby(false); setSeated(false); setIsHost(false);
+            setHostToken(""); setRoster([]); setRoom("");
+          }}>
+            <Text style={s.optout}>← 退出大厅</Text>
+          </Pressable>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    );
+  }
+
   if (!joined) {
     return (
       <KeyboardAvoidingView style={s.page} behavior={Platform.OS === "ios" ? "padding" : undefined}>
@@ -454,9 +556,7 @@ export default function App() {
 
           {creating ? (
             <>
-              <TextInput style={s.input} placeholder="座位名(逗号分隔,至少2个,如 疯子明,小静)"
-                placeholderTextColor="#667" autoCapitalize="none" autoCorrect={false}
-                value={seats} onChangeText={setSeats} />
+              <Text style={s.dim}>空手开房就行——朋友自己进来打名字,你不用替全桌打字</Text>
               <View style={s.row}>
                 <TextInput style={[s.input, { flex: 1 }]} placeholder="时长(分钟)"
                   placeholderTextColor="#667" keyboardType="number-pad"
@@ -475,10 +575,6 @@ export default function App() {
               <TextInput style={s.input} placeholder="🤖 bot 座位(可选,名:人设,逗号分隔)"
                 placeholderTextColor="#667" value={botsText} onChangeText={setBotsText} />
               <Pressable style={s.bigBtn} disabled={starting} onPress={async () => {
-                const seatList = seats.split(",").map((x) => x.trim()).filter(Boolean);
-                if (seatList.length < 2) {
-                  Alert.alert("座位不够", "至少填两个座位名(逗号分隔)"); return;
-                }
                 const bots = {};
                 botsText.split(",").map((x) => x.trim()).filter(Boolean).forEach((x) => {
                   const [n, p] = x.split(/[:：]/);
@@ -490,7 +586,8 @@ export default function App() {
                     // 开局口令:服务器设了 ZAKZOK_START_KEY 才需要(公网防白嫖开局);
                     // 没设则此字段被服务端忽略,留空即可
                     ...(startKey.trim() ? { key: startKey.trim() } : {}),
-                    players: seatList,
+                    // players 不带 = 大厅态开房:立刻拿码,不建引擎不烧钱,朋友自己进来入座
+                    device_id: devRef.current,   // 房主认人第二把钥匙(host_token 之外)
                     minutes: +minutes || 30,
                     wildness: +wildness || 6,
                     objects: [],
@@ -498,25 +595,26 @@ export default function App() {
                     autoplay: true,   // 服务器自驱回合,手机可退到后台/锁屏也不停局
                     occasion: occasion.trim(),
                     playlist: playlist.split(",").map((t) => t.trim()).filter(Boolean),
-                    bots,
+                    bots,   // bots 配置留在开房参数里,锁定开打时并入最终名单
                     // provider/模型一律不带:换家换模型是服务端 .env 的事(YAPPA_PROVIDER/
                     // YAPPA_MODEL),不该焊在客户端里——焊死过一次(qwen 一家),换中转站
                     // 就得改 App 重发包。手机只管开局,用哪家由开服务的人决定。
                   });
-                  if (res.error) { Alert.alert("开局失败", res.error); return; }
-                  if (res.room_code) {
-                    setRoom(res.room_code);
-                    Alert.alert("房间码", `本桌房间码:${res.room_code}\n发给其他人,入座时填这个`);
-                  }
-                  setMe(seatList[0]); setJoined(true); setCreating(false);
-                  remember(base, seatList[0], res.room_code || "");
+                  if (res.error) { Alert.alert("开房失败", res.error); return; }
+                  if (!res.room_code) { Alert.alert("开房失败", "服务器没返回房间码"); return; }
+                  // 拿码进大厅页:房主自己也要入座(开房≠入座),同页顺手填名字
+                  setRoom(res.room_code);
+                  setHostToken(res.host_token || "");
+                  setIsHost(true); setSeated(false); setRoster([]);
+                  setInLobby(true); setCreating(false);
+                  remember(base, "", res.room_code);
                 } catch (e) {
                   Alert.alert("连不上", String(e.message));
                 } finally {
                   setStarting(false);
                 }
               }}>
-                <Text style={s.bigBtnText}>{starting ? "开局中…" : "开新局"}</Text>
+                <Text style={s.bigBtnText}>{starting ? "开房中…" : "开房拿码"}</Text>
               </Pressable>
               <Pressable hitSlop={14} onPress={() => setCreating(false)}>
                 <Text style={s.optout}>← 返回入座</Text>
@@ -533,12 +631,16 @@ export default function App() {
                 placeholderTextColor="#667" autoCapitalize="characters" autoCorrect={false}
                 value={room} onChangeText={(t) => setRoom(t.trim().toUpperCase())} />
               <Pressable style={s.bigBtn} onPress={async () => {
+                const nm = me.trim();
+                if (!nm) { Alert.alert("填个名字", "打上你自己的名字再入座"); return; }
                 try {
-                  // room 已在 api() 里自动带上(query+body);留空则命中唯一房间
-                  const v = await api("/api/view?player=" + encodeURIComponent(me.trim()));
-                  if (v.error) { Alert.alert("入座失败", v.error); return; }
-                  setMe(me.trim()); setJoined(true);
-                  remember(base, me.trim(), room);
+                  // room 已在 api() 里自动带上(query+body);留空则命中唯一房间。
+                  // join 两态通吃:大厅房→进名单等开打;已开打的房→同名同机重连直接进游戏。
+                  const res = await api("/api/join", { name: nm, device_id: devRef.current });
+                  if (res.error) { Alert.alert("入座失败", res.error); return; }
+                  setMe(nm); remember(base, nm, room);
+                  if (res.started) { setJoined(true); }        // 局已开:直接进游戏页
+                  else { setSeated(true); setIsHost(false); setInLobby(true); } // 大厅:等开打
                 } catch (e) { Alert.alert("连不上", String(e.message)); }
               }}>
                 <Text style={s.bigBtnText}>入座</Text>
@@ -819,6 +921,15 @@ const s = StyleSheet.create({
   bigBtnText: { fontSize: 20, fontWeight: "800", color: "#222" },
   bigBtnAlt: { backgroundColor: "#31506e", marginTop: 10 },
   bigBtnAltText: { fontSize: 18, fontWeight: "800", color: "#fff" },
+  // 大厅页:大字房间码 + 实时名单
+  roomCode: { color: "#ffd54a", fontSize: 64, fontWeight: "900", letterSpacing: 8,
+    marginVertical: 10 },
+  rosterBox: { backgroundColor: "#20202c", borderRadius: 12, padding: 14, width: "100%",
+    marginVertical: 12, borderWidth: 1, borderColor: "#3a3350" },
+  rosterTitle: { color: "#c9b8ff", fontSize: 14, fontWeight: "700", marginBottom: 8 },
+  rosterEmpty: { color: "#667", fontSize: 14 },
+  rosterItem: { color: "#eee", fontSize: 18, lineHeight: 26 },
+  rosterMe: { color: "#ffd54a", fontSize: 18, lineHeight: 26, fontWeight: "800" },
   topbar: { flexDirection: "row", justifyContent: "space-between", marginBottom: 6 },
   topText: { color: "#aab", fontSize: 13 },
   topMusic: { color: "#8fb", fontSize: 13 },

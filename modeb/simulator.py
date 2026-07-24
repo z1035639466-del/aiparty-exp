@@ -14,6 +14,7 @@ import copy
 import json
 import os
 import random
+import secrets
 import threading
 import time as _t
 import traceback
@@ -637,16 +638,73 @@ class Session:
         }
 
 
+class Lobby:
+    """大厅态(开放入座房):房主什么都不填就开房拿码,朋友自己进来报名,人齐了锁定开打。
+
+    开房这一下**不建引擎、不烧 LLM**——局还没开,只占一个房间码 + 一份待锁的 cfg。
+    朋友经 /api/join 自己报名入座(名字去空格、重名驳回、上限 MAX_PLAYERS);房主
+    (开房那台,凭 host_token 或开房时的 device_id 识别)经 /api/lock 用最终名单
+    构建 Session。大厅态不落盘:没开打丢了就重开(锁定后才走既有 persist 流程)。
+    """
+
+    def __init__(self, code: str, cfg: dict, host_token: str,
+                 host_device: str = "", join_base: str = "") -> None:
+        self.room_code = code
+        self.cfg = cfg                 # 待锁 cfg(除 players 外的开房参数,含 bots)
+        self.host_token = host_token
+        self.host_device = host_device  # 开房那台的 device_id(host_token 之外的第二把认人钥匙)
+        self.roster: list[dict] = []    # [{"name":..., "device_id":...}] 按入座先后
+        self.join_base = join_base
+        self.last_active = _t.time()
+        self.started = False            # 锁定过渡标记:置真即不再收人(引擎在 Hub.lock 里建)
+        self.lock = threading.Lock()
+
+    def names(self) -> list[str]:
+        return [r["name"] for r in self.roster]
+
+    def is_host(self, host_token: str | None, device_id: str | None) -> bool:
+        """房主认人:host_token 对上,或 device_id 是开房那台。二者任一即可。"""
+        if host_token and host_token == self.host_token:
+            return True
+        if device_id and self.host_device and str(device_id)[:64] == self.host_device:
+            return True
+        return False
+
+    def add_seat(self, name: str, device_id: str | None) -> tuple[int, str] | None:
+        """报名入座(须在锁内经 Hub 调用):成功返回 None,失败返回 (http_code, msg)。
+        名字去空格;重名驳回(除非同名+同设备=重连,放行不重复加);满员驳回。"""
+        name = (name or "").strip()
+        if not name:
+            return (400, "报名要填个名字")
+        name = name[:24]                       # 超长名字截断,免得撑爆台面
+        dev = str(device_id)[:64] if device_id else ""
+        with self.lock:
+            if self.started:
+                return (409, "本局已开打,进不来了")
+            for r in self.roster:
+                if r["name"] == name:
+                    # 同名 + 同设备 = 断线重连,放行(不重复加);同名换设备 = 撞名,驳回
+                    if dev and r.get("device_id") == dev:
+                        return None
+                    return (409, f"“{name}”这个名字已经有人用了,换一个")
+            if len(self.roster) >= MAX_PLAYERS:
+                return (409, f"人满了(上限 {MAX_PLAYERS} 人),进不来了")
+            self.roster.append({"name": name, "device_id": dev})
+            return None
+
+
 class Hub:
     """多局并发:一台服务器同时跑多桌,dict[room_code, Session]。
     /api/* 用 pick() 定位房间:带 room 参数指定,不带则默认唯一活跃房间(向后兼容),
-    多房间不带 room 报 409。收局/闲置(2h 无活动)的房间从字典踢出,episode 文件保留。"""
+    多房间不带 room 报 409。收局/闲置(2h 无活动)的房间从字典踢出,episode 文件保留。
+    大厅态(未锁定的开放入座房)另存 lobbies,锁定时转成 Session 挪进 rooms。"""
 
     def __init__(self, out_dir: Path, join_base: str = "") -> None:
         self.rooms: dict[str, Session] = {}
+        self.lobbies: dict[str, Lobby] = {}   # 未锁定的大厅房(开放入座,尚未建引擎)
         self.out_dir = out_dir
         self.join_base = join_base
-        self.lock = threading.Lock()   # 保护 rooms 字典的增删
+        self.lock = threading.Lock()   # 保护 rooms/lobbies 字典的增删
 
     def _sweep(self, include_finished: bool) -> None:
         """回收房间(须持 self.lock):闲置(>2h)一律回收;收局房仅在开新局时回收——
@@ -665,6 +723,10 @@ class Hub:
                         s.engine._ep.close()
                     except (ValueError, OSError):
                         pass
+        # 大厅房闲置(>2h 无人 join/开打)一并回收:没建引擎没落盘,直接丢弃
+        for code in [c for c, lo in self.lobbies.items()
+                     if now - lo.last_active > IDLE_LIMIT_S]:
+            self.lobbies.pop(code, None)
 
     def pick(self, room: str | None):
         """定位房间 → (session, code, err)。err 为 None=成功;否则 (http_code, msg)。
@@ -698,8 +760,21 @@ class Hub:
             raise ValueError("开局口令不对(服务器设了开局口令,向房主要)")
         with self.lock:
             self._sweep(include_finished=True)   # 开新局时清收局/闲置房,episode 文件保留
-            code = gen_room_code(set(self.rooms))
+            code = gen_room_code(set(self.rooms) | set(self.lobbies))
         players = [p.strip() for p in cfg.get("players", []) if p.strip()]
+        if not players:
+            # —— 大厅态:房主什么都不填直接开房拿码 —— #
+            # 此刻不建引擎、不烧 LLM(局未开);朋友自己 join 报名,房主 lock 才开打。
+            # 开局口令闸在上面照旧管住这一下(公网防白嫖开房)。
+            host_token = secrets.token_hex(8)
+            host_device = str(cfg.get("device_id", "") or "")[:64]
+            lobby_cfg = {k: v for k, v in cfg.items() if k not in ("players", "device_id")}
+            lobby = Lobby(code, lobby_cfg, host_token, host_device, join_base=self.join_base)
+            with self.lock:
+                self.lobbies[code] = lobby
+            return {"room_code": code, "host_token": host_token, "lobby": True,
+                    "started": False, "roster": [],
+                    "limits": {"min_players": MIN_PLAYERS, "max_players": MAX_PLAYERS}}
         session = Session(
             players=players,
             minutes=int(cfg.get("minutes", 30)),
@@ -728,6 +803,118 @@ class Hub:
         with self.lock:
             self.rooms[code] = session
         return session.snapshot()
+
+    def _resolve(self, code: str | None):
+        """大厅/开打房通用定位:带码精确命中;不带码且全场唯一一个(大厅或开打)则默认
+        命中(单房向后兼容,大厅态开发自测也不必逐次敲码)。返回 (lobby, session)。"""
+        with self.lock:
+            self._sweep(include_finished=False)
+            if code:
+                return self.lobbies.get(code), self.rooms.get(code)
+            all_codes = list(self.lobbies) + list(self.rooms)
+            if len(all_codes) == 1:
+                c = all_codes[0]
+                return self.lobbies.get(c), self.rooms.get(c)
+            return None, None
+
+    def join(self, code: str | None, name: str, device_id: str | None) -> tuple[dict, int]:
+        """报名入座:大厅态进花名册;已开打的房只放同名(+同设备)重连,否则驳回。"""
+        lobby, session = self._resolve(code)
+        if lobby is not None:
+            lobby.last_active = _t.time()
+            err = lobby.add_seat(name, device_id)
+            if err:
+                return {"error": err[1]}, err[0]
+            return {"ok": True, "you": (name or "").strip()[:24], "started": False,
+                    "roster": lobby.names()}, 200
+        if session is not None:
+            # 座位已封闭:同名(且设备没被别人占)= 断线重连,放行;否则「本局已开打」
+            nm = (name or "").strip()[:24]
+            if nm in session.state.players:
+                with session.lock:
+                    dev = str(device_id)[:64] if device_id else ""
+                    bound = session.device_map.get(nm)
+                    if dev and bound and bound != dev:
+                        return {"error": f"“{nm}”这个座位已被其他设备占用"}, 409
+                    session.bind_device(nm, device_id)
+                return {"ok": True, "you": nm, "started": True,
+                        "room_code": session.room_code}, 200
+            return {"error": "本局已开打,不能再入座(同名同机可重连)"}, 409
+        return {"error": f"房间 {code or ''} 不存在或已回收"}, 404
+
+    def lobby_state(self, code: str | None) -> tuple[dict, int]:
+        """大厅轮询口:大厅态给 roster;已锁定则回 started=true,App 据此切游戏页。"""
+        lobby, session = self._resolve(code)
+        if lobby is not None:
+            lobby.last_active = _t.time()
+            return {"lobby": True, "started": False, "room_code": lobby.room_code,
+                    "roster": lobby.names(),
+                    "limits": {"min_players": MIN_PLAYERS, "max_players": MAX_PLAYERS}}, 200
+        if session is not None:
+            return {"started": True, "room_code": session.room_code,
+                    "players": list(session.state.players)}, 200
+        return {"error": f"房间 {code or ''} 不存在或已回收"}, 404
+
+    def lock_room(self, code: str | None, host_token: str | None,
+                  device_id: str | None) -> tuple[dict, int]:
+        """房主锁定开打:用最终名单构建 Session 引擎、autoplay 起、座位封闭。
+        非房主驳回 403;人不够 2 驳回;并入开房时配的 bots。已锁过则幂等回 started。"""
+        lobby, session = self._resolve(code)
+        if lobby is None:
+            if session is not None:            # 已经锁过 → 幂等:当作已开打
+                return {"started": True, "room_code": session.room_code}, 200
+            return {"error": f"房间 {code or ''} 不存在或已回收"}, 404
+        with lobby.lock:
+            if not lobby.is_host(host_token, device_id):
+                return {"error": "只有房主能开打(开房那台)"}, 403
+            if lobby.started:
+                return {"error": "正在开打中"}, 409
+            roster = list(lobby.roster)
+            cfg = dict(lobby.cfg)
+            code = lobby.room_code
+            lobby.started = True             # 占位:防并发双锁;建局失败下面回滚
+        names = [r["name"] for r in roster]
+        bots = cfg.get("bots") or {}
+        # bots 是 AI 座位:并入最终名单(不在花名册里的 bot 名补成座位)
+        players = names + [b for b in bots if b not in names]
+        try:
+            if not MIN_PLAYERS <= len(players) <= MAX_PLAYERS:
+                raise ValueError(f"开打要 {MIN_PLAYERS}–{MAX_PLAYERS} 人(现在 {len(players)} 人)")
+            session = Session(
+                players=players,
+                minutes=int(cfg.get("minutes", 30)),
+                wildness=int(cfg.get("wildness", 6)),
+                objects=[o.strip() for o in cfg.get("objects", []) if o.strip()],
+                driver_kind=cfg.get("driver", "manual"),
+                out_dir=self.out_dir,
+                bots=bots,
+                provider=cfg.get("provider"),
+                host_model=cfg.get("host_model"),
+                seat_model=cfg.get("seat_model"),
+                score_style=cfg.get("score_style", "自动"),
+                host_perception=cfg.get("host_perception", "转写"),
+                playlist=cfg.get("playlist") or [],
+                occasion=cfg.get("occasion", ""), scene_brief=cfg.get("scene_brief", ""),
+                max_llm_calls=cfg.get("max_llm_calls"),
+            )
+        except ValueError as e:
+            lobby.started = False            # 回滚:人不够时房主补人再锁
+            return {"error": str(e)}, 400
+        session.join_base = self.join_base
+        session.room_code = code
+        session.autoplay = bool(cfg.get("autoplay"))
+        session.autoplay_interval_s = float(cfg.get("autoplay_interval_s", 1.0))
+        # 花名册里带过来的设备锚点顺手绑定(走既有 bind_device,落 episode 审计线)
+        with session.lock:
+            for r in roster:
+                if r.get("device_id"):
+                    session.bind_device(r["name"], r["device_id"])
+        if cfg.get("autoplay") and cfg.get("driver") == "llm":
+            session.start_autoloop(session.autoplay_interval_s)
+        with self.lock:
+            self.rooms[code] = session
+            self.lobbies.pop(code, None)     # 大厅转正:从待锁字典移除
+        return session.snapshot(), 200
 
 
 def lan_host() -> str:
@@ -920,6 +1107,11 @@ class Handler(BaseHTTPRequestHandler):
         if self.path.startswith("/api/tts"):
             self._tts()
             return
+        if self.path.startswith("/api/lobby"):
+            # 大厅轮询口:App 开房/入座后停在大厅页,靠它拉 roster、发现 started 后切游戏页
+            out, status = self.hub.lobby_state(self._room_param())
+            self._json(status, out)
+            return
         if self.path.startswith("/api/state"):
             s, _code, err = self.hub.pick(self._room_param())
             if err and not self.hub.rooms:
@@ -943,6 +1135,19 @@ class Handler(BaseHTTPRequestHandler):
             path = self.path.split("?", 1)[0]
             if path == "/api/start":
                 self._json(200, self.hub.start(body))
+                return
+            if path == "/api/join":
+                # 报名入座:大厅态进花名册(去空格/重名/满员在 Lobby 里判);
+                # 已开打的房只放同名+同设备重连。不走 _pick(大厅房不是 Session)。
+                out, status = self.hub.join(self._room_param(body),
+                                            body.get("name"), body.get("device_id"))
+                self._json(status, out)
+                return
+            if path == "/api/lock":
+                # 房主开打:用最终名单建引擎、autoplay 起、座位封闭。非房主 403。
+                out, status = self.hub.lock_room(self._room_param(body),
+                                                 body.get("host_token"), body.get("device_id"))
+                self._json(status, out)
                 return
             s = self._pick(body)
             if s is None:
