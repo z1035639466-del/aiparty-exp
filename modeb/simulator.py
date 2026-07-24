@@ -757,6 +757,18 @@ def lan_host() -> str:
 
 
 HTML_PATH = Path(__file__).with_name("sim_ui.html")
+
+# 根路径落地页(用户版门面):玩家永远在 App 里进桌,这页只负责指路+不吓人。
+LANDING_HTML = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ZAKZOK</title><style>
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;
+justify-content:center;background:#0e0f14;color:#eef;font-family:-apple-system,'PingFang SC',sans-serif}
+h1{font-size:56px;letter-spacing:4px;color:#f5c518;margin:0}
+p{color:#99a;font-size:17px;margin:14px 0 0;text-align:center;line-height:1.7;padding:0 24px}
+</style></head><body><h1>ZAKZOK</h1>
+<p>局长在等你入座。<br>打开 ZAKZOK App,输入房间码和座位名即可进桌。</p>
+</body></html>"""
 PLAY_PATH = Path(__file__).with_name("play_ui.html")   # 玩家手机页
 
 
@@ -867,8 +879,18 @@ class Handler(BaseHTTPRequestHandler):
             pass  # 拉音频的那头关页面了,正常,不是错误
 
     def do_GET(self) -> None:
-        if self.path in ("/", "/index.html") or self.path.startswith("/play"):
-            # /play[?player=X] = 玩家页(手机);/ = 驾驶舱(房主)。两页两套视角,
+        if self.path in ("/", "/index.html"):
+            # 公网上线后根路径是产品的门面:给玩家落地页,不给开发驾驶舱
+            #(真机实测:房主自己开域名都以为进错了地方)。驾驶舱挪 /cockpit。
+            body = LANDING_HTML.encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        if self.path.startswith("/cockpit") or self.path.startswith("/play"):
+            # /play[?player=X] = 玩家页(手机);/cockpit = 驾驶舱(房主)。两页两套视角,
             # 玩家页只吃 /api/view,拿不到 tool_use/results/inbox_counts。
             body = (PLAY_PATH if self.path.startswith("/play") else HTML_PATH).read_bytes()
             self.send_response(200)
@@ -1085,7 +1107,7 @@ def main() -> None:
                 session.start_autoloop(session.autoplay_interval_s)
             print(f"已从快照恢复:{args.resume}(房间码 {code},episode 追加续写 {session.episode_path})")
     base = Handler.hub.join_base
-    print(f"模拟台(驾驶舱) → {base}  (机位 {MIN_PLAYERS}–{MAX_PLAYERS},Ctrl-C 退出)")
+    print(f"驾驶舱 → {base}/cockpit  玩家落地页 → {base}  (机位 {MIN_PLAYERS}–{MAX_PLAYERS},Ctrl-C 退出)")
     print(f"玩家入座        → {base}/play")
     if not args.lan:
         print("  ↑ 只有本机能开。手机要入座请加 --lan(同一 Wi-Fi)")
