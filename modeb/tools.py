@@ -97,7 +97,10 @@ def load_atom_pool(atoms_path: str | None = None) -> list[dict]:
                 a = json.loads(line)
             except json.JSONDecodeError:
                 continue
-            if a.get("confidence") != "high" or a.get("atom_id") in seen:
+            # 隔离原子不进抽取池(真机病历 2026-07-24:被标「疑似攻略切片」的
+            # 「大喊闭眼谁睁眼谁输」仍被端上桌——quarantine 此前只是登记,不拦抽取)
+            if (a.get("confidence") != "high" or a.get("quarantine")
+                    or a.get("atom_id") in seen):
                 continue
             seen.add(a["atom_id"])
             pool.append({
