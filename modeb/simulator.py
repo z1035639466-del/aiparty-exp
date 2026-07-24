@@ -336,7 +336,8 @@ class Session:
         self.engine.push_event({"type": "roll", "player": me})
         return {"ok": True, "rolled": True, "count": count}
 
-    def challenge(self, me: str, bid: dict | None = None) -> dict:
+    def challenge(self, me: str, bid: dict | None = None,
+                  bidder: str | None = None) -> dict:
         """玩家拍「开牌!」——大话骰唯一进系统的判定时刻(与快枪手的「拔」同类)。须持 self.lock 调用。
 
         宪法:叫价博弈永远留在嘴上不进系统;唯独开牌是判定时刻,做成按钮。
@@ -380,13 +381,19 @@ class Session:
             all_dice = [d for pr in self.state.props.values()
                         for d in (pr.get("rolled") or [])]
             fc = count_face(all_dice, clean["face"])
+            # 开的是谁(可选):开牌人在面板顺手点了被开的叫价人,则两个方向的
+            # 输家都能报出真名;没点就照旧叫价人输时 loser=None 由局长点名。
+            if bidder not in self.state.players or bidder == me:
+                bidder = None
             if fc >= clean["count"]:
                 loser, role = me, "开牌人"
             else:
-                loser, role = None, "叫价人"
+                loser, role = bidder, "叫价人"
             verdict = {"type": "challenge_verdict", "loser": loser, "loser_role": role,
                        "challenger": me, "face": clean["face"], "face_count": fc,
                        "bid": dict(clean), "wild": bool(WILD_ONES and clean["face"] != 1)}
+            if bidder:
+                verdict["bidder"] = bidder
         for pr in self.state.props.values():
             pr["challenged_by"] = me
             pr["bid"] = clean
@@ -701,6 +708,18 @@ class Session:
                 {"player": p, "kind": c["kind"], "status": c["status"],
                  **({"content": c["content"]} if c["status"] == "revealed" else {})}
                 for p, cs in self.state.cards.items() for c in cs],
+            # 实时流(真机病历 2026-07-24:发言要等局长回合跑完才可见,连发五条攒到
+            # 一拍冒出)。事件队列的遮蔽尾巴直接进 view——桌上说话/信号立即人人可见,
+            # 与局长回合解耦;to=局长 只给"说了句话",内容照旧只有局长看。
+            "live": [
+                ({"player": e.get("player"), "text": e.get("text"), "type": "say"}
+                 if e.get("type") == "say" and e.get("to") != "局长"
+                 else {"player": e.get("player"), "type": "say_host"}
+                 if e.get("type") == "say"
+                 else {"player": e.get("player"), "type": e.get("type")})
+                for e in list(self.engine.event_queue)[-10:]
+                if e.get("type") in ("say", "done", "forfeit", "tap", "laugh", "roll")
+            ],
             "inbox": self.inbox.get(me, [])[-8:],          # 只有自己的
             "open_ask": ({"prompt": ask["prompt"], "asked": ask["asked"],
                           "options": ask["options"]} if ask else None),  # 不含 answers
@@ -1022,7 +1041,16 @@ class Hub:
         lobby, session = self._resolve(code)
         if lobby is None:
             if session is not None:
-                return {"error": "本局已开打,拍照读场只在大厅态(开打前)可用"}, 409
+                # 竞速洞(真机病历 2026-07-24:「拍的环境没进局长视野」):拍照的视觉
+                # 分析要几秒,房主手快先按了开打,结果回来时房已开打——原先 409 丢弃,
+                # 侦察白拍。改为转投进行中的局:走 Session.scene_photo 同款合并
+                #(实物并集/速写更新/重建主持 system),迟到的情报照样进局长视野。
+                #(与局中 /api/scene 同口径:场景侦察本就不设身份闸。)
+                if not image_b64:
+                    return {"error": "缺 image_b64"}, 400
+                out = session.scene_photo(image_b64, media_type)
+                code_ = 200 if "error" not in out else 502
+                return out, code_
             return {"error": f"房间 {code or ''} 不存在或已回收"}, 404
         if not lobby.is_host(host_token, device_id):
             return {"error": "只有房主能拍场子(开房那台)"}, 403
@@ -1369,7 +1397,7 @@ class Handler(BaseHTTPRequestHandler):
                     # 校验(持已摇盅、一局一开)+ 锁全桌盅 + 公开事件。叫价博弈本身
                     # 永远留在嘴上不进系统(宪法),这里只收「谁开的+被开那口叫价」。
                     with s.lock:
-                        out = s.challenge(ev.get("player"), ev.get("bid"))
+                        out = s.challenge(ev.get("player"), ev.get("bid"), ev.get("bidder"))
                     self._json(200 if out.get("ok") else 409, out)
                     return
                 with s.lock:

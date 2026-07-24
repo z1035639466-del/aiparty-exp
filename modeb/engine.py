@@ -38,6 +38,7 @@ class Engine:
         self.last_host_error = ""
         self.cooldown_until = 0.0       # 失败后的冷却:免得自动循环每秒撞一次死 API
         self._wake_retry = False        # 唤醒券补发标记:timer_expired 被空拍吞掉只补一次
+        self._closer_retry = False      # 束手拍提醒标记:no_closer 单发不循环
         # 荷官回执:主持上一拍工具的真实结果,只走 driver 专用信道回给它本人。
         # 遮蔽按观看者定,不按出口定——玩家面/驾驶舱照旧遮,发牌人看自己发的牌。
         self._last_results: list[dict] = []
@@ -312,6 +313,28 @@ class Engine:
                     "note": "上一拍被计时器叫醒却空拍了——结算(ask 表决谁输也行)/追问/设新 timer,三选一"})
         elif text or calls:
             self._wake_retry = False
+        # 束手拍检测(死锁第三变种,真机病历 2026-07-24:discard+draw 抽了新原子,
+        # 嘴上只说「局长换一张!」——原子攥在手里没开出来,又没问没计时,三个唤醒
+        # 条件全灭)。**故意收窄**到引擎真能看见的束手:抽了原子却没挂任何钩子。
+        # 纯口头挑战后的静默等是「等待权」钦定行为(玩家会来 done/say),不许误伤——
+        # 这正是当年冷场闹钟被否的原因。不是闹钟:无定时,当拍立即检查,单发不循环。
+        engaged = (self.state.open_ask is not None or bool(self.state.timers)
+                   or self.state.duel is not None
+                   or self.state.pending_photo is not None
+                   or self.state.pending_audio is not None
+                   or any(pr.get("kind") == "骰盅" and pr.get("rolled") is None
+                          for pr in self.state.props.values()))
+        drew = any(c.get("name") == "draw_atom" and r.get("ok")
+                   for c, r in zip(calls, results))
+        if any(e.get("type") != "no_closer" for e in events):
+            self._closer_retry = False  # 有真实事件进来=局面是新的,提醒额度恢复
+        if (not self.state.finished and drew and not engaged
+                and not self.event_queue and not self._closer_retry):
+            self._closer_retry = True
+            self.event_queue.append({
+                "type": "no_closer",
+                "note": "你刚抽了原子还攥在手里没开出来,又没问询没计时——把玩法当拍开出来,"
+                        "并按【收口器】挂上收口(ask/timer/道具)。"})
         return line
 
     # —— 跑完一局 ——

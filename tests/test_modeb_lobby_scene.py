@@ -174,12 +174,18 @@ def test_missing_image_and_started_room_rejected(tmp_path, monkeypatch):
     code, token = op["room_code"], op["host_token"]
     out, st = hub.lobby_scene(code, token, None, None, "image/jpeg")
     assert st == 400 and "image_b64" in out["error"]
-    # 锁定后再拍 → 已开打,读场关闭
+    # 锁定后再拍 → 转投进行中的局(竞速洞修复 2026-07-24:拍照分析比手快的房主慢,
+    # 迟到的侦察结果不许丢——并进 Session 并重建主持 system)
     hub.join(code, "甲", "d1")
     hub.join(code, "乙", "d2")
     hub.lock_room(code, token, None)
+    session = hub.rooms[code]
     out, st = hub.lobby_scene(code, token, None, "aGk=", "image/jpeg")
-    assert st == 409 and "已开打" in out["error"]
+    assert st == 200, out
+    assert set(out["objects"]) <= set(session.state.scene_objects)
+    # 开打后缺图照旧 400
+    out, st = hub.lobby_scene(code, token, None, None, "image/jpeg")
+    assert st == 400
 
 
 # —— 7. HTTP 全链:/api/start(空) → /api/lobby_scene → /api/join → /api/lock —— #
