@@ -1264,7 +1264,11 @@ export default function App() {
         </View>
       ) : (
       <>
-      <View style={s.row}>
+      {/* 三信号(完成/认罚/抢答)是现实结果回流的唯一通道,砍不得——口头挑战时
+          服务器无任何状态可依,靠它们收口(等待权裁定)。但平时亮着是噪音(房主
+          观感 2026-07-24):默认调暗蛰伏,流程可见地轮到你/有钩子挂着时点亮 */}
+      <View style={[s.row, !(v.timer_running || v.focus === me || askedMe
+        || v.photo_request || v.audio_request) && { opacity: 0.45 }]}>
         <Pressable style={[s.sigBtn, { backgroundColor: "#2c5f3f" }]}
           onPress={() => sendEventEcho({ type: "done" }, "完成")}>
           <Text style={s.sigText}>✅ 完成</Text>
