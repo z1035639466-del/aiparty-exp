@@ -666,6 +666,12 @@ class Lobby:
         self.join_base = join_base
         self.last_active = _t.time()
         self.started = False            # 锁定过渡标记:置真即不再收人(引擎在 Hub.lock 里建)
+        # 大厅态拍照读场(输入侧去打字化,房主裁定 2026-07-24):房主开房那一拍拍张现场照,
+        # 走既有视觉裁判链路析出这三样,存这里;lock 时并入 Session(手填字段优先,拍照只填空缺)。
+        # 视觉不可用(无 key)时这三样留空,大厅照常锁定开打——拍照是增强不是门槛。
+        self.occasion_guess = ""        # 场合猜测(生日/团建/情侣……)
+        self.scene_brief = ""           # 一句场景速写
+        self.scene_objects: list[str] = []  # 认出的可入局实物清单
         self.lock = threading.Lock()
 
     def names(self) -> list[str]:
@@ -700,6 +706,48 @@ class Lobby:
                 return (409, f"人满了(上限 {MAX_PLAYERS} 人),进不来了")
             self.roster.append({"name": name, "device_id": dev})
             return None
+
+    def scene_photo(self, image_b64: str, media_type: str | None) -> dict:
+        """大厅态拍照读场(锁外调用,慢):现场照 → {occasion_guess 场合猜测,
+        objects 实物清单,brief 场景速写},存进大厅待 lock 时并入 Session。
+        走既有视觉裁判链路(与 Session.scene_photo 同款 transport),provider/视觉模型
+        取开房 cfg(不带就落 YAPPA_PROVIDER/YAPPA_MODEL 环境默认)。视觉不可用(无 key)
+        时返回 {"error": ...} 且不改动大厅态——拍照是增强不是门槛,大厅照常锁定开打。"""
+        import re as _re
+
+        from .transports import vision_model_for
+        provider = self.cfg.get("provider") or _default_provider()
+        host_model = self.cfg.get("host_model") or _default_model()
+        model = vision_model_for(provider, host_model)
+        sys_p = ('你是聚会现场侦察员。从照片提取可入游戏的信息,只输出 JSON:'
+                 '{"occasion_guess": "一句场合猜测(生日/团建/情侣约会/朋友小聚/办公室……,拿不准就写最像的)",'
+                 '"objects": ["现场实物,可作道具的,如 瓶子/冰块/抱枕/投影"],'
+                 '"brief": "一句场景速写(在哪/什么氛围/有什么可玩的)"}')
+        msgs = [{"role": "user", "content": [
+            {"type": "image", "source": {"type": "base64",
+                                         "media_type": media_type or "image/jpeg",
+                                         "data": image_b64}},
+            {"type": "text", "text": "提取"}]}]
+        try:
+            judge = make_transport(provider, model)
+            raw = judge.complete(sys_p, msgs)
+            m = _re.search(r"\{.*\}", raw, _re.DOTALL)
+            out = json.loads(m.group(0)) if m else {}
+        except Exception as e:
+            # 无 key/网络断/模型不存在都走这里:明确报错,大厅态一个字段都不动
+            return {"error": f"视觉裁判不可用({type(e).__name__}):{e}。可手填场合,大厅照常锁定开打"}
+        objs = [str(o) for o in (out.get("objects") or []) if str(o).strip()][:20]
+        brief = str(out.get("brief") or "").strip()[:120]
+        occ = str(out.get("occasion_guess") or "").strip()[:40]
+        with self.lock:
+            merged = list(dict.fromkeys([*self.scene_objects, *objs]))
+            self.scene_objects = merged
+            if brief:
+                self.scene_brief = brief
+            if occ:
+                self.occasion_guess = occ
+        return {"occasion_guess": occ, "objects": objs, "brief": brief,
+                "scene_objects": merged}
 
 
 class Hub:
@@ -864,6 +912,25 @@ class Hub:
                     "players": list(session.state.players)}, 200
         return {"error": f"房间 {code or ''} 不存在或已回收"}, 404
 
+    def lobby_scene(self, code: str | None, host_token: str | None,
+                    device_id: str | None, image_b64: str | None,
+                    media_type: str | None) -> tuple[dict, int]:
+        """大厅态拍照读场:房主开房那一拍传现场照,视觉链路析出场合/实物/速写存进大厅。
+        只有房主(host_token/开房 device)能拍;已开打的房不收(读场只在大厅态)。
+        视觉不可用(无 key)返回 502+明确提示,大厅态不变(拍照是增强不是门槛)。"""
+        lobby, session = self._resolve(code)
+        if lobby is None:
+            if session is not None:
+                return {"error": "本局已开打,拍照读场只在大厅态(开打前)可用"}, 409
+            return {"error": f"房间 {code or ''} 不存在或已回收"}, 404
+        if not lobby.is_host(host_token, device_id):
+            return {"error": "只有房主能拍场子(开房那台)"}, 403
+        if not image_b64:
+            return {"error": "缺 image_b64"}, 400
+        lobby.last_active = _t.time()
+        out = lobby.scene_photo(image_b64, media_type)   # 锁外(慢),不占 Hub 字典锁
+        return (out, 502) if "error" in out else (out, 200)
+
     def lock_room(self, code: str | None, host_token: str | None,
                   device_id: str | None) -> tuple[dict, int]:
         """房主锁定开打:用最终名单构建 Session 引擎、autoplay 起、座位封闭。
@@ -881,11 +948,23 @@ class Hub:
             roster = list(lobby.roster)
             cfg = dict(lobby.cfg)
             code = lobby.room_code
+            # 拍照读场结果一并取出(锁内,防与并发拍照竞态):lock 时并入 Session,
+            # 但**手填优先**——房主开房参数里填了的字段不被拍照覆盖,拍照只填空缺。
+            scene = {"occasion_guess": lobby.occasion_guess,
+                     "scene_brief": lobby.scene_brief,
+                     "scene_objects": list(lobby.scene_objects)}
             lobby.started = True             # 占位:防并发双锁;建局失败下面回滚
         names = [r["name"] for r in roster]
         bots = cfg.get("bots") or {}
         # bots 是 AI 座位:并入最终名单(不在花名册里的 bot 名补成座位)
         players = names + [b for b in bots if b not in names]
+        # —— 拍照读场并入(手填优先,拍照只填空缺)—— #
+        # occasion/scene_brief 是单值:房主手填了就用手填,没填才用拍照猜测;
+        # objects 是清单:手填的排前,拍照认出的去重补在后(两边都不丢)。
+        occasion = (cfg.get("occasion", "") or "").strip() or scene["occasion_guess"]
+        scene_brief = (cfg.get("scene_brief", "") or "").strip() or scene["scene_brief"]
+        objects = [o.strip() for o in cfg.get("objects", []) if o.strip()]
+        objects = list(dict.fromkeys([*objects, *scene["scene_objects"]]))
         try:
             if not MIN_PLAYERS <= len(players) <= MAX_PLAYERS:
                 raise ValueError(f"开打要 {MIN_PLAYERS}–{MAX_PLAYERS} 人(现在 {len(players)} 人)")
@@ -893,7 +972,7 @@ class Hub:
                 players=players,
                 minutes=int(cfg.get("minutes", 30)),
                 wildness=int(cfg.get("wildness", 6)),
-                objects=[o.strip() for o in cfg.get("objects", []) if o.strip()],
+                objects=objects,
                 driver_kind=cfg.get("driver", "manual"),
                 out_dir=self.out_dir,
                 bots=bots,
@@ -903,7 +982,7 @@ class Hub:
                 score_style=cfg.get("score_style", "自动"),
                 host_perception=cfg.get("host_perception", "转写"),
                 playlist=cfg.get("playlist") or [],
-                occasion=cfg.get("occasion", ""), scene_brief=cfg.get("scene_brief", ""),
+                occasion=occasion, scene_brief=scene_brief,
                 max_llm_calls=cfg.get("max_llm_calls"),
             )
         except ValueError as e:
@@ -1150,6 +1229,15 @@ class Handler(BaseHTTPRequestHandler):
                 # 已开打的房只放同名+同设备重连。不走 _pick(大厅房不是 Session)。
                 out, status = self.hub.join(self._room_param(body),
                                             body.get("name"), body.get("device_id"))
+                self._json(status, out)
+                return
+            if path == "/api/lobby_scene":
+                # 大厅态拍照读场:房主开房那一拍传现场照,视觉链路析出场合/实物/速写存进大厅,
+                # lock 时并入 Session。只有房主能拍;无 key 明确报错且不挡后续锁定。
+                # 不走 _pick(大厅房不是 Session)。
+                out, status = self.hub.lobby_scene(
+                    self._room_param(body), body.get("host_token"), body.get("device_id"),
+                    body.get("image_b64"), body.get("media_type"))
                 self._json(status, out)
                 return
             if path == "/api/lock":

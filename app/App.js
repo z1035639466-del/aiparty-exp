@@ -22,6 +22,10 @@ import { Accelerometer } from "expo-sensors";
 import * as VideoThumbnails from "expo-video-thumbnails";
 
 const POLL_MS = 900;
+// —— 快捷回应条(输入侧去打字化,房主裁定 2026-07-24)——
+// 社交局不许降维成打字游戏:最常说的几句做成 chips,单点即以桌上说话发出(配轻触感),
+// 玩家少动手、只关注现实场。打字框保留但视觉降级(变矮变淡)。文案在此常量数组里改。
+const QUICK_CHIPS = ["好!", "过", "完成了", "再来一局", "慢点等等"];
 // 官方服务器(正式形态,2026-07-23 定稿):玩家从此只输房间码+座位名,
 // 服务器输入框消失(长按标题下方空白 1.2 秒可唤回,开发调试用)。
 const DEFAULT_SERVER = "https://play.zakzok.app";
@@ -358,7 +362,8 @@ export default function App() {
   const [starting, setStarting] = useState(false);
   const [minutes, setMinutes] = useState("30");
   const [wildness, setWildness] = useState("6");
-  const [occasion, setOccasion] = useState("");
+  // 场合不再手填:开房那一拍拍张现场照,视觉链路自动认出场合/实物(想文字微调走驾驶舱)。
+  const [lobbyScene, setLobbyScene] = useState(null); // 大厅拍照读场结果 {pending|error|occasion_guess,objects}
   const [playlist, setPlaylist] = useState("");
   const [botsText, setBotsText] = useState("");
   const [startKey, setStartKey] = useState(""); // 开局口令(服务器设了 ZAKZOK_START_KEY 才需要)
@@ -512,6 +517,22 @@ export default function App() {
     } catch (e) { Alert.alert("连不上", String(e.message)); }
   };
 
+  // 大厅里房主重拍场子(拍坏了/换了场地的低调补拍通道;首拍在开房那一拍自动走)。
+  // 走既有 ImagePicker,识别结果照旧 lock 时并入 Session。
+  const takeLobbyScene = async () => {
+    try {
+      const perm = await ImagePicker.requestCameraPermissionsAsync();
+      if (!perm.granted) return;
+      const shot = await ImagePicker.launchCameraAsync({ quality: 0.4, base64: true });
+      if (shot.canceled) return;
+      setLobbyScene({ pending: true });
+      const sc = await api("/api/lobby_scene", {
+        host_token: hostToken, device_id: devRef.current,
+        image_b64: shot.assets[0].base64, media_type: "image/jpeg" });
+      setLobbyScene(sc && sc.error ? { error: sc.error } : sc);
+    } catch (e) { setLobbyScene({ error: String(e.message) }); }
+  };
+
   // —— 大厅页:大字房间码 + 实时名单 + 开打大按钮(人未满 2 置灰) ——
   if (inLobby) {
     const enough = roster.length >= 2;
@@ -532,6 +553,30 @@ export default function App() {
               </Text>
             ))}
           </View>
+
+          {/* 拍照读场:首拍已在开房那一拍自动走。这里只回显识别结果(场合猜测+实物,两行小字),
+              外加一个低调的房主重拍通道(拍坏了/换场地用)——不放显眼大卡,拍照是增强不是门槛 */}
+          {isHost ? (
+            <>
+              {lobbyScene ? (
+                <View style={s.sceneMini}>
+                  {lobbyScene.pending ? (
+                    <Text style={s.sceneHint}>识别现场中…</Text>
+                  ) : lobbyScene.error ? (
+                    <Text style={s.sceneErr}>{lobbyScene.error}</Text>
+                  ) : (
+                    <>
+                      <Text style={s.sceneLine}>🎯 {lobbyScene.occasion_guess || "没猜出场合(可到驾驶舱手填)"}</Text>
+                      <Text style={s.sceneLine2}>认出:{(lobbyScene.objects || []).join("、") || "—"}</Text>
+                    </>
+                  )}
+                </View>
+              ) : null}
+              <Pressable hitSlop={12} onPress={takeLobbyScene}>
+                <Text style={s.optout}>📷 {lobbyScene && !lobbyScene.pending && !lobbyScene.error ? "重拍场子" : "拍一下场子"}</Text>
+              </Pressable>
+            </>
+          ) : null}
 
           {!seated ? (
             <>
@@ -594,8 +639,7 @@ export default function App() {
                   placeholderTextColor="#667" keyboardType="number-pad"
                   value={wildness} onChangeText={setWildness} />
               </View>
-              <TextInput style={s.input} placeholder="场合一句话(如 老友重聚/生日局,可选)"
-                placeholderTextColor="#667" value={occasion} onChangeText={setOccasion} />
+              <Text style={s.dim}>📷 场合不用打字:点「开房拿码」会先拍张现场照,自动认出场合和实物(取消也能开)</Text>
               <TextInput style={s.input} placeholder="🔑 开局口令(服务器设了才要填,可选)"
                 placeholderTextColor="#667" autoCapitalize="none" autoCorrect={false}
                 value={startKey} onChangeText={setStartKey} />
@@ -610,6 +654,17 @@ export default function App() {
                   if (n && n.trim()) bots[n.trim()] = (p || "").trim();
                 });
                 setStarting(true);
+                // —— 拍照读场是开房流程的第一拍(输入侧去打字化)——
+                // 先唤相机拍张场子;取消/失败都不挡开房(增强不是门槛)。拍到了就在
+                // 开房拿码后紧接着 POST 到大厅拍照端点,进大厅时识别结果已在路上。
+                let sceneShot = null;
+                try {
+                  const perm = await ImagePicker.requestCameraPermissionsAsync();
+                  if (perm.granted) {
+                    const shot = await ImagePicker.launchCameraAsync({ quality: 0.4, base64: true });
+                    if (!shot.canceled) sceneShot = shot.assets[0].base64;
+                  }
+                } catch (e) { /* 拍照失败不挡开房 */ }
                 try {
                   const res = await api("/api/start", {
                     // 开局口令:服务器设了 ZAKZOK_START_KEY 才需要(公网防白嫖开局);
@@ -622,7 +677,7 @@ export default function App() {
                     objects: [],
                     driver: "llm",
                     autoplay: true,   // 服务器自驱回合,手机可退到后台/锁屏也不停局
-                    occasion: occasion.trim(),
+                    // 场合不再手填:拍照读场结果 lock 时并入(手填优先,拍照填空缺)
                     playlist: playlist.split(",").map((t) => t.trim()).filter(Boolean),
                     bots,   // bots 配置留在开房参数里,锁定开打时并入最终名单
                     // provider/模型一律不带:换家换模型是服务端 .env 的事(YAPPA_PROVIDER/
@@ -637,13 +692,24 @@ export default function App() {
                   setIsHost(true); setSeated(false); setRoster([]);
                   setInLobby(true); setCreating(false);
                   remember(base, "", res.room_code);
+                  // 拍了就紧接着把照片送去大厅拍照端点(带 room,此刻 room 状态还没刷新到闭包)
+                  if (sceneShot) {
+                    setLobbyScene({ pending: true });
+                    api("/api/lobby_scene", {
+                      room: res.room_code, host_token: res.host_token,
+                      device_id: devRef.current, image_b64: sceneShot, media_type: "image/jpeg" })
+                      .then((sc) => setLobbyScene(sc && sc.error ? { error: sc.error } : sc))
+                      .catch((e) => setLobbyScene({ error: String(e.message) }));
+                  } else {
+                    setLobbyScene(null);
+                  }
                 } catch (e) {
                   Alert.alert("连不上", String(e.message));
                 } finally {
                   setStarting(false);
                 }
               }}>
-                <Text style={s.bigBtnText}>{starting ? "开房中…" : "开房拿码"}</Text>
+                <Text style={s.bigBtnText}>{starting ? "开房中…" : "📷 开房拿码(先拍张场子)"}</Text>
               </Pressable>
               <Pressable hitSlop={14} onPress={() => setCreating(false)}>
                 <Text style={s.optout}>← 返回入座</Text>
@@ -913,14 +979,24 @@ export default function App() {
           <Text style={s.sigText}>👏 抢答</Text>
         </Pressable>
       </View>
+      {/* 快捷回应条:最常说的几句单点即以桌上说话发出(配轻触感),少动手、只关注现实场 */}
+      <View style={s.chipRow}>
+        {QUICK_CHIPS.map((c) => (
+          <Pressable key={c} style={s.chip}
+            onPress={() => { Haptics.selectionAsync(); sendEvent({ type: "say", text: c, to: "桌上" }); }}>
+            <Text style={s.chipText}>{c}</Text>
+          </Pressable>
+        ))}
+      </View>
+      {/* 打字框保留但视觉降级(变矮变淡):chips 之外要打字的仍能打,但不再是主入口 */}
       <View style={s.row}>
-        <TextInput style={[s.input, { flex: 1, marginVertical: 0 }]} placeholder="说点什么…"
-          placeholderTextColor="#667" value={say} onChangeText={setSay} />
-        <Pressable style={s.sayBtn} onPress={() => { if (say.trim()) { sendEvent({ type: "say", text: say.trim(), to: "桌上" }); setSay(""); } }}>
-          <Text style={s.sigText}>💬桌上</Text>
+        <TextInput style={[s.sayInputDim, { flex: 1 }]} placeholder="要打字再说…"
+          placeholderTextColor="#556" value={say} onChangeText={setSay} />
+        <Pressable style={s.sayBtnDim} onPress={() => { if (say.trim()) { sendEvent({ type: "say", text: say.trim(), to: "桌上" }); setSay(""); } }}>
+          <Text style={s.sayBtnDimText}>💬桌上</Text>
         </Pressable>
-        <Pressable style={s.sayBtn} onPress={() => { if (say.trim()) { sendEvent({ type: "say", text: say.trim(), to: "局长" }); setSay(""); } }}>
-          <Text style={s.sigText}>🎙局长</Text>
+        <Pressable style={s.sayBtnDim} onPress={() => { if (say.trim()) { sendEvent({ type: "say", text: say.trim(), to: "局长" }); setSay(""); } }}>
+          <Text style={s.sayBtnDimText}>🎙局长</Text>
         </Pressable>
       </View>
       <View style={[s.row, { justifyContent: "center" }]}>
@@ -1065,6 +1141,25 @@ const s = StyleSheet.create({
   sigText: { color: "#fff", fontSize: 16, fontWeight: "700" },
   sayBtn: { backgroundColor: "#31506e", borderRadius: 10, padding: 12,
     minHeight: 48, justifyContent: "center" },
+  // 快捷回应条:单点即发的 chips(主入口)——高对比、易点,配轻触感
+  chipRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 6, marginBottom: 2 },
+  chip: { backgroundColor: "#2c3a52", borderRadius: 18, paddingVertical: 9,
+    paddingHorizontal: 16, minHeight: 40, justifyContent: "center" },
+  chipText: { color: "#dce6f5", fontSize: 16, fontWeight: "700" },
+  // 打字框视觉降级(变矮变淡):保留但不再抢主入口
+  sayInputDim: { backgroundColor: "#191922", color: "#aab", borderRadius: 8,
+    paddingVertical: 7, paddingHorizontal: 10, fontSize: 13, minHeight: 34 },
+  sayBtnDim: { backgroundColor: "#242c3a", borderRadius: 8, paddingVertical: 7,
+    paddingHorizontal: 10, minHeight: 34, justifyContent: "center" },
+  sayBtnDimText: { color: "#8a97a8", fontSize: 12, fontWeight: "600" },
+  // 大厅拍照读场:两行小字回显(场合猜测+认出实物)+ 低调重拍链接
+  sceneMini: { backgroundColor: "#20202c", borderRadius: 10, paddingVertical: 8,
+    paddingHorizontal: 12, width: "100%", marginTop: 2, marginBottom: 2,
+    borderWidth: 1, borderColor: "#2f3a30" },
+  sceneHint: { color: "#8a9", fontSize: 13 },
+  sceneErr: { color: "#c99", fontSize: 12 },
+  sceneLine: { color: "#9d8", fontSize: 14, fontWeight: "700" },
+  sceneLine2: { color: "#889", fontSize: 12, marginTop: 2 },
   optout: { color: "#667", fontSize: 13, textAlign: "center", marginVertical: 8 },
   photoBtn: { backgroundColor: "#4a3a10", borderColor: "#ffd54a", borderWidth: 1,
     borderRadius: 12, padding: 12, marginVertical: 6 },
