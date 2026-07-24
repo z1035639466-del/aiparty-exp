@@ -42,6 +42,10 @@ class Engine:
         # 荷官回执:主持上一拍工具的真实结果,只走 driver 专用信道回给它本人。
         # 遮蔽按观看者定,不按出口定——玩家面/驾驶舱照旧遮,发牌人看自己发的牌。
         self._last_results: list[dict] = []
+        # 截断回执:超句硬截断不许静默(真机病历 2026-07-24:玩法讲解后半段被吞,
+        # 桌上收到"碰拳伸手指,对面复述"这种没头没尾的电报文,局长自己毫不知情)。
+        # 被剪掉的原文下一拍随 driver 信道回给主持本人,补救权在它手里。
+        self._trim_dropped = ""
         self.last_host_ms = 0  # 上一拍主持调用耗时(慢要先量再修)
         # 没有冷场闹钟(房主撤,2026-07-20):时限的唯一机制是主持显式调 timer,
         # 没设时限=选择了开放式等待,一直等是正确行为("没回应就等,就这么简单")。
@@ -230,6 +234,15 @@ class Engine:
         # 现场的局长是半瞎半聋的:听不见桌上的自由交谈,只知道谁按了什么。
         # 模拟台默认给全文,会把主持的本桌化改造能力测得虚高——真机上它拿不到这些。
         upstream = self._perceive(events)
+        if self._trim_dropped:
+            # 截断回执(仅主持可见,与荷官回执同姿势):被剪的原文原样奉还,
+            # 缺的关键信息这一拍补上——玩法步骤该走 show 玩法卡(可多行),不塞主持词。
+            upstream = [{"type": "host_text_trimmed",
+                         "note": "你上一拍主持词超3句,以下内容被截掉**没送达桌上**。"
+                                 "若含玩法关键信息,这一拍用 show 玩法卡(content 可多行)补上;"
+                                 "以后玩法步骤写玩法卡,主持词只留吆喝。",
+                         "dropped": self._trim_dropped}] + upstream
+            self._trim_dropped = ""
         if self._last_results:
             # 荷官回执:只进 driver 信道,不进 line/events_in/任何 HTTP 面——
             # 上一拍的私发原文、随机点数、钳制记录,发牌人有权看自己发的牌。
@@ -285,6 +298,9 @@ class Engine:
                 if ch in "。!?!?":
                     seen += 1
                     if seen == MAX_SENTENCES:
+                        dropped = text[i + 1:].strip()
+                        if dropped:
+                            self._trim_dropped = dropped
                         text = text[:i + 1]
                         break
         scores_before = dict(self.state.scores)
